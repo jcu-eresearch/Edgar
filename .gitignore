@@ -1,0 +1,6 @@
+# generic files to ignore
+*.DS_Store
+*.lock
+*.swp
+*.out
+*~
