@@ -23,7 +23,6 @@ SLEEP_TIME = 10
 # Request URI for the next job on the queue (what needs to be modelled)
 get '/species/next_job' do
     content_type 'text/plain'
-    return_body = nil
     @@species.synchronize do
         if @@species.empty?
             halt 503, {'Content-Type' => 'text/plain'}, "No species modelling required"
