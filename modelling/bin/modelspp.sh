@@ -14,15 +14,20 @@
 # -S specifies the shell type
 # -o/-e specifies where the stdout and stderr will be written
 
+# Determine path to this file.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CONFIG_DIR="$DIR/../config"
+
+# WORKING_DIR DIR is one up from this file (which is in bin)
+WORKING_DIR="$DIR/.."
+
+# Determine path to config (based on path to this file)
+CONFIG_DIR="$WORKING_DIR/config"
 ENVIRONMENT_CFG="$CONFIG_DIR/environment.cfg"
 
 # Load the config file.
 # This defines file paths, etc.
 #
 # Relevant vars set:
-#   WORKING_DIR
 #   MAXENT
 #   TRAINCLIMATE
 #   PROJECTCLIMATE
