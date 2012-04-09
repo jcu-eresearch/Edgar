@@ -119,10 +119,10 @@ function get_next_job_species_id {
         elif [ "$RESPONSE_CODE" -eq "503" ]; then
             # 503 (Service Unavailable): Nothing to run
             echo "nothing to run"
-            CURRENT_SPECIES_ID=""
+            clear_current
         else
             echo ""
-            CURRENT_SPECIES_ID=""
+            clear_current
             # Unexpected response code
             log_error "Unexpected Response: $NEXT_JOB_RESPONSE"
         fi
@@ -137,16 +137,16 @@ function log_error {
     echo "[E] `date`: $1" >&2
 }
 
-# Function to start a job.
+# Function to queue a job.
 #
 # Starts: CURRENT_SPECIES_ID
 #
 # Sets:
 #   * CURRENT_HPC_JOB_ID
 #   * CURRENT_HPC_JOB_START_TIME
-function start_job {
+function queue_job {
     local AP03_SPP="$CURRENT_SPECIES_ID"
-    echo "Starting job: $AP03_SPP"
+    echo "Queueing job: $AP03_SPP"
 
     # Setup the IO dir
     rm -rfd "$TMP_IO_OUTPUT_DIR/$AP03_SPP"
@@ -163,12 +163,10 @@ function start_job {
     # If something went wrong,
     # clear the CURRENT_* vars.
     if [ "$?" -ne "0" ]; then
-        log_error "Failed to start job on HPC: $CURRENT_HPC_JOB_ID"
+        log_error "Failed to queue job on HPC: $CURRENT_HPC_JOB_ID"
 
         # Clear the current species/job vars
-        CURRENT_SPECIES_ID=""
-        CURRENT_HPC_JOB_ID=""
-        CURRENT_HPC_JOB_START_TIME=""
+        clear_current
     fi
 }
 
@@ -187,6 +185,56 @@ function report_status {
     fi
 }
 
+function check_and_report_status {
+    # Check if the job is still running
+    QSTAT_GREP_OUTPUT=`qstat -f "$CURRENT_HPC_JOB_ID" | grep -P "^\s*job_state\s*=" | grep -Po "=.*" | grep -Po "\w"`
+    QSTAT_GREP_EXIT_CODE="$?"
+
+    if [ "$QSTAT_GREP_EXIT_CODE" -ne "0" ]; then
+        # The output of the qstat command wasn't valid.
+        # We assume this means the job wasn't found in the qstat.
+        # We assume that this means the job is finished.
+        mark_current_as_finished
+    else
+        # QSTAT_GREP_OUTPUT is a single letter representing the
+        # job status.
+        #
+        # The different statuses are described in the qstat man page:
+        # C -  Job is completed after having run.
+        # E -  Job is exiting after having run.
+        # H -  Job is held.
+        # Q -  job is queued, eligible to run or routed.
+        # R -  job is running.
+        # T -  job is being moved to new location.
+        # W -  job is waiting for its execution time
+        #      (-a option) to be reached.
+        # S -  (Unicos only) job is suspend.
+        report_status "$QSTAT_GREP_OUTPUT"
+    fi
+}
+
+function mark_current_as_finished {
+    # Report that the job is finished
+    report_status "FINISHED"
+
+    # Note the finish time.
+    CURRENT_HPC_JOB_FINISH_TIME=`date +%s`
+
+    # TODO take note how long the job ran for..
+    # If it appears to have taken too short of a time, report the error.
+
+    # Clear our current job status, so that we queue a new job
+    # on our next cycle
+    clear_current
+}
+
+function clear_current {
+    CURRENT_SPECIES_ID=""
+    CURRENT_HPC_JOB_ID=""
+    CURRENT_HPC_JOB_START_TIME=""
+    CURRENT_HPC_JOB_FINISH_TIME=""
+}
+
 CYCLE_COUNT=0
 
 while true; do
@@ -197,7 +245,7 @@ while true; do
     echo "Current HPC Job: $CURRENT_HPC_JOB_ID"
 
     if [ -z "$CURRENT_HPC_JOB_ID" ]; then
-        # No current HPC Job, we need to start a new job.
+        # No current HPC Job, we need to queue a new job.
 
         # This function sets CURRENT_SPECIES_ID if there is a species that needs 
         # to be modelled
@@ -208,20 +256,20 @@ while true; do
             # We have something to model
             echo "$CURRENT_SPECIES_ID"
 
-            # Starting Job
-            start_job
+            # Queue Job
+            queue_job
 
             # If everything went according to plan, CURRENT_HPC_JOB_ID will now be set.
             if [ -n "$CURRENT_HPC_JOB_ID" ]; then
-                echo "Started job: $AP03_SPP [$CURRENT_HPC_JOB_ID]"
+                echo "Queued job: $AP03_SPP [$CURRENT_HPC_JOB_ID]"
 
-                # Report the starting of the job to the cake app
-                report_status "S"
+                # Report the queueing of the job to the cake app
+                report_status "QUEUED"
             fi
         fi
     else
         # We have a current job, check its status 
-        :
+        check_and_report_status
     fi
 
     sleep $CYCLE_SLEEP_TIME
