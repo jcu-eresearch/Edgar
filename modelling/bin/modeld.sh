@@ -46,7 +46,7 @@
 #
 # At present, when a job status fails to be sent, it isn't resent.
 #
-# This is especially problematic for the status 'S', which indicates that modelling
+# This is especially problematic for the status 'QUEUED', which indicates that modelling
 # has started for the species.
 
 # Determine path to this file.
