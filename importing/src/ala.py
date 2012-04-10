@@ -58,14 +58,10 @@ class Species(object):
                    lsid=self.lsid)
 
 
-def records_for_species(species_lsid, strategy, changed_since=None,
-        unchanged_since=None):
+def records_for_species(species_lsid, strategy, changed_since=None):
     '''A generator for OccurrenceRecord objects fetched from ALA'''
 
-    q = q_param_for_lsid(
-            species_lsid,
-            changed_since=changed_since,
-            unchanged_since=unchanged_since)
+    q = q_param_for_lsid(species_lsid, changed_since=changed_since)
 
     if strategy == 'search':
         return _search_records_for_species(q)
@@ -88,7 +84,7 @@ def species_for_lsid(species_lsid):
     have common names.
     '''
 
-    escaped_lsid = urllib.quote(species_lsid)
+    escaped_lsid = urllib.quote(species_lsid.encode('utf-8'))
     url = BIE + 'species/shortProfile/{0}.json'.format(escaped_lsid)
     info = _fetch_json(create_request(url), check_not_empty=False)
     if not info or len(info) == 0:
@@ -126,7 +122,7 @@ def species_for_scientific_name(scientific_name):
     scientific_name = scientific_name.replace('(', '');
     scientific_name = scientific_name.replace(')', '');
 
-    url = BIE + 'ws/guid/' + urllib.quote(scientific_name)
+    url = BIE + 'ws/guid/' + urllib.quote(scientific_name.encode('utf-8'))
     info = _fetch_json(create_request(url), check_not_empty=False)
     if not info or len(info) == 0:
         return None
@@ -174,56 +170,32 @@ def create_request(url, params=None, use_get=True):
     return urllib2.Request(url, params)
 
 
-def q_param_for_lsid(species_lsid, kosher_only=True, changed_since=None,
-        unchanged_since=None):
+def q_param_for_lsid(species_lsid, changed_since=None):
     '''The 'q' parameter for ALA web service queries
 
-    `changed_since` and `unchanged_since` allow you to only get records that
-    have changed between a certain date range, for example:
+    `changed_since` allows you to only get records that have changed between a
+    certain date range.
 
-        now = datetime.datetime.now()
-        yesterday = ...
-        q_param_for_lsid(..., changed_since=yesterday, unchanged_since=now)
-
-    The `unchanged_since` parameter is specified in case records are changed
-    during the query, in which case they may not be present. If that happens,
-    then you can get the newly changed records the next time:
-
-       old_now = now
-       now = datetime.datetime.now()
-       q_param_for_lsid(..., changed_since=old_now, unchanged_since=now)
-
-    Maybe use a list of specific assertions instead of geospatial_kosher.
-
-    Fields possibly useful in incremental updates:
-        modified_date
-        last_processed_date
-        first_loaded_date
-        last_load_date
-        last_assertion_date
+    TODO: mark geospatial_kosher:false records as 'assumed invalid'
 
     TODO: remove occurrences that happened before 1950?
     '''
 
-    kosher = ''
-    if kosher_only:
-        kosher = 'geospatial_kosher:true AND'
-
-    changed_between = ''
-    if changed_since is not None or unchanged_since is not None:
-        daterange = _q_date_range(changed_since, unchanged_since)
-        changed_between = 'last_processed_date:' + daterange + ' AND'
+    if changed_since is not None:
+        daterange = _q_date_range(changed_since, None)
+        changed_since = '''
+            (last_processed_date:{0} OR last_assertion_date:{0}) AND
+            '''.format(daterange)
 
     return _strip_n_squeeze('''
         lsid:{lsid} AND
-        (rank:species OR subspecies_name:[* TO *])
-        {kosher}
+        (rank:species OR subspecies_name:[* TO *]) AND
         {changed}
         (
             basis_of_record:HumanObservation OR
             basis_of_record:MachineObservation
         )
-        '''.format(lsid=species_lsid, kosher=kosher, changed=changed_between))
+        '''.format(lsid=species_lsid, changed=changed_since))
 
 
 def _retry(tries=3, delay=2, backoff=2):
