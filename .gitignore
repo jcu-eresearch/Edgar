@@ -1,4 +1,5 @@
 # generic files to ignore
+*.htaccess
 *.DS_Store
 *.lock
 *.swp
