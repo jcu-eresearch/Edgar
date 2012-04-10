@@ -179,9 +179,12 @@ def q_param_for_lsid(species_lsid, changed_since=None):
     TODO: mark geospatial_kosher:false records as 'assumed invalid'
 
     TODO: remove occurrences that happened before 1950?
+          'occurrence_year:' + _q_date_range(1950_utc_datetime, None)
     '''
 
-    if changed_since is not None:
+    if changed_since is None:
+        changed_since = ''
+    else:
         daterange = _q_date_range(changed_since, None)
         changed_since = '''
             (last_processed_date:{0} OR last_assertion_date:{0}) AND
@@ -443,11 +446,13 @@ def _search_records_for_species(q):
 
     for page in _json_pages(url, params, ('totalRecords',), 'startIndex'):
         for occ in page['occurrences']:
-            record = OccurrenceRecord()
-            record.latitude = occ['decimalLatitude']
-            record.longitude = occ['decimalLongitude']
-            record.uuid = uuid.UUID(occ['uuid'])
-            yield record
+            # have to check lat long exists, because not every record has them
+            if 'decimalLongitude' in occ and 'decimalLatitude' in occ:
+                record = OccurrenceRecord()
+                record.latitude = occ['decimalLatitude']
+                record.longitude = occ['decimalLongitude']
+                record.uuid = uuid.UUID(occ['uuid'])
+                yield record
 
 def _json_pages_params_filter(params, offset_key):
     '''Returns filtered_params, page_size
