@@ -76,7 +76,7 @@ class DATABASE_CONFIG {
 		'host' => 'localhost',
 		'login' => 'ap03',
 		'password' => 'password',
-		'database' => 'ap03_rob_dev',
+		'database' => 'ap03_rob_test',
 		'prefix' => '',
 		//'encoding' => 'utf8',
 	);
