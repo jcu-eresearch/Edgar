@@ -188,8 +188,8 @@ def _mp_fetch(species_sname, species_id, since_date):
     given to this function.'''
     try:
         _mp_fetch_inner(species_sname, species_id, since_date)
-    except Exception, e:
-        _mp_init.log.critical('mp process failed with expection: ' + str(e))
+    except:
+        _mp_init.log.exception('mp process failed with exception')
 
     _mp_init.record_q.put(None)
 
