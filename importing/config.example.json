@@ -1,0 +1,3 @@
+{
+    "db.url": "mysql://ap03:ap03@localhost/ap03?charset=utf8"
+}

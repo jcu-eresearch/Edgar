@@ -1,0 +1,37 @@
+# Ways a Record Can Change #
+
+When the following things occur:
+
+ - A record is modified
+ - A species splits into two or more species
+ - Two or more species are combined into a single species
+ - A species changes its name
+ - ALA adds/removes an assertion from a record (i.e. jackknife outlier)
+
+This will happen to each record:
+
+ - uuid stays the same
+ - some of the record fields change (including the species that the record
+   applies to, and the list of assertions)
+ - last_processed_date is updated
+
+Although rare, records can be deleted from ALA. One way this can happen
+is if a whole data set is reloaded from the source. In most reloads, the
+record uuids will stay the same.  In a few reloads, the old records are
+deleted and reloaded records will all have new uuids. There is no easy
+way to query for records that have been deleted, so you may have to
+query ALA with the record uuid to see if it still exists.
+
+When a user reports an issue on (a.k.a. vets/adds assertion to) a record, or
+deletes an issue from a record, the 'last_assertion_date' field is
+updated.
+
+
+## Scientific Name Homonyms ##
+
+Some species scientific names (i.e. binomial names) can be homonyms. The
+scientific name only contains the genus, subgenus, and species names. Two
+different taxa can have the exact same genus, subgenus, and species names, but
+have a different kingdom/phylum/class/order/family. For example there could be
+two species named "Whateverus somethingia", where one is an animal (kingdom
+ANIMALIA) and the other is a plant (kingdom Plantae).

@@ -1,7 +1,9 @@
 # generic files to ignore
 *.htaccess
-*.DS_Store
+.DS_Store
 *.lock
 *.swp
 *.out
+*.pyc
 *~
+importing/config.json
