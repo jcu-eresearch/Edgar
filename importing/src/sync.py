@@ -163,14 +163,10 @@ class Syncer:
         '''A generator for db.species rows, for rows without any occurrence
         records in the local database'''
 
-        for _, row in self.local_species():
-            q = select(['count(*)'],
-                    #where
-                    db.occurrences.c.species_id == row['id'])
-
+        for row in self.local_species().itervalues():
+            q = select(['count(*)'], db.occurrences.c.species_id == row['id'])
             if db.engine.execute(q).scalar() == 0:
                 yield row
-
 
 
 def _mp_init(record_q):
