@@ -159,6 +159,20 @@ class Syncer:
         pool.join()
 
 
+    def local_species_with_no_occurrences(self):
+        '''A generator for db.species rows, for rows without any occurrence
+        records in the local database'''
+
+        for _, row in self.local_species():
+            q = select(['count(*)'],
+                    #where
+                    db.occurrences.c.species_id == row['id'])
+
+            if db.engine.execute(q).scalar() == 0:
+                yield row
+
+
+
 def _mp_init(record_q):
     '''Called when a subprocess is started. See
     Syncer.occurrences_changed_since'''

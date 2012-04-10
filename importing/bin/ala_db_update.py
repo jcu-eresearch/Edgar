@@ -16,15 +16,9 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Synchronises local database with ALA')
 
-    parser.add_argument('--dont-add-species', action='store_true',
-        dest='dont_add_species', help='''If new species are found in the ALA
-        data, then don't add them to the database.''')
-
-    parser.add_argument('--dont-delete-species', action='store_true',
-        dest='dont_delete_species', help='''If species in the local database are
-        not present in the ALA data, don't delete them. Species can be removed
-        from ALA when they are merged into another existing species, or if
-        their scientific name changes.''')
+    parser.add_argument('--dont-update-species', action='store_true',
+        dest='dont_update_species', help='''Doesn't update the species table of
+        the database. Use if you only want to update the occurrences table.''')
 
     parser.add_argument('--dont-update-occurrences', action='store_true',
         dest='dont_update_occurrences', help='''If this flag is set, doesn't do
@@ -41,50 +35,38 @@ def parse_args():
     return parser.parse_args();
 
 
-def update_species(syncer, add_new=True, delete_old=True):
-    '''Updates the species table in the database
-
-    Checks ALA for new species, and species that have been deleted (e.g. merged
-    into another existing species).
-    '''
-    if not add_new and not delete_old:
-        return
-
-    added, deleted = syncer.added_and_deleted_species()
-
-    if delete_old:
-        for row in deleted:
-            syncer.delete_species(row)
-
-    if add_new:
-        for species in added:
-            syncer.add_species(species)
-
-
-def update_occurrences(syncer, from_d, to_d, ala_source_id):
-    '''Updates the occurrences table of the db with data from ALA '''
-
-    for occurrence in syncer.occurrences_changed_since(from_d):
-        syncer.upsert_occurrence(occurrence, occurrence.species_id)
-
-    syncer.flush_upserts()
-
-
-def update():
+def update(args):
     ala_source = db.sources.select().execute(name='ALA').fetchone()
     from_d = ala_source['last_import_time']
     to_d = datetime.utcnow()
     syncer = sync.Syncer()
 
-    update_species(syncer, not args.dont_add_species, not args.dont_delete_species)
+    # add new species
+    if not args.dont_update_species:
+        added_species, deleted_species = syncer.added_and_deleted_species()
+        for species in added_species:
+            syncer.add_species(species)
 
+    # update occurrences
     if not args.dont_update_occurrences:
-        update_occurrences(syncer, from_d, to_d, ala_source['id'])
-        # only set the last_import_time if records were updated
+        # insert/update (upsert) all changed occurrences
+        for occurrence in syncer.occurrences_changed_since(from_d):
+            syncer.upsert_occurrence(occurrence, occurrence.species_id)
+        syncer.flush_upserts()
+
+        # store last import time in db.sources
         db.sources.update().\
                 where(db.sources.c.id == ala_source['id']).\
                 values(last_import_time=to_d).\
                 execute()
+
+    # delete old species, and species without any occurrences
+    if not args.dont_update_species:
+        for species in deleted_species:
+            syncer.deleted_species(species)
+        for species in syncer.local_species_with_no_occurrences():
+            syncer.delete_species(species)
+
 
 
 if __name__ == '__main__':
@@ -98,7 +80,7 @@ if __name__ == '__main__':
 
     logging.info("Started at %s", str(datetime.now()))
     try:
-        update()
+        update(args)
     finally:
         logging.info("Ended at %s", str(datetime.now()))
 
