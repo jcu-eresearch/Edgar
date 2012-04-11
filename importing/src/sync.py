@@ -196,7 +196,7 @@ def _mp_fetch_inner(species_sname, species_id, since_date):
         return
 
     num_records = 0
-    for record in ala.records_for_species(species.lsid, 'search', since_date):
+    for record in ala.records_for_species(species.lsid, since_date):
         record.species_id = species_id
         _mp_init.record_q.put(record)
         num_records += 1

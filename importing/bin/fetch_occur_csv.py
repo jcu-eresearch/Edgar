@@ -47,19 +47,6 @@ bd08-6536a53abec9
             help='''Print speed information to standard error.  Useful for
             finding bottlenecks and such.''')
 
-    args.add_argument('--strategy', type=str, nargs=1,
-            choices=['search', 'facet', 'download'], default=['search'],
-            help='''Default is 'search'. There are three ways to get occurrence
-            records from ALA: 'search' uses the 'occurrences/search' web
-            service, which is high on bandwidth (1.5kb per record). 'facet'
-            uses the 'occurrences/facet/download' web service, which is low on
-            bandwidth but does not contain any record information except the
-            lat/long.  'download' uses the 'occurrences/download' web service,
-            which is very low on bandwidth (250kb for 30k records) but ALA
-            servers can't generate the data fast enough (max download speed is
-            about 8kb/s).  This argument will probably be removed once the best
-            strategy is clear.''')
-
     return args.parse_args()
 
 
@@ -79,7 +66,7 @@ def spp_code_for_species_name(species_name):
         return filtered.strip()[:8]
 
 
-def write_csv_for_species_lsid(species_lsid, strategy):
+def write_csv_for_species_lsid(species_lsid):
     species = ala.species_for_lsid(species_lsid)
     sppCode = spp_code_for_species_name(species.scientific_name)
 
@@ -87,7 +74,7 @@ def write_csv_for_species_lsid(species_lsid, strategy):
     num_records = 0
     writer = csv.writer(sys.stdout)
     writer.writerow(['SPPCODE', 'LATDEC', 'LONGDEC'])
-    for record in ala.records_for_species(species_lsid, strategy):
+    for record in ala.records_for_species(species_lsid):
         writer.writerow([sppCode, record.latitude, record.longitude])
         num_records += 1
     t = time.time() - t
@@ -100,4 +87,4 @@ if __name__ == '__main__':
     if args.speed_info:
         log.setLevel(logging.INFO)
         log.addHandler(logging.StreamHandler())
-    write_csv_for_species_lsid(args.lsid[0], args.strategy[0])
+    write_csv_for_species_lsid(args.lsid[0])

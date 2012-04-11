@@ -16,11 +16,10 @@ import logging
 import uuid
 from datetime import datetime
 
-#occurrence records per request for 'search' strategy
-PAGE_SIZE = 1000
+
+PAGE_SIZE = 1000  # occurrence records per request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
-
 
 log = logging.getLogger(__name__)
 
@@ -58,19 +57,26 @@ class Species(object):
                    lsid=self.lsid)
 
 
-def records_for_species(species_lsid, strategy, changed_since=None):
+def records_for_species(species_lsid, changed_since=None):
     '''A generator for OccurrenceRecord objects fetched from ALA'''
 
     q = q_param_for_lsid(species_lsid, changed_since=changed_since)
+    url = BIOCACHE + 'ws/occurrences/search'
+    params = {
+        'q': q,
+        'fl': 'id,latitude,longitude',
+        'facet': 'off',
+    }
 
-    if strategy == 'search':
-        return _search_records_for_species(q)
-    elif strategy == 'download':
-        return _downloadzip_records_for_species(q)
-    elif strategy == 'facet':
-        return _facet_records_for_species(q)
-    else:
-        raise ValueError('Invalid strategy: ' + strategy)
+    for page in _json_pages(url, params, ('totalRecords',), 'startIndex'):
+        for occ in page['occurrences']:
+            # have to check lat long exists, because not every record has them
+            if 'decimalLongitude' in occ and 'decimalLatitude' in occ:
+                record = OccurrenceRecord()
+                record.latitude = occ['decimalLatitude']
+                record.longitude = occ['decimalLongitude']
+                record.uuid = uuid.UUID(occ['uuid'])
+                yield record
 
 
 def species_for_lsid(species_lsid):
@@ -263,12 +269,6 @@ def _fetch_json(request, check_not_empty=True):
         return return_value
 
 
-@_retry()
-def _fetch(request):
-    '''Opens the url and returns the result of urllib2.urlopen'''
-    return urllib2.urlopen(request)
-
-
 def _q_date_range(from_date, to_date):
     '''Formats a start and end date into a date range string for use in ALA
     queries
@@ -308,151 +308,6 @@ def _strip_n_squeeze(q):
 
     return re.sub(r'[\s]+', r' ', q.strip())
 
-
-def _chunked_read_and_write(infile, outfile):
-    '''Reads from infile and writes to outfile in chunks, while logging speed
-    info'''
-
-    chunk_size = 4096
-    report_interval = 5.0
-    last_report_time = time.time()
-    bytes_read = 0
-    bytes_read_this_interval = 0
-
-    while True:
-        chunk = infile.read(chunk_size)
-        if len(chunk) > 0:
-            outfile.write(chunk)
-            bytes_read += len(chunk)
-            bytes_read_this_interval += len(chunk)
-        else:
-            break
-
-        now = time.time()
-        if now - last_report_time > report_interval:
-            kbdown = float(bytes_read_this_interval) / 1024.0
-            log.info('Read %0.0fkb total (at about %0.2f kb/s)',
-                    float(bytes_read) / 1024.0,
-                     kbdown / (now - last_report_time))
-            last_report_time = now
-            bytes_read_this_interval = 0
-
-
-def _downloadzip_records_for_species(q):
-    '''This strategy is too slow. The requested file size is small, but ALA
-    can't generate the file fast enough so the download speed won't go above
-    8kb/s'''
-
-    file_name = 'data'
-
-    #need to write zip file to a temp file
-    log.info('Requesting zip file from ALA...')
-    t = time.time()
-    response = _fetch(create_request(
-        BIOCACHE + 'ws/occurrences/download',
-        {
-            'q': q,
-            'fields': 'decimalLatitude.p,decimalLongitude.p',
-            'email': 'tom.dalling@gmail.au',
-            'reason': 'AP03 project for James Cook University',
-            'file': file_name
-        }))
-    log.info('Response headers received after %0.2f seconds', time.time() - t)
-
-    log.info('Downloading zip file...')
-    log.debug('Response headers: %s', dict(response.info()))
-    temp_zip_file = tempfile.TemporaryFile()
-    t = time.time()
-    _chunked_read_and_write(response, temp_zip_file)
-    t = time.time() - t
-    zip_file_size_kb = float(temp_zip_file.tell()) / 1024.0
-    log.info('Fetched %0.2fkb zip file in %0.2f seconds (%0.2f kb/s)',
-            zip_file_size_kb, t, zip_file_size_kb / t)
-
-    #grab the csv inside
-    log.info('Reading csv from zip file...')
-    t = time.time()
-    zip_file = zipfile.ZipFile(temp_zip_file)
-    reader = csv.DictReader(zip_file.open(file_name + '.csv'))
-    num_records = 0
-    for row in reader:
-        record = OccurrenceRecord()
-        record.latitude = float(row['Latitude - processed'])
-        record.longitude = float(row['Longitude - processed'])
-        yield record
-        num_records += 1
-    t = time.time() - t
-    log.info('Read %d records in %0.2f seconds (%0.2f records/sec)',
-             num_records, t, float(num_records) / t)
-
-    zip_file.close()
-    temp_zip_file.close()
-
-
-def _facet_records_for_species(q):
-    '''Fastest strategy, but each record only contains latitude and longitude.
-
-    Using the '/occurrences/faces/download' web service, there is no way to get
-    other info about the record, like assertions and the record uuid. If
-    bandwidth wasn't an issue, the 'search' strategy may be just as fast as
-    this one.'''
-
-    log.info('Requesting csv..')
-    t = time.time()
-    response = _fetch(create_request(
-        BIOCACHE + 'ws/occurrences/facets/download',
-        {
-            'q': q,
-            'facets': 'lat_long',
-            'count': 'true'
-        }))
-    log.info('Received response headers after %0.2f seconds', time.time() - t)
-
-    reader = csv.reader(response)
-    lat_long_heading, count_heading = reader.next()
-    if lat_long_heading != 'lat_long':
-        raise RuntimeError('Unexpected heading for lat_long facet')
-    if count_heading != 'Count':
-        raise RuntimeError('Unexpected heading for count')
-
-    num_records = 0
-    for row in reader:
-        record = OccurrenceRecord()
-        record.latitude = float(row[0])
-        record.longitude = float(row[1])
-        count = int(row[2])
-        for i in range(count):
-            yield record
-            num_records += 1
-            if num_records % 1000 == 0:
-                log.info('%d records done...', num_records)
-
-
-def _search_records_for_species(q):
-    '''Currently the best strategy.
-
-    Faster than 'download' strategy. More info about each record than 'facet'
-    strategy.
-
-    Speed could maybe be improved by fetching every page concurrently, instead
-    of serially.'''
-
-    url = BIOCACHE + 'ws/occurrences/search'
-    params = {
-        'q': q,
-        'fl': 'id,latitude,longitude',
-        'facet': 'off',
-    }
-
-    for page in _json_pages(url, params, ('totalRecords',), 'startIndex'):
-        for occ in page['occurrences']:
-            # have to check lat long exists, because not every record has them
-            if 'decimalLongitude' in occ and 'decimalLatitude' in occ:
-                record = OccurrenceRecord()
-                record.latitude = occ['decimalLatitude']
-                record.longitude = occ['decimalLongitude']
-                record.uuid = uuid.UUID(occ['uuid'])
-                yield record
 
 def _json_pages_params_filter(params, offset_key):
     '''Returns filtered_params, page_size
