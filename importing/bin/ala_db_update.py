@@ -41,6 +41,8 @@ def update(config):
             syncer.upsert_occurrence(occurrence, occurrence.species_id)
         syncer.flush_upserts()
 
+        syncer.update_num_dirty_occurrences()
+
         if syncer.check_occurrence_counts():
             # store last import time in db.sources
             db.sources.update().\

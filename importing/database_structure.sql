@@ -18,7 +18,9 @@ CREATE TABLE IF NOT EXISTS `species` (
     `id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `scientific_name` VARCHAR(256) NOT NULL,
     `common_name` VARCHAR(256) NULL
-        COMMENT "Some species don't have a common name"
+        COMMENT "Some species don't have a common name",
+    -- This is the number of occurrences that have changed since the last modelling run happened
+    `num_dirty_occurrences` INT UNSIGNED DEFAULT 0 NOT NULL
 )
 CHARSET=utf8;
 

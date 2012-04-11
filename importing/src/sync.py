@@ -23,6 +23,7 @@ class Syncer:
 
         self.source_row_id = row['id']
         self.cached_upserts = []
+        self.num_dirty_records_by_species_id = {}
 
     def local_species(self):
         '''Returns all species in the local db in a dict. Scientific name is the
@@ -108,20 +109,28 @@ class Syncer:
 
         self.cached_upserts.append('(' + ','.join(cols) + ')')
 
+        # record how many changes are made
+        if species_id not in self.num_dirty_records_by_species_id:
+            self.num_dirty_records_by_species_id[species_id] = 0
+        self.num_dirty_records_by_species_id[species_id] += 1
+
     def flush_upserts(self):
+        if len(self.cached_upserts) <= 0:
+            return
+
         query = '''INSERT INTO occurrences(
                         latitude, longitude, rating, species_id, source_id,
                         source_record_id)
 
-                   VALUES
-                        {0}
-
-                   ON DUPLICATE KEY UPDATE
+                   VALUES ''' + \
+                \
+                ','.join(self.cached_upserts) + \
+                \
+                ''' ON DUPLICATE KEY UPDATE
                         latitude=VALUES(latitude),
                         longitude=VALUES(longitude),
                         rating=VALUES(rating),
-                        species_id=VALUES(species_id)
-                '''.format(','.join(self.cached_upserts))
+                        species_id=VALUES(species_id);'''
 
         db.engine.execute(query)
 
@@ -177,7 +186,10 @@ class Syncer:
     def check_occurrence_counts(self):
         '''Checks to see if the number of occurrences in the local db is the
         same as the number that ALA has. Logs warnings if the numbers are
-        different'''
+        different.
+
+        Returns True if all the checks pass, or False if any of the checks
+        fail.'''
 
         counts_are_all_correct = True
 
@@ -205,6 +217,28 @@ class Syncer:
                             remote_count)
 
         return counts_are_all_correct
+
+
+    def update_num_dirty_occurrences(self):
+        '''Updates the species.num_dirty_occurrences column with the number of
+        occurrences that have been changed by self.
+
+        TODO: account for deleted records
+        '''
+        dirty_col = db.species.c.num_dirty_occurrences
+
+        for row in self.local_species().itervalues():
+            if row['id'] not in self.num_dirty_records_by_species_id:
+                continue
+
+            newly_dirty = self.num_dirty_records_by_species_id[row['id']]
+            if newly_dirty <= 0:
+                continue
+
+            db.species.update().\
+                values(num_dirty_occurrences=(dirty_col + newly_dirty)).\
+                where(db.species.c.id == row['id']).\
+                execute()
 
 
 def _mp_init(record_q):
