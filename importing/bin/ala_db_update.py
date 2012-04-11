@@ -16,39 +16,26 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Synchronises local database with ALA')
 
-    parser.add_argument('--dont-update-species', action='store_true',
-        dest='dont_update_species', help='''Doesn't update the species table of
-        the database. Use if you only want to update the occurrences table.''')
-
-    parser.add_argument('--dont-update-occurrences', action='store_true',
-        dest='dont_update_occurrences', help='''If this flag is set, doesn't do
-        anything to the occurrences table. Useful if you only want to update
-        the species table.''')
-
-    parser.add_argument('--log-level', type=str, nargs=1,
-            choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-            default=['INFO'], help='''Determines how much info is printed.''')
-
     parser.add_argument('config', metavar='config_file', type=str, nargs=1,
             help='''The path to the JSON config file.''')
 
     return parser.parse_args();
 
 
-def update(args):
+def update(config):
     ala_source = db.sources.select().execute(name='ALA').fetchone()
     from_d = ala_source['last_import_time']
     to_d = datetime.utcnow()
     syncer = sync.Syncer()
 
     # add new species
-    if not args.dont_update_species:
+    if config['updateSpecies']:
         added_species, deleted_species = syncer.added_and_deleted_species()
         for species in added_species:
             syncer.add_species(species)
 
     # update occurrences
-    if not args.dont_update_occurrences:
+    if config['updateOccurrences']:
         # insert/update (upsert) all changed occurrences
         for occurrence in syncer.occurrences_changed_since(from_d):
             syncer.upsert_occurrence(occurrence, occurrence.species_id)
@@ -62,7 +49,7 @@ def update(args):
                     execute()
 
     # delete old species, and species without any occurrences
-    if not args.dont_update_species:
+    if config['updateSpecies']:
         for species in deleted_species:
             syncer.deleted_species(species)
         for species in syncer.local_species_with_no_occurrences():
@@ -72,16 +59,19 @@ def update(args):
 
 if __name__ == '__main__':
     args = parse_args()
-
-    logging.basicConfig()
-    logging.root.setLevel(logging.__dict__[args.log_level[0]])
-
     with open(args.config[0], 'rb') as f:
-        db.connect(json.load(f))
+        config = json.load(f)
+
+    db.connect(config)
+
+    if 'logLevel' in config:
+        logging.basicConfig()
+        logging.root.setLevel(logging.__dict__[config['logLevel']])
+
 
     logging.info("Started at %s", str(datetime.now()))
     try:
-        update(args)
+        update(config)
     finally:
         logging.info("Ended at %s", str(datetime.now()))
 

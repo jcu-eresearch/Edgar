@@ -1,3 +1,6 @@
 {
-    "db.url": "mysql://ap03:ap03@localhost/ap03?charset=utf8"
+    "db.url": "mysql://ap03:ap03@localhost/ap03?charset=utf8",
+    "updateSpecies": true,
+    "updateOccurrences": true,
+    "logLevel": "WARNING"
 }
