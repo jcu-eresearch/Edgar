@@ -31,6 +31,7 @@ class OccurrenceRecord(object):
         self.latitude = None
         self.longitude = None
         self.uuid = None
+        self.is_geospatial_kosher = False
 
     def __repr__(self):
         return '<record uuid="{uuid}" latLong="{lat}, {lng}" />'.format(
@@ -64,19 +65,18 @@ def records_for_species(species_lsid, changed_since=None):
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q,
-        'fl': 'id,latitude,longitude',
+        'fl': 'id,latitude,longitude,geospatial_kosher',
         'facet': 'off',
     }
 
     for page in _json_pages(url, params, ('totalRecords',), 'startIndex'):
         for occ in page['occurrences']:
-            # have to check lat long exists, because not every record has them
-            if 'decimalLongitude' in occ and 'decimalLatitude' in occ:
-                record = OccurrenceRecord()
-                record.latitude = occ['decimalLatitude']
-                record.longitude = occ['decimalLongitude']
-                record.uuid = uuid.UUID(occ['uuid'])
-                yield record
+            record = OccurrenceRecord()
+            record.latitude = occ['decimalLatitude']
+            record.longitude = occ['decimalLongitude']
+            record.uuid = uuid.UUID(occ['uuid'])
+            record.is_geospatial_kosher = occ['geospatialKosher']
+            yield record
 
 
 def species_for_lsid(species_lsid):

@@ -93,10 +93,15 @@ class Syncer:
         if len(self.cached_upserts) > 1000:
             self.flush_upserts()
 
+        # TODO: determine rating better using lists of assertions
+        rating = 'assumed invalid'
+        if occurrence.is_geospatial_kosher:
+            rating = 'assumed valid'
+
         # these should be escaped strings ready for insertion into the SQL
         cols = (str(float(occurrence.latitude)),
                 str(float(occurrence.longitude)),
-                '"assumed valid"',  # TODO: determine rating
+                '"' + rating + '"',
                 str(int(species_id)),
                 str(int(self.source_row_id)),
                 _mysql_encode_binary(occurrence.uuid.bytes))
