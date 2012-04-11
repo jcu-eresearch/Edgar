@@ -169,6 +169,39 @@ class Syncer:
                 yield row
 
 
+    def check_occurrence_counts(self):
+        '''Checks to see if the number of occurrences in the local db is the
+        same as the number that ALA has. Logs warnings if the numbers are
+        different'''
+
+        counts_are_all_correct = True
+
+        for row in self.local_species().itervalues():
+            species = ala.species_for_scientific_name(row['scientific_name'])
+            if species is None:
+                continue
+
+            local_count = \
+                db.engine.execute(select(
+                    [func.count('*')],
+                    #where
+                     (db.occurrences.c.species_id == row['id']) &
+                     (db.occurrences.c.source_id == self.source_row_id))
+                ).scalar()
+
+            remote_count = ala.num_records_for_lsid(species.lsid)
+
+            if remote_count != local_count:
+                counts_are_all_correct = False
+                log.warning('Occurrence counts differ for species %s, ' +
+                            '(local count = %d, ALA count = %d)',
+                            species.scientific_name,
+                            local_count,
+                            remote_count)
+
+        return counts_are_all_correct
+
+
 def _mp_init(record_q):
     '''Called when a subprocess is started. See
     Syncer.occurrences_changed_since'''

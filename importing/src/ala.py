@@ -199,6 +199,7 @@ def q_param_for_lsid(species_lsid, changed_since=None):
     return _strip_n_squeeze('''
         lsid:{lsid} AND
         (rank:species OR subspecies_name:[* TO *]) AND
+        longitude:[* TO *]
         {changed}
         (
             basis_of_record:HumanObservation OR

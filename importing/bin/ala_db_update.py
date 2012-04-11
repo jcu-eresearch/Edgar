@@ -54,11 +54,12 @@ def update(args):
             syncer.upsert_occurrence(occurrence, occurrence.species_id)
         syncer.flush_upserts()
 
-        # store last import time in db.sources
-        db.sources.update().\
-                where(db.sources.c.id == ala_source['id']).\
-                values(last_import_time=to_d).\
-                execute()
+        if syncer.check_occurrence_counts():
+            # store last import time in db.sources
+            db.sources.update().\
+                    where(db.sources.c.id == ala_source['id']).\
+                    values(last_import_time=to_d).\
+                    execute()
 
     # delete old species, and species without any occurrences
     if not args.dont_update_species:
