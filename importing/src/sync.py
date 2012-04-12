@@ -3,6 +3,7 @@ import ala
 import logging
 import multiprocessing
 import binascii
+import uuid
 from sqlalchemy import func, select
 
 log = logging.getLogger(__name__)
@@ -26,6 +27,10 @@ class Syncer:
         self.num_dirty_records_by_species_id = {}
 
     def local_species(self):
+        '''Returns all db.species rows in the local database.'''
+        return db.species.select().execute().fetchall()
+
+    def local_species_by_scientific_name(self):
         '''Returns all species in the local db in a dict. Scientific name is the
         key, the db row is the value.'''
 
@@ -34,7 +39,7 @@ class Syncer:
             species[row['scientific_name']] = row;
         return species
 
-    def remote_species(self):
+    def remote_species_by_scientific_name(self):
         '''Returns all species available at ALA in a dict. Scientific name is the
         key, the ala.Species object is the value.'''
 
@@ -48,9 +53,9 @@ class Syncer:
         objects that are not present in the local db, and `deleted` is an iterable
         of rows from the db.species table that were not found at ALA.'''
 
-        local = self.local_species()
+        local = self.local_species_by_scientific_name()
         local_set = frozenset(local.keys())
-        remote = self.remote_species()
+        remote = self.remote_species_by_scientific_name()
         remote_set = frozenset(remote.keys())
 
         added_set = remote_set - local_set
@@ -77,6 +82,154 @@ class Syncer:
 
         log.info('Deleting species "%s"', row['scientific_name'])
         db.species.delete().where(db.species.c.id == row['id']).execute()
+
+    def sync_occurrences(self, utc_since_date):
+        '''Performs all adding, updating, and deleting of rows in the
+        db.occurrences table of the database.
+
+        Also updates db.species.c.num_dirty_occurrences.'''
+
+        # insert new, and update existing, occurrences
+        for occurrence in self.occurrences_changed_since(utc_since_date):
+            self.upsert_occurrence(occurrence)
+        self.flush_upserts()
+
+        remote_counts = self.remote_occurrence_counts_by_species_id()
+
+        # delete occurrences that have been deleted at ALA
+        self.delete_local_occurrences_if_needed(remote_counts)
+
+        # log warnings if the counts dont match up
+        self.check_occurrence_counts(remote_counts)
+
+        # increase number in db.species.num_dirty_occurrences
+        self.update_num_dirty_occurrences()
+
+    def delete_local_occurrences_if_needed(self, remote_counts):
+        '''This must be called as the last step in syncing occurrence records,
+        because adding and updating occurrences will alter the number of
+        records per species. Checking for deleted records is expensive in terms
+        of memory and time, so it only happens with the local occurrence count
+        per species is higher than the count at ALA.
+
+        Builds a set of uuid.UUID objects for records that exist at ALA, then
+        checks every local record to see if it still exists in the set.'''
+
+        for row, lc, rc in self.species_with_occurrence_counts(remote_counts):
+            # don't run unless our count is lower than ALAs count
+            if lc <= rc:
+                continue
+
+            log.info('Checking for deleted records for species %s',
+                     row['scientific_name'])
+
+            # species should never be None, because we already have a count for
+            # it from ALA
+            species = ala.species_for_scientific_name(row['scientific_name'])
+            if species is None:
+                log.critical('species should never be None')
+                continue
+
+            # build the set of existing uuids
+            existing_uuids = set()
+            for occurrence in ala.records_for_species(species.lsid):
+                existing_uuids.add(occurrence.uuid)
+
+            # loop through every local occurrence, and store the ids of the
+            # rows that do not exist at ALA
+            row_ids_to_delete = []
+            all_rows_for_species = \
+                db.occurrences.select().\
+                where(db.occurrences.c.species_id == row['id']).\
+                where(db.occurrences.c.source_id == self.source_row_id).\
+                execute()
+            for occ_row in all_rows_for_species:
+                occ_uuid = uuid.UUID(bytes=occ_row['source_record_id'])
+                if occ_uuid not in existing_uuids:
+                    row_ids_to_delete.append(occ_row['id'])
+
+            # free up some memory, because this may be very large
+            del existing_uuids
+
+            # delete all the neccessary local occurrences
+            for occ_id in row_ids_to_delete:
+                db.occurrences.delete().\
+                    where(db.occurrences.c.id == occ_id).\
+                    execute()
+
+            # free up more memory
+            num_deleted = len(row_ids_to_delete)
+            del row_ids_to_delete
+
+            # log and keep track of the deletaions
+            log.info('Deleted %d records for %s', num_deleted,
+                    row['scientific_name'])
+
+            if row['id'] not in self.num_dirty_records_by_species_id:
+                self.num_dirty_records_by_species_id[row['id']] = 0
+            self.num_dirty_records_by_species_id[row['id']] += num_deleted
+
+
+    def check_occurrence_counts(self, remote_counts):
+        '''Logs warnings if the local and remote occurrence counts per species
+        do not match.'''
+
+        for row, lc, rc in self.species_with_occurrence_counts(remote_counts):
+            if lc == rc:
+                continue #  counts are the same
+
+            log.warning('Occurrence counts differ for species %s,' +
+                        '(local count = %d, ALA count = %d)',
+                        row['scientific_name'],
+                        lc, rc)
+
+
+    def species_with_occurrence_counts(self, remote_counts):
+        '''Checks the number of local occurrences against the number of
+        occurrences at ALA, yielding the db.species row, local count and remote
+        count if the counts are different.'''
+
+        local_counts = self.local_occurrence_counts_by_species_id()
+
+        for row in self.local_species():
+            if row['id'] in remote_counts:
+                yield (row, local_counts[row['id']], remote_counts[row['id']])
+
+
+    def remote_occurrence_counts_by_species_id(self):
+        '''Returns a dict with db.species.c.id keys, and the values are the
+        number of occurrences present at ALA for that species.'''
+
+        counts = {}
+
+        for row in self.local_species():
+            species = ala.species_for_scientific_name(row['scientific_name'])
+            if species is not None:
+                counts[row['id']] = ala.num_records_for_lsid(species.lsid)
+
+        return counts;
+
+    def local_occurrence_counts_by_species_id(self):
+        '''Returns a dict with db.species.c.id keys, and the calues are the
+        number of occurrences present in the local database for that
+        species.'''
+
+        counts = {}
+
+        for row in self.local_species():
+            local_count = \
+                db.engine.execute(select(
+                    [func.count('*')],
+                    #where
+                     (db.occurrences.c.species_id == row['id']) &
+                     (db.occurrences.c.source_id == self.source_row_id))
+                ).scalar()
+
+            counts[row['id']] = local_count
+
+        return counts
+
+
 
     def upsert_occurrence(self, occurrence, species_id):
         '''Looks up whether `occurrence` (an ala.OccurrenceRecord object)
@@ -177,46 +330,10 @@ class Syncer:
         '''A generator for db.species rows, for rows without any occurrence
         records in the local database'''
 
-        for row in self.local_species().itervalues():
+        for row in self.local_species():
             q = select(['count(*)'], db.occurrences.c.species_id == row['id'])
             if db.engine.execute(q).scalar() == 0:
                 yield row
-
-
-    def check_occurrence_counts(self):
-        '''Checks to see if the number of occurrences in the local db is the
-        same as the number that ALA has. Logs warnings if the numbers are
-        different.
-
-        Returns True if all the checks pass, or False if any of the checks
-        fail.'''
-
-        counts_are_all_correct = True
-
-        for row in self.local_species().itervalues():
-            species = ala.species_for_scientific_name(row['scientific_name'])
-            if species is None:
-                continue
-
-            local_count = \
-                db.engine.execute(select(
-                    [func.count('*')],
-                    #where
-                     (db.occurrences.c.species_id == row['id']) &
-                     (db.occurrences.c.source_id == self.source_row_id))
-                ).scalar()
-
-            remote_count = ala.num_records_for_lsid(species.lsid)
-
-            if remote_count != local_count:
-                counts_are_all_correct = False
-                log.warning('Occurrence counts differ for species %s, ' +
-                            '(local count = %d, ALA count = %d)',
-                            species.scientific_name,
-                            local_count,
-                            remote_count)
-
-        return counts_are_all_correct
 
 
     def update_num_dirty_occurrences(self):
@@ -227,7 +344,7 @@ class Syncer:
         '''
         dirty_col = db.species.c.num_dirty_occurrences
 
-        for row in self.local_species().itervalues():
+        for row in self.local_species():
             if row['id'] not in self.num_dirty_records_by_species_id:
                 continue
 

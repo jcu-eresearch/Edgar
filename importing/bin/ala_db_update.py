@@ -36,19 +36,13 @@ def update(config):
 
     # update occurrences
     if config['updateOccurrences']:
-        # insert/update (upsert) all changed occurrences
-        for occurrence in syncer.occurrences_changed_since(from_d):
-            syncer.upsert_occurrence(occurrence, occurrence.species_id)
-        syncer.flush_upserts()
+        syncer.sync_occurrences(from_d)
 
-        syncer.update_num_dirty_occurrences()
-
-        if syncer.check_occurrence_counts():
-            # store last import time in db.sources
-            db.sources.update().\
-                    where(db.sources.c.id == ala_source['id']).\
-                    values(last_import_time=to_d).\
-                    execute()
+        # store last import time in db.sources
+        db.sources.update().\
+                where(db.sources.c.id == ala_source['id']).\
+                values(last_import_time=to_d).\
+                execute()
 
     # delete old species, and species without any occurrences
     if config['updateSpecies']:
@@ -56,7 +50,6 @@ def update(config):
             syncer.deleted_species(species)
         for species in syncer.local_species_with_no_occurrences():
             syncer.delete_species(species)
-
 
 
 if __name__ == '__main__':
