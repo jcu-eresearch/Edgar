@@ -3,11 +3,8 @@
 App::import('Vendor', 'CAS/CAS');
 
 class CasAuthenticate {
-    private $_Collection = NULL;
 
     function __construct($collection, $settings) {
-        $this->_Collection = $collection;
-
         if(Configure::read('CAS.debug_log_enabled')){
             phpCAS::setDebug(TMP . 'phpCas.log.txt');
         }
@@ -22,7 +19,8 @@ class CasAuthenticate {
 
     public function authenticate(CakeRequest $request, CakeResponse $response) {
         phpCAS::forceAuthentication();
-        return array('username' => phpCAS::getUser());
+        //Contains keys: firstname, lastname, userid, email
+        return phpCAS::getAttributes();
     }
 
     public function getUser($request) {

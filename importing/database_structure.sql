@@ -72,7 +72,9 @@ ROW_FORMAT=FIXED;
 -- TODO: add extra info required per user
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `email` VARCHAR(256) NOT NULL
+    `email` VARCHAR(256) NOT NULL,
+    `can_rate` BOOLEAN DEFAULT TRUE NOT NULL,
+    `is_admin` BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 
