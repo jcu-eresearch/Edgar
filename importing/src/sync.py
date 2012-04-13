@@ -409,8 +409,9 @@ def _mp_fetch(species_sname, species_id, since_date):
 def _mp_fetch_inner(species_sname, species_id, since_date):
     species = ala.species_for_scientific_name(species_sname)
     if species is None:
-        _mp_init.log.warning('Species not found at ALA: %s', species_sname)
-        return
+        if _mp_init.log is not None:
+            _mp_init.log.warning('Species not found at ALA: %s', species_sname)
+        return 0
 
     num_records = 0
     for record in ala.records_for_species(species.lsid, since_date):
