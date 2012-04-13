@@ -121,13 +121,6 @@ def species_for_scientific_name(scientific_name):
     change and ALA will convert old incorrect names into new correct names.
     '''
 
-    # the web service behaviour changed (frowny face). Might need a to use
-    # a different web service that acceps the genus/species separately instead
-    # of as one string. The fix for now is just stripping the parenthesis off
-    # the subgenus
-    scientific_name = scientific_name.replace('(', '');
-    scientific_name = scientific_name.replace(')', '');
-
     url = BIE + 'ws/guid/' + urllib.quote(scientific_name.encode('utf-8'))
     info = _fetch_json(create_request(url), check_not_empty=False)
     if not info or len(info) == 0:
