@@ -91,7 +91,7 @@ class Syncer:
 
         # insert new, and update existing, occurrences
         for occurrence in self.occurrences_changed_since(utc_since_date):
-            self.upsert_occurrence(occurrence)
+            self.upsert_occurrence(occurrence, occurrence.species_id)
         self.flush_upserts()
 
         remote_counts = self.remote_occurrence_counts_by_species_id()
