@@ -38,6 +38,13 @@
 	CakePlugin::routes();
 
 /**
+ * Tell cake php to parse extra extensions:
+ *   * json
+ *   * csv
+ */
+	Router::parseExtensions('json', 'csv');
+
+/**
  * Load the CakePHP default routes. Remove this if you do not want to use
  * the built-in default routes.
  */
