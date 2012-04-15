@@ -15,7 +15,7 @@
 	<tr>
 		<td><?php echo h($occurrence['Occurrence']['id']); ?>&nbsp;</td>
 		<td>
-			<?php echo $this->Html->link($occurrence['Species']['name'], array('controller' => 'species', 'action' => 'view', $occurrence['Species']['id'])); ?>
+			<?php echo $this->Html->link("".$occurrence['Species']['common_name']." (".$occurrence['Species']['scientific_name'].")", array('controller' => 'species', 'action' => 'view', $occurrence['Species']['id'])); ?>
 		</td>
 		<td><?php echo h($occurrence['Occurrence']['latitude']); ?>&nbsp;</td>
 		<td><?php echo h($occurrence['Occurrence']['longitude']); ?>&nbsp;</td>
@@ -23,8 +23,6 @@
 		<td><?php echo h($occurrence['Occurrence']['modified']); ?>&nbsp;</td>
 		<td class="actions">
 			<?php echo $this->Html->link(__('View'), array('action' => 'view', $occurrence['Occurrence']['id'])); ?>
-			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $occurrence['Occurrence']['id'])); ?>
-			<?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $occurrence['Occurrence']['id']), null, __('Are you sure you want to delete # %s?', $occurrence['Occurrence']['id'])); ?>
 		</td>
 	</tr>
 <?php endforeach; ?>
@@ -47,8 +45,6 @@
 <div class="actions">
 	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
-		<li><?php echo $this->Html->link(__('New Occurrence'), array('action' => 'add')); ?></li>
 		<li><?php echo $this->Html->link(__('List Species'), array('controller' => 'species', 'action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New Species'), array('controller' => 'species', 'action' => 'add')); ?> </li>
 	</ul>
 </div>
