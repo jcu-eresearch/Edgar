@@ -128,69 +128,6 @@ class SpeciesController extends AppController {
         $this->set('_serialize', 'geo_object');
     }
 
-
-    /**
-     * add method
-     *
-     * @return void
-     */
-    public function add() {
-        if ($this->request->is('post')) {
-            $this->Species->create();
-            if ($this->Species->save($this->request->data)) {
-                $this->Session->setFlash(__('The species has been saved'));
-                $this->redirect(array('action' => 'index'));
-            } else {
-                $this->Session->setFlash(__('The species could not be saved. Please, try again.'));
-            }
-        }
-    }
-
-    /**
-     * edit method
-     *
-     * @param string $id
-     * @return void
-     */
-    public function edit($id = null) {
-        $this->Species->id = $id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
-        }
-        if ($this->request->is('post') || $this->request->is('put')) {
-            if ($this->Species->save($this->request->data)) {
-                $this->Session->setFlash(__('The species has been saved'));
-                $this->redirect(array('action' => 'index'));
-            } else {
-                $this->Session->setFlash(__('The species could not be saved. Please, try again.'));
-            }
-        } else {
-            $this->request->data = $this->Species->read(null, $id);
-        }
-    }
-
-    /**
-     * delete method
-     *
-     * @param string $id
-     * @return void
-     */
-    public function delete($id = null) {
-        if (!$this->request->is('post')) {
-            throw new MethodNotAllowedException();
-        }
-        $this->Species->id = $id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
-        }
-        if ($this->Species->delete()) {
-            $this->Session->setFlash(__('Species deleted'));
-            $this->redirect(array('action' => 'index'));
-        }
-        $this->Session->setFlash(__('Species was not deleted'));
-        $this->redirect(array('action' => 'index'));
-    }
-
     /**
      * single_upload_json method
      *

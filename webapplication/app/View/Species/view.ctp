@@ -6,9 +6,19 @@
 			<?php echo h($species['Species']['id']); ?>
 			&nbsp;
 		</dd>
-		<dt><?php echo __('Name'); ?></dt>
+		<dt><?php echo __('Scientific Name'); ?></dt>
 		<dd>
-			<?php echo h($species['Species']['name']); ?>
+			<?php echo h($species['Species']['scientific_name']); ?>
+			&nbsp;
+		</dd>
+		<dt><?php echo __('Common Name'); ?></dt>
+		<dd>
+			<?php echo h($species['Species']['common_name']); ?>
+			&nbsp;
+		</dd>
+		<dt><?php echo __('Number of Dirty Occurrences'); ?></dt>
+		<dd>
+			<?php echo h($species['Species']['num_dirty_occurrences']); ?>
 			&nbsp;
 		</dd>
 		<dt><?php echo __('Created'); ?></dt>
@@ -27,12 +37,8 @@
 	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
 		<li><?php echo $this->Html->link(__('Species Map'), array('action' => 'map', $species['Species']['id'])); ?> </li>
-		<li><?php echo $this->Html->link(__('Edit Species'), array('action' => 'edit', $species['Species']['id'])); ?> </li>
-		<li><?php echo $this->Form->postLink(__('Delete Species'), array('action' => 'delete', $species['Species']['id']), null, __('Are you sure you want to delete # %s?', $species['Species']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('List Species'), array('action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New Species'), array('action' => 'add')); ?> </li>
 		<li><?php echo $this->Html->link(__('List Occurrences'), array('controller' => 'occurrences', 'action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New Occurrence'), array('controller' => 'occurrences', 'action' => 'add')); ?> </li>
 	</ul>
 </div>
 <div class="related">
@@ -60,17 +66,10 @@
 			<td><?php echo $occurrence['modified'];?></td>
 			<td class="actions">
 				<?php echo $this->Html->link(__('View'), array('controller' => 'occurrences', 'action' => 'view', $occurrence['id'])); ?>
-				<?php echo $this->Html->link(__('Edit'), array('controller' => 'occurrences', 'action' => 'edit', $occurrence['id'])); ?>
-				<?php echo $this->Form->postLink(__('Delete'), array('controller' => 'occurrences', 'action' => 'delete', $occurrence['id']), null, __('Are you sure you want to delete # %s?', $occurrence['id'])); ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>
 	</table>
 <?php endif; ?>
 
-	<div class="actions">
-		<ul>
-			<li><?php echo $this->Html->link(__('New Occurrence'), array('controller' => 'occurrences', 'action' => 'add', '?' => array('species_id' => $species['Species']['id'])));?> </li>
-		</ul>
-	</div>
 </div>

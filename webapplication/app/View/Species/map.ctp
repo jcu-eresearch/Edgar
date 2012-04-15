@@ -17,9 +17,19 @@
 			<?php echo h($species['Species']['id']); ?>
 			&nbsp;
 		</dd>
-		<dt><?php echo __('Name'); ?></dt>
+		<dt><?php echo __('Scientific Name'); ?></dt>
 		<dd>
-			<?php echo h($species['Species']['name']); ?>
+			<?php echo h($species['Species']['scientific_name']); ?>
+			&nbsp;
+		</dd>
+		<dt><?php echo __('Common Name'); ?></dt>
+		<dd>
+			<?php echo h($species['Species']['common_name']); ?>
+			&nbsp;
+		</dd>
+		<dt><?php echo __('Number of Dirty Occurrences'); ?></dt>
+		<dd>
+			<?php echo h($species['Species']['num_dirty_occurrences']); ?>
 			&nbsp;
 		</dd>
 		<dt><?php echo __('Created'); ?></dt>
