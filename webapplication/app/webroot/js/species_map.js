@@ -139,7 +139,7 @@ $(document).ready(function() {
             'featureselected': onFeatureSelect,
             'featureunselected': onFeatureUnselect
         });
-        
+
         var select_control = new OpenLayers.Control.SelectFeature(
             occurrences, {hover: false}
         );
@@ -148,20 +148,21 @@ $(document).ready(function() {
         map.addControl(new OpenLayers.Control.MousePosition());
         map.addControl(select_control);
         select_control.activate();
-        
+
         // Let the user change between layers
         map.addControl(new OpenLayers.Control.LayerSwitcher());
 
 //      map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
-        map.addLayers([wms, dist, occurrences]);
-        
+//        map.addLayers([wms, dist, occurrences]);
+        map.addLayers([wms, occurrences]);
+
         // Zoom the map to cover the world.
         //map.zoomToMaxExtent();
 
-        // Zoom the map to cover Australia
+        // Zoom the map to cover Costa Rica
         zoomBounds = new OpenLayers.Bounds();
-        zoomBounds.extend(new OpenLayers.LonLat(140,-40));
-        zoomBounds.extend(new OpenLayers.LonLat(160,-10));
+        zoomBounds.extend(new OpenLayers.LonLat(-86,7));
+        zoomBounds.extend(new OpenLayers.LonLat(-82,13));
 
         map.zoomToExtent(zoomBounds);
 });
