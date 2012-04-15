@@ -46,14 +46,14 @@
 #
 # At present, when a job status fails to be sent, it isn't resent.
 #
-# This is especially problematic for the status 'QUEUED', which indicates that modelling
+# This is especially problematic for the status 'S', which indicates that modelling
 # has started for the species.
 
-# Determine path to this file.
-BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # WORKING_DIR is one up from this file (which is in bin)
-WORKING_DIR="$BIN_DIR/.."
+WORKING_DIR="/home/jc155857/ap03/modelling"
+
+BIN_DIR="$WORKING_DIR/bin"
 
 # Determine path to config (based on path to this file)
 CONFIG_DIR="$WORKING_DIR/config"
@@ -182,6 +182,8 @@ function report_status {
         log_error "Failed to report status of $STATUS_TO_REPORT to $REPORT_URI. Curl command failed. Curl output: $CURL_OUTPUT. Curl exit code: $CMD_EXIT_CODE"
     elif [ "$CURL_OUTPUT" -ne "200" ]; then
         log_error "Failed to report status of $STATUS_TO_REPORT to $REPORT_URI. HTTP response code not okay. Curl output: $CURL_OUTPUT."
+    else
+        echo "Successfully Reported status of $STATUS_TO_REPORT for $CURRENT_SPECIES_ID"
     fi
 }
 

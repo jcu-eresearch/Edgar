@@ -14,11 +14,8 @@
 # -S specifies the shell type
 # -o/-e specifies where the stdout and stderr will be written
 
-# Determine path to this file.
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 # WORKING_DIR DIR is one up from this file (which is in bin)
-WORKING_DIR="$DIR/.."
+WORKING_DIR="/home/jc155857/ap03/modelling"
 
 # Determine path to config (based on path to this file)
 CONFIG_DIR="$WORKING_DIR/config"
@@ -49,7 +46,7 @@ SPP=$AP03_SPP
 #
 # The private file will contain unobfiscated data,
 # the public file may contain obfiscated data.
-PUBLIC_OCCUR="$WORKING_DIR/intputs/$SPP/public_occur.csv"
+PUBLIC_OCCUR="$WORKING_DIR/inputs/$SPP/public_occur.csv"
 PRIVATE_OCCUR="$WORKING_DIR/inputs/$SPP/.private_occur.csv"
 
 OCCUR=""
