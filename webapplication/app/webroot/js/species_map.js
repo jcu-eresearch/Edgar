@@ -8,20 +8,33 @@ $(document).ready(function() {
         geographic = new OpenLayers.Projection("EPSG:4326");
         mercator = new OpenLayers.Projection("EPSG:900913");
 
+        // Zoom the map to cover Costa Rica
+        zoomBounds = new OpenLayers.Bounds();
+        zoomBounds.extend(new OpenLayers.LonLat(-86,7));
+        zoomBounds.extend(new OpenLayers.LonLat(-82,13));
+
         map = new OpenLayers.Map('map', {
-            // Don't let the user move the map outside of the bounds of the earth
-            // Some maps support wrap-around, others don't.
-            // To make everything simpler (incl. our BBox strategy), just prevent it from happening.
-            restrictedExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+            projection: mercator,
             displayProjection: geographic,
-            projection: geographic,
+            units: "m",
+            maxResolution: 156543.0339,
+            maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34),
+
+
+            // Sets the map's maxExtent
+            // This is how the map will be zoomed if the user presses
+            // the earth symbol.
+            // restrictedExtent: zoomBounds.transform(geographic, mercator),
         });
 
         // The standard open layers layer.
+        // Make sure we reproject our WMS map.
         var wms = new OpenLayers.Layer.WMS(
             "OpenLayers WMS",
             "http://vmap0.tiles.osgeo.org/wms/vmap0",
-            {'layers':'basic', projection: geographic} 
+            {
+                'layers':'basic',
+            }
         );
 
         var dist = new OpenLayers.Layer.WMS(
@@ -38,24 +51,24 @@ $(document).ready(function() {
                 "Google Physical",
                 {
                     type: G_PHYSICAL_MAP,
-//                  'sphericalMercator': true,
-//                  'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+                    'sphericalMercator': true,
+                    'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
                 }
         );
         var gmap = new OpenLayers.Layer.Google(
                 "Google Streets", // the default
                 {
                     numZoomLevels:20,
-//                  'sphericalMercator': true,
-//                  'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+                    'sphericalMercator': true,
+                    'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
                 }
         );
         var ghyb = new OpenLayers.Layer.Google(
                 "Google Hybrid",
                 {
                     type: G_HYBRID_MAP,
-//                  'sphericalMercator': true,
-//                  'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+                    'sphericalMercator': true,
+                    'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
                 }
         );
         var gsat = new OpenLayers.Layer.Google(
@@ -63,8 +76,8 @@ $(document).ready(function() {
                 {
                     type: G_SATELLITE_MAP,
                     numZoomLevels: 22,
-//                  'sphericalMercator': true,
-//                  'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+                    'sphericalMercator': true,
+                    'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
                 }
         );
 
@@ -78,10 +91,18 @@ $(document).ready(function() {
         });
 
         var mformat = new OpenLayers.Format.GeoJSON({
+// No need to convert..
+// Looks like having a layer projection of geographic,
+// and a map projection of mercator (displayProjection of geographic)
+// means that OpenLayers is taking care of it..
+//
 //          'internalProjection': geographic,
 //          'externalProjection': geographic 
         });
+
         var occurrences = new OpenLayers.Layer.Vector("Occurrences", {
+            projection: geographic,
+
             // resFactor determines how often to update the map.
             // See: http://dev.openlayers.org/docs/files/OpenLayers/Strategy/BBOX-js.html#OpenLayers.Strategy.BBOX.resFactor
             // A setting of 1 will mean the map is updated every time its zoom/bounds change.
@@ -108,6 +129,8 @@ $(document).ready(function() {
                 },
             })
         });
+//        alert(occurrences.projection);
+        occurrences.setOpacity(0.6);
 
         function onPopupClose(evt) {
             // 'this' is the popup.
@@ -156,15 +179,10 @@ $(document).ready(function() {
 
 //      map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
 //        map.addLayers([wms, dist, occurrences]);
-        map.addLayers([wms, occurrences]);
+          map.addLayers([gphy, gmap, ghyb, gsat, wms, occurrences]);
 
-        // Zoom the map to cover the world.
-        //map.zoomToMaxExtent();
+        // Zoom the map to the map's restrictedExtent (Costa Rica)
+//        map.zoomToMaxExtent();
 
-        // Zoom the map to cover Costa Rica
-        zoomBounds = new OpenLayers.Bounds();
-        zoomBounds.extend(new OpenLayers.LonLat(-86,7));
-        zoomBounds.extend(new OpenLayers.LonLat(-82,13));
-
-        map.zoomToExtent(zoomBounds);
+        map.zoomToExtent(zoomBounds.transform(map.displayProjection, map.projection));
 });
