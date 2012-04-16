@@ -4,6 +4,8 @@
 // Assumes that open layers, jQuery and jQueryUI are all available.
 
 var map, select_control;
+var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
+
 $(document).ready(function() {
         geographic = new OpenLayers.Projection("EPSG:4326");
         mercator = new OpenLayers.Projection("EPSG:900913");
@@ -29,12 +31,19 @@ $(document).ready(function() {
 
         // The standard open layers layer.
         // Make sure we reproject our WMS map.
+        // Read about this layer here: http://earth-info.nga.mil/publications/vmap0.html
+        // and here: http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29
         var wms = new OpenLayers.Layer.WMS(
-            "OpenLayers WMS",
+            "World Map (VMAP0)",
             "http://vmap0.tiles.osgeo.org/wms/vmap0",
             {
                 'layers':'basic',
             }
+        );
+
+        // The open street map layer.
+        var osm = new OpenLayers.Layer.OSM(
+            "Open Street Map"
         );
 
         var dist = new OpenLayers.Layer.WMS(
@@ -80,6 +89,25 @@ $(document).ready(function() {
                     'maxExtent': new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
                 }
         );
+
+        var bing_road = new OpenLayers.Layer.Bing({
+            name: "Bing Road",
+            key: bing_api_key,
+            type: "Road"
+        });
+
+        var bing_hybrid = new OpenLayers.Layer.Bing({
+            name: "Bing Hybrid",
+            key: bing_api_key,
+            type: "AerialWithLabels"
+        });
+
+        var bing_aerial = new OpenLayers.Layer.Bing({
+            name: "Bing Aerial",
+            key: bing_api_key,
+            type: "Aerial"
+        });
+
 
         var style = new OpenLayers.Style({
                 // externalGraphic: "${img_url}",
@@ -179,7 +207,7 @@ $(document).ready(function() {
 
 //      map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
 //        map.addLayers([wms, dist, occurrences]);
-          map.addLayers([gphy, gmap, ghyb, gsat, wms, occurrences]);
+        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, wms, occurrences]);
 
         // Zoom the map to the map's restrictedExtent (Costa Rica)
 //        map.zoomToMaxExtent();
