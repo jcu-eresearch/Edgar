@@ -1,0 +1,31 @@
+tr:nth-child(odd) {
+	background-color:#cef;
+}
+
+tr:nth-child(even) {
+	background-color:#fff;
+}
+
+dl {
+	background-color: #fff;
+	color: #000;
+}
+
+#map * {
+	float: none;
+    margin: 0;
+}
+
+#map input {
+	margin: 0.2em;
+}
+
+#map .baseLayersDiv {
+    margin-top: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+#map .dataLayersDiv {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
