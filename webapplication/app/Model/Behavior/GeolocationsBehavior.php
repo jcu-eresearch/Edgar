@@ -153,7 +153,7 @@ class GeolocationsBehavior extends ModelBehavior {
                         'properties' => array(
                             'title' => "Occurrence",
                             'description' => "<dl><dt>Latitude</dt><dd>$longitude</dd><dt>Longitude</dt><dd>$latitude</dd>",
-                            'point_radius' => 4
+                            'point_radius' => 8
                         ),
                         'geometry' => array(
                             'type' => 'Point',

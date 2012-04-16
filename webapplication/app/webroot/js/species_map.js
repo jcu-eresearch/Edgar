@@ -71,9 +71,10 @@ $(document).ready(function() {
         var style = new OpenLayers.Style({
                 // externalGraphic: "${img_url}",
                 pointRadius: "${point_radius}",
-                fillColor: "#ee9900",
-                fillOpacity: 0.4,
-                strokeOpacity: 0.4
+                fillColor: "#00ff66",
+                strokeColor: "#00ff66",
+                fillOpacity: 0.6,
+                strokeOpacity: 0.6
         });
 
         var mformat = new OpenLayers.Format.GeoJSON({
@@ -90,7 +91,7 @@ $(document).ready(function() {
                     params: {
                         // Place addition request params here..
                         bound: true,
-                        clustered: true
+                        clustered: false
                     },
 
                     // See: http://geojson.org/geojson-spec.html For the GeoJSON spec.
@@ -101,6 +102,7 @@ $(document).ready(function() {
                 "default": style,
                 "select": {
                     "fillColor": "#83aeef",
+                    "strokeColor": "#000000",
                     "fillOpacity": 0.7,
                     "strokeOpacity": 0.7
                 },
