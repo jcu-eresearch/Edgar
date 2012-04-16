@@ -1,5 +1,5 @@
 {
-    "doco_": "Any key starting with 'doco_' is not a config value, it's documentation only."
+    "doco_": "Any key starting with 'doco_' is not a config value, it's documentation only.",
 
     "doco_db": "Everything with a 'db.' prefix is passed to sqlalchemy.engine_from_config",
     "db.url": "mysql://ap03:ap03@localhost/ap03?charset=utf8",
