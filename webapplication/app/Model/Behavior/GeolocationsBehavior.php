@@ -10,6 +10,8 @@ class GeolocationsBehavior extends ModelBehavior {
     const GRID_RANGE_LATITUDE  = 40;    // how many latitude slices to make (cut into GRID_RANGE_LATITUDE along the y axis)
     const MIN_FEATURE_RADIUS   = 4;     // pixels
 
+    const NON_CLUSTERED_FEATURE_RADIUS   = 8;     // pixels
+
     /**
      * Store the settings for this model.
      */
@@ -151,7 +153,9 @@ class GeolocationsBehavior extends ModelBehavior {
                     $location_features[] = array(
                         "type" => "Feature",
                         'properties' => array(
-                            'point_radius' => 4
+                            'title' => "Occurrence",
+                            'description' => "<dl><dt>Latitude</dt><dd>$longitude</dd><dt>Longitude</dt><dd>$latitude</dd>",
+                            'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS
                         ),
                         'geometry' => array(
                             'type' => 'Point',
