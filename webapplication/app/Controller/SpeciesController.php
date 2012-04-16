@@ -117,10 +117,11 @@ class SpeciesController extends AppController {
 
         // Check if clustered was set to true.
         // Default clustered to true
-        $clustered = true;
-        if ( array_key_exists('clustered', $this->request->query) ) {
-            $clustered = $this->request->query['clustered'];
-        }
+//        $clustered = true;
+//        if ( array_key_exists('clustered', $this->request->query) ) {
+//            $clustered = $this->request->query['clustered'];
+//        }
+        $clustered = false;
 
         $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $clustered));
 

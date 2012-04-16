@@ -151,6 +151,8 @@ class GeolocationsBehavior extends ModelBehavior {
                     $location_features[] = array(
                         "type" => "Feature",
                         'properties' => array(
+                            'title' => "Occurrence",
+                            'description' => "<dl><dt>Latitude</dt><dd>$longitude</dd><dt>Longitude</dt><dd>$latitude</dd>",
                             'point_radius' => 4
                         ),
                         'geometry' => array(
