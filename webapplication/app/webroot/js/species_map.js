@@ -33,7 +33,7 @@ $(document).ready(function() {
         // Make sure we reproject our WMS map.
         // Read about this layer here: http://earth-info.nga.mil/publications/vmap0.html
         // and here: http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29
-        var wms = new OpenLayers.Layer.WMS(
+        var vmap0 = new OpenLayers.Layer.WMS(
             "World Map (VMAP0)",
             "http://vmap0.tiles.osgeo.org/wms/vmap0",
             {
@@ -207,7 +207,7 @@ $(document).ready(function() {
 
 //      map.addLayers([wms, gphy, gmap, ghyb, gsat, dist, occurrences]);
 //        map.addLayers([wms, dist, occurrences]);
-        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, wms, occurrences]);
+        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
 
         // Zoom the map to the map's restrictedExtent (Costa Rica)
 //        map.zoomToMaxExtent();
