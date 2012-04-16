@@ -29,9 +29,10 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 	<?php
 		echo $this->Html->meta('icon');
 
-		echo $this->Html->css('cake.generic');
+//		echo $this->Html->css('cake.generic');
 		echo $this->Html->css('screen');
 		echo $this->Html->css('openlayers');
+		echo $this->Html->css('openlayers_extended');
 		echo $this->Html->css('openlayers_google');
 
 		// Include jQuery and jQueryUI
@@ -43,7 +44,9 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 		// echo '<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>';
 
 		// Include OpenLayers
-		echo '<script src="http://openlayers.org/api/OpenLayers.js"></script>';
+//		echo '<script src="http://openlayers.org/api/OpenLayers.js"></script>';
+		echo $this->Html->script('OpenLayers.js');
+		echo $this->Html->script('LayerSwitcher-extended.js');
 
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
