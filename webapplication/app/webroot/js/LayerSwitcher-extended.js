@@ -486,9 +486,9 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                     OpenLayers.Function.bindAsEventListener(this.onInputClick, context)
                 );
 
-                OpenLayers.Event.observe(titleDiv, "mouseup", 
-                    OpenLayers.Function.bindAsEventListener(this.onInputClick, context)
-                );
+//                OpenLayers.Event.observe(titleDiv, "mouseup", 
+//                    OpenLayers.Function.bindAsEventListener(this.onInputClick, context)
+//                );
                 
                 if(layer.queryable) {
                 
