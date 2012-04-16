@@ -90,8 +90,8 @@ class Syncer:
         Also updates db.species.c.num_dirty_occurrences.'''
 
         # insert new, and update existing, occurrences
-        for occurrence in self.occurrences_changed_since(utc_since_date):
-            self.upsert_occurrence(occurrence, occurrence.species_id)
+        for occ in self.occurrences_changed_since(utc_since_date, True):
+            self.upsert_occurrence(occ, occ.species_id)
         self.flush_upserts()
 
         remote_counts = self.remote_occurrence_counts_by_species_id()
@@ -165,9 +165,7 @@ class Syncer:
             log.info('Deleted %d records for %s', num_deleted,
                     row['scientific_name'])
 
-            if row['id'] not in self.num_dirty_records_by_species_id:
-                self.num_dirty_records_by_species_id[row['id']] = 0
-            self.num_dirty_records_by_species_id[row['id']] += num_deleted
+            self.increase_dirty_count(row['id'], num_deleted)
 
 
     def check_occurrence_counts(self, remote_counts):
@@ -262,10 +260,6 @@ class Syncer:
 
         self.cached_upserts.append('(' + ','.join(cols) + ')')
 
-        # record how many changes are made
-        if species_id not in self.num_dirty_records_by_species_id:
-            self.num_dirty_records_by_species_id[species_id] = 0
-        self.num_dirty_records_by_species_id[species_id] += 1
 
     def flush_upserts(self):
         if len(self.cached_upserts) <= 0:
@@ -290,7 +284,7 @@ class Syncer:
         self.cached_upserts = []
 
 
-    def occurrences_changed_since(self, since_date):
+    def occurrences_changed_since(self, since_date, record_dirty=False):
         '''Generator for ala.OccurrenceRecord objects.
 
         Will use whatever is in the species table of the database, so call
@@ -317,13 +311,33 @@ class Syncer:
         # keep reading from the queue until all the subprocesses are finished
         while active_workers > 0:
             record = record_q.get()
-            if record is None:
-                active_workers -= 1
-            else:
+            if isinstance(record, ala.OccurrenceRecord):
                 yield record
+            elif isinstance(record, tuple):
+                active_workers -= 1
+                if len(record) == 3:
+                    if record[2] > 0:
+                        log.info('Finished processing %d records for %s',
+                                 record[2],
+                                 record[0])
+                    if record_dirty:
+                        self.increase_dirty_count(record[1], record[2])
+                else:
+                    raise RuntimeError('Worker process failed: ' + record[0])
+            else:
+                raise RuntimeError('Unexpected type coming from record_q: ' +
+                                   str(type(record)))
+
 
         # all the subprocesses should be dead by now
         pool.join()
+
+
+    def increase_dirty_count(self, species_id, num_dirty):
+        if species_id in self.num_dirty_records_by_species_id:
+            self.num_dirty_records_by_species_id[species_id] += num_dirty
+        else:
+            self.num_dirty_records_by_species_id[species_id] = num_dirty
 
 
     def local_species_with_no_occurrences(self):
@@ -362,27 +376,42 @@ def _mp_init(record_q):
     '''Called when a subprocess is started. See
     Syncer.occurrences_changed_since'''
     _mp_init.record_q = record_q
-    _mp_init.log = multiprocessing.log_to_stderr()
+    _mp_init.log = None #  multiprocessing.log_to_stderr()
 
 
 def _mp_fetch(species_sname, species_id, since_date):
     '''Gets all relevant records for the given species from ALA, and pumps the
-    records into _mp_init.record_q. Puts None into the queue when finished.
+    records into _mp_init.record_q.
 
-    Adds a `species_id` attribute to each species object set to the argument
-    given to this function.'''
+    If the function finished successfully, will put a len 3 tuple in the
+    record_q with (scientific_name, species_id, num_records_found). If the
+    function fails, will put a len 1 tuple in the record_q with a failure
+    message string in it.
+
+    Adds a `species_id` attribute to each ala.OccurrenceRecord object set to
+    the argument given to this function.'''
+
+    num_records = 0
+    failure_msg = None
     try:
-        _mp_fetch_inner(species_sname, species_id, since_date)
-    except:
-        _mp_init.log.exception('mp process failed with exception')
+        num_records = _mp_fetch_inner(species_sname, species_id, since_date)
+    except Exception, e:
+        failure_msg = str(e)
+        if _mp_init.log is not None:
+            _mp_init.log.exception()
 
-    _mp_init.record_q.put(None)
+    if failure_msg is None:
+        _mp_init.record_q.put((species_sname, species_id, num_records))
+    else:
+        _mp_init.record_q.put((failure_msg,))
+
 
 def _mp_fetch_inner(species_sname, species_id, since_date):
     species = ala.species_for_scientific_name(species_sname)
     if species is None:
-        _mp_init.log.warning('Species not found at ALA: %s', species_sname)
-        return
+        if _mp_init.log is not None:
+            _mp_init.log.warning('Species not found at ALA: %s', species_sname)
+        return 0
 
     num_records = 0
     for record in ala.records_for_species(species.lsid, since_date):
@@ -390,9 +419,8 @@ def _mp_fetch_inner(species_sname, species_id, since_date):
         _mp_init.record_q.put(record)
         num_records += 1
 
-    if num_records > 0:
-        _mp_init.log.info('Found %d records for "%s"',
-            num_records, species_sname)
+    return num_records
+
 
 def _mysql_encode_binary(binstr):
     '''
