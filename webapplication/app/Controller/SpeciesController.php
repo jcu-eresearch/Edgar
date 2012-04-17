@@ -117,17 +117,20 @@ class SpeciesController extends AppController {
 
         // Check if clustered was set to true.
         // Default clustered to true
-        $clustered = true;
+        $cluster_type = 'dotgrid';
+
         if ( array_key_exists('clustered', $this->request->query) ) {
             $in_clustered = $this->request->query['clustered'];
             if ( $in_clustered == 'true' ) {
-                $clustered = true;
+                // then use the default, already set above
             } else if ( $in_clustered == 'false' ) {
-                $clustered = false;
+                $cluster_type = 'none';
             }
         }
 
-        $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $clustered));
+        $cluster_type = 'dotradius';
+
+        $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $cluster_type));
 
         // Specify the output for the json view.
         $this->set('_serialize', 'geo_object');
