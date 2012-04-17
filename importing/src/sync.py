@@ -1,9 +1,11 @@
 import db
+import urllib2
 import ala
 import logging
 import multiprocessing
 import binascii
 import uuid
+import traceback
 from sqlalchemy import func, select
 
 log = logging.getLogger(__name__)
@@ -397,6 +399,7 @@ def _mp_fetch(species_sname, species_id, since_date):
         num_records = _mp_fetch_inner(species_sname, species_id, since_date)
     except Exception, e:
         failure_msg = str(e)
+        failure_msg += traceback.format_exc()
         if isinstance(e, urllib2.HTTPError):
             failure_msg += '\n\nResponse Headers:\n' + str(dict(e.info()))
             failure_msg += '\n\nResponse Payload:\n' + e.read()
