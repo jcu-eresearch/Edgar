@@ -201,28 +201,29 @@ def q_param_for_lsid(species_lsid, changed_since=None):
         '''.format(lsid=species_lsid, changed=changed_since))
 
 
-def _retry(tries=3, delay=2, backoff=2):
+# 10 sec * 2^5 == over 5 minutes of retrying
+def _retry(retries=5, delay=10, backoff=2):
     '''A decorator that retries a function or method until it succeeds (success
     is when the function completes and no exception is raised).
 
     delay sets the initial delay in seconds, and backoff sets the factor by
     which the delay should lengthen after each failure. backoff must be greater
-    than 1, or else it isn't really a backoff. tries must be at least 1, and
+    than 1, or else it isn't really a backoff. retries must be greater than 0, and
     delay greater than 0.'''
 
     if backoff <= 1:
         raise ValueError('backoff must be greater than 1')
 
-    tries = math.floor(tries)
-    if tries < 1:
-        raise ValueError('tries must be >= 1')
+    retries = math.floor(retries)
+    if retries < 1:
+        raise ValueError('retries must be >= 1')
 
     if delay <= 0:
         raise ValueError('delay must be >= 0')
 
     def deco_retry(f):
         def f_retry(*args, **kwargs):
-            mtries, mdelay = tries, delay
+            mtries, mdelay = retries + 1, delay
 
             while True:
                 try:
