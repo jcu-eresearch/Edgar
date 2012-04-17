@@ -398,8 +398,7 @@ def _mp_fetch(species_sname, species_id, since_date):
     try:
         num_records = _mp_fetch_inner(species_sname, species_id, since_date)
     except Exception, e:
-        failure_msg = str(e)
-        failure_msg += traceback.format_exc()
+        failure_msg = str(e) + '\n' + traceback.format_exc()
         if isinstance(e, urllib2.HTTPError):
             failure_msg += '\n\nResponse Headers:\n' + str(dict(e.info()))
             failure_msg += '\n\nResponse Payload:\n' + e.read()
@@ -413,7 +412,9 @@ def _mp_fetch(species_sname, species_id, since_date):
 def _mp_fetch_inner(species_sname, species_id, since_date):
     species = ala.species_for_scientific_name(species_sname)
     if species is None:
-        raise RuntimeError('Species not found at ALA: ' + species_sname)
+        #TODO: not crash-worthy, but definitely needs to be logged
+        #raise RuntimeError('Species not found at ALA: ' + species_sname)
+        return 0
 
     num_records = 0
     for record in ala.records_for_species(species.lsid, since_date):
