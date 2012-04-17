@@ -411,7 +411,7 @@ $(document).ready(function() {
     // -------------
 
     // Add the standard set of map controls
-    map.addControl(new OpenLayers.Control.Permalink());
+//    map.addControl(new OpenLayers.Control.Permalink());
     map.addControl(new OpenLayers.Control.MousePosition());
 
     // Let the user change between layers
