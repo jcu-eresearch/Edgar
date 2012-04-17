@@ -3,7 +3,32 @@
 // Assumes that the var species_id, map_tool_url and species_route_url have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 
-var map, occurrences, occurrence_select_control;
+var map, occurrences, distribution, occurrence_select_control;
+
+// Projections
+// ----------
+
+// DecLat, DecLng 
+geographic = new OpenLayers.Projection("EPSG:4326");
+
+// Spherical Meters
+mercator = new OpenLayers.Projection("EPSG:900913");
+
+// Bounds
+// ----------
+
+// Costa Rica Bounds
+costa_rica_bounds = new OpenLayers.Bounds();
+costa_rica_bounds.extend(new OpenLayers.LonLat(-86,7.5));
+costa_rica_bounds.extend(new OpenLayers.LonLat(-82,12));
+costa_rica_bounds = costa_rica_bounds.transform(geographic, mercator);
+
+// The bounds of the world.
+// Used to set maxExtent on maps/layers
+world_bounds = new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+
+// Where to zoom the map to on start.
+zoom_bounds = costa_rica_bounds;
 
 // Edgar bing api key.
 // (registered under Robert's name)
@@ -13,10 +38,13 @@ function speciesGeoJSONURL() {
     return (species_route_url + "/geo_json_occurrences/" + species_id + ".json");
 }
 
-function updateSpeciesId(new_species_id) {
+function updateSpeciesDetails(new_species_id) {
     species_id = new_species_id;
     if (occurrences !== undefined) {
         map.removeLayer(occurrences);
+    }
+    if (distribution !== undefined) {
+        map.removeLayer(distribution);
     }
     if (occurrence_select_control !== undefined) {
         occurrence_select_control.unselectAll();
@@ -25,13 +53,52 @@ function updateSpeciesId(new_species_id) {
     }
 
     clearMapPopups();
+
     addOccurrencesLayer();
+    addDistributionLayer();
 }
 
 function clearMapPopups() {
     $.each(map.popups, function(index, popup) {
         map.removePopup(popup);
     });
+}
+
+function addDistributionLayer() {
+    // Species Distribution
+    // ----------------------
+
+    // Our distribution map layer.
+    //
+    // NOTE:
+    // -----
+    //
+    // This code may need to be updated now that we are using mercator.
+    // I believe that OpenLayers will send the correct projection request
+    // to Map Server. I also believe that map script will correctly process the
+    // projection request.
+    // I could be wrong though...
+    distribution = new OpenLayers.Layer.WMS(
+        "Distribution",
+        map_tool_url, // path to our map script handler.
+
+        // Params to send as part of request (note: keys will be auto-upcased)
+        // I'm typing them in caps so I don't get confused.
+        {
+            MODE: 'map', 
+            MAP: 'costa_rica.map',
+            DATA: (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc'),
+            SPECIESID: species_id,
+            REASPECT: "true",
+            TRANSPARENT: 'true'
+        },
+        {
+            // It's an overlay
+            isBaseLayer: false,
+        }
+    );
+
+    map.addLayer(distribution);
 }
 
 function addOccurrencesLayer() {
@@ -53,10 +120,10 @@ function addOccurrencesLayer() {
         var occurrences_default_style = new OpenLayers.Style({
                 // externalGraphic: "${img_url}",
                 pointRadius: "${point_radius}",
-                fillColor: "#00ff66",
-                strokeColor: "#00ff66",
-                fillOpacity: 0.6,
-                strokeOpacity: 0.6,
+                fillColor: "#993344",
+                strokeColor: "#993344",
+                fillOpacity: 0.8,
+                strokeOpacity: 0.8,
         });
 
         // The occurrences layer
@@ -96,8 +163,8 @@ function addOccurrencesLayer() {
                     "select": {
                         "fillColor": "#83aeef",
                         "strokeColor": "#000000",
-                        "fillOpacity": 0.7,
-                        "strokeOpacity": 0.7
+                        "fillOpacity": 0.9,
+                        "strokeOpacity": 0.9
                     },
                 }),
             }
@@ -115,7 +182,7 @@ function addOccurrencesLayer() {
         // tries to be smart, it will check if layer.opacity is different
         // to your setOpacity arg, and will determine that they haven't changed
         // and so will do nothing..
-        occurrences.setOpacity(0.6);
+        occurrences.setOpacity(0.8);
 
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------
@@ -181,34 +248,18 @@ $(document).ready(function() {
 
     $('#SpeciesSpeciesId').change(function(evt) {
         var new_species_id = $('#SpeciesSpeciesId').val();
-        updateSpeciesId(new_species_id);
+        console.log(evt);
+        console.log($('#SpeciesSpeciesId'));
+        species_sci_name_cased = $('#SpeciesSpeciesId option:selected').text();
+        species_sci_name_cased = $.trim(species_sci_name_cased);
+        species_sci_name_cased = species_sci_name_cased.replace('.', '');
+        species_sci_name_cased = species_sci_name_cased.replace(' ', '_');
+        var new_species_name = $('#SpeciesSpeciesId').val();
+        updateSpeciesDetails(new_species_id);
     });
 
-    // Projections
-    // ----------
-
-    // DecLat, DecLng 
-    geographic = new OpenLayers.Projection("EPSG:4326");
-
-    // Spherical Meters
-    mercator = new OpenLayers.Projection("EPSG:900913");
 
 
-    // Bounds
-    // ----------
-
-    // Costa Rica Bounds
-    costa_rica_bounds = new OpenLayers.Bounds();
-    costa_rica_bounds.extend(new OpenLayers.LonLat(-86,7));
-    costa_rica_bounds.extend(new OpenLayers.LonLat(-82,13));
-    costa_rica_bounds = costa_rica_bounds.transform(geographic, mercator);
-
-    // The bounds of the world.
-    // Used to set maxExtent on maps/layers
-    world_bounds = new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
-
-    // Where to zoom the map to on start.
-    zoom_bounds = costa_rica_bounds;
 
 
     // The Map Object
@@ -332,42 +383,6 @@ $(document).ready(function() {
 
 
 
-    // Species Distribution
-    // ----------------------
-
-    // Our distribution map layer.
-    //
-    // NOTE:
-    // -----
-    //
-    // This code may need to be updated now that we are using mercator.
-    // I believe that OpenLayers will send the correct projection request
-    // to Map Server. I also believe that map script will correctly process the
-    // projection request.
-    // I could be wrong though...
-    var dist = new OpenLayers.Layer.WMS(
-        "Distribution",
-        map_tool_url, // path to our map script handler.
-
-        // Params to send as part of request (note: keys will be auto-upcased)
-        // I'm typing them in caps so I don't get confused.
-        {
-            MODE: 'map', 
-            MAP: 'raster.map', 
-            DATA: (species_id + '_1975.asc'), 
-            SPECIESID: species_id, 
-            REASPECT: "false", 
-            TRANSPARENT: 'true'
-        },
-        {
-            // It's an overlay
-            isBaseLayer: false,
-        }
-    );
-
-
-
-
     // Map - Final Setup
     // -------------
 
@@ -382,7 +397,7 @@ $(document).ready(function() {
     layer_switcher.useLegendGraphics = false;
 
     map.addControl(layer_switcher);
-    layer_switcher.maximizeControl();
+//    layer_switcher.maximizeControl();
 
     // Add our layers
 //        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
@@ -392,7 +407,7 @@ $(document).ready(function() {
     map.zoomToExtent(zoom_bounds);
 
     if (species_id !== undefined) {
-        updateSpeciesId(species_id);
+        updateSpeciesDetails(species_id);
     }
 
 });

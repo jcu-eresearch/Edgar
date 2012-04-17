@@ -1,11 +1,22 @@
 <?php
     // Inject javascript to specify species_id and map_tool_url.
-    $map_tool_url = $this->Html->url(array("controller" => "tools", "action" => "map"));
+//    $map_tool_url = $this->Html->url(array("controller" => "tools", "action" => "map"));
+    $map_tool_url = "http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/index.php";
     $species_route_url = $this->Html->url(array("controller" => "species", "action" => "index"));
     if ($single_species_map) {
+        $species_sci_name_cased = $species['Species']['scientific_name'];
+        // Remove dots
+        $species_sci_name_cased = preg_replace('/(\.)/', '', $species_sci_name_cased);
+        // Remove leading and trailing space.
+        $species_sci_name_cased = preg_replace('/(\s+)$/', '', $species_sci_name_cased);
+        $species_sci_name_cased = preg_replace('/^(\s+)/', '', $species_sci_name_cased);
+        // Replace remaining spaces with _
+        $species_sci_name_cased = preg_replace('/(\s)/', '_', $species_sci_name_cased);
+
         $code_block =  "var species_id = '".$species['Species']['id']."';\n".
                        "var map_tool_url = '".$map_tool_url."';".
-                       "var species_route_url= '".$species_route_url."';";
+                       "var species_route_url= '".$species_route_url."';".
+                       "var species_sci_name_cased = '".$species_sci_name_cased."';";
         echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
         echo $this->Html->script(array('species_map'), array('block' => 'script')); 
     } else {
