@@ -7,10 +7,6 @@
  */
 class GeolocationsBehavior extends ModelBehavior {
 
-    const GRID_RANGE_LONGITUDE = 80;    // how many longitude slices to make (cut into GRID_RANGE_LONGITUDE along the x axis)
-    const GRID_RANGE_LATITUDE  = 40;    // how many latitude slices to make (cut into GRID_RANGE_LATITUDE along the y axis)
-    const MIN_FEATURE_RADIUS   = 4;     // pixels
-
     const NON_CLUSTERED_FEATURE_RADIUS   = 8;     // pixels
 
     /**
@@ -35,6 +31,7 @@ class GeolocationsBehavior extends ModelBehavior {
 
         include 'clustering/dotradius.php';
         include 'clustering/dotgrid.php';
+        include 'clustering/squaregrid.php';
 
         $locations = $Model->getLocationsArray();
         $location_features = array();
@@ -46,6 +43,10 @@ class GeolocationsBehavior extends ModelBehavior {
         } elseif ( $cluster_type == "dotgrid" ) {
             // use dotgrid clustering
             $location_features = get_features_dotgrid($Model, $bounds);
+
+        } elseif ( $cluster_type == "squaregrid" ) {
+            // use dotgrid clustering
+            $location_features = get_features_squaregrid($Model, $bounds);
 
         } else {
             // unrecognised clustering type, or clustering type == none

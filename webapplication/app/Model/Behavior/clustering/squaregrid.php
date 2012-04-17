@@ -9,10 +9,10 @@
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-function get_features_dotgrid(Model $Model, $bounds = array() ) {
+function get_features_squaregrid(Model $Model, $bounds = array() ) {
 
-    $GRID_RANGE_LONGITUDE = 120;    // how many longitude slices to make (cut into GRID_RANGE_LONGITUDE along the x axis)
-    $MIN_FEATURE_RADIUS   = 4;     // pixels
+    $MAX_LONGITUDE_GRID = 80;    // how many longitude slices to make, at most
+    $SQUARE_SIDE_OPTIONS = array(16, 8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);
 
     $locations = $Model->getLocationsArray();
     $location_features = array();
@@ -30,34 +30,26 @@ function get_features_dotgrid(Model $Model, $bounds = array() ) {
         throw new BadRequestException(__('max_longitude bounds required when request is clustered.'));
     }
 
-    // Use a grid cluster technique.
-    // Cut the map up into a grid of GRID_RANGE_LONGITUDE x GRID_RANGE_LATITUDE
     // The grid is based on the bounds.
-    // Transform all locations to the nearest grid position
     $min_longitude = $bounds['min_longitude'];
     $max_longitude = $bounds['max_longitude'];
     $min_latitude = $bounds['min_latitude'];
     $max_latitude = $bounds['max_latitude'];
 
-    /*
-        The following is a thought dump..
-        It describes the clustering algorithm used.
-        (assumes GRID_RANGE_LONGITUDE .nd GRID_RANGE_LATITUDE are 50)
-            if min_lat 30 and max_lat 90
-            max_lat - min_lat = 60
-            60 is lat range.
-            grid is 50
-            60/50 is 1.2.
-            Each grid point is 1.2 up/down
-            A occurrence at 30 should be in array location 0    => ( 30 - 30 ) / 1.2
-            An occurrence at 40 should be in array location 8   => ( 40 - 30 ) / 1.2
-            An occurrence at 90 should be in array location 50  => ( 90 - 30 ) / 1.2
-            transform is: ( occur_lat - min_lat ) / transform_lat
-            transform_lat = ( max_lat - min_lat ) / range ( 1.2 in our example )
-    */
-    $transform_longitude = ( $max_longitude - $min_longitude ) / $GRID_RANGE_LONGITUDE;
-    $transform_latitude = $transform_longitude; // actually, make them "square"
+    $long_range = $max_longitude - $min_longitude;
 
+    $side = $SQUARE_SIDE_OPTIONS[0];
+    // find the best size for side of square, based on our options
+    foreach($SQUARE_SIDE_OPTIONS as $candidate_side) {
+        if (($long_range / $candidate_side) < $MAX_LONGITUDE_GRID) {
+            $side = $candidate_side;
+        }
+    }
+
+    $transform_longitude = $side;
+    $transform_latitude = $side; // make them "square"
+
+    $GRID_RANGE_LONGITUDE = (( $max_longitude - $min_longitude ) / $transform_longitude) + 1;
     $GRID_RANGE_LATITUDE = (( $max_latitude - $min_latitude ) / $transform_latitude) + 1;
 
     // Create a 2x2 array of the correct dimensions. Outside array is longitude. Inner array is latitude.
@@ -92,36 +84,40 @@ function get_features_dotgrid(Model $Model, $bounds = array() ) {
 
     // Iterate over our transformed array (our grid array)
     for ($i = 0; $i < sizeOf($transformed_array); $i++) {
+
         // i is the longitude indicator
-        // using i, estimate the center of this grid coordinate (along the longitude axis)
-        $original_longitude_approximation = ( ( $i * $transform_longitude) + $min_longitude + ( $transform_longitude / 2) );
+        $long_min = (    $i    * $transform_longitude) + $min_longitude;
+        $long_max = ( ($i + 1) * $transform_longitude) + $min_longitude;
+
         for ($j = 0; $j < sizeOf($transformed_array[$i]); $j++) {
+
             // j is the longitude indicator
             $locations_approximately_here       = $transformed_array[$i][$j];
             $locations_approximately_here_size  = sizeOf($locations_approximately_here);
             if ($locations_approximately_here_size > 0) {
                 // using j, estimate the center of this grid coordinate (along the latitude axis)
                 $original_latitude_approximation  = ( ( $j * $transform_latitude) + $min_latitude + ( $transform_latitude / 2 ));
-                // Using log (with floor), determine the size of the clustered feature.
-                // 1-9       items = 0 + MIN_FEATURE_RADIUS
-                // 10-99     items = 1 + MIN_FEATURE_RADIUS
-                // 100-999   items = 2 + MIN_FEATURE_RADIUS
-                // 1000-9999 items = 3 + MIN_FEATURE_RADIUS
-                // etc.
-                // Note: we subtract 1 as MIN_FEATURE_RADIUS should be correct for a cluster of 1
 
-                // Create a well-formatted GeoJSON array for this cluster, and append it to our location_features array
-                $point_radius = ( floor(log($locations_approximately_here_size) ) + $MIN_FEATURE_RADIUS );
+                $lat_min = (    $j    * $transform_latitude) + $min_latitude;
+                $lat_max = ( ($j + 1) * $transform_latitude) + $min_latitude;
+                
+                $coords = array(
+                    array($long_min, $lat_min),
+                    array($long_min, $lat_max),
+                    array($long_max, $lat_max),
+                    array($long_max, $lat_min),
+                    array($long_min, $lat_min)
+                );
+                
                 $location_features[] = array(
                     "type" => "Feature",
                     'properties' => array(
-                        'point_radius' => $point_radius,
                         'title' => "".$locations_approximately_here_size." occurrences",
                         'description' => "",
                     ),
                     'geometry' => array(
-                        'type' => 'Point',
-                        'coordinates' => array($original_longitude_approximation, $original_latitude_approximation),
+                        'type' => 'Polygon',
+                        'coordinates' => array($coords),
                     ),
                 );
             }
