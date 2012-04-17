@@ -178,15 +178,18 @@ class SpeciesController extends AppController {
      */
     public function map($id = null) {
         $this->set('title_for_layout', 'Species - Map');
+        if ($id == null) {
+            throw new Exception(__('Not Yet Implemented'));
+        } else {
+            $this->Species->recursive = 0;
 
-        $this->Species->recursive = 0;
+            $this->Species->id = $id;
+            if (!$this->Species->exists()) {
+                throw new NotFoundException(__('Invalid species'));
+            }
 
-        $this->Species->id = $id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
+            $this->set('species', $this->Species->read(null, $id));
         }
-
-        $this->set('species', $this->Species->read(null, $id));
     }
 
 }
