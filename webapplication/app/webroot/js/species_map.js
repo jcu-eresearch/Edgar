@@ -43,13 +43,15 @@ function speciesGeoJSONURL() {
 // Adds the new fresh layers.
 // Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
 // the fly, so we have to replace our old layers.
-function updateSpeciesOccurrencesAndDistributionLayers() {
+function clearExistingSpeciesOccurrencesAndDistributionLayers() {
     // Remove old layers.
     if (occurrences !== undefined) {
         map.removeLayer(occurrences);
+        occurrences = undefined;
     }
     if (distribution !== undefined) {
         map.removeLayer(distribution);
+        distribution = undefined;
     }
 
     // Remove the old occurrence select control.
@@ -57,11 +59,15 @@ function updateSpeciesOccurrencesAndDistributionLayers() {
         occurrence_select_control.unselectAll();
         occurrence_select_control.deactivate();
         map.removeControl(occurrence_select_control);
+        occurrence_select_control = undefined;
     }
 
     // Get rid of any popups the user may of had on screen.
     clearMapPopups();
+}
 
+// Add our species specific layers.
+function addSpeciesOccurrencesAndDistributionLayers() {
     addOccurrencesLayer();
     addDistributionLayer();
 }
@@ -256,16 +262,26 @@ function addOccurrencesLayer() {
 $(document).ready(function() {
 
     // The work to do if the user changes the selected species..
-    // We need to change the species sci name cased for the dist layer.
+    // We need to change the species_sci_name_cased for the dist layer.
     // We need to then update the species details.
     $('#SpeciesSpeciesId').change(function(evt) {
-        species_id = $('#SpeciesSpeciesId').val();
-        species_sci_name_cased = $('#SpeciesSpeciesId option:selected').text();
-        species_sci_name_cased = $.trim(species_sci_name_cased);
-        species_sci_name_cased = species_sci_name_cased.replace(/\./g, '');
-        species_sci_name_cased = species_sci_name_cased.replace(/\s/g, '_');
-        var new_species_name = $('#SpeciesSpeciesId').val();
-        updateSpeciesOccurrencesAndDistributionLayers();
+        var new_species_id = $('#SpeciesSpeciesId').val();
+
+        // Only update the map if the user chose an actual species.
+        // the 'choose one' option has no value.
+        if (new_species_id !== '') {
+                species_id = new_species_id;
+                species_sci_name_cased = $('#SpeciesSpeciesId option:selected').text();
+                species_sci_name_cased = $.trim(species_sci_name_cased);
+                species_sci_name_cased = species_sci_name_cased.replace(/\./g, '');
+                species_sci_name_cased = species_sci_name_cased.replace(/\s/g, '_');
+                var new_species_name = $('#SpeciesSpeciesId').val();
+
+                clearExistingSpeciesOccurrencesAndDistributionLayers();
+                addSpeciesOccurrencesAndDistributionLayers();
+        } else {
+            clearExistingSpeciesOccurrencesAndDistributionLayers();
+        }
     });
 
 
@@ -415,7 +431,7 @@ $(document).ready(function() {
     map.zoomToExtent(zoom_bounds);
 
     if (species_id !== undefined && species_sci_name_cased !== undefined) {
-        updateSpeciesOccurrencesAndDistributionLayers();
+        addSpeciesOccurrencesAndDistributionLayers();
     }
 
 });
