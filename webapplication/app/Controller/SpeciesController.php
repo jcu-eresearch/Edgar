@@ -7,6 +7,7 @@ App::uses('AppController', 'Controller');
  */
 class SpeciesController extends AppController {
     public $components = array('RequestHandler');
+    public $helpers = array('Form', 'Html', 'Js', 'Time');
 
     /**
      * index method
@@ -182,7 +183,16 @@ class SpeciesController extends AppController {
     public function map($id = null) {
         $this->set('title_for_layout', 'Species - Map');
         if ($id == null) {
-            throw new Exception(__('Not Yet Implemented'));
+            $this->Species->recursive = 0;
+            $this->set('single_species_map', false);
+            $this->set('species', 
+                $this->Species->find('list', 
+                array(
+                    'fields' => array('Species.id', 'Species.scientific_name'),
+                    'recursive' => 0,
+                    'order' => array('Species.scientific_name ASC'), //string or array defining order
+                )
+            ));
         } else {
             $this->Species->recursive = 0;
 
@@ -191,6 +201,7 @@ class SpeciesController extends AppController {
                 throw new NotFoundException(__('Invalid species'));
             }
 
+            $this->set('single_species_map', true);
             $this->set('species', $this->Species->read(null, $id));
         }
     }

@@ -729,3 +729,11 @@ pre {
 #url-rewriting-warning {
 	display:none;
 }
+
+form#SpeciesMapForm {
+    margin-bottom: 1em;
+}
+
+form#SpeciesMapForm label {
+    margin-right: 1em;
+}
