@@ -376,7 +376,7 @@ def _mp_init(record_q):
     '''Called when a subprocess is started. See
     Syncer.occurrences_changed_since'''
     _mp_init.record_q = record_q
-    _mp_init.log = None #  multiprocessing.log_to_stderr()
+    #_mp_init.log = multiprocessing.log_to_stderr()
 
 
 def _mp_fetch(species_sname, species_id, since_date):
@@ -397,8 +397,9 @@ def _mp_fetch(species_sname, species_id, since_date):
         num_records = _mp_fetch_inner(species_sname, species_id, since_date)
     except Exception, e:
         failure_msg = str(e)
-        if _mp_init.log is not None:
-            _mp_init.log.exception()
+        if isinstance(e, urllib2.HTTPError):
+            failure_msg += '\n\nResponse Headers:\n' + str(dict(e.info()))
+            failure_msg += '\n\nResponse Payload:\n' + e.read()
 
     if failure_msg is None:
         _mp_init.record_q.put((species_sname, species_id, num_records))
@@ -409,9 +410,7 @@ def _mp_fetch(species_sname, species_id, since_date):
 def _mp_fetch_inner(species_sname, species_id, since_date):
     species = ala.species_for_scientific_name(species_sname)
     if species is None:
-        if _mp_init.log is not None:
-            _mp_init.log.warning('Species not found at ALA: %s', species_sname)
-        return 0
+        raise RuntimeError('Species not found at ALA: ' + species_sname)
 
     num_records = 0
     for record in ala.records_for_species(species.lsid, since_date):
