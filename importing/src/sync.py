@@ -1,6 +1,7 @@
 import db
-import urllib2
 import ala
+import Queue
+import urllib2
 import logging
 import multiprocessing
 import binascii
@@ -96,15 +97,19 @@ class Syncer:
             self.upsert_occurrence(occ, occ.species_id)
         self.flush_upserts()
 
+        log.info('Fetching ALA occurrence record counts per species')
         remote_counts = self.remote_occurrence_counts_by_species_id()
 
         # delete occurrences that have been deleted at ALA
+        log.info('Deleting local occurrences if needed')
         self.delete_local_occurrences_if_needed(remote_counts)
 
         # log warnings if the counts dont match up
+        log.info('Checking that local occurrence counts match ALA')
         self.check_occurrence_counts(remote_counts)
 
         # increase number in db.species.num_dirty_occurrences
+        log.info('Updating number of dirty occurrences')
         self.update_num_dirty_occurrences()
 
     def delete_local_occurrences_if_needed(self, remote_counts):
@@ -312,16 +317,24 @@ class Syncer:
 
         # keep reading from the queue until all the subprocesses are finished
         while active_workers > 0:
-            record = record_q.get()
+            record = None
+            while record is None:
+                try:
+                    record = record_q.get(True, 10.0)
+                except Queue.Empty:
+                    log.warning('Timeout getting record from record_q')
+
             if isinstance(record, ala.OccurrenceRecord):
                 yield record
             elif isinstance(record, tuple):
                 active_workers -= 1
                 if len(record) == 3:
                     if record[2] > 0:
-                        log.info('Finished processing %d records for %s',
+                        log.info('Finished processing %d records for %s' +
+                                 ' (%d species remaining)',
                                  record[2],
-                                 record[0])
+                                 record[0],
+                                 active_workers)
                     if record_dirty:
                         self.increase_dirty_count(record[1], record[2])
                 else:
@@ -332,7 +345,9 @@ class Syncer:
 
 
         # all the subprocesses should be dead by now
+        log.info('Joining subprocesses')
         pool.join()
+        log.info('Join complete')
 
 
     def increase_dirty_count(self, species_id, num_dirty):
@@ -378,7 +393,7 @@ def _mp_init(record_q):
     '''Called when a subprocess is started. See
     Syncer.occurrences_changed_since'''
     _mp_init.record_q = record_q
-    #_mp_init.log = multiprocessing.log_to_stderr()
+    _mp_init.log = multiprocessing.log_to_stderr()
 
 
 def _mp_fetch(species_sname, species_id, since_date):
@@ -393,6 +408,8 @@ def _mp_fetch(species_sname, species_id, since_date):
     Adds a `species_id` attribute to each ala.OccurrenceRecord object set to
     the argument given to this function.'''
 
+    _mp_init.log.info('Started fetching for "%s"', species_sname)
+
     num_records = 0
     failure_msg = None
     try:
@@ -405,8 +422,10 @@ def _mp_fetch(species_sname, species_id, since_date):
 
     if failure_msg is None:
         _mp_init.record_q.put((species_sname, species_id, num_records))
+        _mp_init.log.info('Finished fetching for "%s"', species_sname)
     else:
         _mp_init.record_q.put((failure_msg,))
+        _mp_init.log.warning('FAILED fetching for "%s"', species_sname)
 
 
 def _mp_fetch_inner(species_sname, species_id, since_date):
