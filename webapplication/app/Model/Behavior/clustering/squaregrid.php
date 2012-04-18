@@ -11,9 +11,11 @@
      */
 function get_features_squaregrid(Model $Model, $bounds = array() ) {
 
-    $MAX_SQUARES_LONG = 60;    // how many longitude slices to make, at most
+    $MAX_SQUARES_LONG = 70;    // how many longitude slices to make, at most
     $SIDE_LENGTH_OPTIONS = array(8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);  // four per parent
 //    $SIDE_LENGTH_OPTIONS = array(9, 3, 1, 0.333333333333, 0.111111111111, 0.037037037037);  // nine per parent
+
+    $uncluster_at = 2;
 
     $locations = $Model->getLocationsArray();
     $location_features = array();
@@ -89,10 +91,13 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
             // Look up the grid array for this transformed location
             $this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
 
-            // Append the location's id into the grid's array
-            $this_locations_array[] = $location['id'];
+            // Append the location into the grid's array
+            $this_locations_array[] = $location;
         }
     }
+
+    // just to be fancy, work out the ordered list of cluster sizes
+    $sizes = array();
 
     // Iterate over our transformed array (our grid array)
     for ($i = 0; $i < sizeOf($transformed_array); $i++) {
@@ -106,7 +111,9 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
             // j is the longitude indicator
             $locations_approximately_here       = $transformed_array[$i][$j];
             $locations_approximately_here_size  = sizeOf($locations_approximately_here);
-            if ($locations_approximately_here_size > 0) {
+            if ($locations_approximately_here_size > $uncluster_at) {
+
+                $sizes[] = $locations_approximately_here_size;
 
                 $lat_min = (    $j    * $side) + $min_lat;
                 $lat_max = ( ($j + 1) * $side) + $min_lat;
@@ -118,11 +125,12 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
                     array($long_max, $lat_min),
                     array($long_min, $lat_min)
                 );
-                
+
                 $location_features[] = array(
                     "type" => "Feature",
                     'properties' => array(
                         'occurrence_type' => 'squaregrid',
+                        'cluster_size' => 'large',
                         'title' => "".$locations_approximately_here_size." occurrences",
                         'description' => "",
                         'label' => $locations_approximately_here_size,
@@ -132,10 +140,47 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
                         'coordinates' => array($coords),
                     ),
                 );
+            } else {
+                for ($loc = sizeOf($locations_approximately_here)-1; $loc >= 0; $loc--) {
+                    $long = $locations_approximately_here[$loc]['longitude'];
+                    $lat = $locations_approximately_here[$loc]['latitude'];
+                    $location_features[] = array(
+                        "type" => "Feature",
+                        'properties' => array(
+                            'title' => "Occurrence",
+                            'occurrence_type' => 'dotradius',
+                            'description' => "<dl><dt>Latitude</dt><dd>$lat</dd><dt>Longitude</dt><dd>$long</dd>",
+                            'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS,
+                        ),
+                        'geometry' => array(
+                            'type' => 'Point',
+                            'coordinates' => array($long, $lat),
+                        ),
+                    );
+                }
             }
         }
     }
 
+    // show large/medium/small cluster sizes
+    sort($sizes);
+    $maxsmall = $sizes[floor(sizeOf($sizes) / 3)];
+    $maxmedium = $sizes[floor(sizeOf($sizes) / 3 * 2)];
+
+    for ($i = sizeOf($location_features)-1; $i >= 0; $i--) {
+        if ($location_features[$i]['properties']['occurrence_type'] == 'squaregrid') {
+            $size = $location_features[$i]['properties']['label'];
+            if ($size < $maxsmall) {
+                $location_features[$i]['properties']['cluster_size'] = 'small';
+            } elseif ($size < $maxmedium) {
+                $location_features[$i]['properties']['cluster_size'] = 'medium';
+            } else {
+                $location_features[$i]['properties']['cluster_size'] = 'large';
+            }
+        }
+    }
+
+    // woop we're done!
     return $location_features;
 
 }
