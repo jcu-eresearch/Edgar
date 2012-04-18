@@ -488,10 +488,11 @@ $(document).ready(function() {
     map.addControl(new OpenLayers.Control.MousePosition());
 
     // Let the user change between layers
-    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
-    layer_switcher.roundedCornerColor = "#090909";
+//    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
+    layer_switcher = new OpenLayers.Control.LayerSwitcher();
+//    layer_switcher.roundedCornerColor = "#090909";
     layer_switcher.ascending = false;
-    layer_switcher.useLegendGraphics = true;
+    layer_switcher.useLegendGraphics = false;
 
     map.addControl(layer_switcher);
 //    layer_switcher.maximizeControl();
