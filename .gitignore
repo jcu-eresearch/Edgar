@@ -6,4 +6,4 @@
 *.out
 *.pyc
 *~
-importing/config.json
+.nfs*
