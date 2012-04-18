@@ -41,5 +41,3 @@
 		<li><?php echo $this->Html->link(__('List Occurrences'), array('controller' => 'occurrences', 'action' => 'index')); ?> </li>
 	</ul>
 </div>
-
-</div>
