@@ -152,15 +152,61 @@ function addOccurrencesLayer() {
 //          'externalProjection': geographic 
         });
 
-        // The default style for our occurrences
-        var occurrences_default_style = new OpenLayers.Style({
-                // externalGraphic: "${img_url}",
-                pointRadius: "${point_radius}",
-                fillColor: "#993344",
-                strokeColor: "#993344",
-                fillOpacity: 0.8,
-                strokeOpacity: 0.8,
+        // The styles for our occurrences / cluster points
+
+        var occurrence_StyleMap = new OpenLayers.StyleMap({
+            'default': {
+                'fillColor': "#993344",
+                'strokeColor': "#993344",
+                'fillOpacity': 0.8,
+                'strokeOpacity': 0.8,
+                'fontFamily': 'sans-serif',
+                'fontSize': '13px',
+            },
+            'select': {
+                'fillColor': "#83aeef",
+                'strokeColor': "#000000",
+                'fillOpacity': 0.9,
+                'strokeOpacity': 0.9
+            }
         });
+
+        var occurrence_render_styles = {
+            'dotradius': {
+                'pointRadius': "${point_radius}",
+            },
+            'dotgrid': {
+                'pointRadius': "${point_radius}",
+            },
+            'squaregrid': {
+                'label': "${label}",
+                'fontOpacity': 1.0,
+                'fillOpacity': 0.25,
+                'strokeOpacity': 0.75,
+                'fillColor': "#00ff66",
+                'strokeColor': "#009922",
+            },
+        }
+        occurrence_StyleMap.addUniqueValueRules("default", "occurrence_type", occurrence_render_styles);
+        occurrence_StyleMap.addUniqueValueRules("select", "occurrence_type", occurrence_render_styles);
+
+        var cluster_size_render_styles = {
+            'large': {
+                'fontWeight': 'bold',
+                'fontSize': '13px',
+            },
+            'medium': {
+                'fontWeight': 'medium',
+                'fontSize': '12px',
+            },
+            'small': {
+                'fontWeight': 'medium',
+                'fontSize': '11px',
+            },
+        }
+        occurrence_StyleMap.addUniqueValueRules("default", "cluster_size", cluster_size_render_styles);
+        occurrence_StyleMap.addUniqueValueRules("select", "cluster_size", cluster_size_render_styles);
+       
 
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
@@ -191,18 +237,7 @@ function addOccurrencesLayer() {
                 }),
 
                 // the layer style
-                styleMap: new OpenLayers.StyleMap({
-                    // Default style for this layer.
-                    "default": occurrences_default_style,
-
-                    // Specify style attribute overrides for selected.
-                    "select": {
-                        "fillColor": "#83aeef",
-                        "strokeColor": "#000000",
-                        "fillOpacity": 0.9,
-                        "strokeOpacity": 0.9
-                    },
-                }),
+                styleMap: occurrence_StyleMap,
             }
 
         );
@@ -218,7 +253,7 @@ function addOccurrencesLayer() {
         // tries to be smart, it will check if layer.opacity is different
         // to your setOpacity arg, and will determine that they haven't changed
         // and so will do nothing..
-        occurrences.setOpacity(0.8);
+        occurrences.setOpacity(1.0);
 
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------
