@@ -61,7 +61,7 @@
     $layer->updateFromString(''.
         'CLASSITEM "[pixel]" '.
             'CLASS '.
-                'NAME "0.75 - 1" '.
+                'NAME "0.75 - 1.0" '.
                 'KEYIMAGE "ramp_75_100.gif" '.
                 'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]<=1) '.
                 'STYLE '.
