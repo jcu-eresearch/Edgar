@@ -277,12 +277,17 @@ class Syncer:
 
         return counts
 
+
     def ala_species_for_scientific_name(self, scientific_name):
+        '''Same as ala.species_for_scientific_name except caches the result'''
         self._cache_all_remote_species()
         if scientific_name in self.ala_species_by_sname:
             return self.ala_species_by_sname[scientific_name]
         else:
-            return None
+            species = ala.species_for_scientific_name(scientific_name)
+            self.ala_species_by_sname[scientific_name] = species
+            return species
+
 
     def upsert_occurrence(self, occurrence, species_id):
         '''Looks up whether `occurrence` (an ala.OccurrenceRecord object)
