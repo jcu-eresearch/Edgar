@@ -3,7 +3,7 @@
 // Assumes that the var species_id, map_tool_url and species_route_url have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 
-var map, occurrences, distribution, occurrence_select_control;
+var map, occurrences, distribution, occurrence_select_control, species_distribution_threshold;
 
 // Projections
 // ----------
@@ -41,6 +41,16 @@ function speciesGeoJSONURL() {
 function legendURL() {
     var data = (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc');
     return map_tool_base_url + 'legend.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=costa_rica_test.map&DATA=' + data;
+}
+
+function updateSpeciesInfo(callback) {
+    $.getJSON(species_route_url + '/view/' + species_id + '.json', function(data) {
+        species_common_name = data['Species']['common_name'];
+        species_distribution_threshold = data['Species']['distribution_threshold'];
+        if ( callback != undefined ) {
+            callback();
+        }
+    });
 }
 
 function updateLegend() {
@@ -85,10 +95,12 @@ function clearExistingSpeciesOccurrencesAndDistributionLayers() {
 
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
-    addOccurrencesLayer();
-    addDistributionLayer();
-    updateLegend();
-    showLegend();
+    updateSpeciesInfo(function() {
+        addOccurrencesLayer();
+        addDistributionLayer();
+        updateLegend();
+        showLegend();
+    });
 }
 
 function clearMapPopups() {
@@ -113,7 +125,7 @@ function addDistributionLayer() {
     // I could be wrong though...
     distribution = new OpenLayers.Layer.WMS(
         "Distribution",
-        map_tool_base_url + 'map.php', // path to our map script handler.
+        map_tool_base_url + 'map_with_threshold.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
@@ -123,7 +135,8 @@ function addDistributionLayer() {
             DATA: (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc'),
             SPECIESID: species_id,
             REASPECT: "true",
-            TRANSPARENT: 'true'
+            TRANSPARENT: 'true',
+            THRESHOLD: species_distribution_threshold
         },
         {
             // It's an overlay
@@ -222,6 +235,7 @@ function addOccurrencesLayer() {
                 // resFactor determines how often to update the map.
                 // See: http://dev.openlayers.org/docs/files/OpenLayers/Strategy/BBOX-js.html#OpenLayers.Strategy.BBOX.resFactor
                 // A setting of <= 1 will mean the map is updated every time its zoom/bounds change.
+//                strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
                 strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
                 protocol: new OpenLayers.Protocol.HTTP({
                     // Path to the geo_json_occurrences for this species.

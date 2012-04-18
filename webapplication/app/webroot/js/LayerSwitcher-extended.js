@@ -307,7 +307,8 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                 layerWrapper.id = "layer_" + layer.id;                
                
                 // create input element
-                var inputElem = document.createElement("input");
+                var inputElem = null;
+                inputElem = document.createElement("input");
                 inputElem.id = this.id + "_input_" + layer.name;
                 inputElem.name = (baseLayer) ? "baseLayers" : layer.name;
                 inputElem.type = (baseLayer) ? "radio" : "checkbox";
@@ -315,6 +316,7 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                 inputElem.checked = checked;
                 inputElem.defaultChecked = checked; 
                 inputElem.style.margin = "2px";
+                inputElem.style.background_color = "red";
 
                 if (!baseLayer && !layer.inRange) {
                     inputElem.disabled = true;
@@ -382,15 +384,15 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                     OpenLayers.Event.observe(metadataUrlLink, "click", 
                         OpenLayers.Function.bindAsEventListener(this.onMetadataUrlClick, metadataUrlLinkContext)
                     );
-               
+
                     //XXX Dumped this into the normal toolbar
                     //abstractToolbarSpan.appendChild(metadataUrlLink);
                 }
-               
+
                 // create the title div
                 var titleDiv = document.createElement("div");
                 titleDiv.id = "title_" + layer.id;
-                                
+
                 if(this.activeLayer == layer.id)
                 {
                     titleDiv.style.backgroundColor = "#999";
@@ -417,55 +419,9 @@ OpenLayers.Control.ExtendedLayerSwitcher =
 //                removeButton.title = "Remove layer";     
                                 
                 // layer order controls
-                var upButton = document.createElement("img");
-                upButton.src = OpenLayers.Util.getImagesLocation() + "up.png";
-                upButton.style.cursor = "pointer";  
-                upButton.alt = "Move layer up";
-                upButton.title = "Move layer up";
-                upButton.style.display = (baseLayer) ? 'none' : 'inline';
                 
         //alert("Middle:"+this.dataLayersTitleDiv.innerHTML);
-                var downButton = document.createElement("img");
-                downButton.src = OpenLayers.Util.getImagesLocation() + "down.png";
-                downButton.style.cursor = "pointer";
-                downButton.alt = "Move layer down";
-                downButton.title = "Move layer down";
-                downButton.style.display = (baseLayer) ? 'none' : 'inline';
-                
-                // opaciMiddle controls
-                var opacityMinusButton = document.createElement("img");
-                opacityMinusButton.src = OpenLayers.Util.getImagesLocation() + "minus.png";
-                opacityMinusButton.style.cursor = "pointer";
-                opacityMinusButton.alt = "Decrease opacity";
-                opacityMinusButton.title = "Decrease opacity";
-                                
-                // set the default opacity
-                layer.setOpacity(layer.opacity); 
-                
-                var opacitySpan = document.createElement("span");                
-                opacitySpan.setAttribute("id", "opacityValue_" + layer.id);                
-                opacitySpan.style.display = "inline-block";
-                opacitySpan.style.width = "23px";        
-                
-                var opacityImg = document.createElement("img");
-                opacityImg.setAttribute("id", "opacityImg_" + layer.id); 
-                opacityImg.src = OpenLayers.Util.getImagesLocation() + "opacity.png";
-                opacityImg.width = (layer.opacity != null) ? (layer.opacity * 23).toFixed(0) : "23";
-                opacityImg.height = "12";
-                opacityImg.alt = "Opacity";
-                opacityImg.title = "Opacity";
-                
-                var opacityTextInput = document.createElement("input");                
-                opacityTextInput.setAttribute("id", "opacity_" + layer.id); 
-                opacityTextInput.setAttribute("type", "hidden");
-                opacityTextInput.setAttribute("value", "1.0");
-                
-                var opacityPlusButton = document.createElement("img");
-                opacityPlusButton.src = OpenLayers.Util.getImagesLocation() + "plus.png";
-                opacityPlusButton.style.cursor = "pointer";
-                opacityPlusButton.alt = "increase opacity";
-                opacityPlusButton.title = "increase opacity";
-                
+
                 var abstractButton = document.createElement("img");
                 abstractButton.setAttribute("id", "abstractButton_" + layer.id); 
                 abstractButton.src = OpenLayers.Util.getImagesLocation() + "expand.png";
@@ -474,22 +430,18 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                 abstractButton.style.top = "0";
                 abstractButton.style.right = "0";
                 abstractButton.style.padding = "5px";                   
-                
+
                 var context = {
                     'layer': layer,
                     'inputElem': inputElem,
                     'titleDiv': titleDiv,
                     'layerSwitcher': this
                 };                   
-                                              
+
                 OpenLayers.Event.observe(inputElem, "mouseup", 
                     OpenLayers.Function.bindAsEventListener(this.onInputClick, context)
                 );
 
-//                OpenLayers.Event.observe(titleDiv, "mouseup", 
-//                    OpenLayers.Function.bindAsEventListener(this.onInputClick, context)
-//                );
-                
                 if(layer.queryable) {
                 
                     var queryableButton = document.createElement("img");
@@ -506,36 +458,6 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                         OpenLayers.Function.bindAsEventListener(this.onTitleClick, context)
                     );
                 }
-                
-                OpenLayers.Event.observe(upButton, "click", 
-                    OpenLayers.Function.bindAsEventListener(this.onUpClick, context)
-                );
-                
-                OpenLayers.Event.observe(downButton, "click", 
-                    OpenLayers.Function.bindAsEventListener(this.onDownClick, context)
-                );
-                
-//                OpenLayers.Event.observe(removeButton, "click", 
-//                    OpenLayers.Function.bindAsEventListener(this.onRemoveClick, context)
-//                );
-                
-                var opacityMinusContext = {
-                    'layer': layer,
-                    'byOpacity': '-0.1',
-                    'layerSwitcher': this
-                };
-                OpenLayers.Event.observe(opacityMinusButton, "click", 
-                    OpenLayers.Function.bindAsEventListener(this.changeLayerOpacity, opacityMinusContext)
-                );
-               
-                var opacityPlusContext = {
-                    'layer': layer,
-                    'byOpacity': '0.1',
-                    'layerSwitcher': this
-                };
-                OpenLayers.Event.observe(opacityPlusButton, "click", 
-                    OpenLayers.Function.bindAsEventListener(this.changeLayerOpacity, opacityPlusContext)
-                );
                 
                 var abstractContext = {
                     'layer': layer,
@@ -565,14 +487,12 @@ OpenLayers.Control.ExtendedLayerSwitcher =
                 layerWrapper.appendChild(titleDiv);  
                 titleDiv.appendChild(inputElem);
                 titleDiv.appendChild(buttonSpan);                
-                buttonSpan.appendChild(upButton);
-                buttonSpan.appendChild(downButton);
 //                buttonSpan.appendChild(removeButton);
-                buttonSpan.appendChild(opacityMinusButton);
-                opacitySpan.appendChild(opacityImg);
-                buttonSpan.appendChild(opacitySpan);
-                buttonSpan.appendChild(opacityTextInput);
-                buttonSpan.appendChild(opacityPlusButton);
+//                buttonSpan.appendChild(opacityMinusButton);
+//                opacitySpan.appendChild(opacityImg);
+//                buttonSpan.appendChild(opacitySpan);
+//                buttonSpan.appendChild(opacityTextInput);
+//                buttonSpan.appendChild(opacityPlusButton);
                 
                 if(layer.description) {
                     titleDiv.appendChild(abstractButton);

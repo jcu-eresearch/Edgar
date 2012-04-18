@@ -10,6 +10,7 @@ import sys
 import csv
 from datetime import datetime
 import logging.handlers
+import re
 
 # make sure this isn't run accidentally
 if '--go' not in sys.argv:
@@ -25,6 +26,7 @@ if '--go' not in sys.argv:
     sys.exit()
 
 import_file_path = 'costa_rica_import.csv'
+import_threshold_file_path = 'costa_rica_import_threshold.csv'
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
@@ -53,85 +55,114 @@ result = db.sources.insert().execute(
 db_source_id = result.lastrowid
 
 
-# open the csv..
-with open(import_file_path, 'rb') as f:
-    reader = csv.reader(f)
-    # skip the header
-    header = reader.next()
+# open threshold csv..
+with open(import_threshold_file_path, 'rb') as tf:
+    # open the costa_rica csv..
+    with open(import_file_path, 'rb') as f:
+        reader = csv.reader(f)
+        # skip the header
+        header = reader.next()
 
-    # iterate over the csv rows
-    for csv_row_array in reader:
-        in_collection_code             = csv_row_array.pop(0)
-        in_catalog_number              = csv_row_array.pop(0)
-        in_occurrence_remarks          = csv_row_array.pop(0)
-        in_record_number               = csv_row_array.pop(0)
-        in_event_date                  = csv_row_array.pop(0)
-        in_location_id                 = csv_row_array.pop(0)
-        in_state_province              = csv_row_array.pop(0)
-        in_county                     = csv_row_array.pop(0)
-        in_municipality               = csv_row_array.pop(0)
-        in_locality                   = csv_row_array.pop(0)
-        in_decimal_latitude            = csv_row_array.pop(0)
-        in_decimal_longitude           = csv_row_array.pop(0)
-        in_scientific_name             = csv_row_array.pop(0)
-        in_kingdom                    = csv_row_array.pop(0)
-        in_phylum                     = csv_row_array.pop(0)
-        in_class                      = csv_row_array.pop(0)
-        in_order                      = csv_row_array.pop(0)
-        in_family                     = csv_row_array.pop(0)
-        in_genus                      = csv_row_array.pop(0)
-        in_specific_epithet            = csv_row_array.pop(0)
-        in_infraspecific_epithet       = csv_row_array.pop(0)
-        in_taxon_rank                  = csv_row_array.pop(0)
+        # iterate over the csv rows
+        for csv_row_array in reader:
+
+            in_collection_code             = csv_row_array.pop(0)
+            in_catalog_number              = csv_row_array.pop(0)
+            in_occurrence_remarks          = csv_row_array.pop(0)
+            in_record_number               = csv_row_array.pop(0)
+            in_event_date                  = csv_row_array.pop(0)
+            in_location_id                 = csv_row_array.pop(0)
+            in_state_province              = csv_row_array.pop(0)
+            in_county                     = csv_row_array.pop(0)
+            in_municipality               = csv_row_array.pop(0)
+            in_locality                   = csv_row_array.pop(0)
+            in_decimal_latitude            = csv_row_array.pop(0)
+            in_decimal_longitude           = csv_row_array.pop(0)
+            in_scientific_name             = csv_row_array.pop(0)
+            in_kingdom                    = csv_row_array.pop(0)
+            in_phylum                     = csv_row_array.pop(0)
+            in_class                      = csv_row_array.pop(0)
+            in_order                      = csv_row_array.pop(0)
+            in_family                     = csv_row_array.pop(0)
+            in_genus                      = csv_row_array.pop(0)
+            in_specific_epithet            = csv_row_array.pop(0)
+            in_infraspecific_epithet       = csv_row_array.pop(0)
+            in_taxon_rank                  = csv_row_array.pop(0)
 
 
-        # Add species if necessary..
 
-        # Look up species by scientific_name
-        row = db.species.select('id')\
-                .where(db.species.c.scientific_name == in_scientific_name)\
-                .execute().fetchone()
+            # Add species if necessary..
 
-        db_species_id = None
-        if row is None:
-            # If we couldn't find it..
-            # so add the species
-            result = db.species.insert().execute(
-                scientific_name=in_scientific_name
-            )
+            # Look up species by scientific_name
+            row = db.species.select('id')\
+                    .where(db.species.c.scientific_name == in_scientific_name)\
+                    .execute().fetchone()
 
-            species_count = species_count + 1
+            db_species_id = None
+            if row is None:
+                # If we couldn't find it..
+                # so add the species
 
-            db_species_id = result.lastrowid
-        else:
-            # We found it, grab the species id
-            db_species_id = row['id']
+                tf.seek(0)
+                threshold_reader = csv.reader(tf)
 
-        # insert the occurrence into the db.
-        # NOTE: Some records have empty in_record_numbers.
-        # The sql db validates source_id vs source_record_id
-        # data, so if we have an empty source_record_id, leave it as unspecified
-        # 
+                in_threshold = 1  # The max (will wipe out all values)
+                for threshold_csv_row_array in threshold_reader:
+                    in_species_name = threshold_csv_row_array[0]
+                    in_threshold = threshold_csv_row_array[1]
+                    # compare species sci_names
+                    conv_in_scientific_name = in_scientific_name.strip()
+                    conv_in_scientific_name = conv_in_scientific_name.replace('.', '')
+                    conv_in_scientific_name = conv_in_scientific_name.replace(' ', '_')
+                    #print conv_in_scientific_name
+                    #print in_species_name
+                    #print '...........'
+                    if conv_in_scientific_name == in_species_name:
+                        print '************'
+                        print in_species_name
+                        if in_threshold == 'na':
+                            in_threshold = '1'
+                        print in_threshold
+                        break
+                    sys.stdout.flush()
 
-        occurrences_count = occurrences_count + 1
-        if in_record_number.strip() != '':
-            result = db.occurrences.insert().execute(
-                species_id=db_species_id,
-                latitude=in_decimal_latitude,
-                longitude=in_decimal_longitude,
-                source_id=db_source_id,
-                source_record_id=in_record_number,
-                rating='assumed valid'
-            )
-        else:
-            result = db.occurrences.insert().execute(
-                species_id=db_species_id,
-                latitude=in_decimal_latitude,
-                longitude=in_decimal_longitude,
-                source_id=db_source_id,
-#                source_record_id=in_record_number,
-                rating='assumed valid'
-            )
+                result = db.species.insert().execute(
+                    scientific_name=in_scientific_name,
+                    distribution_threshold=in_threshold,
+                )
+
+                species_count = species_count + 1
+
+                db_species_id = result.lastrowid
+            else:
+                # We found it, grab the species id
+                db_species_id = row['id']
+
+            # insert the occurrence into the db.
+            # NOTE: Some records have empty in_record_numbers.
+            # The sql db validates source_id vs source_record_id
+            # data, so if we have an empty source_record_id, leave it as unspecified
+            # 
+
+            occurrences_count = occurrences_count + 1
+            if in_record_number.strip() != '':
+                result = db.occurrences.insert().execute(
+                    species_id=db_species_id,
+                    latitude=in_decimal_latitude,
+                    longitude=in_decimal_longitude,
+                    source_id=db_source_id,
+                    source_record_id=in_record_number,
+                    rating='assumed valid'
+                )
+            else:
+                result = db.occurrences.insert().execute(
+                    species_id=db_species_id,
+                    latitude=in_decimal_latitude,
+                    longitude=in_decimal_longitude,
+                    source_id=db_source_id,
+    #                source_record_id=in_record_number,
+                    rating='assumed valid'
+                )
 
 
 
