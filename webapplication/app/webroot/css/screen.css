@@ -71,7 +71,7 @@ dl {
 }
 #header h1 {
 	line-height:20px;
-	background: #003d4c url('../img/cake.icon.png') no-repeat left;
+	background: #003d4c url('../img/cr.icon.png') no-repeat left;
 	color: #fff;
 	padding: 0px 30px;
 }
@@ -736,4 +736,17 @@ form#SpeciesMapForm {
 
 form#SpeciesMapForm label {
     margin-right: 1em;
+}
+
+.species.map {
+    position: relative;
+}
+
+#map_legend_img {
+    position: absolute;
+    background-color: #fff;
+    opacity: 0.8;
+    z-index: 10000;
+    bottom: 40px;
+    left: 0px;
 }

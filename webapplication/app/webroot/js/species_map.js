@@ -19,8 +19,8 @@ mercator = new OpenLayers.Projection("EPSG:900913");
 
 // Costa Rica Bounds
 costa_rica_bounds = new OpenLayers.Bounds();
-costa_rica_bounds.extend(new OpenLayers.LonLat(-86,7.5));
-costa_rica_bounds.extend(new OpenLayers.LonLat(-82,12));
+costa_rica_bounds.extend(new OpenLayers.LonLat(-86.5,8.1));
+costa_rica_bounds.extend(new OpenLayers.LonLat(-82.2,11.2));
 costa_rica_bounds = costa_rica_bounds.transform(geographic, mercator);
 
 // The bounds of the world.
@@ -38,6 +38,22 @@ function speciesGeoJSONURL() {
     return (species_route_url + "/geo_json_occurrences/" + species_id + ".json");
 }
 
+function legendURL() {
+    var data = (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc');
+    return map_tool_base_url + 'legend.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=costa_rica_test.map&DATA=' + data;
+}
+
+function updateLegend() {
+    $('#map_legend_img').attr('src', legendURL());
+}
+
+function showLegend() {
+    $('#map_legend_img').show();
+}
+
+function hideLegend() {
+    $('#map_legend_img').hide();
+}
 
 // Removes the old layers..
 // Adds the new fresh layers.
@@ -64,12 +80,15 @@ function clearExistingSpeciesOccurrencesAndDistributionLayers() {
 
     // Get rid of any popups the user may of had on screen.
     clearMapPopups();
+    hideLegend();
 }
 
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
     addOccurrencesLayer();
     addDistributionLayer();
+    updateLegend();
+    showLegend();
 }
 
 function clearMapPopups() {
@@ -94,13 +113,13 @@ function addDistributionLayer() {
     // I could be wrong though...
     distribution = new OpenLayers.Layer.WMS(
         "Distribution",
-        map_tool_url, // path to our map script handler.
+        map_tool_base_url + 'map.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
         {
             MODE: 'map', 
-            MAP: 'costa_rica.map',
+            MAP: 'costa_rica_test.map',
             DATA: (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc'),
             SPECIESID: species_id,
             REASPECT: "true",
@@ -109,6 +128,9 @@ function addDistributionLayer() {
         {
             // It's an overlay
             isBaseLayer: false,
+            transitionEffect: 'resize',
+            singleTile: true,
+            ratio: 1.5,
         }
     );
 
@@ -257,6 +279,7 @@ function addOccurrencesLayer() {
 
         map.addControl(occurrence_select_control);
         occurrence_select_control.activate();
+
 }
 
 $(document).ready(function() {
@@ -417,15 +440,17 @@ $(document).ready(function() {
     // Let the user change between layers
     layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
     layer_switcher.roundedCornerColor = "#090909";
-    layer_switcher.ascending = true;
-    layer_switcher.useLegendGraphics = false;
+    layer_switcher.ascending = false;
+    layer_switcher.useLegendGraphics = true;
 
     map.addControl(layer_switcher);
 //    layer_switcher.maximizeControl();
 
     // Add our layers
 //        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
-    map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0]);
+//    map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0]);
+    map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
+    map.setBaseLayer(gphy);
 
     // Zoom the map to the zoom_bounds specified earlier
     map.zoomToExtent(zoom_bounds);
@@ -434,7 +459,10 @@ $(document).ready(function() {
         addSpeciesOccurrencesAndDistributionLayers();
     }
 
+    addLegend();
+
 });
 
-
+function addLegend() {
+}
 
