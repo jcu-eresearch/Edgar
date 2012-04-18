@@ -40,7 +40,8 @@ function speciesGeoJSONURL() {
 
 function legendURL() {
     var data = (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc');
-    return map_tool_base_url + 'legend.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=costa_rica_test.map&DATA=' + data;
+    return map_tool_base_url + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=costa_rica.map&DATA=' + data +
+        '&THRESHOLD=' + species_distribution_threshold;
 }
 
 function updateSpeciesInfo(callback) {
@@ -131,7 +132,7 @@ function addDistributionLayer() {
         // I'm typing them in caps so I don't get confused.
         {
             MODE: 'map', 
-            MAP: 'costa_rica_test.map',
+            MAP: 'costa_rica.map',
             DATA: (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc'),
             SPECIESID: species_id,
             REASPECT: "true",
