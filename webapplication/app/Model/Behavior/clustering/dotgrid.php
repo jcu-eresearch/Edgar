@@ -116,6 +116,7 @@ function get_features_dotgrid(Model $Model, $bounds = array() ) {
                     "type" => "Feature",
                     'properties' => array(
                         'point_radius' => $point_radius,
+                        'occurrence_type' => 'dotgrid',
                         'title' => "".$locations_approximately_here_size." occurrences",
                         'description' => "",
                     ),

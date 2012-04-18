@@ -217,6 +217,38 @@ $(document).ready(function() {
                 strokeOpacity: 0.6,
         });
 
+
+
+
+
+        var occurrence_StyleMap = new OpenLayers.StyleMap({
+            'default': {
+                'fillColor': "#00ff66",
+                'strokeColor': "#00ff66",
+                'fillOpacity': 0.6,
+                'strokeOpacity': 0.6,
+            },
+            'select': {
+                'fillColor': "#83aeef",
+                'strokeColor': "#000000",
+            }
+        });
+
+        var occurrence_render_styles = {
+            'dotradius': {
+                pointRadius: "${point_radius}",
+            },
+            'dotgrid': {
+                pointRadius: "${point_radius}",
+            },
+            'squaregrid': {
+                label: "${label}",
+            },
+        }
+
+        occurrence_StyleMap.addUniqueValueRules("default", "occurrence_type", occurrence_render_styles);
+        
+
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
         var occurrences = new OpenLayers.Layer.Vector(
@@ -248,6 +280,11 @@ $(document).ready(function() {
                 }),
 
                 // the layer style
+                styleMap: occurrence_StyleMap,
+
+
+/*
+                // the layer style
                 styleMap: new OpenLayers.StyleMap({
                     // Default style for this layer.
                     "default": occurrences_default_style,
@@ -260,6 +297,8 @@ $(document).ready(function() {
                         "strokeOpacity": 0.7
                     },
                 }),
+*/
+
             }
 
         );

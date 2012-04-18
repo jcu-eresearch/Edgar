@@ -22,6 +22,7 @@ function get_features_dotradius(Model $Model, $bounds = array() ) {
                 "type" => "Feature",
                 'properties' => array(
                     'title' => "Occurrence",
+                    'occurrence_type' => 'dotradius',
                     'description' => "<dl><dt>Latitude</dt><dd>$longitude</dd><dt>Longitude</dt><dd>$latitude</dd>",
                     'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS,
                 ),

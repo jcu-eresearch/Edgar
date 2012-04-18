@@ -11,8 +11,9 @@
      */
 function get_features_squaregrid(Model $Model, $bounds = array() ) {
 
-    $MAX_LONGITUDE_GRID = 80;    // how many longitude slices to make, at most
-    $SQUARE_SIDE_OPTIONS = array(16, 8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);
+    $MAX_SQUARES_LONG = 60;    // how many longitude slices to make, at most
+    $SIDE_LENGTH_OPTIONS = array(8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);  // four per parent
+//    $SIDE_LENGTH_OPTIONS = array(9, 3, 1, 0.333333333333, 0.111111111111, 0.037037037037);  // nine per parent
 
     $locations = $Model->getLocationsArray();
     $location_features = array();
@@ -31,34 +32,45 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
     }
 
     // The grid is based on the bounds.
-    $min_longitude = $bounds['min_longitude'];
-    $max_longitude = $bounds['max_longitude'];
-    $min_latitude = $bounds['min_latitude'];
-    $max_latitude = $bounds['max_latitude'];
+    $min_long = $bounds['min_longitude'];
+    $max_long = $bounds['max_longitude'];
+    $min_lat = $bounds['min_latitude'];
+    $max_lat = $bounds['max_latitude'];
 
-    $long_range = $max_longitude - $min_longitude;
+    $long_range = $max_long - $min_long;
+    $lat_range = $max_lat - $min_lat;
 
-    $side = $SQUARE_SIDE_OPTIONS[0];
+    $side = $SIDE_LENGTH_OPTIONS[0];
     // find the best size for side of square, based on our options
-    foreach($SQUARE_SIDE_OPTIONS as $candidate_side) {
-        if (($long_range / $candidate_side) < $MAX_LONGITUDE_GRID) {
+    foreach($SIDE_LENGTH_OPTIONS as $candidate_side) {
+        // starting at the high end, test candidates; if a candidate wouldn't make to many squares, it's accepted
+        if (($long_range / $candidate_side) < $MAX_SQUARES_LONG) {
             $side = $candidate_side;
         }
     }
+    // $side is now the smallest side that makes less than $MAX_SQUARES_LONG squares longitudinally
 
-    $transform_longitude = $side;
-    $transform_latitude = $side; // make them "square"
+    // now, our squares, whatever size they are, should be aligned to (0,0).  So if you chose
+    // 8 degree squares, the grid squares should have be at 0, 8, 16, etc (not 1, 9, 17...).  To 
+    // make this work we have to re-adjust the lat and long starting points to be multiples of 
+    // the chosen side length.
+    $squares_longitudinally = ceil($long_range / $side) + 1;
+    $min_long = floor($min_long / $side) * $side;
+    $max_long = $min_long + ($side * $squares_longitudinally);
+    $long_range = $max_long - $min_long;
 
-    $GRID_RANGE_LONGITUDE = (( $max_longitude - $min_longitude ) / $transform_longitude) + 1;
-    $GRID_RANGE_LATITUDE = (( $max_latitude - $min_latitude ) / $transform_latitude) + 1;
+    $squares_latitudinally = ceil($lat_range / $side) + 1;
+    $min_lat = floor($min_lat / $side) * $side;
+    $max_lat = $min_lat + ($side * $squares_latitudinally);
+    $lat_range = $max_lat - $min_lat;
 
     // Create a 2x2 array of the correct dimensions. Outside array is longitude. Inner array is latitude.
     $transformed_array = array_fill(
         0,
-        $GRID_RANGE_LONGITUDE,
+        $squares_longitudinally,
         array_fill(
             0, 
-            $GRID_RANGE_LATITUDE,
+            $squares_latitudinally,
             array()
         )
     );
@@ -71,8 +83,8 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
         // then place the location's id within the transformed array at the transformed grid location
         if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
             // transform the latitude and longitude into our grid co-ordinates
-            $transformed_longitude = floor( ( $longitude - $min_longitude ) / $transform_longitude );
-            $transformed_latitude  = floor( ( $latitude - $min_latitude ) / $transform_latitude );
+            $transformed_longitude = floor( ( $longitude - $min_long ) / $side );
+            $transformed_latitude  = floor( ( $latitude - $min_lat ) / $side );
 
             // Look up the grid array for this transformed location
             $this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
@@ -86,8 +98,8 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
     for ($i = 0; $i < sizeOf($transformed_array); $i++) {
 
         // i is the longitude indicator
-        $long_min = (    $i    * $transform_longitude) + $min_longitude;
-        $long_max = ( ($i + 1) * $transform_longitude) + $min_longitude;
+        $long_min = (    $i    * $side) + $min_long;
+        $long_max = ( ($i + 1) * $side) + $min_long;
 
         for ($j = 0; $j < sizeOf($transformed_array[$i]); $j++) {
 
@@ -95,11 +107,9 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
             $locations_approximately_here       = $transformed_array[$i][$j];
             $locations_approximately_here_size  = sizeOf($locations_approximately_here);
             if ($locations_approximately_here_size > 0) {
-                // using j, estimate the center of this grid coordinate (along the latitude axis)
-                $original_latitude_approximation  = ( ( $j * $transform_latitude) + $min_latitude + ( $transform_latitude / 2 ));
 
-                $lat_min = (    $j    * $transform_latitude) + $min_latitude;
-                $lat_max = ( ($j + 1) * $transform_latitude) + $min_latitude;
+                $lat_min = (    $j    * $side) + $min_lat;
+                $lat_max = ( ($j + 1) * $side) + $min_lat;
                 
                 $coords = array(
                     array($long_min, $lat_min),
@@ -112,8 +122,10 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
                 $location_features[] = array(
                     "type" => "Feature",
                     'properties' => array(
+                        'occurrence_type' => 'squaregrid',
                         'title' => "".$locations_approximately_here_size." occurrences",
                         'description' => "",
+                        'label' => $locations_approximately_here_size,
                     ),
                     'geometry' => array(
                         'type' => 'Polygon',
