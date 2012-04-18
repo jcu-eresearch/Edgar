@@ -45,7 +45,7 @@ function legendURL() {
 }
 
 function updateSpeciesInfo(callback) {
-    $.getJSON(species_route_url + '/view/' + species_id + '.json', function(data) {
+    $.getJSON(species_route_url + '/minimal_view/' + species_id + '.json', function(data) {
         species_common_name = data['Species']['common_name'];
         species_distribution_threshold = data['Species']['distribution_threshold'];
         if ( callback != undefined ) {

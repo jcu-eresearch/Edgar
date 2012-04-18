@@ -44,6 +44,27 @@ class SpeciesController extends AppController {
     }
 
     /**
+     * minimal_view method
+     *
+     * @param string $id
+     * @return void
+     */
+    public function minimal_view($id = null) {
+        $this->set('title_for_layout', 'Species - View');
+
+        $this->Species->recursive = 0;
+
+        $this->Species->id = $id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException(__('Invalid species'));
+        }
+        $this->set('species', $this->Species->read(null, $id));
+
+        // Specify the output for the json view.
+        $this->set('_serialize', 'species');
+    }
+
+    /**
      * occurrences method
      *
      * @param string $id
