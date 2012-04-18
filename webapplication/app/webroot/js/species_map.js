@@ -130,46 +130,36 @@ function addOccurrencesLayer() {
 //          'externalProjection': geographic 
         });
 
-        // The default style for our occurrences
-        var occurrences_default_style = new OpenLayers.Style({
-                // externalGraphic: "${img_url}",
-                pointRadius: "${point_radius}",
-                fillColor: "#993344",
-                strokeColor: "#993344",
-                fillOpacity: 0.8,
-                strokeOpacity: 0.8,
-        });
-
-
-
-
+        // The styles for our occurrences / cluster points
 
         var occurrence_StyleMap = new OpenLayers.StyleMap({
             'default': {
-                'fillColor': "#00ff66",
-                'strokeColor': "#00ff66",
-                'fillOpacity': 0.6,
-                'strokeOpacity': 0.6,
+                'fillColor': "#993344",
+                'strokeColor': "#993344",
+                'fillOpacity': 0.8,
+                'strokeOpacity': 0.8,
             },
             'select': {
                 'fillColor': "#83aeef",
                 'strokeColor': "#000000",
+                'fillOpacity': 0.9,
+                'strokeOpacity': 0.9
             }
         });
 
         var occurrence_render_styles = {
             'dotradius': {
-                pointRadius: "${point_radius}",
+                'pointRadius': "${point_radius}",
             },
             'dotgrid': {
-                pointRadius: "${point_radius}",
+                'pointRadius': "${point_radius}",
             },
             'squaregrid': {
-                label: "${label}",
+                'label': "${label}",
             },
         }
-
         occurrence_StyleMap.addUniqueValueRules("default", "occurrence_type", occurrence_render_styles);
+        occurrence_StyleMap.addUniqueValueRules("select", "occurrence_type", occurrence_render_styles);
         
 
         // The occurrences layer
@@ -202,24 +192,6 @@ function addOccurrencesLayer() {
 
                 // the layer style
                 styleMap: occurrence_StyleMap,
-
-
-/*
-                // the layer style
-                styleMap: new OpenLayers.StyleMap({
-                    // Default style for this layer.
-                    "default": occurrences_default_style,
-
-                    // Specify style attribute overrides for selected.
-                    "select": {
-                        "fillColor": "#83aeef",
-                        "strokeColor": "#000000",
-                        "fillOpacity": 0.9,
-                        "strokeOpacity": 0.9
-                    },
-                }),
-*/
-
             }
 
         );
