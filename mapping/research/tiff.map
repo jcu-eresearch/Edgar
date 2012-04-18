@@ -1,0 +1,162 @@
+#simple version of map file
+
+MAP
+
+#define the image type
+    IMAGETYPE PNG8
+
+#define the area
+     EXTENT -180 -90 180 90
+
+#define the size of output image
+    SIZE 256 256
+
+#define the working folder of this map file
+    SHAPEPATH "data/tiff/"
+
+#define the background color
+    TRANSPARENT ON
+    IMAGECOLOR 0 255 255
+
+#define the folder that used for generate image
+#    WEB
+#        IMAGEPATH '/tmp/'
+#        IMAGEURL '/tmp/'
+#    END
+
+#the layer for raster data. you can put multiple layers in one map file
+    LAYER
+        NAME "DISTRIBUTION"
+        TYPE RASTER
+        STATUS ON
+        PROCESSING "SCALE=AUTO"
+
+        #define the transparent of image. 100 is not transpartent.
+        #0 is totally transparent.
+        TRANSPARENCY 40
+
+        #define the color table. color are define as RGB color from 0 to 255.
+        #EXPRESSION are used to define the style apply to the right rang of data
+        #COLORRANGE and DATARANGE are paired to generate gradient color
+        CLASSITEM "[pixel]"
+        CLASS
+            EXPRESSION ([pixel]<0.00001)
+            STYLE
+                COLORRANGE  0 0 0 255 0 0
+                DATARANGE   0 0.00001
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.00001 AND [pixel] < 0.0001)
+            STYLE
+                COLORRANGE  200 220 220 200 0 0
+                DATARANGE   0.00001 0.0001
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.0001 AND [pixel] < 0.001)
+            STYLE
+                COLORRANGE  180 220 220 220 0 0
+                DATARANGE   0.0001 0.001
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.001 AND [pixel] < 0.01)
+            STYLE
+                COLORRANGE  140 220 220 220 0 0
+                DATARANGE   0.001 0.01
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.01 AND [pixel] < 0.1)
+            STYLE
+                COLORRANGE  100 220 220 220 0 0
+                DATARANGE   0.01 0.1
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.1 AND [pixel] < 0.125)
+            STYLE
+                COLORRANGE  0 220 220 220 0 0
+                DATARANGE   0.1 0.125
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.125 AND [pixel] < 0.15)
+            STYLE
+                COLORRANGE  0 200 200 200 0 0
+                DATARANGE   0.125 0.15
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.15 AND [pixel] < 0.175)
+            STYLE
+                COLORRANGE  0 180 180 180 0 0
+                DATARANGE   0.15 0.175
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.175 AND [pixel] < 0.2)
+            STYLE
+                COLORRANGE  0 160 160 160 0 0
+                DATARANGE   0.175 0.2
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.2 AND [pixel] < 0.3)
+            STYLE
+                COLORRANGE  0 140 140 140 0 0
+                DATARANGE   0.2 0.3
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.3 AND [pixel] < 0.4)
+            STYLE
+                COLORRANGE  0 120 120 120 0 0
+                DATARANGE   0.3 0.4
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.4 AND [pixel] < 0.5)
+            STYLE
+                COLORRANGE  30 0 0 30 30 0
+                DATARANGE   0.4 0.5
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.5 AND [pixel] < 0.6)
+            STYLE
+                COLORRANGE  80 0 0 80 80 0
+                DATARANGE   0.5 0.6
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.6 AND [pixel] < 0.7)
+            STYLE
+                COLORRANGE  120 0 0 120 120 0
+                DATARANGE   0.6 0.7
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.7 AND [pixel] < 0.8)
+            STYLE
+                COLORRANGE  160 0 0 160 160 0
+                DATARANGE   0.7 0.8
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel] >= 0.8 AND [pixel] < 0.9)
+            STYLE
+                COLORRANGE  180 0 0 180 180 0
+                DATARANGE   0.8 0.9
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel]>=0.9)
+            STYLE
+                COLORRANGE  255 0 0 255 255 0
+                DATARANGE   0.9 1
+            END
+        END
+    END
+END

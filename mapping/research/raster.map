@@ -1,0 +1,71 @@
+#simple version of map file
+
+MAP
+
+#define the image type
+    IMAGETYPE PNG8
+
+#define the area
+     EXTENT -180 -90 180 90
+
+#define the size of output image
+#    SIZE 256 256
+
+#define the working folder of this map file
+    SHAPEPATH "data/raster/"
+
+#define the background color
+    TRANSPARENT ON
+    IMAGECOLOR 0 255 255
+
+#define the folder that used for generate image
+#    WEB
+#        IMAGEPATH '/tmp/'
+#        IMAGEURL '/tmp/'
+#    END
+
+#the layer for raster data. you can put multiple layers in one map file
+    LAYER
+        NAME "DISTRIBUTION"
+        TYPE RASTER
+        STATUS ON
+        PROCESSING "SCALE=AUTO"
+
+        #define the transparent of image. 100 is not transpartent.
+        #0 is totally transparent.
+        TRANSPARENCY 60
+
+        #define the color table. color are define as RGB color from 0 to 255.
+        #EXPRESSION are used to define the style apply to the right rang of data
+        #COLORRANGE and DATARANGE are paired to generate gradient color
+        CLASSITEM "[pixel]"
+        CLASS
+            EXPRESSION ([pixel]>0 AND [pixel]<0.25)
+            STYLE
+                COLORRANGE  0 0 255 0 255 255
+                DATARANGE   0 0.25
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel]>=0.25 AND [pixel]<0.5)
+            STYLE
+                COLORRANGE  0 255 255 0 255 0
+                DATARANGE   0.25 0.5
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel]>=0.5 AND [pixel]<0.75)
+            STYLE
+                COLORRANGE  0 255 0 255 255 0
+                DATARANGE   0.5 0.75
+            END
+        END
+        CLASS
+            EXPRESSION ([pixel]>=0.75)
+            STYLE
+                COLORRANGE  255 255 0 255 0 0
+                DATARANGE   0.75 1
+            END
+        END
+    END
+END

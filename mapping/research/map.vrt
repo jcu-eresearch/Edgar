@@ -1,0 +1,7 @@
+<OGRVRTDataSource>
+    <OGRVRTLayer name="dem">
+        <SrcDataSource>dem.csv</SrcDataSource> 
+        <GeometryType>wkbPoint</GeometryType> 
+        <GeometryField encoding="PointFromColumns" x="X" y="Y" z="Logistic prediction"/> 
+    </OGRVRTLayer>
+</OGRVRTDataSource>
