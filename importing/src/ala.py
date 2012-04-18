@@ -140,13 +140,14 @@ def all_bird_species():
 
     for page in _json_pages(url, params, total_key_path, 'start'):
         for result in page['searchResults']['results']:
-            s = Species()
-            s.lsid = result['guid']
-            s.scientific_name = result['nameComplete'].strip()
-            if result['commonNameSingle'] is not None:
-                s.common_name = result['commonNameSingle'].strip()
+            if result['occCount'] > 0:
+                s = Species()
+                s.lsid = result['guid']
+                s.scientific_name = result['nameComplete'].strip()
+                if result['commonNameSingle'] is not None:
+                    s.common_name = result['commonNameSingle'].strip()
 
-            yield s
+                yield s
 
 
 def num_records_for_lsid(lsid):
@@ -228,7 +229,9 @@ def _retry(retries=5, delay=10, backoff=2):
             while True:
                 try:
                     return f(*args, **kwargs)
-                except:
+                except Exception, e:
+                    log.warning('Retrying fetch due to exception: %s', str(e))
+
                     mtries -= 1
                     if mtries > 0:
                         time.sleep(mdelay)

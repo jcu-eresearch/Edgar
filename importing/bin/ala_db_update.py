@@ -29,8 +29,8 @@ def update(config):
     syncer = sync.Syncer()
 
     # add new species
-    logging.info('Adding new species')
     if config['updateSpecies']:
+        logging.info('Adding new species')
         added_species, deleted_species = syncer.added_and_deleted_species()
         for species in added_species:
             syncer.add_species(species)
@@ -47,8 +47,8 @@ def update(config):
                 execute()
 
     # delete old species, and species without any occurrences
-    logging.info("Deleting species that don't exist any more")
     if config['updateSpecies']:
+        logging.info("Deleting species that don't exist any more")
         for species in deleted_species:
             syncer.delete_species(species)
         for species in syncer.local_species_with_no_occurrences():
