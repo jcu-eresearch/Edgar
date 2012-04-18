@@ -1,198 +1,121 @@
 // Author: Robert Pyke
 //
-// Assumes that the var species_id has already been set.
+// Assumes that the var species_id, map_tool_url and species_route_url have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 
-var map, occurrence_select_control;
+var map, occurrences, distribution, occurrence_select_control;
+
+// Projections
+// ----------
+
+// DecLat, DecLng 
+geographic = new OpenLayers.Projection("EPSG:4326");
+
+// Spherical Meters
+mercator = new OpenLayers.Projection("EPSG:900913");
+
+// Bounds
+// ----------
+
+// Costa Rica Bounds
+costa_rica_bounds = new OpenLayers.Bounds();
+costa_rica_bounds.extend(new OpenLayers.LonLat(-86,7.5));
+costa_rica_bounds.extend(new OpenLayers.LonLat(-82,12));
+costa_rica_bounds = costa_rica_bounds.transform(geographic, mercator);
+
+// The bounds of the world.
+// Used to set maxExtent on maps/layers
+world_bounds = new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+
+// Where to zoom the map to on start.
+zoom_bounds = costa_rica_bounds;
 
 // Edgar bing api key.
 // (registered under Robert's name)
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 
-$(document).ready(function() {
-
-        // Projections
-        // ----------
-
-        // DecLat, DecLng 
-        geographic = new OpenLayers.Projection("EPSG:4326");
-
-        // Spherical Meters
-        mercator = new OpenLayers.Projection("EPSG:900913");
+function speciesGeoJSONURL() {
+    return (species_route_url + "/geo_json_occurrences/" + species_id + ".json");
+}
 
 
-        // Bounds
-        // ----------
+// Removes the old layers..
+// Adds the new fresh layers.
+// Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
+// the fly, so we have to replace our old layers.
+function clearExistingSpeciesOccurrencesAndDistributionLayers() {
+    // Remove old layers.
+    if (occurrences !== undefined) {
+        map.removeLayer(occurrences);
+        occurrences = undefined;
+    }
+    if (distribution !== undefined) {
+        map.removeLayer(distribution);
+        distribution = undefined;
+    }
 
-        // Costa Rica Bounds
-        costa_rica_bounds = new OpenLayers.Bounds();
-        costa_rica_bounds.extend(new OpenLayers.LonLat(-86,7));
-        costa_rica_bounds.extend(new OpenLayers.LonLat(-82,13));
-        costa_rica_bounds = costa_rica_bounds.transform(geographic, mercator);
+    // Remove the old occurrence select control.
+    if (occurrence_select_control !== undefined) {
+        occurrence_select_control.unselectAll();
+        occurrence_select_control.deactivate();
+        map.removeControl(occurrence_select_control);
+        occurrence_select_control = undefined;
+    }
 
-        // The bounds of the world.
-        // Used to set maxExtent on maps/layers
-        world_bounds = new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+    // Get rid of any popups the user may of had on screen.
+    clearMapPopups();
+}
 
-        // Where to zoom the map to on start.
-        zoom_bounds = costa_rica_bounds;
+// Add our species specific layers.
+function addSpeciesOccurrencesAndDistributionLayers() {
+    addOccurrencesLayer();
+    addDistributionLayer();
+}
 
+function clearMapPopups() {
+    $.each(map.popups, function(index, popup) {
+        map.removePopup(popup);
+    });
+}
 
-        // The Map Object
-        // ----------
+function addDistributionLayer() {
+    // Species Distribution
+    // ----------------------
 
-        map = new OpenLayers.Map('map', {
-            projection: mercator,
-            displayProjection: geographic,
-            units: "m",
-            maxResolution: 156543.0339,
-            maxExtent: world_bounds
+    // Our distribution map layer.
+    //
+    // NOTE:
+    // -----
+    //
+    // This code may need to be updated now that we are using mercator.
+    // I believe that OpenLayers will send the correct projection request
+    // to Map Server. I also believe that map script will correctly process the
+    // projection request.
+    // I could be wrong though...
+    distribution = new OpenLayers.Layer.WMS(
+        "Distribution",
+        map_tool_url, // path to our map script handler.
 
-            // Setting the restrictedExtent will change the bounds
-            // that pressing the 'world' icon zooms to.
-            // User can manually zoom out past this point.
-//            restrictedExtent: zoom_bounds
+        // Params to send as part of request (note: keys will be auto-upcased)
+        // I'm typing them in caps so I don't get confused.
+        {
+            MODE: 'map', 
+            MAP: 'costa_rica.map',
+            DATA: (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc'),
+            SPECIESID: species_id,
+            REASPECT: "true",
+            TRANSPARENT: 'true'
+        },
+        {
+            // It's an overlay
+            isBaseLayer: false,
+        }
+    );
 
-        });
+    map.addLayer(distribution);
+}
 
-
-        // VMap0
-        // ----------
-
-        // The standard open layers VMAP0 layer.
-        // A public domain layer.
-        // Read about this layer here: http://earth-info.nga.mil/publications/vmap0.html
-        // and here: http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29
-        var vmap0 = new OpenLayers.Layer.WMS(
-            "World Map (VMAP0)",
-            "http://vmap0.tiles.osgeo.org/wms/vmap0",
-            {
-                'layers':'basic',
-            }
-        );
-
-
-        // Open Street Map
-        // ----------------
-
-        // The Open Street Map layer.
-        // See more here: http://wiki.openstreetmap.org/wiki/Main_Page
-        // and specifically here: http://wiki.openstreetmap.org/wiki/OpenLayers
-        var osm = new OpenLayers.Layer.OSM(
-            "Open Street Map"
-        );
-
-
-        // Google Maps Layers
-        // --------------------
-        //
-        // requires google maps v2 (with valid API key)
-
-        // Google Physical layer
-        var gphy = new OpenLayers.Layer.Google(
-                "Google Physical",
-                {
-                    type: G_PHYSICAL_MAP,
-                    'sphericalMercator': true,
-                    'maxExtent': world_bounds
-                }
-        );
-
-        // Google Streets layer
-        var gmap = new OpenLayers.Layer.Google(
-                "Google Streets",
-                {
-                    numZoomLevels:20,
-                    'sphericalMercator': true,
-                    'maxExtent': world_bounds
-                }
-        );
-
-        // Google Hybrid layer
-        var ghyb = new OpenLayers.Layer.Google(
-                "Google Hybrid",
-                {
-                    type: G_HYBRID_MAP,
-                    'sphericalMercator': true,
-                    'maxExtent': world_bounds
-                }
-        );
-
-        // Google Satellite layer
-        var gsat = new OpenLayers.Layer.Google(
-                "Google Satellite",
-                {
-                    type: G_SATELLITE_MAP,
-                    numZoomLevels: 22,
-                    'sphericalMercator': true,
-                    'maxExtent': world_bounds
-                }
-        );
-
-
-        // Bing Maps Layers
-        // --------------------
-        //
-        // Requires bing_api_key to be set
-        // More info and registration here: http://bingmapsportal.com/
-
-        // Bing Road layer
-        var bing_road = new OpenLayers.Layer.Bing({
-            name: "Bing Road",
-            key: bing_api_key,
-            type: "Road"
-        });
-
-        // Bing Hybrid layer
-        var bing_hybrid = new OpenLayers.Layer.Bing({
-            name: "Bing Hybrid",
-            key: bing_api_key,
-            type: "AerialWithLabels"
-        });
-
-        // Bing Aerial layer
-        var bing_aerial = new OpenLayers.Layer.Bing({
-            name: "Bing Aerial",
-            key: bing_api_key,
-            type: "Aerial"
-        });
-
-
-
-        // Species Distribution
-        // ----------------------
-
-        // Our distribution map layer.
-        //
-        // NOTE:
-        // -----
-        //
-        // This code may need to be updated now that we are using mercator.
-        // I believe that OpenLayers will send the correct projection request
-        // to Map Server. I also believe that map script will correctly process the
-        // projection request.
-        // I could be wrong though...
-        var dist = new OpenLayers.Layer.WMS(
-            "Distribution",
-            map_tool_url, // path to our map script handler.
-
-            // Params to send as part of request (note: keys will be auto-upcased)
-            // I'm typing them in caps so I don't get confused.
-            {
-                MODE: 'map', 
-                MAP: 'raster.map', 
-                DATA: (species_id + '_1975.asc'), 
-                SPECIESID: species_id, 
-                REASPECT: "false", 
-                TRANSPARENT: 'true'
-            },
-            {
-                // It's an overlay
-                isBaseLayer: false,
-            }
-        );
-
-
+function addOccurrencesLayer() {
         // Occurrences Layer
         // -----------------
 
@@ -211,10 +134,10 @@ $(document).ready(function() {
         var occurrences_default_style = new OpenLayers.Style({
                 // externalGraphic: "${img_url}",
                 pointRadius: "${point_radius}",
-                fillColor: "#00ff66",
-                strokeColor: "#00ff66",
-                fillOpacity: 0.6,
-                strokeOpacity: 0.6,
+                fillColor: "#993344",
+                strokeColor: "#993344",
+                fillOpacity: 0.8,
+                strokeOpacity: 0.8,
         });
 
 
@@ -251,7 +174,7 @@ $(document).ready(function() {
 
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
-        var occurrences = new OpenLayers.Layer.Vector(
+        occurrences = new OpenLayers.Layer.Vector(
             "Occurrences", 
             {
                 // It's an overlay
@@ -266,9 +189,7 @@ $(document).ready(function() {
                 strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
                 protocol: new OpenLayers.Protocol.HTTP({
                     // Path to the geo_json_occurrences for this species.
-                    // This probably should be stored in a javascript var
-                    // similar to map_tool_url.
-                    url: "../geo_json_occurrences/" + species_id + ".json",
+                    url: speciesGeoJSONURL(),
                     params: {
                         // Place addition custom request params here..
                         bound: true,        // do bound the request
@@ -293,8 +214,8 @@ $(document).ready(function() {
                     "select": {
                         "fillColor": "#83aeef",
                         "strokeColor": "#000000",
-                        "fillOpacity": 0.7,
-                        "strokeOpacity": 0.7
+                        "fillOpacity": 0.9,
+                        "strokeOpacity": 0.9
                     },
                 }),
 */
@@ -314,7 +235,7 @@ $(document).ready(function() {
         // tries to be smart, it will check if layer.opacity is different
         // to your setOpacity arg, and will determine that they haven't changed
         // and so will do nothing..
-        occurrences.setOpacity(0.6);
+        occurrences.setOpacity(0.8);
 
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------
@@ -322,7 +243,7 @@ $(document).ready(function() {
         // what to do when the user presses close on the pop-up.
         function onPopupClose(evt) {
             // 'this' is the popup.
-            occurrence_select_control.unselect(this.feature);
+            occurrence_select_control.unselectAll();
         }
 
         // what to do when the user clicks a feature
@@ -357,36 +278,202 @@ $(document).ready(function() {
             'featureunselected': onFeatureUnselect
         });
 
+        // Clear any popups when the zoom changes.
+        // If we don't do this, the popup can become stuck (can't be closed).
+        map.events.on({
+            'zoomend': clearMapPopups
+        });
+
         // Specify the selection control for the occurrences layer.
         //
         // Note: change hover to true to make it a on hover interaction (instead
         // of an on-click interaction)
-        var occurrence_select_control = new OpenLayers.Control.SelectFeature(
+        occurrence_select_control = new OpenLayers.Control.SelectFeature(
             occurrences, {hover: false}
         );
 
+        map.addLayer(occurrences);
 
-        // Map - Final Setup
-        // -------------
-
-        // Add the standard set of map controls
-        map.addControl(new OpenLayers.Control.Permalink());
-        map.addControl(new OpenLayers.Control.MousePosition());
         map.addControl(occurrence_select_control);
         occurrence_select_control.activate();
+}
 
-        // Let the user change between layers
-        layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
-        layer_switcher.roundedCornerColor = "#090909";
-        layer_switcher.ascending = true;
-        layer_switcher.useLegendGraphics = false;
+$(document).ready(function() {
 
-        map.addControl(layer_switcher);
-        layer_switcher.maximizeControl();
+    // The work to do if the user changes the selected species..
+    // We need to change the species_sci_name_cased for the dist layer.
+    // We need to then update the species details.
+    $('#SpeciesSpeciesId').change(function(evt) {
+        var new_species_id = $('#SpeciesSpeciesId').val();
 
-        // Add our layers
-        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
+        // Only update the map if the user chose an actual species.
+        // the 'choose one' option has no value.
+        if (new_species_id !== '') {
+                species_id = new_species_id;
+                species_sci_name_cased = $('#SpeciesSpeciesId option:selected').text();
+                species_sci_name_cased = $.trim(species_sci_name_cased);
+                species_sci_name_cased = species_sci_name_cased.replace(/\./g, '');
+                species_sci_name_cased = species_sci_name_cased.replace(/\s/g, '_');
+                var new_species_name = $('#SpeciesSpeciesId').val();
 
-        // Zoom the map to the zoom_bounds specified earlier
-        map.zoomToExtent(zoom_bounds);
+                clearExistingSpeciesOccurrencesAndDistributionLayers();
+                addSpeciesOccurrencesAndDistributionLayers();
+        } else {
+            clearExistingSpeciesOccurrencesAndDistributionLayers();
+        }
+    });
+
+
+
+    // The Map Object
+    // ----------
+
+    map = new OpenLayers.Map('map', {
+        projection: mercator,
+        displayProjection: geographic,
+        units: "m",
+        maxResolution: 156543.0339,
+        maxExtent: world_bounds
+
+        // Setting the restrictedExtent will change the bounds
+        // that pressing the 'world' icon zooms to.
+        // User can manually zoom out past this point.
+//            restrictedExtent: zoom_bounds
+
+    });
+
+
+    // VMap0
+    // ----------
+
+    // The standard open layers VMAP0 layer.
+    // A public domain layer.
+    // Read about this layer here: http://earth-info.nga.mil/publications/vmap0.html
+    // and here: http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29
+    var vmap0 = new OpenLayers.Layer.WMS(
+        "World Map (VMAP0)",
+        "http://vmap0.tiles.osgeo.org/wms/vmap0",
+        {
+            'layers':'basic',
+        }
+    );
+
+
+    // Open Street Map
+    // ----------------
+
+    // The Open Street Map layer.
+    // See more here: http://wiki.openstreetmap.org/wiki/Main_Page
+    // and specifically here: http://wiki.openstreetmap.org/wiki/OpenLayers
+    var osm = new OpenLayers.Layer.OSM(
+        "Open Street Map"
+    );
+
+
+    // Google Maps Layers
+    // --------------------
+    //
+    // requires google maps v2 (with valid API key)
+
+    // Google Physical layer
+    var gphy = new OpenLayers.Layer.Google(
+            "Google Physical",
+            {
+                type: G_PHYSICAL_MAP,
+                'sphericalMercator': true,
+                'maxExtent': world_bounds
+            }
+    );
+
+    // Google Streets layer
+    var gmap = new OpenLayers.Layer.Google(
+            "Google Streets",
+            {
+                numZoomLevels:20,
+                'sphericalMercator': true,
+                'maxExtent': world_bounds
+            }
+    );
+
+    // Google Hybrid layer
+    var ghyb = new OpenLayers.Layer.Google(
+            "Google Hybrid",
+            {
+                type: G_HYBRID_MAP,
+                'sphericalMercator': true,
+                'maxExtent': world_bounds
+            }
+    );
+
+    // Google Satellite layer
+    var gsat = new OpenLayers.Layer.Google(
+            "Google Satellite",
+            {
+                type: G_SATELLITE_MAP,
+                numZoomLevels: 22,
+                'sphericalMercator': true,
+                'maxExtent': world_bounds
+            }
+    );
+
+
+    // Bing Maps Layers
+    // --------------------
+    //
+    // Requires bing_api_key to be set
+    // More info and registration here: http://bingmapsportal.com/
+
+    // Bing Road layer
+    var bing_road = new OpenLayers.Layer.Bing({
+        name: "Bing Road",
+        key: bing_api_key,
+        type: "Road"
+    });
+
+    // Bing Hybrid layer
+    var bing_hybrid = new OpenLayers.Layer.Bing({
+        name: "Bing Hybrid",
+        key: bing_api_key,
+        type: "AerialWithLabels"
+    });
+
+    // Bing Aerial layer
+    var bing_aerial = new OpenLayers.Layer.Bing({
+        name: "Bing Aerial",
+        key: bing_api_key,
+        type: "Aerial"
+    });
+
+
+
+    // Map - Final Setup
+    // -------------
+
+    // Add the standard set of map controls
+//    map.addControl(new OpenLayers.Control.Permalink());
+    map.addControl(new OpenLayers.Control.MousePosition());
+
+    // Let the user change between layers
+    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
+    layer_switcher.roundedCornerColor = "#090909";
+    layer_switcher.ascending = true;
+    layer_switcher.useLegendGraphics = false;
+
+    map.addControl(layer_switcher);
+//    layer_switcher.maximizeControl();
+
+    // Add our layers
+//        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
+    map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0]);
+
+    // Zoom the map to the zoom_bounds specified earlier
+    map.zoomToExtent(zoom_bounds);
+
+    if (species_id !== undefined && species_sci_name_cased !== undefined) {
+        addSpeciesOccurrencesAndDistributionLayers();
+    }
+
 });
+
+
+
