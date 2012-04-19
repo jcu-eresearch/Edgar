@@ -1,0 +1,53 @@
+---
+title:   UI and tech progress, volume 1
+layout:  post
+author:  daniel
+summary: A progress report
+excerpt: 
+tags:    [progress, UI, user interface]
+---
+
+Our primary researcher wanted to demonstrate our project to
+[INBio](http://www.inbio.ac.cr), a Costa Rican NGO involved
+with biodiversity research and conservation.  So we branched 
+our codebase, recentered the map on Costa Rica, and imported
+the species data INBio gave us.
+
+INBio's dataset was quite small: the most observations for 
+a single species was 700 for <i>Automeris zugana</i>, a moth 
+with prominent wing eyespots that you can 
+[see here getting eaten](http://caterpillar-eyespots.blogspot.com.au/2011/08/automeris-zugana-pwnd1.html)
+by a
+[tailless whip scorpion](http://en.wikipedia.org/wiki/Amblypygi),
+which is not actually a scorpion.
+
+This meant I had a perfect opportunity to look at displaying
+observations on a map.  This is easy; just put a dot at
+the x/y location of each observation.
+
+For example, here's a map of Costa Rica with occurrences of 
+<i>automeris zugana</i> drawn on as little circles:
+
+<img src="{{ basepath }}/images/clustering-costarica-zugana-dots.png" />
+
+You can see that this moth has been found across more-or-less the whole country,
+with a more dense area in the north-western corner.  But with this view,
+you're missing information &mdash; can you tell where the second most dense
+area is?
+
+Here's a different rendering of the same observations, 
+but this time I'll cover the map with squares, and write the number of observations
+in each square:
+
+<img src="{{ basepath }}/images/clustering-costarica-zugana-grid.png" />
+
+If you spend a few seconds looking at the numbers, you can see that 
+north-western corner definitely has the lion's share of observations,
+with a 210 square and a couple of 60-ish squares.  But the map is all
+ugly now, with a big grid over it.  I could try making the grid lines
+fainter, but what about just hiding the empty squares?
+
+<img src="{{ basepath }}/images/clustering-costarica-zugana-sparsegrid.png" />
+
+
+
