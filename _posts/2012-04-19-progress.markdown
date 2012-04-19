@@ -39,7 +39,7 @@ Here's a different rendering of the same observations,
 but this time I'll cover the map with squares, and write the number of observations
 in each square:
 
-<img src="{{ BASE_PATH }}/images/clustering-costarica-zugana-grid.png" />
+<img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-grid.png" />
 
 If you spend a few seconds looking at the numbers, you can see that 
 north-western corner definitely has the lion's share of observations,
@@ -62,7 +62,7 @@ So, each number on the map needs to have borders.  But that's not true
 of the zeros (which I already show as blank, instead of writing "0" on 
 the screen).  So I tried not drawing the borders of empty squares.
 
-<img src="{{ JB.BASE_PATH }}/images/clustering-costarica-zugana-sparsegrid.png" />
+<img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-sparsegrid.png" />
 
 That's still not great, but it's a lot easier to look at.
 
