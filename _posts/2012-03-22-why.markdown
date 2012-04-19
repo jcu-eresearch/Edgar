@@ -1,0 +1,26 @@
+---
+title:   Why do this project?
+layout:  post
+author:  daniel
+summary: What is this project all about.
+excerpt: Simply stated, the goal of the Australian Bird Species Distribution
+         Project is to model the effect of climate change on Australian bird 
+         populations.
+tags:    [andsProjectDescription, andsContext, andsAims, andsObjectives]
+---
+
+Simply stated, the goal of the Australian Bird Species Distribution
+Project (ABSDP) is to model the effect of climate change on Australian bird 
+populations.
+
+This modelling is important to both climatological and zoological 
+researchers, and for policy making in government and elsewhere
+with respect to land care, conservation planning, and similar areas.
+
+Feeding accurate input data to the modelling process is essential
+for good results, and to that end this project also includes mechanisms
+to allow expert reviewers to vet species occurrence records, a process
+that has previously been laborious and difficult to share.
+
+*[ABSDP]: Australian Bird Species Distribution Project
+
