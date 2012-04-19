@@ -206,6 +206,8 @@ function addOccurrencesLayer() {
 
         var cluster_size_render_styles = {
             'large': {
+//                'fontWeight': 'medium',
+//                'fontSize': '12px',
                 'fontWeight': 'bold',
                 'fontSize': '13px',
             },

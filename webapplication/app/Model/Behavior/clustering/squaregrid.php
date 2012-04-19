@@ -15,6 +15,7 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
     $SIDE_LENGTH_OPTIONS = array(8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);  // four per parent
 //    $SIDE_LENGTH_OPTIONS = array(9, 3, 1, 0.333333333333, 0.111111111111, 0.037037037037);  // nine per parent
 
+    $uncluster_at = 0;
     $uncluster_at = 2;
 
     $locations = $Model->getLocationsArray();
