@@ -1,0 +1,12 @@
+---
+title:   The product
+layout:  post
+author:  marianne
+summary: Outline of the project outputs and the primary product produced.
+excerpt:
+tags:    [andsOutputs]
+---
+
+This project will produce an operational website that allows users to view current observations and distribution maps for Australian bird species as well as view predicted future distributions taking into account climate change. The code used to create the website as well as the modelling software to generate the distribution maps (current and predicted) will be availabe for re-use under a BSD licence. All components created by the project team will be available from this github site along with documentation on how to set up your own instance of the site. All dependencies will be documented and configuration instructions for those dependences will be provided. The intention is that the aspects of the system that deal with retrieving data from external sources will be well documented and should be replaceable with alternate scripts in the case where alternate external data sources are to be used.
+
+
