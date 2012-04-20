@@ -1,0 +1,6 @@
+{
+    "db.url": "mysql://ap03unittest:test@localhost/ap03unittest?charset=utf8",
+    "updateSpecies": true,
+    "updateOccurrences": true,
+    "logLevel": "INFO"
+}

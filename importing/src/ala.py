@@ -24,14 +24,17 @@ BIOCACHE = 'http://biocache.ala.org.au/'
 log = logging.getLogger(__name__)
 
 
-class OccurrenceRecord(object):
+class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
-    def __init__(self):
-        self.latitude = None
-        self.longitude = None
-        self.uuid = None
-        self.is_geospatial_kosher = False
+    def __init__(self, lat=None, longi=None, uuidIn=None, kosher=False):
+        self.latitude = float(lat)
+        self.longitude = float(longi)
+        if isinstance(uuidIn, uuid.UUID):
+            self.uuid = uuidIn
+        else:
+            self.uuid = uuid.UUID(uuidIn)
+        self.is_geospatial_kosher = bool(kosher)
 
     def __repr__(self):
         return '<record uuid="{uuid}" latLong="{lat}, {lng}" />'.format(
@@ -43,10 +46,10 @@ class OccurrenceRecord(object):
 class Species(object):
     '''Plain old data structure for a species'''
 
-    def __init__(self):
-        self.common_name = None
-        self.scientific_name = None
-        self.lsid = None
+    def __init__(self, common_name=None, scientific_name=None, lsid=None):
+        self.common_name = common_name
+        self.scientific_name = scientific_name
+        self.lsid = lsid
 
     def __repr__(self):
         # might be None, or contain wierd unicode
@@ -58,20 +61,19 @@ class Species(object):
                    lsid=self.lsid)
 
 
-def records_for_species(species_lsid, changed_since=None):
-    '''A generator for OccurrenceRecord objects fetched from ALA'''
+def occurrences_for_species(species_lsid, changed_since=None):
+    '''A generator for Occurrenceobjects fetched from ALA'''
 
-    q = q_param_for_lsid(species_lsid, changed_since=changed_since)
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
-        'q': q,
+        'q': q_param(species_lsid, changed_since),
         'fl': 'id,latitude,longitude,geospatial_kosher',
         'facet': 'off',
     }
 
     for page in _json_pages(url, params, ('totalRecords',), 'startIndex'):
         for occ in page['occurrences']:
-            record = OccurrenceRecord()
+            record = Occurrence()
             record.latitude = occ['decimalLatitude']
             record.longitude = occ['decimalLongitude']
             record.uuid = uuid.UUID(occ['uuid'])
@@ -150,9 +152,9 @@ def all_bird_species():
                 yield s
 
 
-def num_records_for_lsid(lsid):
+def num_occurrences_for_lsid(lsid):
     j = _fetch_json(create_request(BIOCACHE + 'ws/occurrences/search', {
-            'q': q_param_for_lsid(lsid),
+            'q': q_param(lsid),
             'facet': 'off',
             'pageSize': 0}))
     return j['totalRecords']
@@ -170,7 +172,7 @@ def create_request(url, params=None, use_get=True):
     return urllib2.Request(url, params)
 
 
-def q_param_for_lsid(species_lsid, changed_since=None):
+def q_param(species_lsid=None, changed_since=None):
     '''The 'q' parameter for ALA web service queries
 
     `changed_since` allows you to only get records that have changed between a
@@ -182,6 +184,11 @@ def q_param_for_lsid(species_lsid, changed_since=None):
           'occurrence_year:' + _q_date_range(1950_utc_datetime, None)
     '''
 
+    if species_lsid is None:
+        species_lsid = ''
+    else:
+        species_lsid = 'lsid:' + species_lsid + ' AND '
+
     if changed_since is None:
         changed_since = ''
     else:
@@ -191,10 +198,10 @@ def q_param_for_lsid(species_lsid, changed_since=None):
             '''.format(daterange)
 
     return _strip_n_squeeze('''
-        lsid:{lsid} AND
+        {lsid}
+        {changed}
         (rank:species OR subspecies_name:[* TO *]) AND
         longitude:[* TO *]
-        {changed}
         (
             basis_of_record:HumanObservation OR
             basis_of_record:MachineObservation

@@ -1,5 +1,4 @@
 import db
-import ala
 import Queue
 import urllib2
 import logging
@@ -7,6 +6,7 @@ import multiprocessing
 import binascii
 import uuid
 import traceback
+import datetime
 from sqlalchemy import func, select
 
 log = logging.getLogger(__name__)
@@ -14,11 +14,12 @@ log = logging.getLogger(__name__)
 
 class Syncer:
 
-    def __init__(self):
-        '''TODO: might pass db into here for unit testing purposes instead of
-        using the module directly. Might also do the same for ala module.'''
+    def __init__(self, ala):
+        '''The `ala` param is the ala.py module. This is passed in a a ctor
+        param because it will be substituded with mockala.py during unit
+        testing.'''
 
-        row = db.sources.select('id')\
+        row = db.sources.select()\
                 .where(db.sources.c.name == 'ALA')\
                 .execute().fetchone()
 
@@ -26,10 +27,34 @@ class Syncer:
             raise RuntimeError('ALA row missing from sources table in db')
 
         self.source_row_id = row['id']
+        self.last_import_time = row['last_import_time']
         self.cached_upserts = []
         self.num_dirty_records_by_species_id = {}
-        self.ala_species_record_counts = None  # lazy loaded
+        self.ala = ala
+        self.ala_species_occurrence_counts = None  # lazy loaded
         self.ala_species_by_sname = None  # lazy loaded
+
+
+    def sync(self, sync_species=True, sync_occurrences=True):
+        # add new species
+        if sync_species:
+            log.info('Adding new species')
+            added_species, deleted_species = self.added_and_deleted_species()
+            for species in added_species:
+                self.add_species(species)
+
+        # update occurrences
+        log.info('Updating occurrence records')
+        if sync_occurrences:
+            self.sync_occurrences()
+
+        # delete old species, and species without any occurrences
+        if sync_species:
+            log.info("Deleting species that don't exist any more")
+            for species in deleted_species:
+                self.delete_species(species)
+            for species in self.local_species_with_no_occurrences():
+                self.delete_species(species)
 
 
     def local_species(self):
@@ -50,7 +75,7 @@ class Syncer:
     def _cache_all_remote_species(self):
         if self.ala_species_by_sname is None:
             self.ala_species_by_sname = {}
-            for bird in ala.all_bird_species():
+            for bird in self.ala.all_bird_species():
                 self.ala_species_by_sname[bird.scientific_name] = bird
 
 
@@ -93,14 +118,16 @@ class Syncer:
         db.species.delete().where(db.species.c.id == row['id']).execute()
 
 
-    def sync_occurrences(self, utc_since_date):
+    def sync_occurrences(self):
         '''Performs all adding, updating, and deleting of rows in the
         db.occurrences table of the database.
 
         Also updates db.species.c.num_dirty_occurrences.'''
 
+        start_time = datetime.datetime.utcnow()
+
         # insert new, and update existing, occurrences
-        for occ in self.occurrences_changed_since(utc_since_date, True):
+        for occ in self.occurrences_changed_since(self.last_import_time, True):
             self.upsert_occurrence(occ, occ.species_id)
         self.flush_upserts()
 
@@ -117,6 +144,13 @@ class Syncer:
         # increase number in db.species.num_dirty_occurrences
         log.info('Updating number of dirty occurrences')
         self.update_num_dirty_occurrences()
+
+        # update last import time for ALA
+        db.sources.update().\
+            where(db.sources.c.id == self.source_row_id).\
+            values(last_import_time=start_time).\
+            execute()
+
 
 
     def delete_local_occurrences_if_needed(self):
@@ -146,7 +180,7 @@ class Syncer:
 
             # build the set of existing uuids
             existing_uuids = set()
-            for occurrence in ala.records_for_species(species.lsid):
+            for occurrence in self.ala.occurrences_for_species(species.lsid):
                 existing_uuids.add(occurrence.uuid)
 
             # loop through every local occurrence, and store the ids of the
@@ -216,13 +250,13 @@ class Syncer:
         The results are cached after the first call to this method.'''
 
         # try return cached data
-        if self.ala_species_record_counts is not None:
-            return self.ala_species_record_counts
+        if self.ala_species_occurrence_counts is not None:
+            return self.ala_species_occurrence_counts
 
         log.info('Fetching ALA occurrence counts for species')
 
         input_q = multiprocessing.Queue()
-        pool = multiprocessing.Pool(8, _mp_init, [input_q])
+        pool = multiprocessing.Pool(8, _mp_init, [input_q, self.ala])
         active_workers = 0
 
         # fill pool with every species
@@ -236,7 +270,7 @@ class Syncer:
         pool.close()
 
         #keep reading from the queue until all subprocesses are done
-        self.ala_species_record_counts = {}
+        self.ala_species_occurrence_counts = {}
         while active_workers > 0:
             result = input_q.get()
             active_workers -= 1
@@ -246,7 +280,7 @@ class Syncer:
 
             if len(result) == 2:
                 species_id, occ_count = result
-                self.ala_species_record_counts[species_id] = occ_count
+                self.ala_species_occurrence_counts[species_id] = occ_count
             else:
                 raise RuntimeError("Worker process failed: " + result[0])
 
@@ -254,7 +288,7 @@ class Syncer:
         pool.join()
         log.info('Finished fetching ALA occurrence counts for species')
 
-        return self.ala_species_record_counts;
+        return self.ala_species_occurrence_counts;
 
 
     def local_occurrence_counts_by_species_id(self):
@@ -284,13 +318,13 @@ class Syncer:
         if scientific_name in self.ala_species_by_sname:
             return self.ala_species_by_sname[scientific_name]
         else:
-            species = ala.species_for_scientific_name(scientific_name)
+            species = self.ala.species_for_scientific_name(scientific_name)
             self.ala_species_by_sname[scientific_name] = species
             return species
 
 
     def upsert_occurrence(self, occurrence, species_id):
-        '''Looks up whether `occurrence` (an ala.OccurrenceRecord object)
+        '''Looks up whether `occurrence` (an ala.Occurrence object)
         already exists in the local db. If it does, the db row is updated with
         the information in `occurrence`. If it does not exist, a new row is
         inserted.
@@ -345,7 +379,7 @@ class Syncer:
 
 
     def occurrences_changed_since(self, since_date, record_dirty=False):
-        '''Generator for ala.OccurrenceRecord objects.
+        '''Generator for ala.Occurrence objects.
 
         Will use whatever is in the species table of the database, so call
         update the species table before calling this function.
@@ -357,7 +391,7 @@ class Syncer:
         over the network.'''
 
         input_q = multiprocessing.Queue(10000)
-        pool = multiprocessing.Pool(8, _mp_init, [input_q])
+        pool = multiprocessing.Pool(8, _mp_init, [input_q, self.ala])
         active_workers = 0
 
         # fill the pool full with every species
@@ -383,7 +417,7 @@ class Syncer:
                     log.warning(
                         'Received nothing from ALA in the last 10 seconds')
 
-            if isinstance(record, ala.OccurrenceRecord):
+            if isinstance(record, self.ala.Occurrence):
                 yield record
             elif isinstance(record, tuple):
                 active_workers -= 1
@@ -452,11 +486,13 @@ class Syncer:
                 execute()
 
 
-def _mp_init(output_q):
+def _mp_init(output_q, ala):
     '''Called when a subprocess is started. See
     Syncer.occurrences_changed_since'''
+    _mp_init.ala = ala
     _mp_init.output_q = output_q
     _mp_init.log = multiprocessing.log_to_stderr()
+
 
 def _mp_format_exception(e):
     formatted = str(e) + '\n' + traceback.format_exc()
@@ -472,11 +508,11 @@ def _mp_fetch_occurrences(species, species_id, since_date):
     records into _mp_init.output_q.
 
     If the function finished successfully, will put a len 3 tuple in the
-    output_q with (species, species_id, num_records_found). If the
+    output_q with (species, species_id, num_occurrences_found). If the
     function fails, will put a len 1 tuple in the _mp_init.output_q with a
     failure message string in it.
 
-    Adds a `species_id` attribute to each ala.OccurrenceRecord object set to
+    Adds a `species_id` attribute to each ala.Occurrence object set to
     the argument given to this function.'''
 
     #_mp_init.log.info('Started fetching for "%s"', species_sname)
@@ -492,7 +528,7 @@ def _mp_fetch_occurrences(species, species_id, since_date):
 
 def _mp_fetch_occurrences_inner(species, species_id, since_date):
     num_records = 0
-    for record in ala.records_for_species(species.lsid, since_date):
+    for record in _mp_init.ala.occurrences_for_species(species.lsid, since_date):
         record.species_id = species_id
         _mp_init.output_q.put(record)
         num_records += 1
@@ -502,7 +538,7 @@ def _mp_fetch_occurrences_inner(species, species_id, since_date):
 
 def _mp_fetch_occur_count(species, species_id):
     try:
-        count = ala.num_records_for_lsid(species.lsid)
+        count = _mp_init.ala.num_occurrences_for_lsid(species.lsid)
         _mp_init.output_q.put((species_id, count))
     except Exception, e:
         _mp_init.output_q.put((_mp_format_exception(e),))

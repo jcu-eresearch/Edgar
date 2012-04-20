@@ -3,6 +3,7 @@
 import pathfix
 import sys
 import db
+import ala
 import sync
 import logging
 import argparse
@@ -22,39 +23,6 @@ def parse_args():
     return parser.parse_args();
 
 
-def update(config):
-    ala_source = db.sources.select().execute(name='ALA').fetchone()
-    from_d = ala_source['last_import_time']
-    to_d = datetime.utcnow()
-    syncer = sync.Syncer()
-
-    # add new species
-    if config['updateSpecies']:
-        logging.info('Adding new species')
-        added_species, deleted_species = syncer.added_and_deleted_species()
-        for species in added_species:
-            syncer.add_species(species)
-
-    # update occurrences
-    logging.info('Updating occurrence records')
-    if config['updateOccurrences']:
-        syncer.sync_occurrences(from_d)
-
-        # store last import time in db.sources
-        db.sources.update().\
-                where(db.sources.c.id == ala_source['id']).\
-                values(last_import_time=to_d).\
-                execute()
-
-    # delete old species, and species without any occurrences
-    if config['updateSpecies']:
-        logging.info("Deleting species that don't exist any more")
-        for species in deleted_species:
-            syncer.delete_species(species)
-        for species in syncer.local_species_with_no_occurrences():
-            syncer.delete_species(species)
-
-
 if __name__ == '__main__':
     args = parse_args()
     with open(args.config[0], 'rb') as f:
@@ -69,7 +37,9 @@ if __name__ == '__main__':
 
     logging.info("Started at %s", str(datetime.now()))
     try:
-        update(config)
+        syncer = sync.Syncer(ala)
+        syncer.sync(sync_species=config['updateSpecies'],
+                    sync_occurrences=config['updateOccurrences'])
     finally:
         logging.info("Ended at %s", str(datetime.now()))
 
