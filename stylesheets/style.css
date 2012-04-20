@@ -1,0 +1,37 @@
+
+#logo {
+    height: 100px;
+    float: right;
+}
+.cc-by {
+    padding: 1em 0;
+    text-align: left;
+}
+
+.ands-acknowledge {
+    color: black;
+    background: white;
+    --webkit-border-radius: 6px;
+    border-radius: 6px;
+    border: 1px solid silver;
+    padding: 1ex;
+    margin: 20px -20px;
+}
+
+#cc-logo {
+    float: left;
+    padding-right: 1em;
+}
+
+#qcif-logo {
+    width: 60px;
+    float: right;
+    padding: 5px 10px 0 0px;
+}
+#ands-logo {
+    width: 70px;
+    padding-right: 1em;
+    float: left;
+    margin: 5px;
+}
+
