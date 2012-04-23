@@ -134,8 +134,9 @@ class Syncer:
         log.info('Fetching ALA occurrence record counts per species')
 
         # delete occurrences that have been deleted at ALA
-        log.info('Deleting local occurrences if needed')
-        self.delete_local_occurrences_if_needed()
+        log.info('Performing re-download of occurrences for species'+
+                 'with incorrect occurrence counts');
+        self.redownload_occurrences_if_needed()
 
         # log warnings if the counts dont match up
         log.info('Checking that local occurrence counts match ALA')
@@ -152,23 +153,27 @@ class Syncer:
             execute()
 
 
+    def redownload_occurrences_if_needed(self):
+        '''Re-downloads every single record for each species, but only if the
+        occurrence counts differ between ALA and the local database.
 
-    def delete_local_occurrences_if_needed(self):
-        '''This must be called as the last step in syncing occurrence records,
+        This must be called as the last step in syncing occurrence records,
         because adding and updating occurrences will alter the number of
-        records per species. Checking for deleted records is expensive in terms
-        of memory and time, so it only happens with the local occurrence count
-        per species is higher than the count at ALA.
+        records per species.
+
+        This operation is expensive in terms of memory and time, so it only
+        happens when the local occurrence count per species is different to the
+        count at ALA.
 
         Builds a set of uuid.UUID objects for records that exist at ALA, then
         checks every local record to see if it still exists in the set.'''
 
         for row, lc, rc in self.species_with_occurrence_counts():
-            # don't run unless our count is lower than ALAs count
-            if lc <= rc:
+            # don't run unless our count is different to ALAs count
+            if lc != rc:
                 continue
 
-            log.info('Checking for deleted records for species %s',
+            log.info('Performing full re-download for species %s',
                      row['scientific_name'])
 
             # species should never be None, because we already have a count for
@@ -178,13 +183,17 @@ class Syncer:
                 log.critical('species should never be None')
                 continue
 
-            # build the set of existing uuids
+            # build the set of existing uuids, while also upserting every
+            # occurrence
             existing_uuids = set()
             for occurrence in self.ala.occurrences_for_species(species.lsid):
+                self.upsert_occurrence(occurrence, row['id'])
                 existing_uuids.add(occurrence.uuid)
+            self.flush_upserts()
 
             # loop through every local occurrence, and store the ids of the
-            # rows that do not exist at ALA
+            # rows that do not exist at ALA. Have to delete records after
+            # query is done
             row_ids_to_delete = []
             all_rows_for_species = \
                 db.occurrences.select().\
@@ -206,14 +215,10 @@ class Syncer:
                     execute()
 
             # free up more memory
-            num_deleted = len(row_ids_to_delete)
             del row_ids_to_delete
 
-            # log and keep track of the deletaions
-            log.info('Deleted %d records for %s', num_deleted,
-                    row['scientific_name'])
-
-            self.increase_dirty_count(row['id'], num_deleted)
+            # log and keep track of the deletions and additions
+            self.increase_dirty_count(row['id'], abs(lc - rc))
 
 
     def check_occurrence_counts(self):
