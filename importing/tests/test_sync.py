@@ -9,6 +9,20 @@ import os.path
 import json
 import logging
 
+def setUpModule():
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = test_dir + '/testconfig.json'
+    with open(config_path, 'rb') as f:
+        conf = json.load(f)
+        db.connect(conf)
+
+    #logging.root.setLevel(logging.__dict__[conf['logLevel']])
+
+def tearDownModule():
+    #db.disconnect()
+    pass
+
+
 class TestSync(unittest.TestCase):
 
     def setUp(self):
@@ -49,10 +63,8 @@ class TestSync(unittest.TestCase):
         #make new Syncer
         self.syncer = sync.Syncer(self.mockala)
 
-        # print some gap
+        # nicer test output
         print
-        print
-        print "=" * 80
 
 
     def db_species_exists(self, scientific_name):
@@ -100,13 +112,5 @@ class TestSync(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    test_dir = os.path.dirname(os.path.abspath(__file__))
-    config_path = test_dir + '/testconfig.json'
-    with open(config_path, 'rb') as f:
-        conf = json.load(f)
-        db.connect(conf)
-
     logging.basicConfig()
-    logging.root.setLevel(logging.__dict__[conf['logLevel']])
-
     unittest.main()
