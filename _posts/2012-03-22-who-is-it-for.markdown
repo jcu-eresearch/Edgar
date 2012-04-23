@@ -4,6 +4,7 @@ layout:  post
 author:  daniel
 summary: Outline of the target customers and how the project will meet their needs.
 excerpt: The core users this project will serve are researchers and policy makers.
+categories: [Requirements]
 tags:    [andsCustomers, andsOwners]
 ---
 

@@ -4,6 +4,7 @@ layout:  post
 author:  daniel
 summary:
 excerpt:
+categories: [Requirements]
 tags:    [andsQuality, andsValue, andsAssessment, andsCustomer]
 ---
 

@@ -6,6 +6,7 @@ summary: This project will use open-source tools such as OpenLayers, mapserver,
          JQuery, and PHP to produce a web-based mapping tool for viewing species
          distribution maps and reviewing observation records.
 excerpt:
+categories: [Requirements]
 tags:    [andsFeatures, andsFunctions, andsTechnology, andsArchitecture, andsTools]
 ---
 

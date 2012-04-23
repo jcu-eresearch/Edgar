@@ -1,7 +1,6 @@
-
 #logo {
-    height: 100px;
-    float: right;
+    float: left;
+    margin-bottom: 1ex;
 }
 .cc-by {
     padding: 1em 0;
