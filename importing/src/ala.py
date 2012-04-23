@@ -42,6 +42,18 @@ class Occurrence(object):
             lat=self.latitude,
             lng=self.longitude)
 
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return (self.uuid == other.uuid and
+                    self.latitude == other.latitude and
+                    self.longitude == other.longitude and
+                    self.is_geospatial_kosher == other.is_geospatial_kosher)
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 class Species(object):
     '''Plain old data structure for a species'''
@@ -59,6 +71,17 @@ class Species(object):
             format(com=_asc(self.common_name),
                    sci=_asc(self.scientific_name),
                    lsid=self.lsid)
+
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return (self.common_name == other.common_name and
+                    self.scientific_name == other.scientific_name and
+                    self.lsid == other.lsid)
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 def occurrences_for_species(species_lsid, changed_since=None):

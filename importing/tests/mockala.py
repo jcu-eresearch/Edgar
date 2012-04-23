@@ -1,5 +1,7 @@
 import pathfix
+from datetime import datetime
 import ala
+from copy import deepcopy
 
 class MockALA(object):
 
@@ -57,19 +59,59 @@ class MockALA(object):
 
 
     def mock_add_species(self, species):
+        species = deepcopy(species)
         species.records = {}
         species.rename = None
         self._all_species.append(species)
+        return species
 
 
-    def mock_add_records(self, species, records, at_date):
+    def mock_add_records(self, species, records, at_date=None):
         species = self.species_for_lsid(species.lsid)
         assert species is not None
-        species.records[at_date] = records
+
+        if at_date is None:
+            at_date = datetime.utcnow()
+
+        species.records[at_date] = deepcopy(records)
+
+
+    def mock_remove_records(self, species, records_to_remove):
+        species = self.species_for_lsid(species.lsid)
+        uuids_to_remove = frozenset([r.uuid for r in records_to_remove])
+
+        for species_records in species.records.itervalues():
+            for r in species_records[:]:
+                if r.uuid in uuids_to_remove:
+                    species_records.remove(r)
+
+
+    def mock_update_record(self, old_species, record, at_date=None,
+            new_species=None):
+
+        if new_species is None:
+            new_species = old_species
+
+        if at_date is None:
+            at_date = datetime.utcnow()
+
+        old_species = self.species_for_lsid(old_species.lsid)
+        new_species = self.species_for_lsid(new_species.lsid)
+
+        for records in old_species.records.itervalues():
+            for r in records:
+                if r.uuid == record.uuid:
+                    records.remove(r)
+                    break
+
+        if at_date in new_species.records:
+            new_species.records[at_date].append(deepcopy(record))
+        else:
+            new_species.records[at_date] = [deepcopy(record)]
 
 
     def mock_rename_species(self, old_species, new_species, when):
-        self.mock_add_species(new_species)
+        new_species = self.mock_add_species(new_species)
 
         old_species = self.species_for_lsid(old_species.lsid)
         assert old_species is not None
@@ -81,10 +123,6 @@ class MockALA(object):
 
     def mock_remove_species(self, species):
         self._all_species.remove(species)
-
-
-    def mock_remove_all_species(self):
-        del self._all_species[:]
 
 
     def _get_rename(self, species):

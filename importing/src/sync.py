@@ -137,8 +137,6 @@ class Syncer:
             self.upsert_occurrence(occ, occ.species_id)
         self.flush_upserts()
 
-        log.info('Fetching ALA occurrence record counts per species')
-
         # delete occurrences that have been deleted at ALA
         log.info('Performing re-download of occurrences for species'+
                  'with incorrect occurrence counts');
@@ -176,11 +174,13 @@ class Syncer:
 
         for row, lc, rc in self.species_with_occurrence_counts():
             # don't run unless our count is different to ALAs count
-            if lc != rc:
+            if lc == rc:
                 continue
 
-            log.info('Performing full re-download for species %s',
-                     row['scientific_name'])
+            log.warning('Performing full re-download for species %s. ' +
+                        '(local count = %d, ALA count = %d)',
+                        row['scientific_name'],
+                        lc, rc)
 
             # species should never be None, because we already have a count for
             # it from ALA

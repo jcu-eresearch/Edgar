@@ -75,7 +75,7 @@ class TestSync(unittest.TestCase):
         else:
             return None
 
-    def num_occurrences_for_species(self, species):
+    def num_db_occ_for_spec(self, species):
         species_id = self.id_for_species(species)
         q = select([func.count("(*)")]).\
                 where(db.occurrences.c.species_id == species_id)
@@ -98,7 +98,7 @@ class TestSync(unittest.TestCase):
         #sync
         self.syncer.sync()
         self.assertIsNotNone(self.id_for_species(self.s1))
-        num_records = self.num_occurrences_for_species(self.s1)
+        num_records = self.num_db_occ_for_spec(self.s1)
 
         #rename s1 to sRenamed
         sRenamed = self.mockala.Species('renamed', 'sciRenamed', 'lsidRenamed')
@@ -116,17 +116,103 @@ class TestSync(unittest.TestCase):
         self.assertIsNotNone(self.id_for_species(sRenamed))
 
         #make sure all records have been moved across
-        self.assertEqual(num_records,
-                self.num_occurrences_for_species(sRenamed))
+        self.assertEqual(num_records, self.num_db_occ_for_spec(sRenamed))
 
 
-    def test_removes_species_without_records(self):
+    def test_removes_species_with_no_records(self):
         sNone = self.mockala.Species('no records', 'sciNone', 'nr');
         self.mockala.mock_add_species(sNone)
         self.syncer.sync()
 
         self.assertIsNone(self.id_for_species(sNone))
 
+    def test_added_records(self):
+        #assert 0 records
+        self.assertEqual(self.num_db_occ_for_spec(self.s1), 0)
+
+        #sync
+        self.syncer.sync()
+
+        #assert all records synced
+        self.assertEqual(len(self.records1),
+                         self.num_db_occ_for_spec(self.s1))
+
+    def test_added_records_after_sync(self):
+        #sync
+        self.syncer.sync()
+
+        #simulate new records
+        new_records = [
+            self.mockala.Occurrence(66, 77, uuid.uuid4()),
+            self.mockala.Occurrence(88, 99, uuid.uuid4())
+        ]
+        self.mockala.mock_add_records(self.s1, new_records)
+
+        #sync again
+        self.syncer = sync.Syncer(self.mockala)
+        self.syncer.sync()
+
+        #check new records added
+        self.assertEqual(len(new_records) + len(self.records1),
+                         self.num_db_occ_for_spec(self.s1))
+
+    def test_deleted_records_after_sync(self):
+        #sync
+        self.syncer.sync()
+
+        #delete a couple of records
+        deleted_records = self.records1[:2]
+        remaining_records = self.records1[2:]
+        self.mockala.mock_remove_records(self.s1, deleted_records)
+
+        #sync again
+        self.syncer = sync.Syncer(self.mockala)
+        self.syncer.sync()
+
+        #check deleted records are deleted
+        deleted_uuids = frozenset([r.uuid for r in deleted_records])
+        remaining_uuids = set()
+        for occ in db.occurrences.select().execute():
+            occ_uuid = uuid.UUID(bytes=occ['source_record_id'])
+            self.assertTrue(occ_uuid not in deleted_uuids)
+
+            remaining_uuids.add(occ_uuid)
+
+        #check that remaining records remain
+        for occ in remaining_records:
+            self.assertTrue(occ.uuid in remaining_uuids)
+
+    def test_updated_records_after_sync(self):
+        #sync
+        self.syncer.sync()
+
+        #remember some counts
+        old_s1_count = self.num_db_occ_for_spec(self.s1)
+        old_s2_count = self.num_db_occ_for_spec(self.s2)
+
+        #change a record, keeping the same uuid
+        old_record = self.records1[-1]
+        new_record = self.mockala.Occurrence(123, 456, old_record.uuid)
+        self.mockala.mock_update_record(self.s1, new_record,
+                new_species=self.s2)
+
+        #sync again
+        self.syncer = sync.Syncer(self.mockala)
+        self.syncer.sync()
+
+        #check that counts reflect updated record
+        self.assertEqual(self.num_db_occ_for_spec(self.s1),
+                         old_s1_count - 1)
+        self.assertEqual(self.num_db_occ_for_spec(self.s2),
+                         old_s2_count + 1)
+
+        #check that updated record has correct lat/long
+        for occ in db.occurrences.select().execute():
+            occ_uuid = uuid.UUID(bytes=occ['source_record_id'])
+            if occ_uuid == old_record.uuid:
+                self.assertEqual(occ['latitude'], new_record.latitude)
+                self.assertEqual(occ['longitude'], new_record.longitude)
+                break
 
 
 if __name__ == '__main__':
