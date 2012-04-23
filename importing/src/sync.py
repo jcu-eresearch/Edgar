@@ -36,23 +36,29 @@ class Syncer:
 
 
     def sync(self, sync_species=True, sync_occurrences=True):
-        # add new species
+        # add/delete species
         if sync_species:
             log.info('Adding new species')
             added_species, deleted_species = self.added_and_deleted_species()
             for species in added_species:
                 self.add_species(species)
+            log.info("Deleting species that don't exist any more")
+            for species in deleted_species:
+                self.delete_species(species)
 
         # update occurrences
         log.info('Updating occurrence records')
         if sync_occurrences:
             self.sync_occurrences()
+            # remove orphaned occurrences
+            db.engine.execute('''
+                delete from occurrences
+                where species_id not in
+                (select id from species)''');
 
-        # delete old species, and species without any occurrences
+        # delete species without any occurrences
         if sync_species:
-            log.info("Deleting species that don't exist any more")
-            for species in deleted_species:
-                self.delete_species(species)
+            log.info('Deleting species with 0 occurrences')
             for species in self.local_species_with_no_occurrences():
                 self.delete_species(species)
 
