@@ -203,8 +203,6 @@ function addOccurrencesLayer() {
                 'fontOpacity': 1.0,
                 'fillOpacity': 0.25,
                 'strokeOpacity': 0.75,
-                'fillColor': "#00ff66",
-                'strokeColor': "#009922",
             },
         }
         occurrence_StyleMap.addUniqueValueRules("default", "occurrence_type", occurrence_render_styles);

@@ -11,12 +11,14 @@
      */
 function get_features_squaregrid(Model $Model, $bounds = array() ) {
 
-    $MAX_SQUARES_LONG = 70;    // how many longitude slices to make, at most
+    $MAX_SQUARES_LONG = 90;    // how many longitude slices to make, at most
     $SIDE_LENGTH_OPTIONS = array(8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);  // four per parent
 //    $SIDE_LENGTH_OPTIONS = array(9, 3, 1, 0.333333333333, 0.111111111111, 0.037037037037);  // nine per parent
 
     $uncluster_at = 0;
-    $uncluster_at = 2;
+    $uncluster_at = 1;
+
+    $single_obs_radius = 4; // pixels
 
     $locations = $Model->getLocationsArray();
     $location_features = array();
@@ -151,7 +153,7 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
                             'title' => "Occurrence",
                             'occurrence_type' => 'dotradius',
                             'description' => "<dl><dt>Latitude</dt><dd>$lat</dd><dt>Longitude</dt><dd>$long</dd>",
-                            'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS,
+                            'point_radius' => $single_obs_radius,
                         ),
                         'geometry' => array(
                             'type' => 'Point',

@@ -12,7 +12,7 @@
 function get_features_dotgrid(Model $Model, $bounds = array() ) {
 
     $GRID_RANGE_LONGITUDE = 120;    // how many longitude slices to make (cut into GRID_RANGE_LONGITUDE along the x axis)
-    $MIN_FEATURE_RADIUS   = 4;     // pixels
+    $MIN_FEATURE_RADIUS   = 3;     // pixels
 
     $locations = $Model->getLocationsArray();
     $location_features = array();
@@ -111,7 +111,7 @@ function get_features_dotgrid(Model $Model, $bounds = array() ) {
                 // Note: we subtract 1 as MIN_FEATURE_RADIUS should be correct for a cluster of 1
 
                 // Create a well-formatted GeoJSON array for this cluster, and append it to our location_features array
-                $point_radius = ( floor(log($locations_approximately_here_size) ) + $MIN_FEATURE_RADIUS );
+                $point_radius = ( floor(log($locations_approximately_here_size, 2) ) + $MIN_FEATURE_RADIUS );
                 $location_features[] = array(
                     "type" => "Feature",
                     'properties' => array(
