@@ -14,10 +14,11 @@
     <!-- Le styles -->
     <link href="{{ ASSET_PATH }}/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ ASSET_PATH }}/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="{{ BASE_PATH }}/stylesheets/style.css" rel="stylesheet">
 
     <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="{{ BASE_PATH }}/images/favicon.ico">
   <!-- Update these with your own images
-    <link rel="shortcut icon" href="images/favicon.ico">
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
@@ -29,7 +30,7 @@
     <div class="navbar">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="{{ HOME_PATH }}">{{ site.title }}</a>
+            <a class="brand" href="{{ HOME_PATH }}">{{ site.title }}</a>
           <ul class="nav">
             {% assign pages_list = site.pages %}
             {% assign group = 'navigation' %}
@@ -45,12 +46,18 @@
         {{ content }}
       </div>
 
+      <div class="ands-acknowledge">
+          <a href="http://www.ands.org.au/"><img id="ands-logo" src="http://www.ands.org.au/partner/ands-logo-hi-res.jpg"></a>
+          <a href="http://www.qcif.edu.au/"><img id="qcif-logo" src="http://www.qcif.edu.au/images/logo.png"></a>
+          <p>This project is supported by the Australian National Data Service (ANDS) through the National Collaborative Research Infrastructure Strategy Program and the Education Investment Fund (EIF) Super Science Initiative, as well as through the Queensland Cyber Infrastructure Foundation (QCIF).</p> </div>
       <footer>
-        <p>&copy; {{ site.author.name }} 2012 
-          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          <div class="cc-by">
+              <a rel="license" href="http://creativecommons.org/licenses/by/3.0/au/"><img alt="Creative Commons License" id="cc-logo" src="http://i.creativecommons.org/l/by/3.0/au/88x31.png" /></a>
+              This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" rel="dct:type">work</span> by the <a xmlns:cc="http://creativecommons.org/ns#" href="http://www.jcu.edu.au/ctbcc/" property="cc:attributionName" rel="cc:attributionURL">Centre for Tropical Biodiversity &amp; Climate Change</a> and the <a xmlns:cc="http://creativecommongs.org/ns#" href="http://eresearch.jcu.edu.au" property="cc:attributionName" rel="cc:attributionURL">eResearch Centre</a>, <a href="http://www.jcu.edu.au">James Cook University</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/au/">Creative Commons Attribution 3.0 Australia License</a>.
+This site was created with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
           and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
-        </p>
-      </footer>
+          </div>
+          </footer>
 
     </div> <!-- /container -->
 
