@@ -26,6 +26,7 @@
         // Include map javascript files
         echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
         echo $this->Html->script(array('species_map'), array('block' => 'script')); 
+        echo $this->Html->script('clustering_selector_setup', array('inline'=>false)); 
     }
 
 ?>
@@ -62,6 +63,17 @@
     } else {
 ?>
     <h2 style='display:none'><?php  echo __('Species Map');?></h2>
+
+    <!-- clustering selector -->
+    <fieldset class="clusteroptions" style="float: right">
+        <legend>Clustering Display</legend>
+        <select id="cluster">
+            <option value="dotradius" >Dot Radius (no clustering)</option>
+            <option value="dotgrid" selected>Dot Grid</option>
+            <option value="squaregrid">Square Grid</option>
+        </select>
+    </fieldset>
+
     <!-- Species Selector -->
     <?php
         echo $this->Form->create('Species', array(
@@ -71,6 +83,17 @@
     ?>
         <?php
             echo $this->Form->input('species_id', array('empty' => '(choose one)'));
+/*
+actually I'll just try a hand-coded select
+            echo $this->Form->select('cluster_algo', array(
+                'dotradius' => 'Dot Radius (no clustering)',
+                'dotgrid' => 'Dot Grid',
+                'squaregrid' => 'Square Grid',
+            ), array(
+                'label' => 'Clustering',
+                'empty' => false,
+            ));
+*/
         ?>
     <?php echo $this->Form->end();?>
 <?php

@@ -71,14 +71,24 @@ function hideLegend() {
 // Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
 // the fly, so we have to replace our old layers.
 function clearExistingSpeciesOccurrencesAndDistributionLayers() {
+
+    clearExistingSpeciesOccurrencesLayer();
+    
+    if (distribution !== undefined) {
+        map.removeLayer(distribution);
+        distribution = undefined;
+    }
+
+    // Get rid of any popups the user may of had on screen.
+    clearMapPopups();
+    hideLegend();
+}
+
+function clearExistingSpeciesOccurrencesLayer() {
     // Remove old layers.
     if (occurrences !== undefined) {
         map.removeLayer(occurrences);
         occurrences = undefined;
-    }
-    if (distribution !== undefined) {
-        map.removeLayer(distribution);
-        distribution = undefined;
     }
 
     // Remove the old occurrence select control.
@@ -88,10 +98,6 @@ function clearExistingSpeciesOccurrencesAndDistributionLayers() {
         map.removeControl(occurrence_select_control);
         occurrence_select_control = undefined;
     }
-
-    // Get rid of any popups the user may of had on screen.
-    clearMapPopups();
-    hideLegend();
 }
 
 // Add our species specific layers.
@@ -222,7 +228,13 @@ function addOccurrencesLayer() {
         }
         occurrence_StyleMap.addUniqueValueRules("default", "cluster_size", cluster_size_render_styles);
         occurrence_StyleMap.addUniqueValueRules("select", "cluster_size", cluster_size_render_styles);
-       
+        
+        // set the clustering to use for this occurrences layer
+        cluster_strategy = "none";
+        cluster_selector = document.getElementById("cluster");
+        if (cluster_selector) {
+            cluster_strategy = cluster_selector.options[cluster_selector.selectedIndex].value;
+        }
 
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
@@ -245,8 +257,8 @@ function addOccurrencesLayer() {
                     url: speciesGeoJSONURL(),
                     params: {
                         // Place addition custom request params here..
-                        bound: true,        // do bound the request
-                        clustered: false    // don't bother clustering
+                        bound: true,                 // do bound the request
+                        clustered: cluster_strategy  // use whatever clustering
                     },
 
                     // The data format

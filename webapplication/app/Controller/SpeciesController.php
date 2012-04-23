@@ -142,15 +142,8 @@ class SpeciesController extends AppController {
         $cluster_type = 'dotradius';
 
         if ( array_key_exists('clustered', $this->request->query) ) {
-            $in_clustered = $this->request->query['clustered'];
-            if ( $in_clustered == 'true' ) {
-                // then use the default, already set above
-            } else if ( $in_clustered == 'false' ) {
-                $cluster_type = 'none';
-            }
+            $cluster_type = $this->request->query['clustered'];
         }
-        $cluster_type = 'squaregrid';
-        $cluster_type = 'dotradius';
 
         $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $cluster_type));
 
