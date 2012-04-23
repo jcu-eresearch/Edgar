@@ -8,6 +8,7 @@ import datetime
 import os.path
 import json
 import logging
+from sqlalchemy import select, func
 
 def setUpModule():
     test_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,15 +64,22 @@ class TestSync(unittest.TestCase):
         #make new Syncer
         self.syncer = sync.Syncer(self.mockala)
 
-        # nicer test output
-        print
 
-
-    def db_species_exists(self, scientific_name):
+    def id_for_species(self, species):
+        sci_name = species.scientific_name
         result = db.species.select().\
-                    where(db.species.c.scientific_name == scientific_name).\
+                    where(db.species.c.scientific_name == sci_name).\
                     execute()
-        return result.rowcount == 1
+        if result.rowcount == 1:
+            return result.fetchone()['id']
+        else:
+            return None
+
+    def num_occurrences_for_species(self, species):
+        species_id = self.id_for_species(species)
+        q = select([func.count("(*)")]).\
+                where(db.occurrences.c.species_id == species_id)
+        return db.engine.execute(q).scalar()
 
 
     def test_added_species(self):
@@ -82,32 +90,42 @@ class TestSync(unittest.TestCase):
         for species in added:
             self.syncer.add_species(species)
 
-        self.assertTrue(self.db_species_exists('sci1'))
-        self.assertTrue(self.db_species_exists('sci2'))
+        self.assertIsNotNone(self.id_for_species(self.s1))
+        self.assertIsNotNone(self.id_for_species(self.s2))
 
 
     def test_renamed_species(self):
+        #sync
         self.syncer.sync()
-        self.assertTrue(self.db_species_exists('sci1'))
+        self.assertIsNotNone(self.id_for_species(self.s1))
+        num_records = self.num_occurrences_for_species(self.s1)
 
+        #rename s1 to sRenamed
         sRenamed = self.mockala.Species('renamed', 'sciRenamed', 'lsidRenamed')
         self.mockala.mock_rename_species(self.s1, sRenamed,
                 datetime.datetime.utcnow())
-        self.assertEqual(self.mockala.num_occurrences_for_lsid(self.s1.lsid), 0)
 
+        #sync again
         self.syncer = sync.Syncer(self.mockala)
         self.syncer.sync()
 
-        self.assertFalse(self.db_species_exists('sci1'))
-        self.assertTrue(self.db_species_exists('sciRenamed'))
+        #make sure s1 is missing
+        self.assertIsNone(self.id_for_species(self.s1))
 
+        #make sure sRenamed exists
+        self.assertIsNotNone(self.id_for_species(sRenamed))
+
+        #make sure all records have been moved across
+        self.assertEqual(num_records,
+                self.num_occurrences_for_species(sRenamed))
 
 
     def test_removes_species_without_records(self):
-        self.mockala.mock_add_species(self.mockala.Species('no records', 'sciNone', 'nr'))
+        sNone = self.mockala.Species('no records', 'sciNone', 'nr');
+        self.mockala.mock_add_species(sNone)
         self.syncer.sync()
 
-        self.assertFalse(self.db_species_exists('sciNone'))
+        self.assertIsNone(self.id_for_species(sNone))
 
 
 
