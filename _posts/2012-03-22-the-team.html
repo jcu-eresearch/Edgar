@@ -6,14 +6,14 @@ author: daniel
 tags:   [andsProject, andsProjectTeam, andsSkills, andsApps, andsAP03, fundedByAustralianNationalDataService]
 ---
 
-<img style="width:100%;" src="{{site.JB.BASE_PATH/images/theteam.png}}" />
+<img style="width:100%;" src="{{site.JB.BASE_PATH}}/images/theteam.png" />
 
 <div class="person">
     <a name="marianne"></a>
     {% assign marianne = site.people['marianne'] %}
 	{% if marianne.gravatar %}
 	    <div class="avatarwrapper">
-       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ marianne.gravatar }}?s=24">
+       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ marianne.gravatar }}?s=32">
 	    </div>
 	{% endif %}
 	<h2>Marianne Brown</h2>
@@ -47,7 +47,7 @@ tags:   [andsProject, andsProjectTeam, andsSkills, andsApps, andsAP03, fundedByA
     {% assign daniel = site.people['daniel'] %}
 	{% if daniel.gravatar %}
 	    <div class="avatarwrapper">
-       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ daniel.gravatar }}?s=24">
+       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ daniel.gravatar }}?s=32">
 	    </div>
 	{% endif %}
   	<h2>Daniel Baird</h2>
@@ -71,38 +71,50 @@ tags:   [andsProject, andsProjectTeam, andsSkills, andsApps, andsAP03, fundedByA
 
 <div class="person">
     <a name="rob"></a>
-        <h2>Robert Pyke</h2>
-        <h3>Software Engineer</h3>
+    {% assign rob = site.people['rob'] %}
+	{% if rob.gravatar %}
+	    <div class="avatarwrapper">
+       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ rob.gravatar }}?s=32">
+	    </div>
+	{% endif %}
+    <h2>Robert Pyke</h2>
+    <h3>Software Engineer</h3>
 
-        <p>
-          Robert is a developer for the Centre For Tropical Biodiversity &amp; Climate Change and a student at JCU. He is studying
-          Computer Systems Engineering and Information Technology.
-          In his previous role as Senior Software Engineer at Code Valley, he was responsible for
-          researching, designing and implementing novel company technologies.
-        </p>
-        <p>
-          Robert is an active member of the developer community, and acts as the NQLD ACS
-          Chapter student representative.
-        </p>
-        <p>
-          Robert has participated in a variety of coding competitions. His team placed first in
-          Australia in 2009's IEEEXtreme Programming Competition.
-        </p>
+    <p>
+      Robert is a developer for the Centre For Tropical Biodiversity &amp; Climate Change and a student at JCU. He is studying
+      Computer Systems Engineering and Information Technology.
+      In his previous role as Senior Software Engineer at Code Valley, he was responsible for
+      researching, designing and implementing novel company technologies.
+    </p>
+    <p>
+      Robert is an active member of the developer community, and acts as the NQLD ACS
+      Chapter student representative.
+    </p>
+    <p>
+      Robert has participated in a variety of coding competitions. His team placed first in
+      Australia in 2009's IEEEXtreme Programming Competition.
+    </p>
 
-        <p>
-        Technologies familiar with:
-        <ul>
-            <li>Ruby, Java, HTML, CSS, JSON/XML/YAML, Javascript</li>
-            <li>Google App Engine, Google APIs, AWS, NodeJS, Heroku, Netbeans
-            Module Development, Ruby On Rails, PHP, Lex/Yacc/JavaCC</li>
-            <li>Vim, Netbeans</li>
-            <li>Git, Subversion</li>
-        </ul>
-        </p>
+    <p>
+    Technologies familiar with:
+    <ul>
+        <li>Ruby, Java, HTML, CSS, JSON/XML/YAML, Javascript</li>
+        <li>Google App Engine, Google APIs, AWS, NodeJS, Heroku, Netbeans
+        Module Development, Ruby On Rails, PHP, Lex/Yacc/JavaCC</li>
+        <li>Vim, Netbeans</li>
+        <li>Git, Subversion</li>
+    </ul>
+    </p>
 </div>
 
 <div class="person">
     <a name="tom"></a>
+        {% assign tom = site.people['tom'] %}
+	    {% if tom.gravatar %}
+	        <div class="avatarwrapper">
+           		<img class="avatar" src="http://www.gravatar.com/avatar/{{ tom.gravatar }}?s=32">
+	        </div>
+	    {% endif %}
         <h2>Tom Dalling</h2>
         <h3>Software Engineer</h3>
         <p>
@@ -146,6 +158,12 @@ tags:   [andsProject, andsProjectTeam, andsSkills, andsApps, andsAP03, fundedByA
 
 <div class="person">
     <a name="lauren"></a>
+        {% assign lauren = site.people['lauren'] %}
+	    {% if lauren.gravatar %}
+	        <div class="avatarwrapper">
+           		<img class="avatar" src="http://www.gravatar.com/avatar/{{ lauren.gravatar }}?s=32">
+	        </div>
+	    {% endif %}
         <h2>Lauren Hodgson</h2>
         <h3>Domain Expert</h3>
         <p>
