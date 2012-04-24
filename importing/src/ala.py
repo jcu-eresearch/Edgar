@@ -28,8 +28,8 @@ class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
     def __init__(self, lat=None, longi=None, uuidIn=None, kosher=False):
-        self.latitude = float(lat)
-        self.longitude = float(longi)
+        self.latitude = None if lat is None else float(lat)
+        self.longitude = None if longi is None else float(longi)
         if isinstance(uuidIn, uuid.UUID):
             self.uuid = uuidIn
         else:
