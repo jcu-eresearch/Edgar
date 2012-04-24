@@ -1,3 +1,8 @@
+img {
+    /* OMFG Fing IE OMG@!! */
+    position: relative;
+}
+
 #logo {
     float: left;
     margin-bottom: 1ex;
