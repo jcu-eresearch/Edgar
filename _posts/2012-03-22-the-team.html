@@ -6,7 +6,13 @@ author: daniel
 tags:   [andsProject, andsProjectTeam, andsSkills, andsApps, andsAP03, fundedByAustralianNationalDataService]
 ---
 
-<img style="width:100%;" src="{{site.JB.BASE_PATH}}/images/theteam.png" />
+<style>
+    img.teamshot { width: 100%; border: 0; }
+    .avatarwrapper { display: inline-block; }
+    .person p { clear: both; }
+</style>
+
+<img class="teamshot" src="{{site.JB.BASE_PATH}}/images/theteam.png" />
 
 <div class="person">
     <a name="marianne"></a>
@@ -70,11 +76,11 @@ tags:   [andsProject, andsProjectTeam, andsSkills, andsApps, andsAP03, fundedByA
 </div>
 
 <div class="person">
-    <a name="rob"></a>
-    {% assign rob = site.people['rob'] %}
-	{% if rob.gravatar %}
+    <a name="robert"></a>
+    {% assign robert = site.people['robert'] %}
+	{% if robert.gravatar %}
 	    <div class="avatarwrapper">
-       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ rob.gravatar }}?s=32">
+       		<img class="avatar" src="http://www.gravatar.com/avatar/{{ robert.gravatar }}?s=32">
 	    </div>
 	{% endif %}
     <h2>Robert Pyke</h2>
