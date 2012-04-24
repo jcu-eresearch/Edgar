@@ -4,6 +4,7 @@ layout:  post
 author:  daniel
 summary: A progress report
 excerpt: 
+categories: [Development]
 tags:    [progress, UI, user interface]
 ---
 

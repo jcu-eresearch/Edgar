@@ -4,6 +4,7 @@ layout:  post
 author:  marianne
 summary: Outline of the project outputs and the primary product produced.
 excerpt:
+categories: [Requirements]
 tags:    [andsOutputs]
 ---
 

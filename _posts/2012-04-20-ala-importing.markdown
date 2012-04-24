@@ -4,6 +4,7 @@ layout:  post
 author:  tom
 summary: A description of the ALA importer
 excerpt:
+categories: [Development]
 tags:    [ALA, importing]
 ---
 

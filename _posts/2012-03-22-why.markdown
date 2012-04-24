@@ -6,6 +6,7 @@ summary: What is this project all about.
 excerpt: Simply stated, the goal of the Australian Bird Species Distribution
          Project is to model the effect of climate change on Australian bird 
          populations.
+categories: [Requirements]
 tags:    [andsProjectDescription, andsContext, andsAims, andsObjectives]
 ---
 
