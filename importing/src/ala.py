@@ -30,11 +30,14 @@ class Occurrence(object):
     def __init__(self, lat=None, longi=None, uuidIn=None, kosher=False):
         self.latitude = None if lat is None else float(lat)
         self.longitude = None if longi is None else float(longi)
-        if isinstance(uuidIn, uuid.UUID):
+        self.is_geospatial_kosher = bool(kosher)
+
+        if uuidIn is None:
+            self.uuid = None
+        elif isinstance(uuidIn, uuid.UUID):
             self.uuid = uuidIn
         else:
             self.uuid = uuid.UUID(uuidIn)
-        self.is_geospatial_kosher = bool(kosher)
 
     def __repr__(self):
         return '<record uuid="{uuid}" latLong="{lat}, {lng}" />'.format(

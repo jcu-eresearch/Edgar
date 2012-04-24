@@ -38,18 +38,18 @@ class Syncer:
     def sync(self, sync_species=True, sync_occurrences=True):
         # add/delete species
         if sync_species:
-            log.info('Adding new species')
+            log.info('Syncing species list')
             added_species, deleted_species = self.added_and_deleted_species()
             for species in added_species:
                 self.add_species(species)
-            log.info("Deleting species that don't exist any more")
             for species in deleted_species:
                 self.delete_species(species)
 
         # update occurrences
-        log.info('Updating occurrence records')
         if sync_occurrences:
+            log.info('Syncing occurrence records')
             self.sync_occurrences()
+
             # remove orphaned occurrences
             db.engine.execute('''
                 delete from occurrences
@@ -133,7 +133,9 @@ class Syncer:
         start_time = datetime.datetime.utcnow()
 
         # insert new, and update existing, occurrences
-        for occ in self.occurrences_changed_since(self.last_import_time, True):
+        occ_generator = self.mp_fetch_occurrences(since=self.last_import_time,
+                                                  record_dirty=True)
+        for occ in occ_generator:
             self.upsert_occurrence(occ, occ.species_id)
         self.flush_upserts()
 
@@ -172,6 +174,8 @@ class Syncer:
         Builds a set of uuid.UUID objects for records that exist at ALA, then
         checks every local record to see if it still exists in the set.'''
 
+        species_to_redownload = []
+
         for row, lc, rc in self.species_with_occurrence_counts():
             # don't run unless our count is different to ALAs count
             if lc == rc:
@@ -182,49 +186,27 @@ class Syncer:
                         row['scientific_name'],
                         lc, rc)
 
-            # species should never be None, because we already have a count for
-            # it from ALA
-            species = self.ala_species_for_scientific_name(row['scientific_name'])
-            if species is None:
-                log.critical('species should never be None')
-                continue
+            species_to_redownload.append(row)
 
-            # build the set of existing uuids, while also upserting every
-            # occurrence
-            existing_uuids = set()
-            for occurrence in self.ala.occurrences_for_species(species.lsid):
-                self.upsert_occurrence(occurrence, row['id'])
-                existing_uuids.add(occurrence.uuid)
-            self.flush_upserts()
-
-            # loop through every local occurrence, and store the ids of the
-            # rows that do not exist at ALA. Have to delete records after
-            # query is done
-            row_ids_to_delete = []
-            all_rows_for_species = \
-                db.occurrences.select().\
+            # delete local records
+            db.occurrences.delete().\
                 where(db.occurrences.c.species_id == row['id']).\
                 where(db.occurrences.c.source_id == self.source_row_id).\
                 execute()
-            for occ_row in all_rows_for_species:
-                occ_uuid = uuid.UUID(bytes=occ_row['source_record_id'])
-                if occ_uuid not in existing_uuids:
-                    row_ids_to_delete.append(occ_row['id'])
 
-            # free up some memory, because this may be very large
-            del existing_uuids
-
-            # delete all the neccessary local occurrences
-            for occ_id in row_ids_to_delete:
-                db.occurrences.delete().\
-                    where(db.occurrences.c.id == occ_id).\
-                    execute()
-
-            # free up more memory
-            del row_ids_to_delete
-
-            # log and keep track of the deletions and additions
+            # keep track of the deletions and additions
             self.increase_dirty_count(row['id'], abs(lc - rc))
+
+
+        # fetch all the records again
+        occ_generator = self.mp_fetch_occurrences(
+                since=None,
+                species=species_to_redownload,
+                record_dirty=False)
+
+        for occurrence in occ_generator:
+            self.upsert_occurrence(occurrence, occurrence.species_id)
+        self.flush_upserts()
 
 
     def check_occurrence_counts(self):
@@ -286,8 +268,9 @@ class Syncer:
             result = input_q.get()
             active_workers -= 1
 
-            log.info('%d species remaining to fetch occurrence counts for',
-                    active_workers)
+            if active_workers % 100 == 0:
+                log.info('%d species remaining to fetch occurrence counts for',
+                        active_workers)
 
             if len(result) == 2:
                 species_id, occ_count = result
@@ -389,11 +372,12 @@ class Syncer:
         self.cached_upserts = []
 
 
-    def occurrences_changed_since(self, since_date, record_dirty=False):
+    def mp_fetch_occurrences(self, since, record_dirty=False, species=None):
         '''Generator for ala.Occurrence objects.
 
-        Will use whatever is in the species table of the database, so call
-        update the species table before calling this function.
+        `species` is an iterable of db.species rows. If it is None (default) it
+        will get all species rows from the database, so update the species
+        table before calling this function.
 
         Uses a pool of processes to fetch occurrence records. The subprocesses
         feed the records into a queue which the original process reads and
@@ -405,14 +389,17 @@ class Syncer:
         pool = multiprocessing.Pool(8, _mp_init, [input_q, self.ala])
         active_workers = 0
 
+        if species is None:
+            species = db.species.select().execute();
+
         # fill the pool full with every species
-        for row in db.species.select().execute():
+        for row in species:
             species = self.ala_species_for_scientific_name(row['scientific_name'])
             if species is None:
                 log.warning("Should have ALA.Species for %s, but don't",
                             row['scientific_name'])
             else:
-                args = (species, row['id'], since_date)
+                args = (species, row['id'], since)
                 pool.apply_async(_mp_fetch_occurrences, args)
                 active_workers += 1
 
@@ -453,9 +440,7 @@ class Syncer:
 
 
         # all the subprocesses should be dead by now
-        log.info('Joining subprocesses')
         pool.join()
-        log.info('Join complete')
 
 
     def increase_dirty_count(self, species_id, num_dirty):
@@ -499,7 +484,7 @@ class Syncer:
 
 def _mp_init(output_q, ala):
     '''Called when a subprocess is started. See
-    Syncer.occurrences_changed_since'''
+    Syncer.mp_fetch_occurrences'''
     _mp_init.ala = ala
     _mp_init.output_q = output_q
     _mp_init.log = multiprocessing.log_to_stderr()
