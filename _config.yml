@@ -1,6 +1,6 @@
 # This is the default format. 
 # For more see: https://github.com/mojombo/jekyll/wiki/Permalinks
-permalink: /:categories/:year/:month/:day/:title 
+permalink: /:categories/:year/:month/:day/:title
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 auto: true
@@ -10,11 +10,11 @@ pygments: true
 # so be sure to set them if your theme uses them.
 #
 title : Edgar
-tagline: Site Tagline
+tagline: Australian Birds In A Changing Climate 
 author :
   name : JCU eResearch
-  email : eresearch@test
-  github : username
+  email : eresearch@jcu.edu.au
+  github : jcu-eresearch
   twitter : username
   feedburner : feedname
 
@@ -26,7 +26,7 @@ author :
 # Else if you are pushing to username.github.com, replace with your username.
 # Finally if you are pushing to a GitHub project page, include the project name at the end.
 #
-production_url : http://jcu-eresearach.github.com/Edgar
+production_url : http://jcu-eresearch.github.com/Edgar
 
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #
@@ -123,4 +123,19 @@ JB :
   # and include your custom code. Your custom file must be defined at:
   #   ./_includes/custom/[HELPER]
   # where [HELPER] is the name of the helper you are overriding.
-  
+
+# intreesting info for using elsewhere..
+people:
+  daniel:
+    displayname: Daniel Baird
+    gravatar: bd0203dc8478deb969d72f52e741bd4f
+  marianne:
+    displayname: Marianne Brown
+    gravatar: 024deb6605ebc9c11fd906a06c410c0b
+  robert:
+    displayname: Robert Pyke
+    gravatar: 1833c3a33d7185b8cfd7e9d00a8f599c
+  tom:
+    displayname: Tom Dalling
+    gravatar: 05463d616d56d33fd6a61df100fbbb94
+
