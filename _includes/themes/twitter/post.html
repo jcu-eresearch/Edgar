@@ -8,7 +8,7 @@
   <div class="span8">
 
     <div class="byline">
-        {% assign author = site.people[post.author] %}
+        {% assign author = site.people[page.author] %}
 	    {% if author.gravatar %}
         	<div class="avatarwrapper">
         		<img class="avatar" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=24">
@@ -16,7 +16,7 @@
 	    {% endif %}
 	    <div class="postedbywrapper">
 		    <span class="subtle">Posted by</span>
-		    <a class="userlink" href="{{ site.basepath }}/team/#{{ post.author }}">
+		    <a class="userlink" href="{{ site.basepath }}/team/#{{ page.author }}">
 			    {{ author.displayname }}
 		    </a>
 	    </div>
