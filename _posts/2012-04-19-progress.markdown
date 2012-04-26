@@ -20,7 +20,7 @@ with prominent wing eyespots that you can
 [see here getting eaten](http://caterpillar-eyespots.blogspot.com.au/2011/08/automeris-zugana-pwnd1.html)
 by a
 [tailless whip scorpion](http://en.wikipedia.org/wiki/Amblypygi),
-which is not actually a scorpion.
+which is not actually a scorpion (or even a whip scorpion).
 
 This meant I had a perfect opportunity to look at displaying
 observations on a map.  This is easy; just put a dot at
@@ -36,9 +36,14 @@ with a more dense area in the north-western corner.  But with this view,
 you're missing information &mdash; can you tell where the second most dense
 area is?
 
+This problem, where lots of things on a map cover each other up, can be solved
+by bunching the items together into clusters.
+Clustering also helps when there are so many items on the map that sending 
+each one from the server to your browser takes a long time.
+
 Here's a different rendering of the same observations, 
-but this time I'll cover the map with squares, and write the number of observations
-in each square:
+but this time I'll cover the map with squares, and write the number of 
+observations in each square:
 
 <img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-grid.png" />
 
@@ -48,39 +53,50 @@ with a 210 square and a couple of 60-ish squares, and there's another
 60-ish block in central Costa Rica too. That's important information 
 you weren't getting from the dots.  But the map is all ugly now, with
 a big grid over it.  Maybe I should make all the grid lines fainter, 
-but if making them *less* visible is okay, why not hide them completely?
+but if we say it's okay to make them *a bit* less visible, why aren't I
+making them *completely* invisible?
 
-Clearly I need to answer this question:
+To make a good decision here I need to answer this question:
 
-**what information, exactly, are the grid borders communicating
+**What information, exactly, are the grid borders communicating
 to the viewer?**
 
 The answer I came up with is this: the grid lines show you the area the
 count applies to; the number in the middle of a grid square is the sum
-of observations in that square.
+of observations inside the square's borders.
 
-So, each number on the map needs to have borders.  But that's not true
-of the zeros (which I already show as blank, instead of writing "0" on 
-the screen).  So I tried not drawing the borders of empty squares.
+So, I've decided that the user needs to know where the border is for
+each number's area.  But that's not important for the zeros (which I 
+already show as blank, instead of writing "0" on the screen).  So I 
+tried not drawing the borders of empty squares.
 
 <img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-sparsegrid.png" />
 
-That's still not great, but it's a lot easier to look at.
+That's still not great, but it's a lot easier to look at.  Secondly,
+most people aren't very good at picking out of high and low sections
+in a grid of numbers (accountants and other people who look at spreadsheets
+a lot are better at that than normal people like you and I).
 
+I tried dividing up the numbers into high, medium and low terciles, and
+formatting them differently:
 
+<img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-sparsegridwithfont.png" />
 
+I also changed the colour, so it didn't interfere with the green map
+background as much.  This does a pretty good job of showing where the
+big clusters are.
 
+Finally, the idea of showing a cluster square for just 1 or 2 occurrences
+seems a bit odd, so I added a cutoff so that in those cases, instead of
+a square, I'll just show the observations directly on the map as dots.
 
+..pic goes here..
 
+Okay, so that clustering technique is ready to show to my customer.  I
+also want to work up an alternative clustering technique or two for 
+comparison's sake.
 
-
-
-
-
-
-
-
-
-
+I haven't shown zooming behaviour here, but it's another interesting 
+problem that I will try to cover in a later post.
 
 

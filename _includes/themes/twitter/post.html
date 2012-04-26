@@ -6,6 +6,27 @@
 <div style="clear: both"></div>
 <div class="row">
   <div class="span8">
+
+    <div class="byline">
+        {% assign author = site.people[post.author] %}
+	    {% if author.gravatar %}
+        	<div class="avatarwrapper">
+        		<img class="avatar" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=24">
+		    </div>
+	    {% endif %}
+	    <div class="postedbywrapper">
+		    <span class="subtle">Posted by</span>
+		    <a class="userlink" href="{{ site.basepath }}/team/#{{ post.author }}">
+			    {{ author.displayname }}
+		    </a>
+	    </div>
+	    <div class="postedonwrapper">
+		    <span class="subtle">on</span>
+		    <span class="postedondate">
+			    {{ post.date | date_to_string }}
+		    </span>
+	    </div>
+    </div>
     {{ content }}
     <hr>
     <div class="pagination">
