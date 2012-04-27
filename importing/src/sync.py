@@ -201,7 +201,7 @@ class Syncer:
         # fetch all the records again
         occ_generator = self.mp_fetch_occurrences(
                 since=None,
-                species=species_to_redownload,
+                species_to_fetch=species_to_redownload,
                 record_dirty=False)
 
         for occurrence in occ_generator:
@@ -372,7 +372,7 @@ class Syncer:
         self.cached_upserts = []
 
 
-    def mp_fetch_occurrences(self, since, record_dirty=False, species=None):
+    def mp_fetch_occurrences(self, since, record_dirty=False, species_to_fetch=None):
         '''Generator for ala.Occurrence objects.
 
         `species` is an iterable of db.species rows. If it is None (default) it
@@ -385,21 +385,22 @@ class Syncer:
         speed while the subprocesses are waiting for more records to arrive
         over the network.'''
 
+        if species_to_fetch is None:
+            species_to_fetch = db.species.select().execute();
+
         input_q = multiprocessing.Queue(10000)
         pool = multiprocessing.Pool(8, _mp_init, [input_q, self.ala])
         active_workers = 0
 
-        if species is None:
-            species = db.species.select().execute();
-
         # fill the pool full with every species
-        for row in species:
-            species = self.ala_species_for_scientific_name(row['scientific_name'])
+        for species_row in species_to_fetch:
+            sciname = species_row['scientific_name']
+            species = self.ala_species_for_scientific_name(sciname)
             if species is None:
                 log.warning("Should have ALA.Species for %s, but don't",
-                            row['scientific_name'])
+                            sciname)
             else:
-                args = (species, row['id'], since)
+                args = (species, species_row['id'], since)
                 pool.apply_async(_mp_fetch_occurrences, args)
                 active_workers += 1
 
@@ -463,8 +464,6 @@ class Syncer:
     def update_num_dirty_occurrences(self):
         '''Updates the species.num_dirty_occurrences column with the number of
         occurrences that have been changed by self.
-
-        TODO: account for deleted records
         '''
         dirty_col = db.species.c.num_dirty_occurrences
 
@@ -483,8 +482,7 @@ class Syncer:
 
 
 def _mp_init(output_q, ala):
-    '''Called when a subprocess is started. See
-    Syncer.mp_fetch_occurrences'''
+    '''Called when a subprocess is started. See Syncer.mp_fetch_occurrences'''
     _mp_init.ala = ala
     _mp_init.output_q = output_q
     _mp_init.log = multiprocessing.log_to_stderr()
