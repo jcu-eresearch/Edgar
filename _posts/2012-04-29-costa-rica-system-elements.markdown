@@ -404,7 +404,7 @@ the class style. This is where something silly can happen... If instead of
 a color range (COLORRANGE), a single color (COLOR) is defined, the key image
 will be a generated icon coloured COLOR of dimensions KEYSIZE. When a COLORRANGE 
 is defined and no key image is defined, the key icon appears to be the last 
-color generated. If no data pass the class's expression check, then the key 
+color generated. If no data passes the class's expression check, then the key 
 icon is empty (no key icon).
 
 The following image shows the map colour transition:
