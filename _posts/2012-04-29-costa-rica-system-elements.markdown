@@ -367,10 +367,11 @@ This is where we define how to interpret the input data and draw the layer.
 The input ascii grid file describes the distribution likelihood as a value 
 between 0 and 1. 0 represents never will be here, and 1 means definitely should 
 be here. We specify 4 classes for this class item.
-1. 0 to 0.25
-2. 0.25 to 0.5
-3. 0.5 to 0.75
-4. 0.75 to 1
+
+1. _0 to 0.25_
+2. _0.25 to 0.5_
+3. _0.5  to 0.75_
+4. _0.75 to 1_
 
 I'll explain one of these in detail. From that, the rest should be self explanatory.
 
