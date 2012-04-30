@@ -1,9 +1,10 @@
 ---
-title:   UI and tech progress, volume 1
+title:   Displaying occurrences in clusters
 layout:  post
 author:  daniel
-summary: A progress report
-excerpt: 
+summary: Developing a clustering technique for displaying occurrences
+excerpt: I had a perfect opportunity to look at displaying
+         observations on a map.
 categories: [Development]
 tags:    [progress, UI, user interface]
 ---
@@ -53,8 +54,8 @@ with a 210 square and a couple of 60-ish squares, and there's another
 60-ish block in central Costa Rica too. That's important information 
 you weren't getting from the dots.  But the map is all ugly now, with
 a big grid over it.  Maybe I should make all the grid lines fainter, 
-but if we say it's okay to make them *a bit* less visible, why aren't I
-making them *completely* invisible?
+but if we say it's okay to make them *a bit* less visible, why shouldn't
+I make them *completely* invisible?
 
 To make a good decision here I need to answer this question:
 
@@ -86,11 +87,12 @@ I also changed the colour, so it didn't interfere with the green map
 background as much.  This does a pretty good job of showing where the
 big clusters are.
 
-Finally, the idea of showing a cluster square for just 1 or 2 occurrences
-seems a bit odd, so I added a cutoff so that in those cases, instead of
-a square, I'll just show the observations directly on the map as dots.
+Finally, the idea of showing a cluster square for just a few occurrences
+seems a bit odd, so I added a cutoff so that if a square would have fewer
+than four observations they just show up as dots, and I don't draw the
+square.
 
-..pic goes here..
+<img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-finalgrid.png" />
 
 Okay, so that clustering technique is ready to show to my customer.  I
 also want to work up an alternative clustering technique or two for 
