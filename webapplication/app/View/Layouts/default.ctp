@@ -27,7 +27,7 @@ App::uses('Sanitize', 'Utility');
         <?php
             echo $this->Html->meta('icon');
             echo $this->Html->css('edgar');
-
+            echo $this->Html->css('/js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
             echo $this->Html->css('openlayers');
             echo $this->Html->css('openlayers_extended');
             echo $this->Html->css('openlayers_google');

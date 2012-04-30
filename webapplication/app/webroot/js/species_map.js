@@ -352,17 +352,14 @@ function addOccurrencesLayer() {
 
 $(document).ready(function() {
 
-    // The work to do if the user changes the selected species..
-    // We need to change the species_sci_name_cased for the dist layer.
-    // We need to then update the species details.
-    $('#SpeciesSpeciesId').change(function(evt) {
-        var new_species_id = $('#SpeciesSpeciesId').val();
+    function changeSpecies(new_species_id, sci_name){
+        console.log("Changing species to " + sci_name);
 
         // Only update the map if the user chose an actual species.
         // the 'choose one' option has no value.
         if (new_species_id !== '') {
                 species_id = new_species_id;
-                species_sci_name_cased = $('#SpeciesSpeciesId option:selected').text();
+                species_sci_name_cased = sci_name;
                 species_sci_name_cased = $.trim(species_sci_name_cased);
                 species_sci_name_cased = species_sci_name_cased.replace(/\./g, '');
                 species_sci_name_cased = species_sci_name_cased.replace(/\s/g, '_');
@@ -373,6 +370,23 @@ $(document).ready(function() {
         } else {
             clearExistingSpeciesOccurrencesAndDistributionLayers();
         }
+    }
+
+    $('#species_autocomplete').autocomplete({
+        minLength: 2,
+        source: '/species/autocomplete.json',
+        select: function(event, ui) {
+            changeSpecies(ui.item.id, ui.item.value);
+        }
+    });
+
+    // The work to do if the user changes the selected species..
+    // We need to change the species_sci_name_cased for the dist layer.
+    // We need to then update the species details.
+    $('#SpeciesSpeciesId').change(function(evt) {
+        var new_species_id = $('#SpeciesSpeciesId').val();
+        var sci_name = $('#SpeciesSpeciesId option:selected').text();
+        changeSpecies(new_species_id, sci_name);
     });
 
 

@@ -220,4 +220,37 @@ class SpeciesController extends AppController {
         }
     }
 
+
+    /**
+     * Returns JSON for a jQuery UI autocomplete box
+     */
+    public function autocomplete() {
+        //get what the user typed in
+        $partial = $this->request->query['term'];
+
+        //query db
+        $matched_species = $this->Species->find('all', array(
+            'conditions' => array('OR' => array(
+                array('species.scientific_name LIKE' => '%'.$partial.'%'),
+                array('Species.common_name LIKE' => '%'.$partial.'%')
+            )),
+            'order' => array('Species.common_name DESC'),
+            'recursive' => 0
+        ));
+
+        //convert $matched_species into json format expected by jquery ui
+        foreach($matched_species as $key => $value){
+            $species = $value['Species'];
+            $matched_species[$key] = array(
+                'id' => $species['id'],
+                'value' => $species['scientific_name'],
+                'label' => $species['common_name'] . ' - '.$species['scientific_name'],
+            );
+        }
+
+        //render json
+        $this->set('results', $matched_species);
+        $this->set('_serialize', 'results');
+    }
+
 }

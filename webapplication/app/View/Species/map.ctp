@@ -36,11 +36,9 @@
         <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
     </div>
 
-<?php
-    if ($single_species_map) {
-?>
-<h2><?php  echo __('Species Map');?></h2>
-<!-- Map Specific For Species -->
+<?php if ($single_species_map): ?>
+    <h2><?php  echo __('Species Map');?></h2>
+    <!-- Map Specific For Species -->
     <dl>
         <dt><?php echo __('Id'); ?></dt>
         <dd>
@@ -58,10 +56,7 @@
             &nbsp;
         </dd>
     </dl>
-
-<?php
-    } else {
-?>
+<?php else: ?>
     <h2 style='display:none'><?php  echo __('Species Map');?></h2>
 
     <!-- clustering selector -->
@@ -75,29 +70,8 @@
     </fieldset>
 
     <!-- Species Selector -->
-    <?php
-        echo $this->Form->create('Species', array(
-            'type' => 'get',
-            'action' => 'map'
-        ));
-    ?>
-        <?php
-            echo $this->Form->input('species_id', array('empty' => '(choose one)'));
-/*
-actually I'll just try a hand-coded select
-            echo $this->Form->select('cluster_algo', array(
-                'dotradius' => 'Dot Radius (no clustering)',
-                'dotgrid' => 'Dot Grid',
-                'squaregrid' => 'Square Grid',
-            ), array(
-                'label' => 'Clustering',
-                'empty' => false,
-            ));
-*/
-        ?>
-    <?php echo $this->Form->end();?>
-<?php
-    }
-?>
+    <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+<?php endif ?>
+
     <div style="width:60em; height: 40em;" id="map"></div>
 </div>
