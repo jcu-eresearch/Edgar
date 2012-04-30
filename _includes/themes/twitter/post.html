@@ -28,13 +28,13 @@
     {% include JB/comments %}
   </div>
   
-  <div class="span4">
+  <div class="span4 sidebar">
     <h4>Published</h4>
     <div class="byline">
         {% assign author = site.people[page.author] %}
 	    {% if author.gravatar %}
         	<div class="avatarwrapper">
-        		<img class="avatar" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=24">
+        		<img class="avatar" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=32">
 		    </div>
 	    {% endif %}
 	    <div class="postedbywrapper">

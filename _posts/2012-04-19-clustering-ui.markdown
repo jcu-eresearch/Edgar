@@ -30,7 +30,7 @@ the x/y location of each observation.
 For example, here's a map of Costa Rica with occurrences of 
 <i>automeris zugana</i> drawn on as little circles:
 
-<img src="{{BASE_PATH}}/images/clustering-costarica-zugana-dots.png" />
+<img src="{{ site.JB.BASE_PATH }}/images/clustering-costarica-zugana-dots.png" />
 
 You can see that this moth has been found across more-or-less the whole country,
 with a more dense area in the north-western corner.  But with this view,

@@ -1,5 +1,5 @@
-img {
-    /* OMFG Fing IE OMG@!! */
+    img {
+    /* OMFG eff-ing IE OMG@!! */
     position: relative;
 }
 
@@ -38,4 +38,43 @@ img {
     float: left;
     margin: 5px;
 }
+
+/* sidebar ------------------------------------- */
+.sidebar h4 {
+    padding-top: 2em;
+}
+
+.sidebar h4:first-child {
+    padding-top: 0;
+}
+
+/* post byline --------------------------------- */
+
+.subtle { color: #666; }
+
+.postedbywrapper, .postedonwrapper {
+	display: block;
+	padding: 0 1em 0 0;
+	margin: 0;
+}
+
+.avatarwrapper {
+    float: left;
+	padding-right: 0.5em;
+    height: 3em;        /* the height of the avatar wrapper */
+}
+
+.avatarwrapper img {
+    position: relative;
+    margin-top: 1.5em;  /* half the height of the avatarwrapper */
+    height: 32px;       /* known height of the avatar image */
+    top: -16px;         /* half the height of the avatar image */
+                        /* viola: centered vertically! */
+}
+
+
+
+
+
+
 
