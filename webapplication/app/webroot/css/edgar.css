@@ -734,3 +734,16 @@ pre {
 #url-rewriting-warning {
     display:none;
 }
+
+.species.map {
+    position: relative;
+}
+
+#map_legend_img {
+    position: absolute;
+    background-color: #fff;
+    opacity: 0.8;
+    z-index: 10000;
+    bottom: 40px;
+    left: 0px;
+}

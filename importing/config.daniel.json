@@ -1,0 +1,15 @@
+{
+    "doco_": "Any key starting with 'doco_' is not a config value, it's documentation only.",
+
+    "doco_db": "Everything with a 'db.' prefix is passed to sqlalchemy.engine_from_config",
+    "db.url": "mysql://edgar_import:password@localhost/edgar_dev?charset=utf8",
+
+    "doco_updateSpecies": "true/false, whether or not to add/update/delete species",
+    "updateSpecies": true,
+
+    "doco_updateOccurrences": "true/false, whether or not to add/update/delete occurrences",
+    "updateOccurrences": true,
+
+    "doco_logLevel": "string, any level from the python logging module (i.e. DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+    "logLevel": "WARNING"
+}

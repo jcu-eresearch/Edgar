@@ -20,7 +20,9 @@ CREATE TABLE IF NOT EXISTS `species` (
     `common_name` VARCHAR(256) NULL
         COMMENT "Some species don't have a common name",
     -- This is the number of occurrences that have changed since the last modelling run happened
-    `num_dirty_occurrences` INT UNSIGNED DEFAULT 0 NOT NULL
+    `num_dirty_occurrences` INT UNSIGNED DEFAULT 0 NOT NULL,
+    `distribution_threshold` FLOAT UNSIGNED DEFAULT 0 NOT NULL
+        COMMENT "the Equate entropy of thresholded and original distributions logistic threshold found in the model output"
 )
 CHARSET=utf8;
 
