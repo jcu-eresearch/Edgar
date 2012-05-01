@@ -368,7 +368,7 @@ function changeSpecies(new_species_id, sciName){
 
         addSpeciesOccurrencesAndDistributionLayers();
 
-        if(Edgar.user && Edgar.user.canRemodel){
+        if(Edgar.user && Edgar.user.canRequestRemodel){
             $('#model_rerun_button').show();
             $('#model_rerun_requested').hide();
             $('#model_rerun').show();

@@ -1,5 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('User', 'Model');
+
 /**
  * Species Controller
  *
@@ -199,8 +201,8 @@ class SpeciesController extends AppController {
         if ($id == null) {
             $this->Species->recursive = 0;
             $this->set('single_species_map', false);
-            $this->set('species', 
-                $this->Species->find('list', 
+            $this->set('species',
+                $this->Species->find('list',
                 array(
                     'fields' => array('Species.id', 'Species.scientific_name'),
                     'recursive' => 0,
@@ -258,17 +260,20 @@ class SpeciesController extends AppController {
      */
     public function next_job() {
         $species = $this->Species->find('first', array(
-            'order' => 'num_dirty_occurrences DESC',
+            'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
+            'order' => array(
+                'is_null' => 'ASC',
+                'first_requested_remodel' => 'ASC',
+                'num_dirty_occurrences' => 'DESC'
+            ),
             'conditions' => 'num_dirty_occurrences > 0',
             'recursive' => false
         ));
 
         if($species){
-            print $species['Species']['id'];
-            exit();
+            $this->dieWithStatus(200, $species['Species']['id']);
         } else {
-            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-            die("No species modelling required.");
+            $this->dieWithStatus(404, 'No species modelling required.');
         }
     }
 
@@ -276,15 +281,13 @@ class SpeciesController extends AppController {
      * Updates the status of a running modelling job
      */
     public function job_status($species_id) {
-        header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-        die("Not implemented yet.");
+        $this->dieWithStatus(500, 'Not implemented yet');
     }
 
     /**
      * Called when the user requests remodelling for a species
      */
     public function request_model_rerun($species_id) {
-        header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-        die("Not implemented yet.");
+        $this->dieWithStatus(500, 'Not implemented yet');
     }
 }

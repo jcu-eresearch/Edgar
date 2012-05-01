@@ -17,6 +17,7 @@
  */
 
 App::uses('Sanitize', 'Utility');
+App::uses('User', 'Model');
 $user = AuthComponent::user();
 
 ?>
@@ -33,8 +34,8 @@ $user = AuthComponent::user();
                 Edgar.user = null;
             <?php else: ?>
                 Edgar.user = {
-                    canRate: true,
-                    canRemodel: true
+                    canRate: <?php print ($user['can_rate'] ? 'true' : 'false') ?>,
+                    canRequestRemodel: <?php print (User::canRequestRemodel($user) ? 'true' : 'false') ?>
                 }
             <?php endif ?>
         </script>

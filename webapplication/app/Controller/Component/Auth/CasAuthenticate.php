@@ -4,7 +4,11 @@ App::import('Vendor', 'CAS/CAS');
 
 class CasAuthenticate {
 
+    private $_settings = array();
+
     function __construct($collection, $settings) {
+        $this->_settings = $settings;
+
         if(Configure::read('CAS.debug_log_enabled')){
             phpCAS::setDebug(TMP . 'phpCas.log.txt');
         }
@@ -19,8 +23,33 @@ class CasAuthenticate {
 
     public function authenticate(CakeRequest $request, CakeResponse $response) {
         phpCAS::forceAuthentication();
-        //Contains keys: firstname, lastname, userid, email
-        return phpCAS::getAttributes();
+        //$casInfo contains keys: firstname, lastname, userid, email
+        $casInfo = phpCAS::getAttributes();
+
+        //convert cas fields to user model fields
+        $userInfo = array();
+        foreach($this->_settings['fields'] as $casField => $userField){
+            $userInfo[$userField] = $casInfo[$casField];
+        }
+
+        //find existing user in db using the model
+        $userModelName = $this->_settings['userModel'];
+        $keyField = $this->_settings['userModelKeyField'];
+        $userModel = ClassRegistry::init($userModelName);
+        $user = $userModel->find('first', array(
+            'conditions' => array($keyField => $userInfo[$keyField])
+        ));
+
+        //if the user doesn't exist in the db, insert a new row
+        if($user === false){
+            $userModel->save(array($userModelName => $userInfo));
+            $user = $userModel->find('first', array(
+                'conditions' => array($keyField => $userInfo[$keyField])
+            ));
+            assert('$user !== false');
+        }
+
+        return $user[$userModelName];
     }
 
     public function getUser($request) {

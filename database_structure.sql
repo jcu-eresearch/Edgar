@@ -22,7 +22,9 @@ CREATE TABLE IF NOT EXISTS `species` (
     -- This is the number of occurrences that have changed since the last modelling run happened
     `num_dirty_occurrences` INT UNSIGNED DEFAULT 0 NOT NULL,
     `distribution_threshold` FLOAT UNSIGNED DEFAULT 0 NOT NULL
-        COMMENT "the Equate entropy of thresholded and original distributions logistic threshold found in the model output"
+        COMMENT "the Equate entropy of thresholded and original distributions logistic threshold found in the model output",
+    `first_requested_remodel` DATETIME DEFAULT NULL NULL
+        COMMENT "The first time, since last modelling run, that a user requested a remodel for this species"
 )
 CHARSET=utf8;
 
@@ -75,6 +77,8 @@ ROW_FORMAT=FIXED;
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `email` VARCHAR(256) NOT NULL,
+    `fname` VARCHAR(256) NOT NULL,
+    `lname` VARCHAR(256) NOT NULL,
     `can_rate` BOOLEAN DEFAULT TRUE NOT NULL,
     `is_admin` BOOLEAN DEFAULT FALSE NOT NULL
 );

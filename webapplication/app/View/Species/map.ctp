@@ -17,16 +17,16 @@
                        "var map_tool_base_url = '".$map_tool_base_url."';".
                        "var species_route_url= '".$species_route_url."';".
                        "var species_sci_name_cased = '".$species_sci_name_cased."';";
-        echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
-        echo $this->Html->script(array('species_map'), array('block' => 'script')); 
+        echo $this->Html->scriptBlock($code_block, array('block' => 'script'));
+        echo $this->Html->script(array('species_map'), array('block' => 'script'));
     } else {
         $code_block =  "var species_id = undefined;".
                        "var map_tool_base_url = '".$map_tool_base_url."';".
                        "var species_route_url= '".$species_route_url."';";
         // Include map javascript files
-        echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
-        echo $this->Html->script(array('species_map'), array('block' => 'script')); 
-        echo $this->Html->script('clustering_selector_setup', array('inline'=>false)); 
+        echo $this->Html->scriptBlock($code_block, array('block' => 'script'));
+        echo $this->Html->script(array('species_map'), array('block' => 'script'));
+        echo $this->Html->script('clustering_selector_setup', array('inline'=>false));
     }
 
 ?>
