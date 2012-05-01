@@ -24,6 +24,12 @@ App::uses('Sanitize', 'Utility');
     <head>
         <?php echo $this->Html->charset(); ?>
         <title><?php echo $title_for_layout; ?> - Edgar</title>
+
+        <script type="text/javascript">
+            window.Edgar = window.Edgar || {};
+            Edgar.baseUrl = "<?php print $this->Html->url('', true) ?>";
+        </script>
+
         <?php
             echo $this->Html->meta('icon');
             echo $this->Html->css('edgar');

@@ -374,7 +374,7 @@ $(document).ready(function() {
 
     $('#species_autocomplete').autocomplete({
         minLength: 2,
-        source: '/species/autocomplete.json',
+        source: Edgar.baseURL + 'species/autocomplete.json',
         select: function(event, ui) {
             changeSpecies(ui.item.id, ui.item.value);
         }
