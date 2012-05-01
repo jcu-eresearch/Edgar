@@ -347,34 +347,36 @@ function addOccurrencesLayer() {
 
         map.addControl(occurrence_select_control);
         occurrence_select_control.activate();
+}
 
+function flattenScientificName(name) {
+    return $.trim(name).replace(/\./g, '').replace(/\s/g, '_');
+}
+
+function changeSpecies(new_species_id, sciName){
+    console.log("Changing species to " + sciName);
+
+    // Only update the map if the user chose an actual species.
+    // the 'choose one' option has no value.
+    if (new_species_id !== '') {
+        species_id = new_species_id;
+        species_sci_name_cased = flattenScientificName(sciName);
+
+        clearExistingSpeciesOccurrencesAndDistributionLayers();
+        addSpeciesOccurrencesAndDistributionLayers();
+        $('#model_rerun_button').show();
+    } else {
+        species_id = undefined;
+        clearExistingSpeciesOccurrencesAndDistributionLayers();
+        $('#model_rerun_button').hide();
+    }
 }
 
 $(document).ready(function() {
 
-    function changeSpecies(new_species_id, sci_name){
-        console.log("Changing species to " + sci_name);
-
-        // Only update the map if the user chose an actual species.
-        // the 'choose one' option has no value.
-        if (new_species_id !== '') {
-                species_id = new_species_id;
-                species_sci_name_cased = sci_name;
-                species_sci_name_cased = $.trim(species_sci_name_cased);
-                species_sci_name_cased = species_sci_name_cased.replace(/\./g, '');
-                species_sci_name_cased = species_sci_name_cased.replace(/\s/g, '_');
-                var new_species_name = $('#SpeciesSpeciesId').val();
-
-                clearExistingSpeciesOccurrencesAndDistributionLayers();
-                addSpeciesOccurrencesAndDistributionLayers();
-        } else {
-            clearExistingSpeciesOccurrencesAndDistributionLayers();
-        }
-    }
-
     $('#species_autocomplete').autocomplete({
         minLength: 2,
-        source: Edgar.baseURL + 'species/autocomplete.json',
+        source: Edgar.baseUrl + 'species/autocomplete.json',
         select: function(event, ui) {
             changeSpecies(ui.item.id, ui.item.value);
         }

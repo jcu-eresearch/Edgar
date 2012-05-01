@@ -253,4 +253,36 @@ class SpeciesController extends AppController {
         $this->set('_serialize', 'results');
     }
 
+    /**
+     * Return next species to run a modelling job for
+     */
+    public function next_job() {
+        $species = $this->Species->find('first', array(
+            'order' => 'num_dirty_occurrences DESC',
+            'conditions' => 'num_dirty_occurrences > 0',
+            'recursive' => false
+        ));
+
+        if($species){
+            print $species['Species']['id'];
+            exit();
+        } else {
+            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+            die("No species modelling required.");
+        }
+    }
+
+    /**
+     * Updates the status of a running modelling job
+     */
+    public function job_status($species_id) {
+        header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
+        die("No implemented yet.");
+    }
+
+    /**
+     * 
+     */
+    public function request_model_rerun($species_id) {
+    }
 }

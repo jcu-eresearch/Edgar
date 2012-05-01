@@ -69,8 +69,11 @@
         </select>
     </fieldset>
 
+    <a id="model_rerun_button" style="display:none" href="#">Request recalculation of distribution map</a>
+
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+
 <?php endif ?>
 
     <div style="width:60em; height: 40em;" id="map"></div>
