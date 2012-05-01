@@ -6,7 +6,7 @@ summary: Developing a clustering technique for displaying occurrences
 excerpt: I had a perfect opportunity to look at displaying
          observations on a map.
 categories: [Development]
-tags:    [progress, UI, user interface]
+tags:    [progress, UI, user interface, costa rica, mapping, clustering]
 ---
 
 Our primary researcher wanted to demonstrate our project to
