@@ -17,6 +17,7 @@
  */
 
 App::uses('Sanitize', 'Utility');
+$user = AuthComponent::user();
 
 ?>
 <!DOCTYPE html>
@@ -28,6 +29,14 @@ App::uses('Sanitize', 'Utility');
         <script type="text/javascript">
             window.Edgar = window.Edgar || {};
             Edgar.baseUrl = "<?php print $this->Html->url('', true) ?>";
+            <?php if($user === null): ?>
+                Edgar.user = null;
+            <?php else: ?>
+                Edgar.user = {
+                    canRate: true,
+                    canRemodel: true
+                }
+            <?php endif ?>
         </script>
 
         <?php

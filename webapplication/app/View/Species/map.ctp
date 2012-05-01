@@ -69,7 +69,10 @@
         </select>
     </fieldset>
 
-    <a id="model_rerun_button" style="display:none" href="#">Request recalculation of distribution map</a>
+    <div id="model_rerun" style="display:none">
+        <a id="model_rerun_button" href="#">Request recalculation of distribution map</a>
+        <p id="model_rerun_requested">Request successfull</p>
+    </div>
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />

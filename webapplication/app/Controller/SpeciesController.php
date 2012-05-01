@@ -277,12 +277,14 @@ class SpeciesController extends AppController {
      */
     public function job_status($species_id) {
         header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-        die("No implemented yet.");
+        die("Not implemented yet.");
     }
 
     /**
-     * 
+     * Called when the user requests remodelling for a species
      */
     public function request_model_rerun($species_id) {
+        header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
+        die("Not implemented yet.");
     }
 }
