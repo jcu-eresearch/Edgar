@@ -486,6 +486,10 @@ def _mp_init(output_q, ala):
     _mp_init.ala = ala
     _mp_init.output_q = output_q
     _mp_init.log = multiprocessing.log_to_stderr()
+    _mp_init.log_level = _mp_init.log.getEffectiveLevel()
+
+    #stops annoying "child process shutting down" messages
+    _mp_init.log.setLevel(logging.WARNING)
 
 
 def _mp_format_exception(e):
@@ -509,7 +513,7 @@ def _mp_fetch_occurrences(species, species_id, since_date):
     Adds a `species_id` attribute to each ala.Occurrence object set to
     the argument given to this function.'''
 
-    #_mp_init.log.info('Started fetching for "%s"', species_sname)
+    _mp_init.log.setLevel(_mp_init.log_level);
 
     try:
         num_records = _mp_fetch_occurrences_inner(species,
@@ -518,6 +522,9 @@ def _mp_fetch_occurrences(species, species_id, since_date):
         _mp_init.output_q.put((species, species_id, num_records))
     except Exception, e:
         _mp_init.output_q.put((_mp_format_exception(e),))
+
+    #stops annoying "child process shutting down" messages
+    _mp_init.log.setLevel(logging.WARNING)
 
 
 def _mp_fetch_occurrences_inner(species, species_id, since_date):
@@ -531,11 +538,16 @@ def _mp_fetch_occurrences_inner(species, species_id, since_date):
 
 
 def _mp_fetch_occur_count(species, species_id):
+    _mp_init.log.setLevel(_mp_init.log_level);
+
     try:
         count = _mp_init.ala.num_occurrences_for_lsid(species.lsid)
         _mp_init.output_q.put((species_id, count))
     except Exception, e:
         _mp_init.output_q.put((_mp_format_exception(e),))
+
+    #stops annoying "child process shutting down" messages
+    _mp_init.log.setLevel(logging.WARNING)
 
 
 def _mysql_encode_binary(binstr):
