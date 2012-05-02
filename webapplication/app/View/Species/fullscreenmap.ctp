@@ -1,5 +1,9 @@
 <?php
 
+    // change to the fullscreen layout
+    $this->layout = 'fullscreencontent';
+
+
     // Inject javascript to specify species_id and map_tool_url.
 //    $map_tool_url = $this->Html->url(array("controller" => "tools", "action" => "map"));
     $map_tool_base_url = "http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/";
@@ -31,7 +35,6 @@
     }
 
 ?>
-
 <div class="species map">
     <div class='map_legend'>
         <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>

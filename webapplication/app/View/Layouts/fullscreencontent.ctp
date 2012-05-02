@@ -49,6 +49,7 @@ $user = AuthComponent::user();
         echo $this->Html->meta('icon');
         echo $this->Html->css('h5bp');  // html5boilerplate "sanity reset" css
         echo $this->Html->css('edgar');
+        echo $this->Html->css('edgarfullscreen');
         echo $this->Html->css('../js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
         echo $this->Html->css('openlayers');
         echo $this->Html->css('openlayers_extended');
@@ -75,10 +76,13 @@ $user = AuthComponent::user();
     ?>
 </head>
 <body>
-    <div id="header">
+    <div id="content">
+        <?php echo $this->fetch('content') ?>
+    </div>
+
+    <div id="user">
         <div class="wrapper">
-            <img src="<?php print $this->Html->url('/img/logo.png') ?>" />
-            <div class="login"><?php
+            <?php
                 $user = AuthComponent::user();
                 if($user === NULL){
                     print $this->Html->link('Log In', '/users/login');
@@ -87,21 +91,25 @@ $user = AuthComponent::user();
                     print $this->Html->link('Log Out', '/users/logout');
                     print ')';
                 }
-            ?></div>
-
+            ?>
         </div>
     </div>
 
-    <div id="content">
+    <div id="flash">
         <div class="wrapper">
             <?php echo $this->Session->flash() ?>
+        </div>
+    </div>
+
+    <div id="header">
+        <div class="wrapper">
             <h1><?php echo $title_for_layout ?></h1>
-            <?php echo $this->fetch('content') ?>
         </div>
     </div>
 
     <div id="footer">
     </div>
+
     <?php echo $this->element('sql_dump'); ?>
 </body>
 </html>

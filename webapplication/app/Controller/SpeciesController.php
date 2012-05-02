@@ -218,6 +218,9 @@ class SpeciesController extends AppController {
             $this->set('single_species_map', true);
             $this->set('species', $this->Species->read(null, $id));
         }
+        
+        // use the fullscreen map view
+        $this->render('fullscreenmap');
     }
 
 
