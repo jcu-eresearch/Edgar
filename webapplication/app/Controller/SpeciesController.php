@@ -236,11 +236,9 @@ class SpeciesController extends AppController {
 
         //convert $matched_species into json format expected by jquery ui
         foreach($matched_species as $key => $value){
-            $species = $value['Species'];
-            $matched_species[$key] = array(
-                'id' => $species['id'],
-                'label' => $species['common_name'] . ' - '.$species['scientific_name'],
-            );
+            $species = $this->_speciesToJson($value['Species']);
+            $species['label'] = $value['Species']['common_name'] . ' - '.$value['Species']['scientific_name'];
+            $matched_species[$key] = $species;
         }
 
         //render json
@@ -294,5 +292,16 @@ class SpeciesController extends AppController {
         $species['Species']['first_requested_remodel'] = date(DATE_ISO8601);
         $this->Species->save($species);
         $this->dieWithStatus(200, 'Request processed');
+    }
+
+    private function _speciesToJson($species) {
+        return array(
+            'id' => $species['id'],
+            'scientificName' => $species['scientific_name'],
+            'commonName' => $species['common_name'],
+            'numDirtyOccurrences' => $species['num_dirty_occurrences'],
+            'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
+            'remodelStatus' => 'Not implemented yet'
+        );
     }
 }

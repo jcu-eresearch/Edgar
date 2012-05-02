@@ -69,10 +69,23 @@
         </select>
     </fieldset>
 
-    <div id="model_rerun" style="display:none">
-        <a id="model_rerun_button" href="#">Request recalculation of distribution map</a>
-        <p id="model_rerun_requested">Request successfull</p>
-    </div>
+    <table>
+        <tr>
+            <th>Freshness</th>
+            <td id="species_freshness"></td>
+        </tr>
+
+        <tr>
+            <th>Modeling Status</th>
+            <td>
+                <span id="model_status"></span>
+                <span id="model_rerun" style="display:none">
+                    <a id="model_rerun_button" href="#">Boost</a>
+                    <span id="model_rerun_requested">Boost successfull</span>
+                </span>
+            </td>
+        </tr>
+    </table>
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
