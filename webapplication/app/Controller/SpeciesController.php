@@ -273,7 +273,7 @@ class SpeciesController extends AppController {
         if($species){
             $this->dieWithStatus(200, $species['Species']['id']);
         } else {
-            $this->dieWithStatus(404, 'No species modelling required.');
+            $this->dieWithStatus(204, 'No species modelling required.');
         }
     }
 
