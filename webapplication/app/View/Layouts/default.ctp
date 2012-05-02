@@ -29,7 +29,7 @@ $user = AuthComponent::user();
 
         <script type="text/javascript">
             window.Edgar = window.Edgar || {};
-            Edgar.baseUrl = "<?php print $this->Html->url('', true) ?>";
+            Edgar.baseUrl = "<?php print $this->Html->url('/', true) ?>";
             <?php if($user === null): ?>
                 Edgar.user = null;
             <?php else: ?>

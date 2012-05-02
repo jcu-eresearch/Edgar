@@ -747,3 +747,7 @@ pre {
     bottom: 40px;
     left: 0px;
 }
+
+.ui-autocomplete {
+    z-index: 99999 !important; /* puts it above the map controls */
+}

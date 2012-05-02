@@ -3,6 +3,7 @@
 // File: app/Model/Species.rb
 class Species extends AppModel {
     public $name = 'Species';
+    public $recursive = -1; //stops queries fetching all the occurrences
 
     // Define behaviours
     public $actsAs = array(

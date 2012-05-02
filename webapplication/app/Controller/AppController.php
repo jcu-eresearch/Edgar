@@ -60,7 +60,12 @@ class AppController extends Controller {
 
     public function dieWithStatus($statusCode, $msg = null) {
         $this->response->statusCode($statusCode);
-        $this->response->body($msg);
+        if($msg){
+            $this->response->body($msg);
+        } else {
+            $statusMsg = $this->httpCodes($statusCode);
+            $this->response->body($statusCode . ' - ' . $statusMsg[$statusCode]);
+        }
         $this->response->send();
         exit();
     }
