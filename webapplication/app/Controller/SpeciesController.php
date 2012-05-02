@@ -233,10 +233,10 @@ class SpeciesController extends AppController {
         //query db
         $matched_species = $this->Species->find('all', array(
             'conditions' => array('OR' => array(
-                array('species.scientific_name LIKE' => '%'.$partial.'%'),
-                array('Species.common_name LIKE' => '%'.$partial.'%')
+                array('scientific_name LIKE' => '%'.$partial.'%'),
+                array('common_name LIKE' => '%'.$partial.'%')
             )),
-            'order' => array('Species.common_name DESC'),
+            'order' => array('common_name DESC'),
             'recursive' => 0
         ));
 
