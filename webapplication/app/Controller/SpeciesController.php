@@ -301,7 +301,19 @@ class SpeciesController extends AppController {
             'commonName' => $species['common_name'],
             'numDirtyOccurrences' => $species['num_dirty_occurrences'],
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
-            'remodelStatus' => 'Not implemented yet'
+            'remodelStatus' => $this->_speciesRemodelStatusMessage($species)
         );
+    }
+
+    private function _speciesRemodelStatusMessage($species) {
+        if($species['remodel_status'] === null){
+            if($species['first_requested_remodel'] !== null){
+                return 'Priority queued for remodelling';
+            } else {
+                return 'Automatically queued for remodelling';
+            }
+        } else {
+            return 'Remodelling running with status: ' . $species['remodel_status'];
+        }
     }
 }
