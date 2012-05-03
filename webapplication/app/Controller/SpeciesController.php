@@ -269,10 +269,35 @@ class SpeciesController extends AppController {
 
     /**
      * Updates the status of a running modelling job
+     *
+     * TODO: any auth on this? looks like a minor security hole
+     * TODO: how do we handle failure? Just ignored it for the moment.
+     *
+     * Takes POST/PUT params:
+     *  - job_status - a status code string
+     *  - job_status_message - human readable (?) message for job_status
+     *  - dirty_occurrences - value of num_dirty_occurrences when the job started
      */
     public function job_status($species_id) {
-        //TODO: any auth on this? looks like a minor security hole
-        $this->dieWithStatus(501);
+        $species = $this->Species->find('first', array(
+            'conditions' => array('id' => $species_id)
+        ));
+        if($species === false)
+            $this->dieWithStatus(404, 'No species found with given id');
+
+        $jobStatus = $this->request->data('job_status');
+        if($jobStatus === 'FINISHED_SUCCESS' || $jobStatus === 'FINISHED_FAILURE'){
+            $occurrencesCleared = (int)$this->request->data('dirty_occurrences');
+            $species['Species']['num_dirty_occurrences'] -= $occurrencesCleared;
+            $species['Species']['remodel_status'] = null;
+            $species['Species']['first_requested_remodel'] = null;
+        } else {
+            $jobStatusMsg = $this->request->data('job_status_message');
+            $species['Species']['remodel_status'] = $jobStatusMsg;
+        }
+
+        $this->Species->save($species);
+        $this->dieWithStatus(200);
     }
 
     /**
@@ -306,14 +331,15 @@ class SpeciesController extends AppController {
     }
 
     private function _speciesRemodelStatusMessage($species) {
-        if($species['remodel_status'] === null){
-            if($species['first_requested_remodel'] !== null){
-                return 'Priority queued for remodelling';
-            } else {
-                return 'Automatically queued for remodelling';
-            }
-        } else {
+        if($species['num_dirty_occurrences'] <= 0)
+            return 'Up to date';
+
+        if($species['remodel_status'] !== null)
             return 'Remodelling running with status: ' . $species['remodel_status'];
-        }
+
+        if($species['first_requested_remodel'] !== null)
+            return 'Priority queued for remodelling';
+
+        return 'Automatically queued for remodelling';
     }
 }
