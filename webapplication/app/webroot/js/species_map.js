@@ -353,7 +353,7 @@ function flattenScientificName(name) {
     return $.trim(name).replace(/\./g, '').replace(/\s/g, '_');
 }
 
-function changeSpecies(new_species_id, sciName){
+function changeSpecies(species){
     // The work to do if the user changes the selected species..
     // We need to change the species_sci_name_cased for the dist layer.
     // We need to then update the species details.
@@ -362,19 +362,25 @@ function changeSpecies(new_species_id, sciName){
     // the 'choose one' option has no value.
     clearExistingSpeciesOccurrencesAndDistributionLayers();
 
-    if (new_species_id !== '') {
-        species_id = new_species_id;
-        species_sci_name_cased = flattenScientificName(sciName);
+    if (species !== null) {
+        species_id = species.id;
+        species_sci_name_cased = flattenScientificName(species.scientificName);
 
         addSpeciesOccurrencesAndDistributionLayers();
 
-        if(Edgar.user && Edgar.user.canRemodel){
+        $('#species_freshness').text('' + species.numDirtyOccurrences + ' records changed since last modeling run.');
+        $('#model_status').text(species.remodelStatus);
+        if(Edgar.user && Edgar.user.canRequestRemodel && species.canRequestRemodel){
             $('#model_rerun_button').show();
             $('#model_rerun_requested').hide();
             $('#model_rerun').show();
+        } else {
+            $('#model_rerun').hide();
         }
     } else {
         species_id = undefined;
+        $('#species_freshness').text('');
+        $('#model_status').text('');
         $('#model_rerun').hide();
     }
 }
@@ -385,14 +391,8 @@ $(document).ready(function() {
         minLength: 2,
         source: Edgar.baseUrl + 'species/autocomplete.json',
         select: function(event, ui) {
-            changeSpecies(ui.item.id, ui.item.value);
+            changeSpecies(ui.item);
         }
-    });
-
-    $('#SpeciesSpeciesId').change(function(evt) {
-        var new_species_id = $('#SpeciesSpeciesId').val();
-        var sci_name = $('#SpeciesSpeciesId option:selected').text();
-        changeSpecies(new_species_id, sci_name);
     });
 
     $('#model_rerun_button').click(function() {

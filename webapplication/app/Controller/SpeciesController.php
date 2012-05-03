@@ -1,5 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('User', 'Model');
+
 /**
  * Species Controller
  *
@@ -17,7 +19,6 @@ class SpeciesController extends AppController {
     public function index() {
         $this->set('title_for_layout', 'Species - Index');
 
-        $this->Species->recursive = 0;
         $this->set('species', $this->paginate());
 
         // Specify the output for the json view.
@@ -33,6 +34,7 @@ class SpeciesController extends AppController {
     public function view($id = null) {
         $this->set('title_for_layout', 'Species - View');
 
+        $this->Species->recursive = 1;
         $this->Species->id = $id;
         if (!$this->Species->exists()) {
             throw new NotFoundException(__('Invalid species'));
@@ -51,8 +53,6 @@ class SpeciesController extends AppController {
      */
     public function minimal_view($id = null) {
         $this->set('title_for_layout', 'Species - View');
-
-        $this->Species->recursive = 0;
 
         $this->Species->id = $id;
         if (!$this->Species->exists()) {
@@ -120,6 +120,7 @@ class SpeciesController extends AppController {
         }
 
         // Look up the species provided
+        $this->Species->recursive = 1;
         $species = $this->Species->read(null, $id);
 
         // Check if we were provided a bbox (bounding box)
@@ -197,19 +198,15 @@ class SpeciesController extends AppController {
     public function map($id = null) {
         $this->set('title_for_layout', 'Species - Map');
         if ($id == null) {
-            $this->Species->recursive = 0;
             $this->set('single_species_map', false);
-            $this->set('species', 
-                $this->Species->find('list', 
+            $this->set('species',
+                $this->Species->find('list',
                 array(
                     'fields' => array('Species.id', 'Species.scientific_name'),
-                    'recursive' => 0,
                     'order' => array('Species.scientific_name ASC'), //string or array defining order
                 )
             ));
         } else {
-            $this->Species->recursive = 0;
-
             $this->Species->id = $id;
             if (!$this->Species->exists()) {
                 throw new NotFoundException(__('Invalid species'));
@@ -234,21 +231,17 @@ class SpeciesController extends AppController {
         //query db
         $matched_species = $this->Species->find('all', array(
             'conditions' => array('OR' => array(
-                array('species.scientific_name LIKE' => '%'.$partial.'%'),
-                array('Species.common_name LIKE' => '%'.$partial.'%')
+                array('scientific_name LIKE' => '%'.$partial.'%'),
+                array('common_name LIKE' => '%'.$partial.'%')
             )),
-            'order' => array('Species.common_name DESC'),
-            'recursive' => 0
+            'order' => array('common_name DESC')
         ));
 
         //convert $matched_species into json format expected by jquery ui
         foreach($matched_species as $key => $value){
-            $species = $value['Species'];
-            $matched_species[$key] = array(
-                'id' => $species['id'],
-                'value' => $species['scientific_name'],
-                'label' => $species['common_name'] . ' - '.$species['scientific_name'],
-            );
+            $species = $this->_speciesToJson($value['Species']);
+            $species['label'] = $value['Species']['common_name'] . ' - '.$value['Species']['scientific_name'];
+            $matched_species[$key] = $species;
         }
 
         //render json
@@ -261,17 +254,19 @@ class SpeciesController extends AppController {
      */
     public function next_job() {
         $species = $this->Species->find('first', array(
-            'order' => 'num_dirty_occurrences DESC',
-            'conditions' => 'num_dirty_occurrences > 0',
-            'recursive' => false
+            'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
+            'order' => array(
+                'is_null' => 'ASC',
+                'first_requested_remodel' => 'ASC',
+                'num_dirty_occurrences' => 'DESC'
+            ),
+            'conditions' => 'num_dirty_occurrences > 0'
         ));
 
         if($species){
-            print $species['Species']['id'];
-            exit();
+            $this->dieWithStatus(200, $species['Species']['id']);
         } else {
-            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-            die("No species modelling required.");
+            $this->dieWithStatus(204, 'No species modelling required.');
         }
     }
 
@@ -279,15 +274,37 @@ class SpeciesController extends AppController {
      * Updates the status of a running modelling job
      */
     public function job_status($species_id) {
-        header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-        die("Not implemented yet.");
+        //TODO: any auth on this? looks like a minor security hole
+        $this->dieWithStatus(501);
     }
 
     /**
      * Called when the user requests remodelling for a species
      */
     public function request_model_rerun($species_id) {
-        header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-        die("Not implemented yet.");
+        if(!User::canRequestRemodel(AuthComponent::user()))
+            $this->dieWithStatus(403);
+
+        $species = $this->Species->findById($species_id);
+        if($species === False)
+            $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
+
+        if($species['Species']['first_requested_remodel'] !== NULL)
+            $this->dieWithStatus(200, 'Modelling already requested previously');
+
+        $species['Species']['first_requested_remodel'] = date(DATE_ISO8601);
+        $this->Species->save($species);
+        $this->dieWithStatus(200, 'Request processed');
+    }
+
+    private function _speciesToJson($species) {
+        return array(
+            'id' => $species['id'],
+            'scientificName' => $species['scientific_name'],
+            'commonName' => $species['common_name'],
+            'numDirtyOccurrences' => $species['num_dirty_occurrences'],
+            'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
+            'remodelStatus' => 'Not implemented yet'
+        );
     }
 }

@@ -23,6 +23,8 @@ BIOCACHE = 'http://biocache.ala.org.au/'
 
 log = logging.getLogger(__name__)
 
+_max_retry_secs = 300 # 5 minutes by default
+
 
 class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
@@ -85,6 +87,11 @@ class Species(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+
+def set_max_retry_secs(max_retry_secs):
+    global _max_retry_secs;
+    _max_retry_secs = max_retry_secs;
 
 
 def occurrences_for_species(species_lsid, changed_since=None):
@@ -235,42 +242,27 @@ def q_param(species_lsid=None, changed_since=None):
         '''.format(lsid=species_lsid, changed=changed_since))
 
 
-# 10 sec * 2^5 == over 5 minutes of retrying
-def _retry(retries=5, delay=10, backoff=2):
+def _retry(delay=10.0):
     '''A decorator that retries a function or method until it succeeds (success
     is when the function completes and no exception is raised).
 
-    delay sets the initial delay in seconds, and backoff sets the factor by
-    which the delay should lengthen after each failure. backoff must be greater
-    than 1, or else it isn't really a backoff. retries must be greater than 0, and
-    delay greater than 0.'''
-
-    if backoff <= 1:
-        raise ValueError('backoff must be greater than 1')
-
-    retries = math.floor(retries)
-    if retries < 1:
-        raise ValueError('retries must be >= 1')
-
-    if delay <= 0:
-        raise ValueError('delay must be >= 0')
+    Waits `delay` seconds between retries. Reraises the failure exception if
+    more than `_max_retry_secs` has elapsed.'''
 
     def deco_retry(f):
         def f_retry(*args, **kwargs):
-            mtries, mdelay = retries + 1, delay
+            startTime = time.time();
 
             while True:
                 try:
                     return f(*args, **kwargs)
                 except Exception, e:
-                    log.warning('Retrying fetch due to exception: %s', str(e))
-
-                    mtries -= 1
-                    if mtries > 0:
-                        time.sleep(mdelay)
-                        mdelay *= backoff
+                    if time.time() - startTime < _max_retry_secs:
+                        log.warning('Retrying fetch due to exception: %s', str(e))
+                        time.sleep(delay)
                     else:
                         raise
+
         return f_retry
     return deco_retry
 

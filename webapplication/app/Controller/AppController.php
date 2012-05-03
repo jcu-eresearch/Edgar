@@ -35,17 +35,38 @@ class AppController extends Controller {
     public $components = array(
         'Session',
         'Auth' => array(
-            'loginRedirect' => array('controller' => 'pages', 'action' => 'display', 'home'),
-            'logoutRedirect' => array('controller' => 'pages', 'action' => 'display', 'home')
+            'loginRedirect' => array('controller' => 'species', 'action' => 'map'),
+            'logoutRedirect' => array('controller' => 'species', 'action' => 'map')
         )
     );
 
     public function beforeFilter() {
         $this->Auth->authenticate = array(
-            AuthComponent::ALL => array('userModel' => 'Member'),
-            'Cas',
-            'Form'
+            'Cas' => array(
+                'userModel' => 'User',
+                'userModelKeyField' => 'email',
+                'fields' => array(
+                    'email' => 'email',
+                    'firstname' => 'fname',
+                    'lastname' => 'lname'
+                )
+            ),
+            'Form' => array('userModel' => 'User')
         );
         $this->Auth->allow('*');
+
+        parent::beforeFilter();
+    }
+
+    public function dieWithStatus($statusCode, $msg = null) {
+        $this->response->statusCode($statusCode);
+        if($msg){
+            $this->response->body($msg);
+        } else {
+            $statusMsg = $this->httpCodes($statusCode);
+            $this->response->body($statusCode . ' - ' . $statusMsg[$statusCode]);
+        }
+        $this->response->send();
+        exit();
     }
 }
