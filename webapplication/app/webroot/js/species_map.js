@@ -3,7 +3,7 @@
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 
-var map, occurrences, distribution, occurrence_select_control, species_distribution_threshold;
+var map, occurrences, distribution, occurrence_select_control;
 
 // Projections
 // ----------
@@ -42,17 +42,7 @@ function legendURL() {
     var sciNameCased = flattenScientificName(mapSpecies.scientificName);
     var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
     return mapToolBaseUrl + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + species_distribution_threshold;
-}
-
-function updateSpeciesInfo(callback) {
-    $.getJSON(Edgar.baseUrl + 'species/minimal_view/' + mapSpecies.id + '.json', function(data) {
-        species_common_name = data['Species']['common_name'];
-        species_distribution_threshold = data['Species']['distribution_threshold'];
-        if ( callback != undefined ) {
-            callback();
-        }
-    });
+        '&THRESHOLD=' + mapSpecies.distributionThreshold;
 }
 
 function updateLegend() {
@@ -107,12 +97,10 @@ function clearExistingSpeciesOccurrencesLayer() {
 
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
-    updateSpeciesInfo(function() {
-        addOccurrencesLayer();
-        addDistributionLayer();
-        updateLegend();
-        showLegend();
-    });
+    addOccurrencesLayer();
+    addDistributionLayer();
+    updateLegend();
+    showLegend();
 }
 
 function clearMapPopups() {
@@ -152,7 +140,7 @@ function addDistributionLayer() {
             SPECIESID: mapSpecies.id,
             REASPECT: "true",
             TRANSPARENT: 'true',
-            THRESHOLD: species_distribution_threshold
+            THRESHOLD: mapSpecies.distributionThreshold
         },
         {
             // It's an overlay

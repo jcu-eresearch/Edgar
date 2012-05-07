@@ -46,25 +46,6 @@ class SpeciesController extends AppController {
     }
 
     /**
-     * minimal_view method
-     *
-     * @param string $id
-     * @return void
-     */
-    public function minimal_view($id = null) {
-        $this->set('title_for_layout', 'Species - View');
-
-        $this->Species->id = $id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
-        }
-        $this->set('species', $this->Species->read(null, $id));
-
-        // Specify the output for the json view.
-        $this->set('_serialize', 'species');
-    }
-
-    /**
      * occurrences method
      *
      * @param string $id
@@ -320,7 +301,8 @@ class SpeciesController extends AppController {
             'numDirtyOccurrences' => $species['num_dirty_occurrences'],
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
             'remodelStatus' => $this->_speciesRemodelStatusMessage($species),
-            'label' => $species['common_name'].' - '.$species['scientific_name']
+            'label' => $species['common_name'].' - '.$species['scientific_name'],
+            'distributionThreshold' => $species['distribution_threshold']
         );
     }
 
