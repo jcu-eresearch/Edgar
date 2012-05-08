@@ -17,6 +17,8 @@
  */
 
 App::uses('Sanitize', 'Utility');
+App::uses('User', 'Model');
+$user = AuthComponent::user();
 
 ?>
 <!DOCTYPE html>
@@ -24,10 +26,24 @@ App::uses('Sanitize', 'Utility');
     <head>
         <?php echo $this->Html->charset(); ?>
         <title><?php echo $title_for_layout; ?> - Edgar</title>
+
+        <script type="text/javascript">
+            window.Edgar = window.Edgar || {};
+            Edgar.baseUrl = "<?php print $this->Html->url('/', true) ?>";
+            <?php if($user === null): ?>
+                Edgar.user = null;
+            <?php else: ?>
+                Edgar.user = {
+                    canRate: <?php print ($user['can_rate'] ? 'true' : 'false') ?>,
+                    canRequestRemodel: <?php print (User::canRequestRemodel($user) ? 'true' : 'false') ?>
+                }
+            <?php endif ?>
+        </script>
+
         <?php
             echo $this->Html->meta('icon');
             echo $this->Html->css('edgar');
-            echo $this->Html->css('/js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
+            echo $this->Html->css('../js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
             echo $this->Html->css('openlayers');
             echo $this->Html->css('openlayers_extended');
             echo $this->Html->css('openlayers_google');

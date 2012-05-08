@@ -34,6 +34,8 @@ if __name__ == '__main__':
         logging.basicConfig()
         logging.root.setLevel(logging.__dict__[config['logLevel']])
 
+    if 'maxRetrySeconds' in config:
+        ala.set_max_retry_secs(float(config['maxRetrySeconds']));
 
     logging.info("Started at %s", str(datetime.now()))
     try:

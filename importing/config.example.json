@@ -11,5 +11,8 @@
     "updateOccurrences": true,
 
     "doco_logLevel": "string, any level from the python logging module (i.e. DEBUG, INFO, WARNING, ERROR, CRITICAL)",
-    "logLevel": "WARNING"
+    "logLevel": "WARNING",
+
+    "doco_maxRetrySeconds": "The maximum number of seconds to keep retrying an ALA request, before finally canceling the import",
+    "maxRetrySeconds": 300
 }

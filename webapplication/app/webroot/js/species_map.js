@@ -347,48 +347,60 @@ function addOccurrencesLayer() {
 
         map.addControl(occurrence_select_control);
         occurrence_select_control.activate();
+}
 
+function flattenScientificName(name) {
+    return $.trim(name).replace(/\./g, '').replace(/\s/g, '_');
+}
+
+function changeSpecies(species){
+    // The work to do if the user changes the selected species..
+    // We need to change the species_sci_name_cased for the dist layer.
+    // We need to then update the species details.
+
+    // Only update the map if the user chose an actual species.
+    // the 'choose one' option has no value.
+    clearExistingSpeciesOccurrencesAndDistributionLayers();
+
+    if (species !== null) {
+        species_id = species.id;
+        species_sci_name_cased = flattenScientificName(species.scientificName);
+
+        addSpeciesOccurrencesAndDistributionLayers();
+
+        $('#species_freshness').text('' + species.numDirtyOccurrences + ' records changed since last modeling run.');
+        $('#model_status').text(species.remodelStatus);
+        if(Edgar.user && Edgar.user.canRequestRemodel && species.canRequestRemodel){
+            $('#model_rerun_button').show();
+            $('#model_rerun_requested').hide();
+            $('#model_rerun').show();
+        } else {
+            $('#model_rerun').hide();
+        }
+    } else {
+        species_id = undefined;
+        $('#species_freshness').text('');
+        $('#model_status').text('');
+        $('#model_rerun').hide();
+    }
 }
 
 $(document).ready(function() {
 
-    function changeSpecies(new_species_id, sci_name){
-        console.log("Changing species to " + sci_name);
-
-        // Only update the map if the user chose an actual species.
-        // the 'choose one' option has no value.
-        if (new_species_id !== '') {
-                species_id = new_species_id;
-                species_sci_name_cased = sci_name;
-                species_sci_name_cased = $.trim(species_sci_name_cased);
-                species_sci_name_cased = species_sci_name_cased.replace(/\./g, '');
-                species_sci_name_cased = species_sci_name_cased.replace(/\s/g, '_');
-                var new_species_name = $('#SpeciesSpeciesId').val();
-
-                clearExistingSpeciesOccurrencesAndDistributionLayers();
-                addSpeciesOccurrencesAndDistributionLayers();
-        } else {
-            clearExistingSpeciesOccurrencesAndDistributionLayers();
-        }
-    }
-
     $('#species_autocomplete').autocomplete({
         minLength: 2,
-        source: species_route_url + '/autocomplete.json',
+        source: Edgar.baseUrl + 'species/autocomplete.json',
         select: function(event, ui) {
-            changeSpecies(ui.item.id, ui.item.value);
+            changeSpecies(ui.item);
         }
     });
 
-    // The work to do if the user changes the selected species..
-    // We need to change the species_sci_name_cased for the dist layer.
-    // We need to then update the species details.
-    $('#SpeciesSpeciesId').change(function(evt) {
-        var new_species_id = $('#SpeciesSpeciesId').val();
-        var sci_name = $('#SpeciesSpeciesId option:selected').text();
-        changeSpecies(new_species_id, sci_name);
+    $('#model_rerun_button').click(function() {
+        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + species_id });
+        $(this).fadeOut('fast', function(){
+            $('#model_rerun_requested').fadeIn();
+        });
     });
-
 
 
     // The Map Object

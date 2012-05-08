@@ -17,16 +17,16 @@
                        "var map_tool_base_url = '".$map_tool_base_url."';".
                        "var species_route_url= '".$species_route_url."';".
                        "var species_sci_name_cased = '".$species_sci_name_cased."';";
-        echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
-        echo $this->Html->script(array('species_map'), array('block' => 'script')); 
+        echo $this->Html->scriptBlock($code_block, array('block' => 'script'));
+        echo $this->Html->script(array('species_map'), array('block' => 'script'));
     } else {
         $code_block =  "var species_id = undefined;".
                        "var map_tool_base_url = '".$map_tool_base_url."';".
                        "var species_route_url= '".$species_route_url."';";
         // Include map javascript files
-        echo $this->Html->scriptBlock($code_block, array('block' => 'script')); 
-        echo $this->Html->script(array('species_map'), array('block' => 'script')); 
-        echo $this->Html->script('clustering_selector_setup', array('inline'=>false)); 
+        echo $this->Html->scriptBlock($code_block, array('block' => 'script'));
+        echo $this->Html->script(array('species_map'), array('block' => 'script'));
+        echo $this->Html->script('clustering_selector_setup', array('inline'=>false));
     }
 
 ?>
@@ -69,8 +69,27 @@
         </select>
     </fieldset>
 
+    <table>
+        <tr>
+            <th>Freshness</th>
+            <td id="species_freshness"></td>
+        </tr>
+
+        <tr>
+            <th>Modeling Status</th>
+            <td>
+                <span id="model_status"></span>
+                <span id="model_rerun" style="display:none">
+                    <a id="model_rerun_button" href="#">Boost</a>
+                    <span id="model_rerun_requested">Boost successfull</span>
+                </span>
+            </td>
+        </tr>
+    </table>
+
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+
 <?php endif ?>
 
     <div style="width:60em; height: 40em;" id="map"></div>
