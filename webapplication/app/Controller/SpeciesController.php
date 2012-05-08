@@ -226,12 +226,15 @@ class SpeciesController extends AppController {
     public function next_job() {
         $species = $this->Species->find('first', array(
             'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
+            'conditions' => array(
+                'num_dirty_occurrences >' => 0,
+                'remodel_status' => null
+            ),
             'order' => array(
                 'is_null' => 'ASC',
                 'first_requested_remodel' => 'ASC',
-                'num_dirty_occurrences' => 'DESC'
-            ),
-            'conditions' => 'num_dirty_occurrences > 0'
+                'num_dirty_occurrences' => 'DESC',
+            )
         ));
 
         if($species){
@@ -266,8 +269,8 @@ class SpeciesController extends AppController {
             $species['Species']['remodel_status'] = null;
             $species['Species']['first_requested_remodel'] = null;
         } else {
-            $jobStatusMsg = $this->request->data('job_status_message');
-            $species['Species']['remodel_status'] = $jobStatusMsg;
+            //$jobStatusMsg = $this->request->data('job_status_message');
+            $species['Species']['remodel_status'] = $jobStatus;
         }
 
         $this->Species->save($species);
