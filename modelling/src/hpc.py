@@ -99,11 +99,10 @@ class HPCJob:
         self.speciesId = speciesId
         self.jobId            = None
         self.jobStatus        = None
-        self.jobStatusMsg     = None
+        self.jobStatusMsg     = ""
         self.jobQueuedTime    = None
-        self.jobFinishTime    = None
         self.tempfile         = None
-        self.writeCSVSpeciesJobFile()
+        self._writeCSVSpeciesJobFile()
 
     def _setJobId(self, jobId):
         self.jobId = jobId
@@ -116,10 +115,6 @@ class HPCJob:
     def _setJobQueuedTimeToNow(self):
         self.jobQueuedTime = time.gmtime()
         return self.jobQueuedTime
-
-    def _setJobFinishTimeToNow(self):
-        self.jobFinishTime = time.gmtime()
-        return self.jobFinishTime
 
     def _setJobStatus(self, status):
         self.jobStatus = status
@@ -144,39 +139,50 @@ class HPCJob:
             raise Exception("Can't set tempfile for a job more than once")
         return self.tempfile
 
-    def writeCSVSpeciesJobFile(self):
+    def _writeCSVSpeciesJobFile(self):
         try:
+            # Connect the DB
             HPCConfig.connectDB()
 
+            # Select the species row that matches this job's species
             species_row = db.species.select()\
                     .where(db.species.c.id == self.speciesId)\
                     .execute().fetchone()
             if species_row == None:
-                # This shouldn't happen...
+                # We didn't find the species in the table..
+                # this shouldn't happen...
                raise Exception("Couldn't find species with id " + self.speciesId + " in table. This shouldn't happen.")
             else:
+                # We foudn it
+                # Now record the no. of dirtyOccurrences
                 dirtyOccurrences = species_row['num_dirty_occurrences']
                 self._setDirtyOccurrences(dirtyOccurrences)
                 log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
 
+                # Create a tempfile to write our csv file to
                 f = tempfile.NamedTemporaryFile(delete=False)
+                # Remember the path to the csv file
                 self._setTempfile(f.name)
                 log.debug("Writing csv to: %s", f.name)
                 writer = csv.writer(f)
+                # Write the header
                 writer.writerow(["SPECIES_ID", "LATITUDE", "LONGITUDE"])
 
+                # Select the occurrences for this species
                 occurrence_rows = db.occurrences.select()\
                         .where(db.occurrences.c.species_id == self.speciesId)\
                         .execute()
+                # Iterate over the occurrences, and write them to the csv
                 for occurrence_row in occurrence_rows:
-                    # We found it, grab the species id
                     writer.writerow([self.speciesId, occurrence_row['latitude'], occurrence_row['longitude']])
 
+                # Be a good file citizen, and close the file handle
                 f.close()
         except Exception as e:
             log.warn("Exception while trying to write CSV file species. Exception: %s", e)
             raise
 
+    # Allow someone to use this class with the *with* syntax
     def __enter__(self):
         return self
 
@@ -192,13 +198,18 @@ class HPCJob:
             except Exception as e:
                 log.warn("Exception while deleting tmpfile (%s) for job. Exception: %s", self.tempfile, e)
 
+    # Has this job expired?
     def isExpired(self):
         return ( ( time.gmtime() - self.jobQueuedTime ) > HPCJob.expireJobAfterXSeconds )
 
+    # Is this job done?
     def isDone(self):
         return ( self.jobStatus == HPCJobStatus.finishedSuccess or
         self.jobStatus == HPCJobStatus.finishedFailure )
 
+    # Queue this job on the HPC
+    # Returns true if we queued the job
+    # Returns false if we failed to queue the job
     def queue(self):
         log.debug("Queueing job for %s", self.speciesId)
 
@@ -223,6 +234,9 @@ class HPCJob:
             )
             return False;
 
+    # Check the status of this job.
+    # Returns true if we updated the status
+    # Returns false otherise
     def checkStatus(self):
         log.debug("Checking status of job %s (%s)", self.jobId, self.speciesId)
 
@@ -232,7 +246,7 @@ class HPCJob:
             self._setJobExpired()
             return True
         else:
-            # Run the hpc queue script
+            # Run the hpc check status script
             cmd = [HPCConfig.checkJobStatusScriptPath, self.jobId, HPCConfig.workingDir]
             p = Popen(cmd, stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
@@ -253,6 +267,9 @@ class HPCJob:
                 )
                 return False;
 
+    # Send the job's status to the cake app.
+    # Returns true if we sent the status update correctly.
+    # Returns false if we failed to send the status update.
     def reportStatusToCakeApp(self):
         try:
             url = HPCConfig.getSpeciesReportURL(self.speciesId)
