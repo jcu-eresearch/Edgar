@@ -52,6 +52,7 @@ $user = AuthComponent::user();
             // Include jQuery and jQueryUI
             echo $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js');
             echo $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js');
+            echo $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js');
 
             // Include Google API
             // Note: API Key is Robert's.

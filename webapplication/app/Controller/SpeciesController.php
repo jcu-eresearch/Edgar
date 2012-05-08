@@ -46,25 +46,6 @@ class SpeciesController extends AppController {
     }
 
     /**
-     * minimal_view method
-     *
-     * @param string $id
-     * @return void
-     */
-    public function minimal_view($id = null) {
-        $this->set('title_for_layout', 'Species - View');
-
-        $this->Species->id = $id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
-        }
-        $this->set('species', $this->Species->read(null, $id));
-
-        // Specify the output for the json view.
-        $this->set('_serialize', 'species');
-    }
-
-    /**
      * occurrences method
      *
      * @param string $id
@@ -198,22 +179,16 @@ class SpeciesController extends AppController {
     public function map($id = null) {
         $this->set('title_for_layout', 'Species - Map');
         if ($id == null) {
-            $this->set('single_species_map', false);
-            $this->set('species',
-                $this->Species->find('list',
-                array(
-                    'fields' => array('Species.id', 'Species.scientific_name'),
-                    'order' => array('Species.scientific_name ASC'), //string or array defining order
-                )
-            ));
+            $this->set('species', null);
         } else {
-            $this->Species->id = $id;
-            if (!$this->Species->exists()) {
+            $result = $this->Species->find('first', array(
+                'conditions' => array('id' => $id)
+            ));
+            if($result !== false){
+                $this->set('species', $this->_speciesToJson($result['Species']));
+            } else {
                 throw new NotFoundException(__('Invalid species'));
             }
-
-            $this->set('single_species_map', true);
-            $this->set('species', $this->Species->read(null, $id));
         }
     }
 
@@ -237,7 +212,6 @@ class SpeciesController extends AppController {
         //convert $matched_species into json format expected by jquery ui
         foreach($matched_species as $key => $value){
             $species = $this->_speciesToJson($value['Species']);
-            $species['label'] = $value['Species']['common_name'] . ' - '.$value['Species']['scientific_name'];
             $matched_species[$key] = $species;
         }
 
@@ -326,7 +300,9 @@ class SpeciesController extends AppController {
             'commonName' => $species['common_name'],
             'numDirtyOccurrences' => $species['num_dirty_occurrences'],
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
-            'remodelStatus' => $this->_speciesRemodelStatusMessage($species)
+            'remodelStatus' => $this->_speciesRemodelStatusMessage($species),
+            'label' => $species['common_name'].' - '.$species['scientific_name'],
+            'distributionThreshold' => $species['distribution_threshold']
         );
     }
 
