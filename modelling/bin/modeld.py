@@ -25,49 +25,63 @@ log.debug("Starting modeld.py")
 currentJob = None
 currentCycle = 0
 
+
 # The Main Loop
 while True:
+
     currentCycle += 1
     log.debug("Loop %i (%s). Current Job: %s", currentCycle, datetime.today(), currentJob)
 
     # Check if we are handling a current job
     if currentJob == None:
-        log.debug("No current job...")
+        try:
+            log.debug("No current job...")
 
-        # If we don't have a current job,
-        # determine what the next species job would be.
-        speciesId = HPCJob.getNextSpeciesId()
-        if speciesId:
-            # We got the species, so try and queue HPC Job for it.
-            currentJob = HPCJob(speciesId)
-            log.debug("Queuing a job for: %s", speciesId)
-            queued = currentJob.queue()
+            # If we don't have a current job,
+            # determine what the next species job would be.
+            speciesId = HPCJob.getNextSpeciesId()
+            if speciesId:
 
-            if queued:
-                # We were able to queue a job,
-                # so report the current status to the cake app
-                currentJob.reportStatusToCakeApp()
-            else:
-                # We couldn't queue a job for the species,
-                # so clear the current job
-                currentJob = None
+                # We got the species, so try and queue HPC Job for it.
+                    currentJob = HPCJob(speciesId)
+                    log.debug("Queuing a job for: %s", speciesId)
+                    queued = currentJob.queue()
+
+                    if queued:
+                        # We were able to queue a job,
+                        # so report the current status to the cake app
+                        currentJob.reportStatusToCakeApp()
+                    else:
+                        # We couldn't queue a job for the species,
+                        # so clear the current job
+                        currentJob.cleanup()
+                        currentJob = None
+        except Exception, e:
+            # swallow any exceptions
+            log.warn("Error while trying to queue a new job: %s", e)
+
     else:
-        # If we have a current job...
-        log.debug("Coninuing current job...")
+        try:
+            # If we have a current job...
+            log.debug("Coninuing current job...")
 
-        # Check the status of the job
-        checked = currentJob.checkStatus()
+            # Check the status of the job
+            checked = currentJob.checkStatus()
 
-        if checked:
-            # We were able to check the status of the job,
-            # so report the status to the cake app
-            reported = currentJob.reportStatusToCakeApp()
-            if reported and currentJob.isDone():
-                currentJob = None
+            if checked:
+                # We were able to check the status of the job,
+                # so report the status to the cake app
+                reported = currentJob.reportStatusToCakeApp()
+                if reported and currentJob.isDone():
+                    currentJob.cleanup()
+                    currentJob = None
 
-        else:
-            # We couldn't determine the status of the current job
-            log.warn("Failed to determine the status of the current job")
+            else:
+                # We couldn't determine the status of the current job
+                log.warn("Failed to determine the status of the current job")
+        except Exception, e:
+            # swallow any exceptions
+            log.warn("Error while trying to proccess an existing job: %s", e)
 
     # Sleep a time, then go round again
     sleep(sleepTime)

@@ -3,5 +3,8 @@
 
 import sys
 import os.path
-srcpath = os.path.realpath(os.path.dirname(__file__) + '/../src')
-sys.path.append(srcpath)
+modellingsrcpath = os.path.realpath(os.path.dirname(__file__) + '/../src')
+sys.path.append(modellingsrcpath)
+
+importingsrcpath = os.path.realpath(os.path.dirname(__file__) + '/../../importing/src')
+sys.path.append(importingsrcpath)

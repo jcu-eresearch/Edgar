@@ -1,14 +1,25 @@
 import os
+import os.path
 from subprocess import Popen, PIPE
 import time
 from datetime import datetime
+import socket
+import httplib, urllib
 import urllib2
 from datetime import datetime
 import logging
 import logging.handlers
-import httplib, urllib
+import db
+import csv
+import json
+import tempfile
+import ala
 
 log = logging.getLogger()
+
+# Set a default timeout for all socket requests
+socketTimeout = 10
+socket.setdefaulttimeout(socketTimeout)
 
 # All time variables in UTC (not localtime)
 
@@ -21,10 +32,12 @@ class HPCConfig:
     # Determine the paths to the different files
     #workingDir = os.path.join('/', 'home', 'jc155857', 'ap03', 'modelling')
     workingDir = os.path.join('/', 'Users', 'robert', 'Git_WA', 'Edgar', 'modelling')
-    binDir     = os.path.join(workingDir, 'bin')
-    configDir  = os.path.join(workingDir, 'config')
+    importingWorkingDir = os.path.join(workingDir, '../', 'importing')
 
-    environmentConfigPath = os.path.join(configDir, 'environment.cfg')
+    importingConfigPath = os.path.join(importingWorkingDir, 'config.json')
+
+    binDir     = os.path.join(workingDir, 'bin')
+
     modelSppScriptPath    = os.path.join(binDir, 'modelspp.sh')
 
     queueJobScriptPath          = os.path.join(binDir, 'queueJob.sh')
@@ -33,6 +46,16 @@ class HPCConfig:
     @staticmethod
     def getSpeciesReportURL(speciesId):
         return HPCConfig.cakeAppBaseURL + "/species/job_status/" + speciesId
+
+    @staticmethod
+    def connectDB():
+        config = None
+        with open(HPCConfig.importingConfigPath, 'rb') as f:
+            config = json.load(f)
+
+        db.connect(config)
+
+        return db
 
 # A container for our HPC Job Statuses
 # Any job status not defined here is a qstat status
@@ -68,7 +91,7 @@ class HPCJob:
                 log.warn("Unexpected response code. Response code should have been 200 or 204")
                 return None
 
-        except urllib2.HTTPError, e:
+        except (urllib2.URLError, urllib2.HTTPError, socket.timeout) as e:
             log.warn("Error reading next species URL: %s", e)
             return None
 
@@ -79,6 +102,8 @@ class HPCJob:
         self.jobStatusMsg     = None
         self.jobQueuedTime    = None
         self.jobFinishTime    = None
+        self.tempfile         = None
+        self.writeCSVSpeciesJobFile()
 
     def _setJobId(self, jobId):
         self.jobId = jobId
@@ -112,6 +137,61 @@ class HPCJob:
         self._setJobStatus(HPCJobStatus.queued)
         return True
 
+    def _setTempfile(self, f):
+        if self.tempfile == None:
+            self.tempfile = f
+        else:
+            raise Exception("Can't set tempfile for a job more than once")
+        return self.tempfile
+
+    def writeCSVSpeciesJobFile(self):
+        try:
+            HPCConfig.connectDB()
+
+            species_row = db.species.select()\
+                    .where(db.species.c.id == self.speciesId)\
+                    .execute().fetchone()
+            if species_row == None:
+                # This shouldn't happen...
+               raise Exception("Couldn't find species with id " + self.speciesId + " in table. This shouldn't happen.")
+            else:
+                dirtyOccurrences = species_row['num_dirty_occurrences']
+                self._setDirtyOccurrences(dirtyOccurrences)
+                log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
+
+                f = tempfile.NamedTemporaryFile(delete=False)
+                self._setTempfile(f.name)
+                log.debug("Writing csv to: %s", f.name)
+                writer = csv.writer(f)
+                writer.writerow(["SPECIES_ID", "LATITUDE", "LONGITUDE"])
+
+                occurrence_rows = db.occurrences.select()\
+                        .where(db.occurrences.c.species_id == self.speciesId)\
+                        .execute()
+                for occurrence_row in occurrence_rows:
+                    # We found it, grab the species id
+                    writer.writerow([self.speciesId, occurrence_row['latitude'], occurrence_row['longitude']])
+
+                f.close()
+        except Exception as e:
+            log.warn("Exception while trying to write CSV file species. Exception: %s", e)
+            raise
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.cleanup()
+
+    # If we had a tempfile, delete it
+    def cleanup(self):
+        if self.tempfile:
+            try:
+                os.unlink(self.tempfile)
+                os.path.exists(self.tempfile)
+            except Exception as e:
+                log.warn("Exception while deleting tmpfile (%s) for job. Exception: %s", self.tempfile, e)
+
     def isExpired(self):
         return ( ( time.gmtime() - self.jobQueuedTime ) > HPCJob.expireJobAfterXSeconds )
 
@@ -123,7 +203,7 @@ class HPCJob:
         log.debug("Queueing job for %s", self.speciesId)
 
         # Run the hpc queue script
-        cmd = [HPCConfig.queueJobScriptPath, self.speciesId, HPCConfig.workingDir]
+        cmd = [HPCConfig.queueJobScriptPath, self.speciesId, HPCConfig.workingDir, self.tempfile]
         p = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         returnCode = p.returncode
@@ -195,6 +275,6 @@ class HPCJob:
                 log.warn("Failed to report job status, response: %s", responseContent)
                 return False
 
-        except urllib2.HTTPError, e:
+        except (urllib2.URLError, urllib2.HTTPError, socket.timeout) as e:
             log.warn("Error reporting job status: %s", e)
             return False
