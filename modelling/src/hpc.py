@@ -14,6 +14,7 @@ import csv
 import json
 import tempfile
 import ala
+import paramiko
 
 log = logging.getLogger()
 
@@ -24,14 +25,15 @@ socket.setdefaulttimeout(socketTimeout)
 # All time variables in UTC (not localtime)
 
 class HPCConfig:
-    #cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
-    cakeAppBaseURL = "http://localhost/~robert/ap03"
+    cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
+    #cakeAppBaseURL = "http://localhost/~robert/ap03"
     nextSpeciesURL= cakeAppBaseURL + "/species/next_job"
-
+    sshUser = "jc155857"
+    sshHPCDestination = "login.hpc.jcu.edu.au"
 
     # Determine the paths to the different files
-    #workingDir = os.path.join('/', 'home', 'jc155857', 'ap03', 'modelling')
-    workingDir = os.path.join('/', 'Users', 'robert', 'Git_WA', 'Edgar', 'modelling')
+    workingDir = os.path.join('/', 'home', 'jc155857', 'Edgar', 'modelling')
+    #workingDir = os.path.join('/', 'Users', 'robert', 'Git_WA', 'Edgar', 'modelling')
     importingWorkingDir = os.path.join(workingDir, '../', 'importing')
 
     importingConfigPath = os.path.join(importingWorkingDir, 'config.json')
@@ -213,11 +215,20 @@ class HPCJob:
     def queue(self):
         log.debug("Queueing job for %s", self.speciesId)
 
+        # Connect to the HPC
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.WarningPolicy())
+        client.connect(HPCConfig.sshHPCDestination, username=HPCConfig.sshUser)
+
+
+        chan = client.get_transport().open_session()
         # Run the hpc queue script
-        cmd = [HPCConfig.queueJobScriptPath, self.speciesId, HPCConfig.workingDir, self.tempfile]
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = p.communicate()
-        returnCode = p.returncode
+        sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '" + HPCConfig.workingDir + "' '" + self.tempfile + "'"
+        stdin, stdout, stderr = chan.exec_command(sshCmd)
+        stdin.close()
+        returnCode = chan.recv_exit_status()
+        log.debug("Queue Return Code: %s", returnCode)
+        log.debug("Queue Output: %s", stdout)
 
         if returnCode == 0:
             self._recordQueuedJob(stdout)
@@ -233,6 +244,8 @@ class HPCJob:
                 ), returnCode, stdout, stderr
             )
             return False;
+
+        client.close()
 
     # Check the status of this job.
     # Returns true if we updated the status
