@@ -35,34 +35,8 @@
     }
 
 ?>
-<div class="species map">
-    <div class='map_legend'>
-        <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
-    </div>
 
-<?php if ($single_species_map): ?>
-    <h2><?php  echo __('Species Map');?></h2>
-    <!-- Map Specific For Species -->
-    <dl>
-        <dt><?php echo __('Id'); ?></dt>
-        <dd>
-            <?php echo h($species['Species']['id']); ?>
-            &nbsp;
-        </dd>
-        <dt><?php echo __('Scientific Name'); ?></dt>
-        <dd>
-            <?php echo h($species['Species']['scientific_name']); ?>
-            &nbsp;
-        </dd>
-        <dt><?php echo __('Common Name'); ?></dt>
-        <dd>
-            <?php echo h($species['Species']['common_name']); ?>
-            &nbsp;
-        </dd>
-    </dl>
-<?php else: ?>
-    <h2 style='display:none'><?php  echo __('Species Map');?></h2>
-
+<div id="debugpanel" class="opposite panel debugpanel">
     <!-- clustering selector -->
     <fieldset class="clusteroptions" style="float: right">
         <legend>Clustering Display</legend>
@@ -72,16 +46,27 @@
             <option value="squaregrid">Square Grid</option>
         </select>
     </fieldset>
+</div>
 
-    <div id="model_rerun" style="display:none">
+<div id="toolspanel" class="side panel toolspanel">
+    <!-- things here -->    
+    <div class="tool">
+        <h1>some tool</h1>
+        <div class="toolcontent">
+            tool content goes here
+        </div>
+    </div>
+</div>
+
+<div id="speciespanel" class="top panel speciespanel">
+    <div id="model_rerun">
         <a id="model_rerun_button" href="#">Request recalculation of distribution map</a>
-        <p id="model_rerun_requested">Request successfull</p>
+        <p id="model_rerun_requested">Request successful</p>
     </div>
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
-
-<?php endif ?>
-
-    <div style="width:60em; height: 40em;" id="map"></div>
 </div>
+
+<div id="map"></div>
+

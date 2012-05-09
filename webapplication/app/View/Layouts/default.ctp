@@ -55,24 +55,26 @@ $user = AuthComponent::user();
         echo $this->Html->css('openlayers_extended');
         echo $this->Html->css('openlayers_google');
 
-        // include Modernizr for html5 shims and feature detection
-    	echo $this->Html->script('modernizr/modernizr-2.5.3.min.js');
+        // include Modernizr for html5 shims and feature detection.  this needs to go early!
+    	$this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
 
         // Include jQuery and jQueryUI
-        echo $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js');
-        echo $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js');
-
-        // Include Google API
-        // Note: API Key is Robert's.
-        echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAo3TVBlAHxH57sROb2cV_7-Tar7bKnIcY'></script>";
-
+        $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false));
+        $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js', array('inline' => false));
+        $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js', array('inline' => false));
+        $this->append('script');
+            // Include Google API
+            // Note: API Key is Robert's.
+            echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAo3TVBlAHxH57sROb2cV_7-Tar7bKnIcY'></script>";
+        $this->end();
         // Include OpenLayers
-        echo $this->Html->script('OpenLayers.js');
-        echo $this->Html->script('LayerSwitcher-extended.js');
+        $this->Html->script('OpenLayers.js', array('inline' => false));
+        $this->Html->script('LayerSwitcher-extended.js', array('inline' => false));
 
+        // now emit the meta, css and some js tags
         echo $this->fetch('meta');
         echo $this->fetch('css');
-        echo $this->fetch('script');
+        echo $this->fetch('earlyscript');
     ?>
 </head>
 <body>
@@ -103,6 +105,10 @@ $user = AuthComponent::user();
 
     <div id="footer">
     </div>
-    <?php echo $this->element('sql_dump'); ?>
+    <?php echo
+        $this->element('sql_dump');
+        // now we're all modern and stuff, here at the bottom is where all the javascript goes...
+        $this->fetch('script');
+    ?>
 </body>
 </html>

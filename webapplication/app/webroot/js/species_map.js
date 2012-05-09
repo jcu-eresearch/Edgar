@@ -187,7 +187,7 @@ function addOccurrencesLayer() {
                 'fillOpacity': 0.8,
                 'strokeOpacity': 0.8,
                 'fontFamily': 'sans-serif',
-                'fontSize': '13px',
+                'fontSize': '13px'
             },
             'select': {
                 'fillColor': "#83aeef",
@@ -199,17 +199,17 @@ function addOccurrencesLayer() {
 
         var occurrence_render_styles = {
             'dotradius': {
-                'pointRadius': "${point_radius}",
+                'pointRadius': "${point_radius}"
             },
             'dotgrid': {
-                'pointRadius': "${point_radius}",
+                'pointRadius': "${point_radius}"
             },
             'squaregrid': {
                 'label': "${label}",
                 'fontOpacity': 1.0,
                 'fillOpacity': 0.25,
-                'strokeOpacity': 0.75,
-            },
+                'strokeOpacity': 0.75
+            }
         }
         occurrence_StyleMap.addUniqueValueRules("default", "occurrence_type", occurrence_render_styles);
         occurrence_StyleMap.addUniqueValueRules("select", "occurrence_type", occurrence_render_styles);
@@ -219,16 +219,16 @@ function addOccurrencesLayer() {
 //                'fontWeight': 'medium',
 //                'fontSize': '12px',
                 'fontWeight': 'bold',
-                'fontSize': '13px',
+                'fontSize': '13px'
             },
             'medium': {
                 'fontWeight': 'medium',
-                'fontSize': '12px',
+                'fontSize': '12px'
             },
             'small': {
                 'fontWeight': 'medium',
-                'fontSize': '11px',
-            },
+                'fontSize': '11px'
+            }
         }
         occurrence_StyleMap.addUniqueValueRules("default", "cluster_size", cluster_size_render_styles);
         occurrence_StyleMap.addUniqueValueRules("select", "cluster_size", cluster_size_render_styles);
@@ -266,11 +266,11 @@ function addOccurrencesLayer() {
                     },
 
                     // The data format
-                    format: occurrences_format,
+                    format: occurrences_format
                 }),
 
                 // the layer style
-                styleMap: occurrence_StyleMap,
+                styleMap: occurrence_StyleMap
             }
 
         );
@@ -385,7 +385,8 @@ function changeSpecies(species){
     }
 }
 
-$(document).ready(function() {
+
+$(function() {
 
     $('#species_autocomplete').autocomplete({
         minLength: 2,
@@ -432,7 +433,7 @@ $(document).ready(function() {
         "World Map (VMAP0)",
         "http://vmap0.tiles.osgeo.org/wms/vmap0",
         {
-            'layers':'basic',
+            'layers':'basic'
         }
     );
 
@@ -529,7 +530,7 @@ $(document).ready(function() {
 
     // Add the standard set of map controls
 //    map.addControl(new OpenLayers.Control.Permalink());
-    map.addControl(new OpenLayers.Control.MousePosition());
+//    map.addControl(new OpenLayers.Control.MousePosition());
 
     // Let the user change between layers
 //    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
@@ -537,6 +538,8 @@ $(document).ready(function() {
 //    layer_switcher.roundedCornerColor = "#090909";
     layer_switcher.ascending = false;
     layer_switcher.useLegendGraphics = false;
+
+    map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(50,50));
 
     map.addControl(layer_switcher);
 //    layer_switcher.maximizeControl();
@@ -555,7 +558,18 @@ $(document).ready(function() {
     }
 
     addLegend();
-
+/*
+    setTimeout( function() {
+        var all_controls = map.getControlsByClass( { test: function() {return true;} } );
+        var control_names = "";
+        $(all_controls).each( function(control) {
+            control_names += ", " + control + ":" + typeof(control);
+            var this_one = map.getControl(control);
+            alert(this_one);
+        });
+        alert( control_names );
+    }, 2000);
+*/
 });
 
 function addLegend() {

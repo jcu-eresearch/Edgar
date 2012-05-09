@@ -76,38 +76,40 @@ $user = AuthComponent::user();
     ?>
 </head>
 <body>
-    <div id="content">
-        <?php echo $this->fetch('content') ?>
-    </div>
 
-    <div id="user">
-        <div class="wrapper">
-            <?php
-                $user = AuthComponent::user();
-                if($user === NULL){
-                    print $this->Html->link('Log In', '/users/login');
-                } else {
-                    print 'Logged in as ' . Sanitize::html($user['email']) . ' (';
-                    print $this->Html->link('Log Out', '/users/logout');
-                    print ')';
-                }
-            ?>
+    <?php echo $this->fetch('content') ?>
+
+    <div id="sidebar">
+        <div id="user">
+            <div class="wrapper">
+                <?php
+                    $user = AuthComponent::user();
+                    if($user === NULL){
+                        print $this->Html->link('Log In', '/users/login');
+                    } else {
+                        print 'Logged in as ' . Sanitize::html($user['email']) . ' (';
+                        print $this->Html->link('Log Out', '/users/logout');
+                        print ')';
+                    }
+                ?>
+            </div>
         </div>
-    </div>
 
-    <div id="flash">
-        <div class="wrapper">
-            <?php echo $this->Session->flash() ?>
+        <div id="flash">
+            <div class="wrapper">
+                <?php echo $this->Session->flash() ?>
+            </div>
         </div>
-    </div>
 
-    <div id="header">
-        <div class="wrapper">
-            <h1><?php echo $title_for_layout ?></h1>
+        <div id="header">
+            <div class="wrapper">
+                <h1><?php echo $title_for_layout ?></h1>
+            </div>
         </div>
-    </div>
 
-    <div id="footer">
+        <div id="footer">
+        </div>
+    
     </div>
 
     <?php echo $this->element('sql_dump'); ?>
