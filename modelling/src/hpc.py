@@ -14,6 +14,7 @@ import csv
 import json
 import tempfile
 import ala
+import ssh
 
 log = logging.getLogger()
 
@@ -27,7 +28,8 @@ class HPCConfig:
     #cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
     cakeAppBaseURL = "http://localhost/~robert/ap03"
     nextSpeciesURL= cakeAppBaseURL + "/species/next_job"
-
+    sshUser = "jc155857"
+    sshHPCDestination = "login.hpc.jcu.edu.au"
 
     # Determine the paths to the different files
     #workingDir = os.path.join('/', 'home', 'jc155857', 'ap03', 'modelling')
