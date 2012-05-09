@@ -14,8 +14,7 @@
 # -S specifies the shell type
 # -o/-e specifies where the stdout and stderr will be written
 
-# WORKING_DIR DIR is one up from this file (which is in bin)
-WORKING_DIR="/home/jc155857/ap03/modelling"
+# WORKING_DIR DIR is set by ENV variables
 
 # Determine path to config (based on path to this file)
 CONFIG_DIR="$WORKING_DIR/config"

@@ -1,9 +1,9 @@
 // Author: Robert Pyke
 //
-// Assumes that the var species_id, map_tool_url and species_route_url have already been set.
+// Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 
-var map, occurrences, distribution, occurrence_select_control, species_distribution_threshold;
+var map, occurrences, distribution, occurrence_select_control;
 
 // Projections
 // ----------
@@ -35,23 +35,14 @@ zoom_bounds = australia_bounds;
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 
 function speciesGeoJSONURL() {
-    return (species_route_url + "/geo_json_occurrences/" + species_id + ".json");
+    return (Edgar.baseUrl + "species/geo_json_occurrences/" + mapSpecies.id + ".json");
 }
 
 function legendURL() {
-    var data = (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc');
-    return map_tool_base_url + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + species_distribution_threshold;
-}
-
-function updateSpeciesInfo(callback) {
-    $.getJSON(species_route_url + '/minimal_view/' + species_id + '.json', function(data) {
-        species_common_name = data['Species']['common_name'];
-        species_distribution_threshold = data['Species']['distribution_threshold'];
-        if ( callback != undefined ) {
-            callback();
-        }
-    });
+    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+    var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
+    return mapToolBaseUrl + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
+        '&THRESHOLD=' + mapSpecies.distributionThreshold;
 }
 
 function updateLegend() {
@@ -77,7 +68,7 @@ function hideLegend() {
 function clearExistingSpeciesOccurrencesAndDistributionLayers() {
 
     clearExistingSpeciesOccurrencesLayer();
-    
+
     if (distribution !== undefined) {
         map.removeLayer(distribution);
         distribution = undefined;
@@ -106,12 +97,10 @@ function clearExistingSpeciesOccurrencesLayer() {
 
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
-    updateSpeciesInfo(function() {
-        addOccurrencesLayer();
-        addDistributionLayer();
-        updateLegend();
-        showLegend();
-    });
+    addOccurrencesLayer();
+    addDistributionLayer();
+    updateLegend();
+    showLegend();
 }
 
 function clearMapPopups() {
@@ -135,20 +124,23 @@ function addDistributionLayer() {
     // to Map Server. I also believe that map script will correctly process the
     // projection request.
     // I could be wrong though...
+
+    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+
     distribution = new OpenLayers.Layer.WMS(
         "Distribution",
-        map_tool_base_url + 'map_with_threshold.php', // path to our map script handler.
+        mapToolBaseUrl + 'map_with_threshold.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
         {
             MODE: 'map', 
             MAP: 'edgar_master.map',
-            DATA: (species_sci_name_cased + '/outputs/' + species_sci_name_cased + '.asc'),
-            SPECIESID: species_id,
+            DATA: (sciNameCased + '/outputs/' + sciNameCased + '.asc'),
+            SPECIESID: mapSpecies.id,
             REASPECT: "true",
             TRANSPARENT: 'true',
-            THRESHOLD: species_distribution_threshold
+            THRESHOLD: mapSpecies.distributionThreshold
         },
         {
             // It's an overlay
@@ -232,7 +224,7 @@ function addOccurrencesLayer() {
         }
         occurrence_StyleMap.addUniqueValueRules("default", "cluster_size", cluster_size_render_styles);
         occurrence_StyleMap.addUniqueValueRules("select", "cluster_size", cluster_size_render_styles);
-        
+
         // set the clustering to use for this occurrences layer
         cluster_strategy = "none";
         cluster_selector = document.getElementById("cluster");
@@ -243,7 +235,7 @@ function addOccurrencesLayer() {
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
         occurrences = new OpenLayers.Layer.Vector(
-            "Occurrences", 
+            "Occurrences",
             {
                 // It's an overlay
                 isBaseLayer: false,
@@ -353,21 +345,28 @@ function flattenScientificName(name) {
     return $.trim(name).replace(/\./g, '').replace(/\s/g, '_');
 }
 
+function updateWindowHistory() {
+    if(window.History.enabled) {
+        window.History.replaceState(
+            mapSpecies,
+            '',
+            Edgar.baseUrl + 'species/map/' + mapSpecies.id
+        );
+    }
+}
+
 function changeSpecies(species){
     // The work to do if the user changes the selected species..
-    // We need to change the species_sci_name_cased for the dist layer.
     // We need to then update the species details.
 
-    // Only update the map if the user chose an actual species.
-    // the 'choose one' option has no value.
     clearExistingSpeciesOccurrencesAndDistributionLayers();
 
-    if (species !== null) {
-        species_id = species.id;
-        species_sci_name_cased = flattenScientificName(species.scientificName);
+    mapSpecies = species;
 
+    if (species !== null) {
         addSpeciesOccurrencesAndDistributionLayers();
 
+        $('#species_autocomplete').val(species.label);
         $('#species_freshness').text('' + species.numDirtyOccurrences + ' records changed since last modeling run.');
         $('#model_status').text(species.remodelStatus);
         if(Edgar.user && Edgar.user.canRequestRemodel && species.canRequestRemodel){
@@ -378,11 +377,13 @@ function changeSpecies(species){
             $('#model_rerun').hide();
         }
     } else {
-        species_id = undefined;
+        $('#species_autocomplete').val('');
         $('#species_freshness').text('');
         $('#model_status').text('');
         $('#model_rerun').hide();
     }
+
+    updateWindowHistory();
 }
 
 
@@ -397,7 +398,7 @@ $(function() {
     });
 
     $('#model_rerun_button').click(function() {
-        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + species_id });
+        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + mapSpecies.id });
         $(this).fadeOut('fast', function(){
             $('#model_rerun_requested').fadeIn();
         });
@@ -553,8 +554,8 @@ $(function() {
     // Zoom the map to the zoom_bounds specified earlier
     map.zoomToExtent(zoom_bounds);
 
-    if (species_id !== undefined && species_sci_name_cased !== undefined) {
-        addSpeciesOccurrencesAndDistributionLayers();
+    if (mapSpecies !== null) {
+        changeSpecies(mapSpecies);
     }
 
     addLegend();

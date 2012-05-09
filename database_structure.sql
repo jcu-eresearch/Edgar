@@ -24,7 +24,9 @@ CREATE TABLE IF NOT EXISTS `species` (
     `distribution_threshold` FLOAT UNSIGNED DEFAULT 0 NOT NULL
         COMMENT "the Equate entropy of thresholded and original distributions logistic threshold found in the model output",
     `first_requested_remodel` DATETIME DEFAULT NULL NULL
-        COMMENT "The first time, since last modelling run, that a user requested a remodel for this species"
+        COMMENT "The first time, since last modelling run, that a user requested a remodel for this species",
+    `remodel_status` VARCHAR(256) DEFAULT NULL NULL
+        COMMENT "NULL if no modeling run is happening for this species, otherwise a message indicating the status of the modeling run"
 )
 CHARSET=utf8;
 

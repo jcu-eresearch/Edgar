@@ -71,7 +71,7 @@ $user = AuthComponent::user();
         $this->Html->script('OpenLayers.js', array('inline' => false));
         $this->Html->script('LayerSwitcher-extended.js', array('inline' => false));
 
-        // now emit the meta, css and some js tags
+        // now emit the meta, css and *some* js tags
         echo $this->fetch('meta');
         echo $this->fetch('css');
         echo $this->fetch('earlyscript');

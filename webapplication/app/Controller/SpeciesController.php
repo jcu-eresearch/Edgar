@@ -46,25 +46,6 @@ class SpeciesController extends AppController {
     }
 
     /**
-     * minimal_view method
-     *
-     * @param string $id
-     * @return void
-     */
-    public function minimal_view($id = null) {
-        $this->set('title_for_layout', 'Species - View');
-
-        $this->Species->id = $id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
-        }
-        $this->set('species', $this->Species->read(null, $id));
-
-        // Specify the output for the json view.
-        $this->set('_serialize', 'species');
-    }
-
-    /**
      * occurrences method
      *
      * @param string $id
@@ -198,22 +179,16 @@ class SpeciesController extends AppController {
     public function map($id = null) {
         $this->set('title_for_layout', 'Species - Map');
         if ($id == null) {
-            $this->set('single_species_map', false);
-            $this->set('species',
-                $this->Species->find('list',
-                array(
-                    'fields' => array('Species.id', 'Species.scientific_name'),
-                    'order' => array('Species.scientific_name ASC'), //string or array defining order
-                )
-            ));
+            $this->set('species', null);
         } else {
-            $this->Species->id = $id;
-            if (!$this->Species->exists()) {
+            $result = $this->Species->find('first', array(
+                'conditions' => array('id' => $id)
+            ));
+            if($result !== false){
+                $this->set('species', $this->_speciesToJson($result['Species']));
+            } else {
                 throw new NotFoundException(__('Invalid species'));
             }
-
-            $this->set('single_species_map', true);
-            $this->set('species', $this->Species->read(null, $id));
         }
         
         // use the fullscreen map view
@@ -240,7 +215,6 @@ class SpeciesController extends AppController {
         //convert $matched_species into json format expected by jquery ui
         foreach($matched_species as $key => $value){
             $species = $this->_speciesToJson($value['Species']);
-            $species['label'] = $value['Species']['common_name'] . ' - '.$value['Species']['scientific_name'];
             $matched_species[$key] = $species;
         }
 
@@ -255,12 +229,15 @@ class SpeciesController extends AppController {
     public function next_job() {
         $species = $this->Species->find('first', array(
             'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
+            'conditions' => array(
+                'num_dirty_occurrences >' => 0,
+                'remodel_status' => null
+            ),
             'order' => array(
                 'is_null' => 'ASC',
                 'first_requested_remodel' => 'ASC',
-                'num_dirty_occurrences' => 'DESC'
-            ),
-            'conditions' => 'num_dirty_occurrences > 0'
+                'num_dirty_occurrences' => 'DESC',
+            )
         ));
 
         if($species){
@@ -272,10 +249,35 @@ class SpeciesController extends AppController {
 
     /**
      * Updates the status of a running modelling job
+     *
+     * TODO: any auth on this? looks like a minor security hole
+     * TODO: how do we handle failure? Just ignored it for the moment.
+     *
+     * Takes POST/PUT params:
+     *  - job_status - a status code string
+     *  - job_status_message - human readable (?) message for job_status
+     *  - dirty_occurrences - value of num_dirty_occurrences when the job started
      */
     public function job_status($species_id) {
-        //TODO: any auth on this? looks like a minor security hole
-        $this->dieWithStatus(501);
+        $species = $this->Species->find('first', array(
+            'conditions' => array('id' => $species_id)
+        ));
+        if($species === false)
+            $this->dieWithStatus(404, 'No species found with given id');
+
+        $jobStatus = $this->request->data('job_status');
+        if($jobStatus === 'FINISHED_SUCCESS' || $jobStatus === 'FINISHED_FAILURE'){
+            $occurrencesCleared = (int)$this->request->data('dirty_occurrences');
+            $species['Species']['num_dirty_occurrences'] -= $occurrencesCleared;
+            $species['Species']['remodel_status'] = null;
+            $species['Species']['first_requested_remodel'] = null;
+        } else {
+            //$jobStatusMsg = $this->request->data('job_status_message');
+            $species['Species']['remodel_status'] = $jobStatus;
+        }
+
+        $this->Species->save($species);
+        $this->dieWithStatus(200);
     }
 
     /**
@@ -304,7 +306,22 @@ class SpeciesController extends AppController {
             'commonName' => $species['common_name'],
             'numDirtyOccurrences' => $species['num_dirty_occurrences'],
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
-            'remodelStatus' => 'Not implemented yet'
+            'remodelStatus' => $this->_speciesRemodelStatusMessage($species),
+            'label' => $species['common_name'].' - '.$species['scientific_name'],
+            'distributionThreshold' => $species['distribution_threshold']
         );
+    }
+
+    private function _speciesRemodelStatusMessage($species) {
+        if($species['num_dirty_occurrences'] <= 0)
+            return 'Up to date';
+
+        if($species['remodel_status'] !== null)
+            return 'Remodelling running with status: ' . $species['remodel_status'];
+
+        if($species['first_requested_remodel'] !== null)
+            return 'Priority queued for remodelling';
+
+        return 'Automatically queued for remodelling';
     }
 }
