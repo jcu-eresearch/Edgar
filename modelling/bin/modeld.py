@@ -11,6 +11,8 @@ from subprocess import Popen, PIPE
 from hpc import HPCConfig, HPCJob, HPCJobStatus
 import urllib2
 from datetime import datetime
+import traceback
+
 
 # How long to sleep between cycles (in seconds)
 sleepTime = 5
@@ -56,9 +58,9 @@ while True:
                         # so clear the current job
                         currentJob.cleanup()
                         currentJob = None
-        except Exception, e:
+        except Exception:
             # swallow any exceptions
-            log.warn("Error while trying to queue a new job: %s", e)
+            log.error("Error while trying to queue a new job: %s", traceback.format_exc())
 
     else:
         try:
@@ -79,9 +81,9 @@ while True:
             else:
                 # We couldn't determine the status of the current job
                 log.warn("Failed to determine the status of the current job")
-        except Exception, e:
+        except Exception:
             # swallow any exceptions
-            log.warn("Error while trying to proccess an existing job: %s", e)
+            log.error("Error while trying to proccess an existing job: %s", traceback.format_exc())
 
     # Sleep a time, then go round again
     sleep(sleepTime)
