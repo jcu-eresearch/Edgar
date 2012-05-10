@@ -9,8 +9,8 @@ tagline:
 Welcome to the Edgar project site! This project aims to build a site for diseminating species distribution information for both current and future projected distributions under climate change scenarios.
 
 This site will contain:
-* [development team profiles]({{ BASE_PATH }}/team/)
-* developers' blog;
+* [development team profiles]({{ BASE_PATH }}/2012/03/22/the-team)
+* [developers' blog]({{ BASE_PATH }}/archive.html);
 * user guides;
 * installation guides;
 and other project documentation.
