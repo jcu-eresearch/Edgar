@@ -19,11 +19,14 @@ BIN_DIR="$WORKING_DIR/bin"
 MODELS_SPP_SH="$BIN_DIR/modelspp.sh"
 TMP_IO_OUTPUT_DIR="$WORKING_DIR/tmp/io"
 
+mkdir -p "$TMP_IO_OUTPUT_DIR" > /dev/null
+
 PRIVATE_OCCUR_DIR="$WORKING_DIR/inputs/$CURRENT_SPECIES_ID"
+mkdir -p "$PRIVATE_OCCUR_DIR" > /dev/null
 PRIVATE_OCCUR_FILE="$PRIVATE_OCCUR_DIR/.private_occur.csv"
 
 # Copy the input CSV to the private occur file location
-cp "$INPUT_CSV" "$PRIVATE_OCCUR_FILE" > /dev/null
+mv "$INPUT_CSV" "$PRIVATE_OCCUR_FILE" > /dev/null
 
 AP03_SPP="$CURRENT_SPECIES_ID"
 
@@ -42,7 +45,7 @@ CURRENT_HPC_JOB_ID=`qsub -S /bin/bash -V -o "$TMP_IO_OUTPUT_DIR/$AP03_SPP/std.ou
 CMD_EXIT_CODE="$?"
 
 if [ $CMD_EXIT_CODE -eq "0" ]; then
-    echo -n "$CURRENT_SPECIES_ID"
+    echo -n "$CURRENT_HPC_JOB_ID"
     exit 0
 else
     exit $CMD_EXIT_CODE

@@ -15,14 +15,13 @@ import json
 import tempfile
 import ala
 import paramiko
+import ssh
 
 log = logging.getLogger()
 
 # Set a default timeout for all socket requests
 socketTimeout = 10
 socket.setdefaulttimeout(socketTimeout)
-
-# All time variables in UTC (not localtime)
 
 class HPCConfig:
     cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
@@ -115,12 +114,12 @@ class HPCJob:
         return self.dirtyOccurrences
 
     def _setJobQueuedTimeToNow(self):
-        self.jobQueuedTime = time.gmtime()
+        self.jobQueuedTime = time.time()
         return self.jobQueuedTime
 
     def _setJobStatus(self, status):
         self.jobStatus = status
-        self._lastUpdatedJobStatus = time.gmtime()
+        self._lastUpdatedJobStatus = time.time()
         return self.jobStatus
 
     def _setJobExpired(self):
@@ -129,7 +128,7 @@ class HPCJob:
         return None
 
     def _recordQueuedJob(self, jobId):
-        self._setJobQueuedTimeToNow
+        self._setJobQueuedTimeToNow()
         self._setJobId(jobId)
         self._setJobStatus(HPCJobStatus.queued)
         return True
@@ -202,7 +201,7 @@ class HPCJob:
 
     # Has this job expired?
     def isExpired(self):
-        return ( ( time.gmtime() - self.jobQueuedTime ) > HPCJob.expireJobAfterXSeconds )
+        return ( ( time.time() - self.jobQueuedTime ) > HPCJob.expireJobAfterXSeconds )
 
     # Is this job done?
     def isDone(self):
@@ -215,20 +214,29 @@ class HPCJob:
     def queue(self):
         log.debug("Queueing job for %s", self.speciesId)
 
+        client_scp = ssh.Connection(HPCConfig.sshHPCDestination, username=HPCConfig.sshUser)
+
+        client_scp.put(self.tempfile, self.tempfile)
+        client_scp.close()
+
         # Connect to the HPC
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.WarningPolicy())
         client.connect(HPCConfig.sshHPCDestination, username=HPCConfig.sshUser)
 
 
-        chan = client.get_transport().open_session()
         # Run the hpc queue script
         sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '" + HPCConfig.workingDir + "' '" + self.tempfile + "'"
-        stdin, stdout, stderr = chan.exec_command(sshCmd)
-        stdin.close()
+        log.debug("ssh command: %s", sshCmd)
+        chan = client.get_transport().open_session()
+        chan.exec_command(sshCmd)
         returnCode = chan.recv_exit_status()
+        # TODO remove magic numbers..
+        stdout = chan.recv(1024)
+        stderr = chan.recv_stderr(1024)
         log.debug("Queue Return Code: %s", returnCode)
         log.debug("Queue Output: %s", stdout)
+        client.close()
 
         if returnCode == 0:
             self._recordQueuedJob(stdout)
@@ -245,7 +253,6 @@ class HPCJob:
             )
             return False;
 
-        client.close()
 
     # Check the status of this job.
     # Returns true if we updated the status
@@ -260,10 +267,23 @@ class HPCJob:
             return True
         else:
             # Run the hpc check status script
-            cmd = [HPCConfig.checkJobStatusScriptPath, self.jobId, HPCConfig.workingDir]
-            p = Popen(cmd, stdout=PIPE, stderr=PIPE)
-            stdout, stderr = p.communicate()
-            returnCode = p.returncode
+            sshCmd = HPCConfig.checkJobStatusScriptPath + " '" + self.jobId + "' '" + HPCConfig.workingDir + "'"
+
+            # Connect to the HPC
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            client.connect(HPCConfig.sshHPCDestination, username=HPCConfig.sshUser)
+            log.debug("ssh command: %s", sshCmd)
+            chan = client.get_transport().open_session()
+            chan.exec_command(sshCmd)
+            returnCode = chan.recv_exit_status()
+            # TODO remove magic numbers..
+            stdout = chan.recv(1024)
+            stderr = chan.recv_stderr(1024)
+
+            log.debug("Check Status Return Code: %s", returnCode)
+            log.debug("Check Status Output: %s", stdout)
+            client.close()
 
             if returnCode == 0:
                 self._setJobStatus(stdout)
@@ -296,7 +316,7 @@ class HPCJob:
             req = urllib2.Request(url, data)
             connection = urllib2.urlopen(req)
             responseContent = connection.read()
-            responseCode = connection.getCode()
+            responseCode = connection.getcode()
 
             if responseCode == 200:
                 log.debug("Reported job status, response: %s", responseContent)
