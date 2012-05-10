@@ -1,9 +1,9 @@
 <script type="text/javascript">
     <?php if($species === null): ?>
         var mapSpecies = null;
-    <? else: ?>
+    <?php else: ?>
         var mapSpecies = <?php print json_encode($species) ?>;
-    <? endif ?>
+    <?php endif ?>
     var mapToolBaseUrl = "http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/";
 </script>
 
