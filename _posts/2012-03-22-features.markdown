@@ -35,7 +35,7 @@ the user to download.
 
 Architecture
 ------------
-<img class="diagram" src="{{ site.basepath }}/images/HighLevelArchitecture.png">
+<img class="diagram" src="{{ site.JB.BASE_PATH }}/images/HighLevelArchitecture.png">
 
 Technology
 ----------
