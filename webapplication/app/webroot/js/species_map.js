@@ -413,7 +413,12 @@ $(function() {
         displayProjection: geographic,
         units: "m",
         maxResolution: 156543.0339,
-        maxExtent: world_bounds
+        maxExtent: world_bounds,
+        controls: [
+            new OpenLayers.Control.ArgParser(),
+            new OpenLayers.Control.Attribution(),
+            new OpenLayers.Control.Navigation()
+        ]
 
         // Setting the restrictedExtent will change the bounds
         // that pressing the 'world' icon zooms to.
@@ -421,6 +426,9 @@ $(function() {
 //            restrictedExtent: zoom_bounds
 
     });
+
+    // not sure how to position controls while adding them in constructor
+    map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(5,60));
 
 
     // VMap0
@@ -540,7 +548,6 @@ $(function() {
     layer_switcher.ascending = false;
     layer_switcher.useLegendGraphics = false;
 
-    map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(50,50));
 
     map.addControl(layer_switcher);
 //    layer_switcher.maximizeControl();

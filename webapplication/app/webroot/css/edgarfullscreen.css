@@ -1,5 +1,7 @@
 @charset "utf-8";
 
+/* overall layout ----------------------------------------------------- */
+
 /* all the main things should be full screen size */
 html, body, #map {
     margin: 0;
@@ -7,19 +9,59 @@ html, body, #map {
     height: 100%;
 }
 
-/* DEBUG: the clustering selector can float above */
+/* things in the main layout */
+#flash, #header, #footer, #sidebar {
+    display: none;
+}
+
+/* things in the species map view */
+#map {
+    z-index: -1;
+}
+
+.panel {
+    position: absolute;
+    z-index: 10000;
+    opacity: 0.33;
+    background: white;
+}
+
+.panel:hover {
+    opacity: 0.66;
+}
+
+.top.panel {
+    top: 0;
+    left: 0;
+    right: 35%;
+    height: 55px;
+}
+
+.side.panel {
+    right: 0;
+    top: 0;
+    width: 30%;
+    height: 100%;
+}
+
+.opposite.panel {
+    background: transparent;
+    left: 50px;
+    top: 30%;
+}
+
+/* debug panel content ------------------------------------------------ */
+
 .clusteroptions {
     -webkit-border-radius: 0.5em;
     -moz-border-radius: 0.5em;
     border-radius: 0.5em;
-    font-size: 80%;
+    font-size: 65%;
     background: #fff;
     opacity: 0.5;
-    position: absolute;
-    left:0;
-    top:100px;
     z-index: 1000000;
     padding: 1em;
+    margin: 1em;
 }
 .clusteroptions legend {
     -webkit-border-radius: 0.5em;
@@ -32,58 +74,8 @@ html, body, #map {
     padding: 0.1em 1em;
 }
 
-/*
-#user, #flash, #header, #maptools, #footer, .cake-sql-log
-{ position: absolute; right: 0; border: 1px solid pink;}
-*/
 
-/* things in the maijn layout */
-#flash, #header, #footer {
-    display: none;
-}
-
-/* things in the species map view */
-#map {
-    z-index: -1;
-    background: green;
-}
-
-.panel {
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 10000;
-    width: 10em;
-    border: 1px solid pink;
-}
-
-#sidebar {
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 10000;
-    width: 10em;
-    border: 1px solid pink;
-}
-
-#maptools {
-    background: #fff;
-    opacity: 0.8;
-    padding: 1em;
-    position: absolute;
-    right: 10%;
-    top: 0;    
-    width: 80%;
-    z-index: 10000;
-}
-
-
-/* openlayers customisations ----------------------------------------------- */
-.olControlPanZoom {
-    top: 36px;    /* shuffle the pan/zoom bit down below the top panel */
-}
-
-
+/* openlayers customisations ------------------------------------------ */
 
 
 /* sql log for the bottom */
