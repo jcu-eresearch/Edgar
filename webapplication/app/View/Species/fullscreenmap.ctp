@@ -17,6 +17,7 @@
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
+    $this->Html->script('toolspanel_setup', array('inline'=>false));
 ?>
 
 
@@ -36,6 +37,12 @@
     <!-- things here -->    
     <div class="tool">
         <h1>some tool</h1>
+        <div class="toolcontent">
+            tool content goes here
+        </div>
+    </div>
+    <div class="tool">
+        <h1>another tool</h1>
         <div class="toolcontent">
             tool content goes here
         </div>

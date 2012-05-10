@@ -50,6 +50,26 @@ html, body, #map {
     top: 30%;
 }
 
+/* tools panel content ------------------------------------------------ */
+
+#toolspanel .tool {
+    color: black;
+    margin-bottom: 0.1em;
+    padding: 0.5em;
+}
+
+#toolspanel .tool h1 {
+    margin: 0;
+    padding: 0.3em;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+#toolspanel .tool .toolcontent {
+    background-color: #ddd;
+    padding: 0.5em;
+}
+
 /* debug panel content ------------------------------------------------ */
 
 .clusteroptions {
