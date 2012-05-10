@@ -43,10 +43,23 @@
 </div>
 
 <div id="speciespanel" class="top panel speciespanel">
-    <div id="model_rerun">
-        <a id="model_rerun_button" href="#">Request recalculation of distribution map</a>
-        <p id="model_rerun_requested">Request successful</p>
-    </div>
+    <table>
+        <tr>
+            <th>Freshness</th>
+            <td id="species_freshness"></td>
+        </tr>
+
+        <tr>
+            <th>Modeling Status</th>
+            <td>
+                <span id="model_status"></span>
+                <span id="model_rerun" style="display:none">
+                    <a id="model_rerun_button" href="#">Boost</a>
+                    <span id="model_rerun_requested">Boost successfull</span>
+                </span>
+            </td>
+        </tr>
+    </table>
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
