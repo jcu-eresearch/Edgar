@@ -67,10 +67,11 @@ cd "$WORKING_DIR/inputs/$SPP"
 
 # Make an output directory
 TMP_OUTPUT_DIR="$WORKING_DIR/tmp_outputs/$SPP"
-FINAL_OUTPUT_DIR="$WORKING_DIR/outputs/$SPP"
+OUTPUTS_DIR="$WORKING_DIR/outputs"
+FINAL_OUTPUT_DIR="$OUTPUTS_DIR/$SPP"
 
 mkdir -p "$TMP_OUTPUT_DIR"
-mkdir -p "$FINAL_OUTPUT_DIR"
+mkdir -p "$OUTPUTS_DIR"
 
 # Dump the environmental vars to the output dir
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
