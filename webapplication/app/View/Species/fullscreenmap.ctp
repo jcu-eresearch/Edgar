@@ -1,4 +1,7 @@
 <?php
+    // change to the fullscreen layout
+    $this->layout = 'fullscreencontent';
+
     // build some initialising JS
     $species_value = "null";
     if ($species !== null) {
@@ -12,17 +15,13 @@
     $this->Html->scriptBlock($species_init_js, array('inline'=>false));
     
     // add the actual JS that makes the map work
-    $this->Html->script(array('species_map'), array('block' => 'script'));
+    $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
+    $this->Html->script('toolspanel_setup', array('inline'=>false));
 ?>
 
-<div class="species map">
-    <div class='map_legend'>
-        <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
-    </div>
 
-    <h2 style='display:none'><?php  echo __('Species Map');?></h2>
-
+<div id="debugpanel" class="opposite panel debugpanel">
     <!-- clustering selector -->
     <fieldset class="clusteroptions" style="float: right">
         <legend>Clustering Display</legend>
@@ -32,7 +31,25 @@
             <option value="squaregrid">Square Grid</option>
         </select>
     </fieldset>
+</div>
 
+<div id="toolspanel" class="side panel toolspanel">
+    <!-- things here -->    
+    <div class="tool">
+        <h1>some tool</h1>
+        <div class="toolcontent">
+            tool content goes here
+        </div>
+    </div>
+    <div class="tool">
+        <h1>another tool</h1>
+        <div class="toolcontent">
+            tool content goes here
+        </div>
+    </div>
+</div>
+
+<div id="speciespanel" class="top panel speciespanel">
     <table>
         <tr>
             <th>Freshness</th>
@@ -53,6 +70,7 @@
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
-
-    <div style="width:60em; height: 40em;" id="map"></div>
 </div>
+
+<div id="map"></div>
+

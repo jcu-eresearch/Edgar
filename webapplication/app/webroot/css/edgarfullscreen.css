@@ -1,0 +1,106 @@
+@charset "utf-8";
+
+/* overall layout ----------------------------------------------------- */
+
+/* all the main things should be full screen size */
+html, body, #map {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* things in the main layout */
+#flash, #header, #footer, #sidebar {
+    display: none;
+}
+
+/* things in the species map view */
+#map {
+    z-index: -1;
+}
+
+.panel {
+    position: absolute;
+    z-index: 10000;
+    opacity: 0.33;
+    background: white;
+}
+
+.panel:hover {
+    opacity: 0.66;
+}
+
+.top.panel {
+    top: 0;
+    left: 0;
+    right: 35%;
+    height: 55px;
+}
+
+.side.panel {
+    right: 0;
+    top: 0;
+    width: 30%;
+    height: 100%;
+}
+
+.opposite.panel {
+    background: transparent;
+    left: 50px;
+    top: 30%;
+}
+
+/* tools panel content ------------------------------------------------ */
+
+#toolspanel .tool {
+    color: black;
+    margin-bottom: 0.1em;
+    padding: 0.5em;
+}
+
+#toolspanel .tool h1 {
+    margin: 0;
+    padding: 0.3em;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+#toolspanel .tool .toolcontent {
+    background-color: #ddd;
+    padding: 0.5em;
+}
+
+/* debug panel content ------------------------------------------------ */
+
+.clusteroptions {
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    font-size: 65%;
+    background: #fff;
+    opacity: 0.5;
+    z-index: 1000000;
+    padding: 1em;
+    margin: 1em;
+}
+.clusteroptions legend {
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    background: #fff;
+    font-size: inherit;
+    font-weight: inherit;
+    color: #999;
+    padding: 0.1em 1em;
+}
+
+
+/* openlayers customisations ------------------------------------------ */
+
+
+/* sql log for the bottom */
+.cake-sql-log {
+    position: absolute;
+    bottom: 5%;
+    opacity: 0.5;
+

@@ -50,6 +50,7 @@ $user = AuthComponent::user();
         echo $this->Html->meta('icon');
         echo $this->Html->css('h5bp');  // html5boilerplate "sanity reset" css
         echo $this->Html->css('edgar');
+        echo $this->Html->css('edgarfullscreen');
         echo $this->Html->css('../js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
         echo $this->Html->css('openlayers');
         echo $this->Html->css('openlayers_extended');
@@ -59,56 +60,66 @@ $user = AuthComponent::user();
     	$this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
 
         // Include jQuery and jQueryUI
-        $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false));
-        $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js', array('inline' => false));
-        $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js', array('inline' => false));
-        $this->append('script');
+        $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false, 'block'=>'libscript'));
+        $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js', array('inline' => false, 'block'=>'libscript'));
+        $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js', array('inline' => false, 'block'=>'libscript'));
+        $this->append('libscript');
             // Include Google API
             // Note: API Key is Robert's.
             echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAo3TVBlAHxH57sROb2cV_7-Tar7bKnIcY'></script>";
         $this->end();
         // Include OpenLayers
-        $this->Html->script('OpenLayers.js', array('inline' => false));
-        $this->Html->script('LayerSwitcher-extended.js', array('inline' => false));
+        $this->Html->script('OpenLayers.js', array('inline' => false, 'block'=>'libscript'));
+        $this->Html->script('LayerSwitcher-extended.js', array('inline' => false, 'block'=>'libscript'));
 
         // now emit the meta, css and *some* js tags
         echo $this->fetch('meta');
         echo $this->fetch('css');
         echo $this->fetch('earlyscript');
     ?>
+
 </head>
 <body>
-    <div id="header">
-        <div class="wrapper">
-            <img src="<?php print $this->Html->url('/img/logo.png') ?>" />
-            <div class="login"><?php
-                $user = AuthComponent::user();
-                if($user === NULL){
-                    print $this->Html->link('Log In', '/users/login');
-                } else {
-                    print 'Logged in as ' . Sanitize::html($user['email']) . ' (';
-                    print $this->Html->link('Log Out', '/users/logout');
-                    print ')';
-                }
-            ?></div>
 
+    <?php echo $this->fetch('content') ?>
+
+    <div id="sidebar">
+        <div id="user">
+            <div class="wrapper">
+                <?php
+                    $user = AuthComponent::user();
+                    if($user === NULL){
+                        print $this->Html->link('Log In', '/users/login');
+                    } else {
+                        print 'Logged in as ' . Sanitize::html($user['email']) . ' (';
+                        print $this->Html->link('Log Out', '/users/logout');
+                        print ')';
+                    }
+                ?>
+            </div>
         </div>
-    </div>
 
-    <div id="content">
-        <div class="wrapper">
-            <?php echo $this->Session->flash() ?>
-            <h1><?php echo $title_for_layout ?></h1>
-            <?php echo $this->fetch('content') ?>
+        <div id="flash">
+            <div class="wrapper">
+                <?php echo $this->Session->flash() ?>
+            </div>
         </div>
+
+        <div id="header">
+            <div class="wrapper">
+                <h1><?php echo $title_for_layout ?></h1>
+            </div>
+        </div>
+
+        <div id="footer">
+        </div>
+    
     </div>
 
-    <div id="footer">
-    </div>
-    <?php echo
-        $this->element('sql_dump');
-        // now we're all modern and stuff, here at the bottom is where all the javascript goes...
-        $this->fetch('script');
+    <?php
+        echo $this->element('sql_dump');
+        echo $this->fetch('libscript');
+        echo $this->fetch('script');
     ?>
 </body>
 </html>

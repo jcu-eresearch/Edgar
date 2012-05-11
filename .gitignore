@@ -7,3 +7,7 @@
 *.pyc
 *~
 .nfs*
+modelling/tmp
+modelling/inputs
+modelling/outputs
+modelling/tmp_outputs

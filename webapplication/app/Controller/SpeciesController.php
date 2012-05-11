@@ -190,6 +190,9 @@ class SpeciesController extends AppController {
                 throw new NotFoundException(__('Invalid species'));
             }
         }
+        
+        // use the fullscreen map view
+        $this->render('fullscreenmap');
     }
 
 
