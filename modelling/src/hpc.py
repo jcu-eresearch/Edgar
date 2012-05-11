@@ -168,7 +168,7 @@ class HPCJob:
                 log.debug("Writing csv to: %s", f.name)
                 writer = csv.writer(f)
                 # Write the header
-                writer.writerow(["SPECIES_ID", "LATITUDE", "LONGITUDE"])
+                writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
 
                 # Select the occurrences for this species
                 occurrence_rows = db.occurrences.select()\
