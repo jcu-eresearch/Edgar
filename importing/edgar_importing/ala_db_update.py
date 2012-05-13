@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import pathfix
 import sys
-import db
-import ala
-import sync
+from edgar_importing import db
+from edgar_importing import ala
+from edgar_importing import sync
 import logging
 import argparse
 import json
@@ -23,7 +22,7 @@ def parse_args():
     return parser.parse_args();
 
 
-if __name__ == '__main__':
+def main():
     args = parse_args()
     with open(args.config[0], 'rb') as f:
         config = json.load(f)

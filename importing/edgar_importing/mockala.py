@@ -1,6 +1,5 @@
-import pathfix
 from datetime import datetime
-import ala
+from edgar_importing import ala
 from copy import deepcopy
 
 class MockALA(object):

@@ -1,17 +1,28 @@
-This directory contains python scripts to import/synchronise data from ALA into the local database.
-
-Executable scripts are in the 'bin' directory. Non-executable scripts are in
-the 'src' directory.
-
-Run the scripts in the 'bin' directory with the '-h' option for usage documentation. There is also code documentation in docstrings inside the python files themselves.
+This directory contains the Python egg edga\_importing.  edgar\_importing
+imports/synchronises data from external sources (such as ALA) into the
+local database. It follows the standard egg/zc.buildout structure.
 
 ## Setup ##
 
-You might need to run these to install dependencies:
+Run the standard buildout setup using Python2.6 (this will install all
+dependencies):
 
-    sudo yum install python-setuptools
-    sudo yum install MySQL-python
-    sudo easy_install argparse
-    sudo easy_install http://pypi.python.org/packages/source/S/SQLAlchemy/SQLAlchemy-0.7.6.tar.gz#md5=6383cade61ecff1a236708fae066447a
+    python2.6 bootstrap.py
+    bin/buildout
 
-Next, you need to create a config file with the database host/user/password. See `config.example.json`. This file is passed into the scripts as a command line argument.
+Next, you need to create a config file with the database
+host/user/password. See `config.example.json`. This file is passed into
+the scripts as a command line argument.
+
+
+## Usage ##
+
+Most commands can be run with the `-h` flag to show documentation.
+
+`bin/test` - Runs all the unit tests. Outputs jUnit formatted xml.
+
+`bin/ala_db_update` - Syncs local database with ALA data
+
+`bin/ala_cron.sh` - An example cron script for `ala_db_update`.
+
+`bin/db_wipe` - Wipes all occurrences and species in the db with test data.

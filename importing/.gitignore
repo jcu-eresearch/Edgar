@@ -1,1 +1,14 @@
 /config.json
+/testconfig.json
+/config.daniel.json
+/bin/
+/eggs/
+/develop-eggs/
+/include/
+/lib/
+/parts/
+/edgar_importing.egg-info/
+/.Python
+/.installed.cfg
+/testreports/
+*.egg

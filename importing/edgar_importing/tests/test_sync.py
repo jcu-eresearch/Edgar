@@ -1,7 +1,6 @@
-import pathfix
-import mockala
-import sync
-import db
+from edgar_importing import mockala
+from edgar_importing import sync
+from edgar_importing import db
 import unittest
 import uuid
 import datetime
@@ -9,19 +8,6 @@ import os.path
 import json
 import logging
 from sqlalchemy import select, func
-
-def setUpModule():
-    test_dir = os.path.dirname(os.path.abspath(__file__))
-    config_path = test_dir + '/testconfig.json'
-    with open(config_path, 'rb') as f:
-        conf = json.load(f)
-        db.connect(conf)
-
-    #logging.root.setLevel(logging.__dict__[conf['logLevel']])
-
-def tearDownModule():
-    #db.disconnect()
-    pass
 
 
 class TestSync(unittest.TestCase):
@@ -75,6 +61,7 @@ class TestSync(unittest.TestCase):
         else:
             return None
 
+
     def num_db_occ_for_spec(self, species):
         species_id = self.id_for_species(species)
         q = select([func.count("(*)")]).\
@@ -90,14 +77,14 @@ class TestSync(unittest.TestCase):
         for species in added:
             self.syncer.add_species(species)
 
-        self.assertIsNotNone(self.id_for_species(self.s1))
-        self.assertIsNotNone(self.id_for_species(self.s2))
+        self.assertNotEqual(self.id_for_species(self.s1), None)
+        self.assertNotEqual(self.id_for_species(self.s2), None)
 
 
     def test_renamed_species(self):
         #sync
         self.syncer.sync()
-        self.assertIsNotNone(self.id_for_species(self.s1))
+        self.assertFalse(self.id_for_species(self.s1) == None)
         num_records = self.num_db_occ_for_spec(self.s1)
 
         #rename s1 to sRenamed
@@ -110,10 +97,10 @@ class TestSync(unittest.TestCase):
         self.syncer.sync()
 
         #make sure s1 is missing
-        self.assertIsNone(self.id_for_species(self.s1))
+        self.assertEqual(self.id_for_species(self.s1), None)
 
         #make sure sRenamed exists
-        self.assertIsNotNone(self.id_for_species(sRenamed))
+        self.assertNotEqual(self.id_for_species(sRenamed), None)
 
         #make sure all records have been moved across
         self.assertEqual(num_records, self.num_db_occ_for_spec(sRenamed))
@@ -124,7 +111,8 @@ class TestSync(unittest.TestCase):
         self.mockala.mock_add_species(sNone)
         self.syncer.sync()
 
-        self.assertIsNone(self.id_for_species(sNone))
+        self.assertEqual(self.id_for_species(sNone), None)
+
 
     def test_added_records(self):
         #assert 0 records
@@ -136,6 +124,7 @@ class TestSync(unittest.TestCase):
         #assert all records synced
         self.assertEqual(len(self.records1),
                          self.num_db_occ_for_spec(self.s1))
+
 
     def test_added_records_after_sync(self):
         #sync
@@ -155,6 +144,7 @@ class TestSync(unittest.TestCase):
         #check new records added
         self.assertEqual(len(new_records) + len(self.records1),
                          self.num_db_occ_for_spec(self.s1))
+
 
     def test_deleted_records_after_sync(self):
         #sync
@@ -181,6 +171,7 @@ class TestSync(unittest.TestCase):
         #check that remaining records remain
         for occ in remaining_records:
             self.assertTrue(occ.uuid in remaining_uuids)
+
 
     def test_updated_records_after_sync(self):
         #sync
@@ -215,6 +206,10 @@ class TestSync(unittest.TestCase):
                 break
 
 
-if __name__ == '__main__':
-    logging.basicConfig()
-    unittest.main()
+def test_suite():
+    print os.getcwd()
+    with open('testconfig.json', 'rb') as f:
+        conf = json.load(f)
+        db.connect(conf)
+
+    return unittest.makeSuite(TestSync)

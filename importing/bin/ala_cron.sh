@@ -6,7 +6,7 @@
 
 IMPORTER_DIR="/home/jc171154/Edgar/importing"
 LOG_DIR="$IMPORTER_DIR/logs"
-SYNC_SCRIPT="$IMPORTER_DIR/bin/ala_db_update.py"
+SYNC_SCRIPT="$IMPORTER_DIR/bin/ala_db_update"
 CONFIG_FILE="$IMPORTER_DIR/config.json"
 
 LOG_FILE="$LOG_DIR/$(date "+%Y-%m-%d %H:%M:%S").log"

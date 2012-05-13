@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-import pathfix
 import csv
 import string
-import ala
+from edgar_importing import ala
 import argparse
 import textwrap
 import logging
@@ -82,7 +81,7 @@ def write_csv_for_species_lsid(species_lsid):
             num_records, t, float(num_records) / t)
 
 
-if __name__ == '__main__':
+def main():
     args = parse_args()
     if args.speed_info:
         log.setLevel(logging.INFO)

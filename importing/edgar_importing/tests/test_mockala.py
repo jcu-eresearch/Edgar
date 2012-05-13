@@ -1,4 +1,4 @@
-import mockala
+from edgar_importing import mockala
 import unittest
 import uuid
 import datetime
@@ -10,7 +10,7 @@ class TestMockALA(unittest.TestCase):
 
     def test_add_species(self):
         s = self.mock.Species('Bug Bear', 'Bugus Bearii', 'bbblsid')
-        self.assertIsNone(self.mock.species_for_lsid(s.lsid))
+        self.assertEqual(None, self.mock.species_for_lsid(s.lsid))
         self.mock.mock_add_species(s)
         self.assertEqual(s, self.mock.species_for_lsid(s.lsid))
         self.assertEqual(s,
@@ -98,7 +98,7 @@ class TestMockALA(unittest.TestCase):
         self.assertEqual(self.mock.num_occurrences_for_lsid(old.lsid), 0)
 
         # lsid lookup of old -> None
-        self.assertIsNone(self.mock.species_for_lsid(old.lsid))
+        self.assertEqual(None, self.mock.species_for_lsid(old.lsid))
 
         # sci name lookup of old -> new
         self.assertEqual(self.mock.species_for_scientific_name(old.scientific_name), new)
@@ -123,7 +123,7 @@ class TestMockALA(unittest.TestCase):
 
         all_species = list(self.mock.all_bird_species())
         self.assertFalse(s in all_species)
-        self.assertIsNone(self.mock.species_for_lsid(s.lsid))
+        self.assertEqual(None, self.mock.species_for_lsid(s.lsid))
 
 
     def test_remove_records(self):
@@ -190,5 +190,5 @@ class TestMockALA(unittest.TestCase):
         self.assertEqual(len(list(records_after)), 0)
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_suite():
+    return unittest.makeSuite(TestMockALA)
