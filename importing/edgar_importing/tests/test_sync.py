@@ -54,17 +54,23 @@ class TestSync(unittest.TestCase):
     def id_for_species(self, species):
         sci_name = species.scientific_name
         result = db.species.select().\
-                    where(db.species.c.scientific_name == sci_name).\
-                    execute()
-        if result.rowcount == 1:
-            return result.fetchone()['id']
-        else:
+                where(db.species.c.scientific_name == sci_name).\
+                execute().\
+                fetchone()
+
+        if result is None:
             return None
+        else:
+            return result['id']
 
 
     def num_db_occ_for_spec(self, species):
         species_id = self.id_for_species(species)
+        if species_id is None:
+            return 0
+
         q = select([func.count("(*)")]).\
+                select_from(db.occurrences).\
                 where(db.occurrences.c.species_id == species_id)
         return db.engine.execute(q).scalar()
 
@@ -207,9 +213,8 @@ class TestSync(unittest.TestCase):
 
 
 def test_suite():
-    print os.getcwd()
-    with open('testconfig.json', 'rb') as f:
-        conf = json.load(f)
-        db.connect(conf)
+    #in memory sqlite db
+    db.connect({'db.url':'sqlite://'})
+    db.metadata.create_all()
 
     return unittest.makeSuite(TestSync)

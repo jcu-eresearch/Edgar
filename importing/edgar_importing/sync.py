@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 class Syncer:
 
-    def __init__(self, ala):
+    def __init__(self, ala, mysql_upsert_optimisation=False):
         '''The `ala` param is the ala.py module. This is passed in a a ctor
         param because it will be substituded with mockala.py during unit
         testing.'''
@@ -26,6 +26,7 @@ class Syncer:
         if row is None:
             raise RuntimeError('ALA row missing from sources table in db')
 
+        self.mysql_optimise = mysql_upsert_optimisation
         self.source_row_id = row['id']
         self.last_import_time = row['last_import_time']
         self.cached_upserts = []
@@ -107,7 +108,7 @@ class Syncer:
 
 
     def add_species(self, species):
-        '''Adds `species` to the local db, where `s` is an ala.Species
+        '''Adds `species` to the local db, where `species` is an ala.Species
         object'''
 
         log.info('Adding new species "%s"', species.scientific_name)
@@ -316,6 +317,14 @@ class Syncer:
             self.ala_species_by_sname[scientific_name] = species
             return species
 
+    def rate_occurrence(self, occurrence):
+        '''Returns an occurrences.rating enum value for an ala.Occurrence'''
+        # TODO: determine rating better using lists of assertions
+        if occurrence.is_geospatial_kosher:
+            return 'assumed valid'
+        else:
+            return 'assumed invalid'
+
 
     def upsert_occurrence(self, occurrence, species_id):
         '''Looks up whether `occurrence` (an ala.Occurrence object)
@@ -330,18 +339,44 @@ class Syncer:
         flushed every 1000 occurrences. YOU MUST CALL `flush_upserts` AFTER YOU
         HAVE CALLED THIS METHOD FOR THE FINAL TIME.'''
 
+        if self.mysql_optimise:
+            self.upsert_occurrence_mysql_optimised(occurrence, species_id)
+        else:
+            self.upsert_occurrence_unoptimised(occurrence, species_id)
+
+
+    def upsert_occurrence_unoptimised(self, occurrence, species_id):
+        existing = db.occurrences.select().\
+            where(db.occurrences.c.source_record_id == occurrence.uuid.bytes).\
+            where(db.occurrences.c.source_id == self.source_row_id).\
+            execute().\
+            fetchone()
+
+        if existing is None:
+            db.occurrences.insert().execute(
+                latitude=occurrence.latitude,
+                longitude=occurrence.longitude,
+                rating=self.rate_occurrence(occurrence),
+                species_id=species_id,
+                source_id=self.source_row_id,
+                source_record_id=occurrence.uuid.bytes)
+        else:
+            db.occurrences.update().\
+                values(latitude=occurrence.latitude,
+                       longitude=occurrence.longitude,
+                       rating=self.rate_occurrence(occurrence),
+                       species_id=species_id).\
+                where(db.occurrences.c.id == existing['id']).\
+                execute()
+
+    def upsert_occurrence_mysql_optimised(self, occurrence, species_id):
         if len(self.cached_upserts) > 1000:
             self.flush_upserts()
-
-        # TODO: determine rating better using lists of assertions
-        rating = 'assumed invalid'
-        if occurrence.is_geospatial_kosher:
-            rating = 'assumed valid'
 
         # these should be escaped strings ready for insertion into the SQL
         cols = (str(float(occurrence.latitude)),
                 str(float(occurrence.longitude)),
-                '"' + rating + '"',
+                '"' + self.rate_occurrence(occurrence) + '"',
                 str(int(species_id)),
                 str(int(self.source_row_id)),
                 _mysql_encode_binary(occurrence.uuid.bytes))
@@ -350,6 +385,9 @@ class Syncer:
 
 
     def flush_upserts(self):
+        if not self.mysql_optimise:
+            return
+
         if len(self.cached_upserts) <= 0:
             return
 
