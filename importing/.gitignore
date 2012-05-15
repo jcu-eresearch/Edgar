@@ -12,3 +12,4 @@
 /.installed.cfg
 /testreports/
 *.egg
+.coverage
