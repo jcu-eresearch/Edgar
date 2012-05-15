@@ -37,7 +37,7 @@
 <div id="toolspanel" class="side panel toolspanel">
     <!-- things here -->    
     <div class="tool">
-        <h1>Map background</h1>
+        <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
     </div>
     <div class="tool">

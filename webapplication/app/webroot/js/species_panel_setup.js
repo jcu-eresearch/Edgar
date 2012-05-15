@@ -44,13 +44,12 @@ function changeSpecies(species) {
 function updateSpeciesShowingLabel() {
     setTimeout(function() {
         var selector = $('#species_autocomplete');
-        if (selector.is(':focus') || mapSpecies === null) {
-            // when textbox is focussed, or there's no selected species, tell them to choose
+        if (mapSpecies === null) {
             $('#species_showing_label').text('choose a species for display');      
         } else {
             $('#species_showing_label').text('now showing');        
         }
-    }, 10);
+    }, 0);
 }
 // ------------------------------------------------------------------
 function logthing() {
@@ -68,6 +67,9 @@ $(function() {
     $('#species_autocomplete').focus( function() {
         // when the _text_box_ is focussed
         updateSpeciesShowingLabel();
+        setTimeout(function() {
+            $('#species_autocomplete').select();
+        }, 0);
     });
 
     $('#species_autocomplete').autocomplete({

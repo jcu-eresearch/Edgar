@@ -497,11 +497,12 @@ $(function() {
     // Let the user change between layers
 //    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
     layer_switcher = new OpenLayers.Control.LayerSwitcher({
-        div: $('#layerstool').get(0)
+        div: $('#layerstool').get(0),
+        roundedCorner: false,
+        useLegendGraphics: true
     });
-//    layer_switcher.roundedCornerColor = "#090909";
     layer_switcher.ascending = false;
-    layer_switcher.useLegendGraphics = false;
+//    layer_switcher.useLegendGraphics = false;
 
 
     map.addControl(layer_switcher);

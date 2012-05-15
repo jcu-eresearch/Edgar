@@ -34,17 +34,17 @@ html, body, #map {
 .top.panel {
     top: 0;
     left: 0;
-    right: 30%;
+    right: 15em;
     padding-right: 1%;
-    xheight: 55px;
 }
 
 .side.panel {
     right: 0;
     top: 0;
-    width: 30%;
+    width: 15em;
     height: 100%;
-    border-left: 1px solid #ccc;
+    border-left: 1px solid #999;
+    overflow: auto;
 }
 
 .opposite.panel {
@@ -75,6 +75,7 @@ html, body, #map {
 /* tools panel content ------------------------------------------------ */
 
 #toolspanel .tool {
+    text-align: left;
     color: black;
     margin-bottom: 0.1em;
     padding: 0.5em;
@@ -87,9 +88,42 @@ html, body, #map {
     cursor: pointer;
 }
 
+#toolspanel .tool h1:before { /* show a disclosure triangle */
+    display: inline-block;
+    width: 1.5em;
+    height: 1.1em;
+    line-height: 1.1em;
+    xtext-align: center;
+    content: '\25bc'; /* 25bc is a downward-pointing triangle */
+    opacity: 0.7;
+}
+
+#toolspanel .tool h1.closed:before {
+    content: '\25b6'; /* 25b6 is a right-pointing triangle */
+}
+
 #toolspanel .tool .toolcontent {
+    font-size: 90%;
     background-color: #ddd;
     padding: 0.5em;
+}
+
+#layerstool {
+}
+
+#toolspanel .labelSpan {
+    font-size: inherit;
+    display: inline-block;
+    height: 1.7em;
+    line-height: 1.7em;
+}
+
+#toolspanel input[type="radio"], #toolspanel input[type="checkbox"] {
+    font-size: inherit;
+    height: 1.7em;
+    vertical-align: bottom; /* OpenLayers adds valign: b to the labelSpan */
+    width: auto;
+    margin: 0 0.4em 0 0;
 }
 
 /* debug panel content ------------------------------------------------ */
