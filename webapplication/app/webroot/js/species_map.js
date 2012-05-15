@@ -110,7 +110,6 @@ function clearMapPopups() {
 }
 
 function addDistributionLayer() {
-/*
     // Species Distribution
     // ----------------------
 
@@ -125,7 +124,7 @@ function addDistributionLayer() {
     // projection request.
     // I could be wrong though...
 
-    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+//    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
 
     distribution = new OpenLayers.Layer.WMS(
         "Distribution",
@@ -136,11 +135,14 @@ function addDistributionLayer() {
         {
             MODE: 'map', 
             MAP: 'edgar_master.map',
-            DATA: (sciNameCased + '/outputs/' + sciNameCased + '.asc'),
+            DATA: (mapSpecies.id + '/1975.asc'),
             SPECIESID: mapSpecies.id,
             REASPECT: "true",
             TRANSPARENT: 'true',
-            THRESHOLD: mapSpecies.distributionThreshold
+            // TODO -> Set the threshold.
+//            THRESHOLD: mapSpecies.distributionThreshold
+            THRESHOLD: "0"
+
         },
         {
             // It's an overlay
@@ -152,7 +154,6 @@ function addDistributionLayer() {
     );
 
     map.addLayer(distribution);
-*/
 }
 
 function addOccurrencesLayer() {

@@ -92,3 +92,6 @@ rm -rfd "$FINAL_OUTPUT_DIR"
 
 # Move the tmp output to the final output location
 mv "$TMP_OUTPUT_DIR" "$FINAL_OUTPUT_DIR"
+
+# Give read access to everyone
+chmod -R ugo+rX "$FINAL_OUTPUT_DIR"
