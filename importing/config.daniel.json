@@ -5,7 +5,7 @@
     "db.url": "mysql://edgar_import:password@localhost/edgar_dev?charset=utf8",
 
     "doco_updateSpecies": "true/false, whether or not to add/update/delete species",
-    "updateSpecies": false,
+    "updateSpecies": true,
 
     "doco_updateOccurrences": "true/false, whether or not to add/update/delete occurrences",
     "updateOccurrences": true,

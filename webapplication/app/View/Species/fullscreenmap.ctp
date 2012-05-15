@@ -16,6 +16,7 @@
     
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
+    $this->Html->script('species_panel_setup', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
 ?>
@@ -36,6 +37,10 @@
 <div id="toolspanel" class="side panel toolspanel">
     <!-- things here -->    
     <div class="tool">
+        <h1>Map background</h1>
+        <div id="layerstool" class="toolcontent"></div>
+    </div>
+    <div class="tool">
         <h1>some tool</h1>
         <div class="toolcontent">
             tool content goes here
@@ -49,13 +54,15 @@
     </div>
 </div>
 
-<div id="speciespanel" class="top panel speciespanel">
-    <table>
-        <tr>
-            <th>Freshness</th>
-            <td id="species_freshness"></td>
-        </tr>
+<div id="speciespanel" class="top panel speciespanel clearfix">
 
+    <p class="minor label" id="species_modelling_status"></p>
+    <p class="minor label" id="species_showing_label"></p>
+
+    <!-- Species Selector -->
+    <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+    
+    <table>
         <tr>
             <th>Modeling Status</th>
             <td>
@@ -67,9 +74,6 @@
             </td>
         </tr>
     </table>
-
-    <!-- Species Selector -->
-    <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
 </div>
 
 <div id="map"></div>

@@ -24,6 +24,7 @@ html, body, #map {
     z-index: 10000;
     opacity: 0.33;
     background: white;
+    color: black;
 }
 
 .panel:hover {
@@ -33,8 +34,9 @@ html, body, #map {
 .top.panel {
     top: 0;
     left: 0;
-    right: 35%;
-    height: 55px;
+    right: 30%;
+    padding-right: 1%;
+    xheight: 55px;
 }
 
 .side.panel {
@@ -42,12 +44,32 @@ html, body, #map {
     top: 0;
     width: 30%;
     height: 100%;
+    border-left: 1px solid #ccc;
 }
 
 .opposite.panel {
     background: transparent;
     left: 50px;
     top: 30%;
+}
+
+/* species panel content ------------------------------------------------ */
+
+.minor.label {
+    margin: 0;
+    padding: 0.2em;
+    font-size: 80%;
+    font-weight: bold;
+    color: #666;
+}
+
+#species_showing_label {
+    text-align: left;
+}
+
+#species_modelling_status {
+    float: right;
+    text-align: right;
 }
 
 /* tools panel content ------------------------------------------------ */
@@ -103,4 +125,6 @@ html, body, #map {
     position: absolute;
     bottom: 5%;
     opacity: 0.5;
+    display: none;
+}
 

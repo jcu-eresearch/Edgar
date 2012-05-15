@@ -355,55 +355,8 @@ function updateWindowHistory() {
     }
 }
 
-function changeSpecies(species){
-    // The work to do if the user changes the selected species..
-    // We need to then update the species details.
-
-    clearExistingSpeciesOccurrencesAndDistributionLayers();
-
-    mapSpecies = species;
-
-    if (species !== null) {
-        addSpeciesOccurrencesAndDistributionLayers();
-
-        $('#species_autocomplete').val(species.label);
-        $('#species_freshness').text('' + species.numDirtyOccurrences + ' records changed since last modeling run.');
-        $('#model_status').text(species.remodelStatus);
-        if(Edgar.user && Edgar.user.canRequestRemodel && species.canRequestRemodel){
-            $('#model_rerun_button').show();
-            $('#model_rerun_requested').hide();
-            $('#model_rerun').show();
-        } else {
-            $('#model_rerun').hide();
-        }
-    } else {
-        $('#species_autocomplete').val('');
-        $('#species_freshness').text('');
-        $('#model_status').text('');
-        $('#model_rerun').hide();
-    }
-
-    updateWindowHistory();
-}
-
 
 $(function() {
-
-    $('#species_autocomplete').autocomplete({
-        minLength: 2,
-        source: Edgar.baseUrl + 'species/autocomplete.json',
-        select: function(event, ui) {
-            changeSpecies(ui.item);
-        }
-    });
-
-    $('#model_rerun_button').click(function() {
-        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + mapSpecies.id });
-        $(this).fadeOut('fast', function(){
-            $('#model_rerun_requested').fadeIn();
-        });
-    });
-
 
     // The Map Object
     // ----------
@@ -543,7 +496,9 @@ $(function() {
 
     // Let the user change between layers
 //    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
-    layer_switcher = new OpenLayers.Control.LayerSwitcher();
+    layer_switcher = new OpenLayers.Control.LayerSwitcher({
+        div: $('#layerstool').get(0)
+    });
 //    layer_switcher.roundedCornerColor = "#090909";
     layer_switcher.ascending = false;
     layer_switcher.useLegendGraphics = false;
