@@ -95,7 +95,7 @@ Finishing Modelling
 
 The HPC script operates as a simple loop, so when it completes a species 
 distribution map job, it simply moves on to the next species to model. When there 
-is nothing to model, it simply sleeps, and then loops.
+is nothing to model, it simply sleeps, and then loops again.
 
 When the cake app receives a **FINISHED_SUCCESS** status update, it subtracts
 the number of dirty occurrences indicated by the HPC model status update from the
