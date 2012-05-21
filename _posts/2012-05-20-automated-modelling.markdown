@@ -71,8 +71,8 @@ with Jeremy's (our client's) species distribution modelling scripts. Once
 the input CSV is generated, the modelling job is submitted to the HPC. This is
 done using the <code>qsub</code> command.
 Assuming the job was successfully queued on the HPC, the cake app is provided
-a status update for the species. The status update includes the fact that the
-species was **QUEUED**.
+a status update via a POST to the URI: <code>/species/job_status/SPECIES_ID</code>.
+The status update includes the fact that the species was **QUEUED**.
 
 At this point, the species distribution has been queued on the HPC, and the
 cake app has been informed that the job is queued. As soon as the cake app
