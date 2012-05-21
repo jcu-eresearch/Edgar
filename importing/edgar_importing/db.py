@@ -7,6 +7,9 @@ from sqlalchemy.types import SmallInteger, String, Integer, \
 engine = None
 metadata = MetaData()
 
+ratings_enum = Enum('unknown', 'invalid', 'history', 'vagrant', 'irruptive',
+    'non-breeding', 'introduced non-breeding', 'breeding', 
+    'introduced breeding');
 
 def connect(engine_config):
     '''Call this before trying to use anything else'''
@@ -37,12 +40,7 @@ occurrences = Table('occurrences', metadata,
     Column('id', Integer(), primary_key=True),
     Column('latitude', Float(), nullable=False),
     Column('longitude', Float(), nullable=False),
-    Column('rating', Enum(
-        'known valid',
-        'assumed valid',
-        'known invalid',
-        'assumed invalid'),
-        nullable=False),
+    Column('rating', ratings_enum, nullable=False),
     Column('species_id', SmallInteger(), ForeignKey('species.id'),
         nullable=False),
     Column('source_id', SmallInteger(), ForeignKey('sources.id'),
@@ -64,12 +62,7 @@ ratings = Table('ratings', metadata,
     Column('user_id', Integer(), ForeignKey('users.id'),
         nullable=False),
     Column('comment', Text(), nullable=False),
-    Column('rating', Enum(
-        'known valid',
-        'assumed valid',
-        'known invalid',
-        'assumed invalid'),
-        nullable=False)
+    Column('rating', ratings_enum, nullable=False)
 )
 
 occurrences_ratings_bridge = Table('occurrences_ratings_bridge', metadata,

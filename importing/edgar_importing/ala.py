@@ -211,8 +211,6 @@ def q_param(species_lsid=None, changed_since=None):
     `changed_since` allows you to only get records that have changed between a
     certain date range.
 
-    TODO: mark geospatial_kosher:false records as 'assumed invalid'
-
     TODO: remove occurrences that happened before 1950?
           'occurrence_year:' + _q_date_range(1950_utc_datetime, None)
     '''

@@ -321,9 +321,9 @@ class Syncer:
         '''Returns an occurrences.rating enum value for an ala.Occurrence'''
         # TODO: determine rating better using lists of assertions
         if occurrence.is_geospatial_kosher:
-            return 'assumed valid'
+            return 'irruptive'
         else:
-            return 'assumed invalid'
+            return 'invalid'
 
 
     def upsert_occurrence(self, occurrence, species_id):
