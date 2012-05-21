@@ -220,7 +220,7 @@ html, body {
 
 #toolspanel .dataLayersDiv .labelSpan:before {
     float: right;
-    content: url(/img/loading-bar.gif);
+    content: url(../img/loading-bar.gif);
 }
 
 #toolspanel .dataLayersDiv .labelSpan.notloading:before {
