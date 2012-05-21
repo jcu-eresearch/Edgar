@@ -45,7 +45,7 @@ dirty occurrences. The model with the most dirty occurrences is ran first.
 What To Model? - Web Service Interaction
 ----------------------------------------
 
-The web service provides the following URI: <code>/species/next\_job/</code>.
+The web service provides the following URI: <code>/species/next_job/</code>.
 The web service either returns the species id of the species to model next,
 or a 204 (no content) page.
 
@@ -77,7 +77,7 @@ species was **QUEUED**.
 At this point, the species distribution has been queued on the HPC, and the
 cake app has been informed that the job is queued. As soon as the cake app
 received the update for the species saying that its job is underway, it stops
-returning that species in response to the <code>/species/next\_job/</code> request.
+returning that species in response to the <code>/species/next_job/</code> request.
 
 The HPC script will continue to monitor the state of the job, and will
 post job status updates to the cake app. These status updates are the result
