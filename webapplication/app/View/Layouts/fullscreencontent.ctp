@@ -81,33 +81,30 @@ $user = AuthComponent::user();
 </head>
 <body>
 
-    <?php echo $this->fetch('content') ?>
+    <div id="header">
+        <div id="user">
+            <?php
+                $user = AuthComponent::user();
+                if($user === NULL){
+                    echo $this->Html->link('Log In', '/users/login', array('class'=>'login'));
+                } else {
+                    echo 'Logged in as ' . Sanitize::html($user['email']);
+                    echo $this->Html->link('Log Out', '/users/logout', array('class'=>'logout'));
+                }
+            ?>
+        </div>
+        <h1><?php echo $title_for_layout ?></h1>
+    </div>
+
+    <div id="content">
+        <?php echo $this->fetch('content') ?>
+    </div>
 
     <div id="sidebar">
-        <div id="user">
-            <div class="wrapper">
-                <?php
-                    $user = AuthComponent::user();
-                    if($user === NULL){
-                        print $this->Html->link('Log In', '/users/login');
-                    } else {
-                        print 'Logged in as ' . Sanitize::html($user['email']) . ' (';
-                        print $this->Html->link('Log Out', '/users/logout');
-                        print ')';
-                    }
-                ?>
-            </div>
-        </div>
 
         <div id="flash">
             <div class="wrapper">
                 <?php echo $this->Session->flash() ?>
-            </div>
-        </div>
-
-        <div id="header">
-            <div class="wrapper">
-                <h1><?php echo $title_for_layout ?></h1>
             </div>
         </div>
 

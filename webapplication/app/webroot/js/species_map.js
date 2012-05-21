@@ -61,6 +61,7 @@ function hideLegend() {
     $('#map_legend_img').hide();
 }
 
+
 // Removes the old layers..
 // Adds the new fresh layers.
 // Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
@@ -153,6 +154,7 @@ function addDistributionLayer() {
         }
     );
 
+    registerLayerProgress(distribution, "climate suitability");
     map.addLayer(distribution);
 }
 
@@ -336,6 +338,7 @@ function addOccurrencesLayer() {
             occurrences, {hover: false}
         );
 
+        registerLayerProgress(occurrences, "species occurrences");
         map.addLayer(occurrences);
 
         map.addControl(occurrence_select_control);
@@ -355,7 +358,6 @@ function updateWindowHistory() {
         );
     }
 }
-
 
 $(function() {
 
@@ -496,22 +498,18 @@ $(function() {
 //    map.addControl(new OpenLayers.Control.MousePosition());
 
     // Let the user change between layers
-//    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
-    layer_switcher = new OpenLayers.Control.LayerSwitcher({
+//    layerSwitcher = new OpenLayers.Control.ExtendedLayerSwitcher();
+    layerSwitcher = new OpenLayers.Control.LayerSwitcher({
         div: $('#layerstool').get(0),
         roundedCorner: false,
         useLegendGraphics: true
     });
-    layer_switcher.ascending = false;
-//    layer_switcher.useLegendGraphics = false;
+    layerSwitcher.ascending = false;
 
-
-    map.addControl(layer_switcher);
-//    layer_switcher.maximizeControl();
+    map.addControl(layerSwitcher);
+//    layerSwitcher.maximizeControl();
 
     // Add our layers
-//        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
-//    map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0]);
     map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
     map.setBaseLayer(gphy);
 
@@ -523,18 +521,7 @@ $(function() {
     }
 
     addLegend();
-/*
-    setTimeout( function() {
-        var all_controls = map.getControlsByClass( { test: function() {return true;} } );
-        var control_names = "";
-        $(all_controls).each( function(control) {
-            control_names += ", " + control + ":" + typeof(control);
-            var this_one = map.getControl(control);
-            alert(this_one);
-        });
-        alert( control_names );
-    }, 2000);
-*/
+
 });
 
 function addLegend() {

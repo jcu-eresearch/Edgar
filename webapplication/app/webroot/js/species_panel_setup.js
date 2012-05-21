@@ -52,15 +52,8 @@ function updateSpeciesShowingLabel() {
     }, 0);
 }
 // ------------------------------------------------------------------
-function logthing() {
-    console.log( "selected index: " + $('#species_autocomplete').attr('selectedIndex') );
-    console.log( "val: " + $('#species_autocomplete').val() );
-//    setTimeout("logthing();", 10000);
-}
-// ------------------------------------------------------------------
 $(function() {
 
-    logthing();
 
     updateSpeciesShowingLabel();
     

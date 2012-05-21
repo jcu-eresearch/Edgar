@@ -23,33 +23,40 @@
 
 
 <div id="debugpanel" class="opposite panel debugpanel">
-    <!-- clustering selector -->
-    <fieldset class="clusteroptions" style="float: right">
-        <legend>Clustering Display</legend>
-        <select id="cluster">
-            <option value="dotradius" >Dot Radius (no clustering)</option>
-            <option value="dotgrid" selected>Dot Grid</option>
-            <option value="squaregrid">Square Grid</option>
-        </select>
-    </fieldset>
 </div>
 
 <div id="toolspanel" class="side panel toolspanel">
-    <!-- things here -->    
+
     <div class="tool">
         <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
     </div>
+
     <div class="tool">
         <h1>some tool</h1>
         <div class="toolcontent">
             tool content goes here
         </div>
     </div>
+
     <div class="tool">
-        <h1>another tool</h1>
+        <h1>debug</h1>
         <div class="toolcontent">
-            tool content goes here
+
+            <!-- clustering selector -->
+            <fieldset class="clusteroptions" style="float: right">
+                <legend>Clustering Display</legend>
+                <select id="cluster">
+                    <option value="dotradius" >Dot Radius (no clustering)</option>
+                    <option value="dotgrid" selected>Dot Grid</option>
+                    <option value="squaregrid">Square Grid</option>
+                </select>
+            </fieldset>
+
+            <hr style="clear: both">
+
+            <button id="go">.go.</button>
+            <label><input id="done" type="checkbox" value="done" />done</label>
         </div>
     </div>
 </div>
@@ -77,4 +84,6 @@
 </div>
 
 <div id="map"></div>
+
+<div id="spinner"></div>
 
