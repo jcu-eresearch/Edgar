@@ -107,3 +107,21 @@ a species did receive occurrence updates, then the number of dirty occurrences
 would be above zero after the subtraction, meaning that the species distribution 
 model is still out of date.
 
+Benefits
+=============
+
+By separating the automated modelling into two sections, we can get the 
+following benefits:
+
+* Managing priority, what to model next, is entirely handled through the cake
+app.
+* The cake app controls the updating of state, and is the only part that needs
+write access to the database (of these two parts).
+* The cake app doesn't need access to the private occurrence data, only the
+modelling script does. This increases the security of the private occurrence data,
+and makes it less likely it will be inadvertently leaked through the web app.
+* The modular nature of the solution means that should someone else
+want to use the AP03 software at another institute, they only need to modify 
+the HPC script to work with their HPC. They don't need to modify the web
+service code. Similarly, if we wanted to run our models on another HPC, for example
+Amazon's EC2, we only need modify the HPC script.
