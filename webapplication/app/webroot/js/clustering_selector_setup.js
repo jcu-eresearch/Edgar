@@ -16,14 +16,11 @@ var layersLoading = [];
 // ------------------------------------------------------------------
 // attaches layer loading and done-loading events so we can indicate loading
 function registerLayerProgress(layer, layerName) {
-
+/*
     // find the layerswitcher
     var ls = map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
 
     layer.events.register('loadstart', layer, function() {
-
-console.log("loading layer " + layer.name);
-console.log(ls.dataLayers);
 
         // find the label for this layer
         layerIndicator = $.grep(ls.dataLayers, function(dl, index) {
@@ -40,8 +37,6 @@ console.log(ls.dataLayers);
 
     layer.events.register('loadend', layer, function() {
 
-console.log("finished loading layer " + layer.name);
-
         // find the label for this layer
         layerIndicator = $.grep(ls.dataLayers, function(dl, index) {
             return (dl.layer === layer);
@@ -54,6 +49,7 @@ console.log("finished loading layer " + layer.name);
         layersLoading.splice( $.inArray(layerName, layersLoading), 1 );
         loadingChanged();
     });
+*/
 }
 // ------------------------------------------------------------------
 function loadingHappening() {
@@ -99,8 +95,8 @@ function loadingChanged() {
         if (showingLoading == false) {
             showingLoading = true;
             $('#spinner').show();
-            pulseMap();
-            indicateLoading();
+//            pulseMap();
+//            indicateLoading();
         }
     }
 }

@@ -383,7 +383,88 @@ $(function() {
 
     });
 
-    // not sure how to position controls while adding them in constructor
+    // I want to show the layer loading status on the layer-switcher, but
+    // OpenLayers keeps remaking the dom elements in the switcher.
+    // I'm attaching behaviour to the layer-added-to-map event that will
+    // hook up all the loading indicators when layers are added.
+    map.events.register('addlayer', null, function(event) {
+
+        // find the label DOM for a given layer --------------------------
+        function layerLabelDom(layer) {
+            var switcher = layer.map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
+            var layerIndicator = $.grep(switcher.dataLayers, function(dl, index) {
+                return (dl.layer === event.layer);
+            });
+            if (layerIndicator && layerIndicator.length > 0) {
+                return $(layerIndicator[0].labelSpan);
+            } else {
+                return null;
+            }
+        } // -------------------------------------------------------------
+
+
+//////////////// experimental
+if (event.layer.name == "Occurrences") {
+
+    setTimeout( function() {
+        lspan = layerLabelDom(event.layer);
+        lspan.css('border', '10px solid red');
+        console.log('   occurrences layer label made border on');
+    }, 1000);
+}
+////////////////
+
+
+
+        console.log('registering layer ' + event.layer.name);
+
+
+        // do stuff when the layer has started loading
+        event.layer.events.register('loadstart', null, function(evt) {
+            // find the layerswitcher
+console.log('start loading layer ' + evt.object.name + '...');
+            var label = layerLabelDom(evt.object);
+            if (label) {
+                label.addClass('loading');
+            } else {
+console.log('! no matching label for ' + evt.object.name + '!');
+            }
+            layersLoading.push(evt.object.name);
+            loadingChanged();
+        });
+
+        // do stuff when the layer has finished loading
+        event.layer.events.register('loadend', null, function(evt) {
+console.log('... done loading layer ' + evt.object.name);
+            // find the layerswitcher
+            var label = layerLabelDom(evt.object);
+            if (label) {
+                label.removeClass('loading');
+            }
+            layersLoading.splice( $.inArray(evt.object.name, layersLoading), 1 );
+            loadingChanged();
+        });
+/*
+        // do stuff when the layer has changed
+        event.layer.events.register('visibilitychanged', null, function(evt) {
+console.log('layer visibility changed (' + event.layer.visibility + ') ' + event.layer.name);
+            // find the layerswitcher
+            var ls = map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
+            var label = layerLabelDom(ls, event.layer);
+            if (label) {
+                label.addClass('notloading');
+            }
+            layersLoading.splice( $.inArray(event.layer.name, layersLoading), 1 );
+            loadingChanged();
+        });
+*/
+
+
+    });
+
+
+    // not sure how to position controls while adding them in constructor.
+    // instead I'm just adding the control here in the right place.
     map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(5,60));
 
 

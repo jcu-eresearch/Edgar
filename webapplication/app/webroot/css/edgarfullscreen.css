@@ -218,13 +218,9 @@ html, body {
     line-height: 1.7em;
 }
 
-#toolspanel .dataLayersDiv .labelSpan:before {
+#toolspanel .dataLayersDiv .labelSpan.loading:before {
     float: right;
     content: url(../img/loading-bar.gif);
-}
-
-#toolspanel .dataLayersDiv .labelSpan.notloading:before {
-    content: '';
 }
 
 
