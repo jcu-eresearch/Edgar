@@ -18,7 +18,7 @@ a brief explanation of how we achieve this goal.
 We decided to implement the automated modelling process in two parts. The
 first part was a web service. We built the web service directly into the cake
 app. The web service can provide a requester with information about what species
-should be modelled next, and can receive updates recording the current job
+should be modelled next, and can receive updates indicating the current job
 status for a species.
 The second part was a HPC script. The HPC script interacts with the web service,
 and starts jobs to model the species indicated by the web service. It also
