@@ -2,6 +2,17 @@
 //
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
+//
+//global Edgar object
+window.Edgar = window.Edgar || {};
+//vars related to the species map
+Edgar.map = Edgar.map || {};
+//(object) current species displayed on the map
+Edgar.map.species = null;
+//(string) identifier of the emission scenario for the distribution map (e.g. "giss_aom")
+Edgar.map.emissionScenario = null;
+//(integer) the year that the distribution map represents (e.g. 2010, or 2020, or 1980)
+Edgar.map.year = null;
 
 var map, occurrences, distribution, occurrence_select_control;
 
@@ -35,14 +46,14 @@ zoom_bounds = australia_bounds;
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 
 function speciesGeoJSONURL() {
-    return (Edgar.baseUrl + "species/geo_json_occurrences/" + mapSpecies.id + ".json");
+    return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.map.species.id + ".json");
 }
 
 function legendURL() {
-    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
     var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
     return mapToolBaseUrl + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + mapSpecies.distributionThreshold;
+        '&THRESHOLD=' + Edgar.map.species.distributionThreshold;
 }
 
 function updateLegend() {
@@ -110,7 +121,28 @@ function clearMapPopups() {
     });
 }
 
+function reloadDistributionLayers() {
+    if (distribution !== undefined) {
+        map.removeLayer(distribution);
+        distribution = undefined;
+    }
+    addDistributionLayer();
+}
+
 function addDistributionLayer() {
+    speciesId = Edgar.map.species.id;
+    scenario = Edgar.map.emissionScenario;
+    year = Edgar.map.year;
+    bioData = 'csiro_mk3_5'; //what is this meant to be set to?
+    runs = 'run1.run1'; //what is this meant to be set to?
+
+    //check box will be removed when it is working
+    if($('#use_emission_and_year').is(':checked')){
+        mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
+    } else {
+        mapPath = speciesId+'/1975.asc';
+    }
+
     // Species Distribution
     // ----------------------
 
@@ -125,7 +157,7 @@ function addDistributionLayer() {
     // projection request.
     // I could be wrong though...
 
-//    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+//    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
 
     distribution = new OpenLayers.Layer.WMS(
         "Distribution",
@@ -134,14 +166,14 @@ function addDistributionLayer() {
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
         {
-            MODE: 'map', 
+            MODE: 'map',
             MAP: 'edgar_master.map',
-            DATA: (mapSpecies.id + '/1975.asc'),
-            SPECIESID: mapSpecies.id,
+            DATA: mapPath,
+            SPECIESID: Edgar.map.species.id,
             REASPECT: "true",
             TRANSPARENT: 'true',
             // TODO -> Set the threshold.
-//            THRESHOLD: mapSpecies.distributionThreshold
+//            THRESHOLD: Edgar.map.species.distributionThreshold
             THRESHOLD: "0"
 
         },
@@ -352,9 +384,9 @@ function flattenScientificName(name) {
 function updateWindowHistory() {
     if(window.History.enabled) {
         window.History.replaceState(
-            mapSpecies,
+            Edgar.map.species,
             '',
-            Edgar.baseUrl + 'species/map/' + mapSpecies.id
+            Edgar.baseUrl + 'species/map/' + Edgar.map.species.id
         );
     }
 }
@@ -596,10 +628,6 @@ console.log('layer visibility changed (' + event.layer.visibility + ') ' + event
 
     // Zoom the map to the zoom_bounds specified earlier
     map.zoomToExtent(zoom_bounds);
-
-    if (mapSpecies !== null) {
-        changeSpecies(mapSpecies);
-    }
 
     addLegend();
 

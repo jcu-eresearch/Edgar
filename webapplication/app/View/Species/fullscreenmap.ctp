@@ -40,6 +40,33 @@
     </div>
 
     <div class="tool">
+        <h1>emissions and time</h1>
+        <div class="toolcontent">
+            <!-- the check box will probably be removed when this is working properly -->
+            <input id="use_emission_and_year" type="checkbox" />
+            <select id="emission_scenarios">
+                <option value="sresa1b" selected="selected">sresa1b</option>
+                <option value="sresb1">sresb1</option>
+                <option value="sresa2">sresa2</option>
+            </select>
+            <select id="year_selector">
+                <option value="1970" selected="selected">1970</option>
+                <option value="1980">1980</option>
+                <option value="1990">1990</option>
+                <option value="2000">2000</option>
+                <option value="2010">2010</option>
+                <option value="2020">2020</option>
+                <option value="2030">2030</option>
+                <option value="2040">2040</option>
+                <option value="2050">2050</option>
+                <option value="2060">2060</option>
+                <option value="2070">2070</option>
+                <option value="2080">2080</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="tool">
         <h1>debug</h1>
         <div class="toolcontent">
 
