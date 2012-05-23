@@ -50,12 +50,10 @@
                 <option value="sresa2">sresa2</option>
             </select>
             <select id="year_selector">
-                <option value="1970" selected="selected">1970</option>
-                <option value="1980">1980</option>
                 <option value="1990">1990</option>
                 <option value="2000">2000</option>
                 <option value="2010">2010</option>
-                <option value="2020">2020</option>
+                <option value="2020" selected="selected">2020</option>
                 <option value="2030">2030</option>
                 <option value="2040">2040</option>
                 <option value="2050">2050</option>
