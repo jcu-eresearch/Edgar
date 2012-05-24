@@ -7,14 +7,14 @@ function changeSpecies(species) {
 
     clearExistingSpeciesOccurrencesAndDistributionLayers();
 
-    mapSpecies = species;
+    Edgar.map.species = species;
 
     if (species !== null) {
 
         addSpeciesOccurrencesAndDistributionLayers();
 
         $('#species_autocomplete').val(species.label);
-        
+
         var statusText = "";
         if (species.numDirtyOccurrences < 1) {
             statusText = statusText + 'modelling for this species is up to date';
@@ -44,19 +44,16 @@ function changeSpecies(species) {
 function updateSpeciesShowingLabel() {
     setTimeout(function() {
         var selector = $('#species_autocomplete');
-        if (mapSpecies === null) {
-            $('#species_showing_label').text('choose a species for display');      
+        if (Edgar.map.species === null) {
+            $('#species_showing_label').text('choose a species for display');
         } else {
-            $('#species_showing_label').text('now showing');        
+            $('#species_showing_label').text('now showing');
         }
     }, 0);
 }
 // ------------------------------------------------------------------
 $(function() {
 
-
-    updateSpeciesShowingLabel();
-    
     $('#species_autocomplete').focus( function() {
         // when the _text_box_ is focussed
         updateSpeciesShowingLabel();
@@ -75,11 +72,18 @@ $(function() {
     });
 
     $('#model_rerun_button').click(function() {
-        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + mapSpecies.id });
+        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.map.species.id });
         $(this).fadeOut('fast', function(){
             $('#model_rerun_requested').fadeIn();
         });
     });
+
+    //load species if specified
+    if (mapSpecies !== null) {
+        changeSpecies(mapSpecies);
+    }
+
+    updateSpeciesShowingLabel();
 });
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
