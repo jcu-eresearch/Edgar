@@ -402,7 +402,7 @@ $(function() {
             }
         } // -------------------------------------------------------------
 
-
+/*
 //////////////// experimental
 if (event.layer.name == "Occurrences") {
 
@@ -413,7 +413,7 @@ if (event.layer.name == "Occurrences") {
     }, 1000);
 }
 ////////////////
-
+*/
 
 
         console.log('registering layer ' + event.layer.name);
