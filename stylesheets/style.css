@@ -82,19 +82,18 @@
     xborder: 1px solid pink;
 }
 
-/* five or more posts, super bold */
 .tag a {
     line-height: 1.0;
-    font-size: 1.8em;
-    font-weight: 900;
     position: relative;
-    top: -0.45em;
 }
 
-.tag.tagcount1 a { font-size: 1.0em; top: -0.25em; font-weight: 100; }
-.tag.tagcount2 a { font-size: 1.2em; top: -0.30em; font-weight: 300; }
-.tag.tagcount3 a { font-size: 1.4em; top: -0.35em; font-weight: 500; }
-.tag.tagcount4 a { font-size: 1.6em; top: -0.40em; font-weight: 700; }
+/* use default to apply to 5 or more posts, and get less */
+/* bold and large as the number of associated posts drops */
+.tag           a { font-size: 1.8em; top: -0.250em; font-weight: 900; }
+.tag.tagcount4 a { font-size: 1.6em; top: -0.200em; font-weight: 700; }
+.tag.tagcount3 a { font-size: 1.4em; top: -0.175em; font-weight: 500; }
+.tag.tagcount2 a { font-size: 1.2em; top: -0.150em; font-weight: 300; }
+.tag.tagcount1 a { font-size: 1.0em; top: -0.125em; font-weight: 100; }
 
 
 
