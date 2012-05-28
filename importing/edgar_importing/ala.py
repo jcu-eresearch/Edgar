@@ -21,37 +21,60 @@ PAGE_SIZE = 1000  # occurrence records per request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
 
-log = logging.getLogger(__name__)
-
+_log = logging.getLogger(__name__)
 _max_retry_secs = 300 # 5 minutes by default
+_api_key = None # don't use any api key by default
+
+
+class Coord(object):
+
+    def __init__(self, lati, longi):
+        self.lati = float(lati)
+        self.longi = float(longi)
+
+    def __repr__(self):
+        return '({0}, {1})'.format(self.lati, self.longi)
+
+    def __eq__(self, other):
+        return (type(other) is type(self) and
+                self.lati == other.lati and
+                self.longi == other.longi)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def from_dict(d, latKey, longKey):
+        if latKey in d and longKey in d:
+            return Coord(d[latKey], d[longKey])
+        else:
+            return None
 
 
 class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
-    def __init__(self, lat=None, longi=None, uuidIn=None, kosher=False):
-        self.latitude = None if lat is None else float(lat)
-        self.longitude = None if longi is None else float(longi)
+    def __init__(self, coord=None, sens_coord=None, uuid_in=None, kosher=False):
+        self.coord = coord
+        self.sensitive_coord = sens_coord
         self.is_geospatial_kosher = bool(kosher)
 
-        if uuidIn is None:
+        if uuid_in is None:
             self.uuid = None
-        elif isinstance(uuidIn, uuid.UUID):
-            self.uuid = uuidIn
+        elif isinstance(uuid_in, uuid.UUID):
+            self.uuid = uuid_in
         else:
-            self.uuid = uuid.UUID(uuidIn)
+            self.uuid = uuid.UUID(uuid_in)
 
     def __repr__(self):
-        return '<record uuid="{uuid}" latLong="{lat}, {lng}" />'.format(
+        return '<record uuid="{uuid}" coord="{coord}" />'.format(
             uuid=self.uuid,
-            lat=self.latitude,
-            lng=self.longitude)
+            coord=self.coord)
 
     def __eq__(self, other):
         if type(other) is type(self):
             return (self.uuid == other.uuid and
-                    self.latitude == other.latitude and
-                    self.longitude == other.longitude and
+                    self.coord == other.coord and
+                    self.sensitive_coord == other.sensitive_coord and
                     self.is_geospatial_kosher == other.is_geospatial_kosher)
         else:
             return False
@@ -89,6 +112,10 @@ class Species(object):
         return not self.__eq__(other)
 
 
+def set_api_key(api_key):
+    global _api_key
+    _api_key = api_key
+
 def set_max_retry_secs(max_retry_secs):
     global _max_retry_secs;
     _max_retry_secs = max_retry_secs;
@@ -100,18 +127,18 @@ def occurrences_for_species(species_lsid, changed_since=None):
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
-        'fl': 'id,latitude,longitude,geospatial_kosher',
+        'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude',
         'facet': 'off',
     }
 
-    for page in _json_pages(url, params, ('totalRecords',), 'startIndex'):
+    for page in _json_pages(url, params, ('totalRecords',), 'startIndex', use_api_key=True):
         for occ in page['occurrences']:
-            record = Occurrence()
-            record.latitude = occ['decimalLatitude']
-            record.longitude = occ['decimalLongitude']
-            record.uuid = uuid.UUID(occ['uuid'])
-            record.is_geospatial_kosher = occ['geospatialKosher']
-            yield record
+            yield Occurrence(
+                uuid_in=uuid.UUID(occ['uuid']),
+                coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
+                sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
+                kosher=occ['geospatialKosher']
+            )
 
 
 def species_for_lsid(species_lsid):
@@ -139,7 +166,7 @@ def species_for_lsid(species_lsid):
             s.common_name = info['commonName'].strip()
         return s
     else:
-        log.warning('lsid is for "%s", not "species": %s',
+        _log.warning('lsid is for "%s", not "species": %s',
                 info['rank'], species_lsid)
         return None
 
@@ -193,15 +220,29 @@ def num_occurrences_for_lsid(lsid):
     return j['totalRecords']
 
 
-def create_request(url, params=None, use_get=True):
-    '''URL encodes params and into a GET or POST request'''
+def create_request(url, params=None, use_get=True, use_api_key=False):
+    '''URL encodes params and into a GET or POST request.
+
+    Also adds ALA api key to request, if set.'''
+
     if params is not None:
+        # convert to list
+        if isinstance(params, dict):
+            params = list(dict.items())
+
+        # add api key
+        if use_api_key and _api_key is not None:
+            params.append(('apiKey', _api_key))
+
+        # encode params
         params = urllib.urlencode(params)
+
+        # append params to url if using GET instead of POST
         if use_get:
             url += '?' + params
             params = None
 
-    log.debug('Created request for: ' + url)
+    _log.debug('Created request for: ' + url)
     return urllib2.Request(url, params)
 
 
@@ -209,13 +250,7 @@ def q_param(species_lsid=None, changed_since=None):
     '''The 'q' parameter for ALA web service queries
 
     `changed_since` allows you to only get records that have changed between a
-    certain date range.
-
-    TODO: mark geospatial_kosher:false records as 'assumed invalid'
-
-    TODO: remove occurrences that happened before 1950?
-          'occurrence_year:' + _q_date_range(1950_utc_datetime, None)
-    '''
+    certain date range.'''
 
     if species_lsid is None:
         species_lsid = ''
@@ -258,7 +293,7 @@ def _retry(delay=10.0):
                     return f(*args, **kwargs)
                 except Exception, e:
                     if time.time() - startTime < _max_retry_secs:
-                        log.warning('Retrying fetch due to exception: %s', str(e))
+                        _log.warning('Retrying fetch due to exception: %s', str(e))
                         time.sleep(delay)
                     else:
                         raise
@@ -280,7 +315,7 @@ def _fetch_json(request, check_not_empty=True):
     response_str = response.read()
     end_time = time.time()
 
-    log.debug('Loaded JSON at %f kb/s. %f before response + %f download time.',
+    _log.debug('Loaded JSON at %f kb/s. %f before response + %f download time.',
             (len(response_str) / 1024.0) / (end_time - start_time),
             response_time - start_time,
             end_time - response_time)
@@ -373,7 +408,7 @@ def _json_pages_params_filter(params, offset_key):
 
 
 
-def _json_pages(url, params, total_key_path, offset_key):
+def _json_pages(url, params, total_key_path, offset_key, use_api_key=False):
     assert len(total_key_path) > 0
 
     params, page_size = _json_pages_params_filter(params, offset_key)

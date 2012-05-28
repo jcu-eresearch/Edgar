@@ -354,16 +354,16 @@ class Syncer:
 
         if existing is None:
             db.occurrences.insert().execute(
-                latitude=occurrence.latitude,
-                longitude=occurrence.longitude,
+                latitude=occurrence.coord.lati,
+                longitude=occurrence.coord.longi,
                 rating=self.rate_occurrence(occurrence),
                 species_id=species_id,
                 source_id=self.source_row_id,
                 source_record_id=occurrence.uuid.bytes)
         else:
             db.occurrences.update().\
-                values(latitude=occurrence.latitude,
-                       longitude=occurrence.longitude,
+                values(latitude=occurrence.coord.lati,
+                       longitude=occurrence.coord.longi,
                        rating=self.rate_occurrence(occurrence),
                        species_id=species_id).\
                 where(db.occurrences.c.id == existing['id']).\
@@ -374,8 +374,8 @@ class Syncer:
             self.flush_upserts()
 
         # these should be escaped strings ready for insertion into the SQL
-        cols = (str(float(occurrence.latitude)),
-                str(float(occurrence.longitude)),
+        cols = (str(float(occurrence.coord.lati)),
+                str(float(occurrence.coord.longi)),
                 '"' + self.rate_occurrence(occurrence) + '"',
                 str(int(species_id)),
                 str(int(self.source_row_id)),

@@ -36,13 +36,13 @@ class TestSync(unittest.TestCase):
 
         # dummy records
         self.records1 = [
-            self.mockala.Occurrence(1, 2, uuid.uuid4()),
-            self.mockala.Occurrence(3, 4, uuid.uuid4()),
-            self.mockala.Occurrence(5, 6, uuid.uuid4())
+            self.mockala.Occurrence(self.mockala.Coord(1, 2), None, uuid.uuid4()),
+            self.mockala.Occurrence(self.mockala.Coord(3, 4), None, uuid.uuid4()),
+            self.mockala.Occurrence(self.mockala.Coord(5, 6), None, uuid.uuid4())
         ]
         self.records2 = [
-            self.mockala.Occurrence(7, 8, uuid.uuid4()),
-            self.mockala.Occurrence(9, 10, uuid.uuid4()),
+            self.mockala.Occurrence(self.mockala.Coord(7, 8), None, uuid.uuid4()),
+            self.mockala.Occurrence(self.mockala.Coord(9, 10), None, uuid.uuid4()),
         ]
         self.mockala.mock_add_records(self.s1, self.records1, self.yesterday)
         self.mockala.mock_add_records(self.s2, self.records2, self.now)
@@ -138,8 +138,8 @@ class TestSync(unittest.TestCase):
 
         #simulate new records
         new_records = [
-            self.mockala.Occurrence(66, 77, uuid.uuid4()),
-            self.mockala.Occurrence(88, 99, uuid.uuid4())
+            self.mockala.Occurrence(self.mockala.Coord(66, 77), None, uuid.uuid4()),
+            self.mockala.Occurrence(self.mockala.Coord(88, 99), None, uuid.uuid4())
         ]
         self.mockala.mock_add_records(self.s1, new_records)
 
@@ -189,7 +189,7 @@ class TestSync(unittest.TestCase):
 
         #change a record, keeping the same uuid
         old_record = self.records1[-1]
-        new_record = self.mockala.Occurrence(123, 456, old_record.uuid)
+        new_record = self.mockala.Occurrence(self.mockala.Coord(123, 456), None, old_record.uuid)
         self.mockala.mock_update_record(self.s1, new_record,
                 new_species=self.s2)
 
@@ -207,8 +207,8 @@ class TestSync(unittest.TestCase):
         for occ in db.occurrences.select().execute():
             occ_uuid = uuid.UUID(bytes=occ['source_record_id'])
             if occ_uuid == old_record.uuid:
-                self.assertEqual(occ['latitude'], new_record.latitude)
-                self.assertEqual(occ['longitude'], new_record.longitude)
+                self.assertEqual(occ['latitude'], new_record.coord.lati)
+                self.assertEqual(occ['longitude'], new_record.coord.longi)
                 break
 
 
