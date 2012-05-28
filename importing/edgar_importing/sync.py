@@ -191,6 +191,10 @@ class Syncer:
                 where(db.occurrences.c.species_id == row['id']).\
                 where(db.occurrences.c.source_id == self.source_row_id).\
                 execute()
+            db.sensitive_occurrences.delete().\
+                where(db.sensitive_occurrences.c.species_id == row['id']).\
+                where(db.sensitive_occurrences.c.source_id == self.source_row_id).\
+                execute()
 
             # keep track of the deletions and additions
             self.increase_dirty_count(row['id'], abs(lc - rc))

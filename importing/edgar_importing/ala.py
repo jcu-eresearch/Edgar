@@ -43,7 +43,8 @@ class Coord(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def from_dict(d, latKey, longKey):
+    @classmethod
+    def from_dict(cls, d, latKey, longKey):
         if latKey in d and longKey in d:
             return Coord(d[latKey], d[longKey])
         else:
@@ -228,7 +229,9 @@ def create_request(url, params=None, use_get=True, use_api_key=False):
     if params is not None:
         # convert to list
         if isinstance(params, dict):
-            params = list(dict.items())
+            params = list(params.items())
+        else:
+            params = list(params) # makes a copy before modifying
 
         # add api key
         if use_api_key and _api_key is not None:
@@ -373,9 +376,9 @@ def _json_pages_params_filter(params, offset_key):
     If 'pageSize' is not present in params, adds it with value = PAGE_SIZE.
     Strips out any offset_key ('startIndex') params. Turns params into a list.
 
-    >>> params = {'q':'query', 'pageSize': 100, 'startIndex': 10}
+    >>> params = {'q':'query', 'pageSize': 666, 'startIndex': 10}
     >>> _json_pages_params_filter(params, 'startIndex')
-    ([('q', 'query'), ('pageSize', 100)], 100)
+    ([('q', 'query'), ('pageSize', 666)], 100)
 
     >>> params = (('fq', 'filter1'), ('fq', 'filter2'))
     >>> _json_pages_params_filter(params, 'start')
@@ -417,7 +420,8 @@ def _json_pages(url, params, total_key_path, offset_key, use_api_key=False):
     total_pages = None
     while True:
         params.append((offset_key, page_idx * page_size))
-        response = _fetch_json(create_request(url, params))
+        req = create_request(url, params, use_api_key=use_api_key)
+        response = _fetch_json(req)
         yield response
 
 
