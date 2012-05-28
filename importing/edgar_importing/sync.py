@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 class Syncer:
 
-    def __init__(self, ala, mysql_upsert_optimisation=False):
+    def __init__(self, ala):
         '''The `ala` param is the ala.py module. This is passed in a a ctor
         param because it will be substituded with mockala.py during unit
         testing.'''
@@ -26,10 +26,8 @@ class Syncer:
         if row is None:
             raise RuntimeError('ALA row missing from sources table in db')
 
-        self.mysql_optimise = mysql_upsert_optimisation
         self.source_row_id = row['id']
         self.last_import_time = row['last_import_time']
-        self.cached_upserts = []
         self.num_dirty_records_by_species_id = {}
         self.ala = ala
         self.ala_species_occurrence_counts = None  # lazy loaded
@@ -138,7 +136,6 @@ class Syncer:
                                                   record_dirty=True)
         for occ in occ_generator:
             self.upsert_occurrence(occ, occ.species_id)
-        self.flush_upserts()
 
         # delete occurrences that have been deleted at ALA
         log.info('Performing re-download of occurrences for species'+
@@ -207,7 +204,6 @@ class Syncer:
 
         for occurrence in occ_generator:
             self.upsert_occurrence(occurrence, occurrence.species_id)
-        self.flush_upserts()
 
 
     def check_occurrence_counts(self):
@@ -333,81 +329,38 @@ class Syncer:
         inserted.
 
         `species_id` must be supplied as an argument because it is not
-        obtainable from `occurrence`
+        obtainable from `occurrence`'''
 
-        The inserts/updates are cached for performance reasons. The cache is
-        flushed every 1000 occurrences. YOU MUST CALL `flush_upserts` AFTER YOU
-        HAVE CALLED THIS METHOD FOR THE FINAL TIME.'''
+        if occurrence.coord is not None:
+            self.upsert(occurrence, species_id, db.occurrences)
 
-        if self.mysql_optimise:
-            self.upsert_occurrence_mysql_optimised(occurrence, species_id)
-        else:
-            self.upsert_occurrence_unoptimised(occurrence, species_id)
+        if occurrence.sensitive_coord is not None:
+            self.upsert(occurrence, species_id, db.sensitive_occurrences)
 
 
-    def upsert_occurrence_unoptimised(self, occurrence, species_id):
-        existing = db.occurrences.select().\
-            where(db.occurrences.c.source_record_id == occurrence.uuid.bytes).\
-            where(db.occurrences.c.source_id == self.source_row_id).\
+    def upsert(self, occ, species_id, table):
+        existing = table.select().\
+            where(table.c.source_record_id == occ.uuid.bytes).\
+            where(table.c.source_id == self.source_row_id).\
             execute().\
             fetchone()
 
         if existing is None:
-            db.occurrences.insert().execute(
-                latitude=occurrence.coord.lati,
-                longitude=occurrence.coord.longi,
-                rating=self.rate_occurrence(occurrence),
+            table.insert().execute(
+                latitude=occ.coord.lati,
+                longitude=occ.coord.longi,
+                rating=self.rate_occurrence(occ),
                 species_id=species_id,
                 source_id=self.source_row_id,
-                source_record_id=occurrence.uuid.bytes)
+                source_record_id=occ.uuid.bytes)
         else:
-            db.occurrences.update().\
-                values(latitude=occurrence.coord.lati,
-                       longitude=occurrence.coord.longi,
-                       rating=self.rate_occurrence(occurrence),
+            table.update().\
+                values(latitude=occ.coord.lati,
+                       longitude=occ.coord.longi,
+                       rating=self.rate_occurrence(occ),
                        species_id=species_id).\
-                where(db.occurrences.c.id == existing['id']).\
+                where(table.c.id == existing['id']).\
                 execute()
-
-    def upsert_occurrence_mysql_optimised(self, occurrence, species_id):
-        if len(self.cached_upserts) > 1000:
-            self.flush_upserts()
-
-        # these should be escaped strings ready for insertion into the SQL
-        cols = (str(float(occurrence.coord.lati)),
-                str(float(occurrence.coord.longi)),
-                '"' + self.rate_occurrence(occurrence) + '"',
-                str(int(species_id)),
-                str(int(self.source_row_id)),
-                _mysql_encode_binary(occurrence.uuid.bytes))
-
-        self.cached_upserts.append('(' + ','.join(cols) + ')')
-
-
-    def flush_upserts(self):
-        if not self.mysql_optimise:
-            return
-
-        if len(self.cached_upserts) <= 0:
-            return
-
-        query = '''INSERT INTO occurrences(
-                        latitude, longitude, rating, species_id, source_id,
-                        source_record_id)
-
-                   VALUES ''' + \
-                \
-                ','.join(self.cached_upserts) + \
-                \
-                ''' ON DUPLICATE KEY UPDATE
-                        latitude=VALUES(latitude),
-                        longitude=VALUES(longitude),
-                        rating=VALUES(rating),
-                        species_id=VALUES(species_id);'''
-
-        db.engine.execute(query)
-
-        self.cached_upserts = []
 
 
     def mp_fetch_occurrences(self, since, record_dirty=False, species_to_fetch=None):
@@ -586,11 +539,3 @@ def _mp_fetch_occur_count(species, species_id):
 
     #stops annoying "child process shutting down" messages
     _mp_init.log.setLevel(logging.WARNING)
-
-
-def _mysql_encode_binary(binstr):
-    '''
-    >>> _mysql_encode_binary('hello')
-    "x'68656c6c6f'"
-    '''
-    return "x'" + binascii.hexlify(binstr) + "'"
