@@ -8,6 +8,8 @@ categories: [Development]
 tags:    [progress, vetting, classification, dimensions, occurrences]
 ---
 
+# draft
+
 One of the two major pillars of the Edgar project is vetting bird records.
 
 The selfish reason for doing vetting is because modelling
