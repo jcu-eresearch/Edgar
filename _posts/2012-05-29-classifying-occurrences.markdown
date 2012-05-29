@@ -2,7 +2,7 @@
 title:   Classifying occurrences
 layout:  post
 author:  daniel
-summary: Making the vetting interface: developing the classification dimensions for occurrences
+summary: 'Making the vetting interface: developing the classification dimensions for occurrences'
 excerpt: 
 categories: [Development]
 tags:    [progress, vetting, classification, dimensions, occurrences]
@@ -66,7 +66,12 @@ After a bit of cultural immersion and a long discussion with
 a reasonable classification for an occurrence's habitat.
 
 <style>
-    table.occurrenceclassification, table.occurrenceclassification table {
+    table.occurrenceclassification {
+        border-spacing: 0.666em;
+        margin: 0;
+    }
+
+    table.occurrenceclassification table {
         border-spacing: 0.666em;
         margin: 0 0 -5.666em;
     }
