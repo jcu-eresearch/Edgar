@@ -1,5 +1,4 @@
-/config.json
-/testconfig.json
+/config*json
 /config.daniel.json
 /bin/
 /eggs/
