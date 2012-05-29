@@ -307,7 +307,7 @@ Certainty ranges from 0 to 6.
 
 - "Not yet classified" starts at certainty level 1 (I'm 
 reserving 0 for some future
-"[wtf!?](http://google.com/search?q=%22why+the+face%22+%22modern+family%22"
+"[wtf!?](http://google.com/search?q=%22why+the+face%22+%22modern+family%22)"
 situation).
 
 - A classification of "invalid" determined by metadata about
