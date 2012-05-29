@@ -1,6 +1,4 @@
-/config.json
-/testconfig.json
-/config.daniel.json
+/config*json
 /bin/
 /eggs/
 /develop-eggs/
