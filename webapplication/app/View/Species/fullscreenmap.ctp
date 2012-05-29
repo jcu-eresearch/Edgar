@@ -18,6 +18,7 @@
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
+    $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
 ?>
 
@@ -31,7 +32,7 @@
         <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
     </div>
-
+<!--
     <div class="tool">
         <h1>some tool</h1>
         <div class="toolcontent">
@@ -42,7 +43,8 @@
     <div class="tool">
         <h1>emissions and time</h1>
         <div class="toolcontent">
-            <!-- the check box will probably be removed when this is working properly -->
+-->            <!-- the check box will probably be removed when this is working properly -->
+<!--
             <input id="use_emission_and_year" type="checkbox" />
             <select id="emission_scenarios">
                 <option value="sresa1b" selected="selected">sresa1b</option>
@@ -68,7 +70,8 @@
         <h1>debug</h1>
         <div class="toolcontent">
 
-            <!-- clustering selector -->
+-->            <!-- clustering selector -->
+<!--
             <fieldset class="clusteroptions" style="float: right">
                 <legend>Clustering Display</legend>
                 <select id="cluster">
@@ -84,16 +87,17 @@
             <label><input id="done" type="checkbox" value="done" />done</label>
         </div>
     </div>
+-->
 </div>
 
-<div id="speciespanel" class="top panel speciespanel clearfix">
+<div id="speciespanel" class="top panel speciespanel">
 
     <p class="minor label" id="species_modelling_status"></p>
     <p class="minor label" id="species_showing_label"></p>
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
-    
+<!--    
     <table>
         <tr>
             <th>Modeling Status</th>
@@ -106,6 +110,7 @@
             </td>
         </tr>
     </table>
+-->
 </div>
 
 <div id="map"></div>

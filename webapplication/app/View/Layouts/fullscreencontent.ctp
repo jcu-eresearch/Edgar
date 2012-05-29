@@ -94,6 +94,38 @@ $user = AuthComponent::user();
             ?>
         </div>
         <h1><?php echo $title_for_layout ?></h1>
+
+        <ul id="tabtriggers">
+            <li><a href="#" id="abouttrigger" for="about">about Edgar</a></li>
+            <li><a href="#" id="downloadstrigger" for="downloads" class="closed">downloads</a></li>
+        </ul>
+
+    </div>
+
+    <div id="about">
+        <p>
+            Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
+            <a href="http://enable-javascript.com/">JavaScript enabled</a>.
+        </p>
+
+        <div class="credits">
+            <a class="ands-image" href="http://www.ands.org.au/">
+                <img width="154" height="74" title="ANDS" alt="Australian National Data Service"
+                src="https://eresearch.jcu.edu.au/tdh/++resource++tdh.metadata/ands-logo-sml.jpg">
+            </a>
+            <a class="qcif-image" href="http://www.qcif.edu.au/">
+                <img width="88" height="74" title="QCIF" alt="Queensland Cyber Infrastructure Foundation"
+                src="https://eresearch.jcu.edu.au/tdh/++resource++tdh.metadata/qcif_logo_sm.png">
+            </a>
+            This project is supported by the 
+            <a href="http://www.ands.org.au/">Australian National Data Service (ANDS)</a>
+            through the National Collaborative Research Infrastructure Strategy Program and the
+            Education Investment Fund (EIF) Super Science Initiative, as well as through the
+            <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
+        </div>
+    </div>
+
+    <div id="downloads">
     </div>
 
     <div id="content">

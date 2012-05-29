@@ -34,7 +34,6 @@ html, body {
 
 #header {
     margin: 0;
-    padding-left: 100px;
     background-color: #333;
     color: #ccc;
     z-index: 1000000;
@@ -43,19 +42,9 @@ html, body {
 #header:before {
     display: block;
     position: absolute;
-    top: 4px;
+    top: 7px;
     left: 4px;
-    content: url(/img/logo.png);
-}
-
-/* if the logo was the right size, we woulnd't need this bit */
-#header:before {
-    height: 100px;
-    width: 100px;
-    content: ' '; /* use background instead coz we can resize the background */
-    background-image: url(/img/logo.png);
-    background-size: 60%; /* is a percentage of the image's original size */
-    background-repeat: no-repeat;
+    content: url(/img/edgarlogo41.png);
 }
 
 #header h1 { display: none; }
@@ -92,6 +81,109 @@ html, body {
     text-decoration: underline;
 }
 
+/* tab triggers in the header ----------------------------------------- */
+
+
+#tabtriggers {
+    position: absolute;
+    left: 16.5%;
+    margin: 13px -2em 0 -2em;
+    padding: 0;
+    font-weight: bold;
+    line-height: 24px;
+    text-decoration: inherit;
+}
+
+#tabtriggers li {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+#tabtriggers li a {
+    font-size: 85%;
+    border-top: 2px solid #ccc;
+    text-decoration: inherit;
+    padding: 0 2em 0;
+    display: inline-block;
+    height: 50px;
+    border-radius: 0.5em;
+    background: #444;
+    color: #ccc;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+#tabtriggers a.closed {
+    background: #333;
+    color: #999;
+    padding: 0 2em 0;
+    border-top-color: transparent;
+}
+
+#tabtriggers li a:before { /* show a disclosure triangle */
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    line-height: 1.1em;
+    margin-right: 0.2em;
+    text-align: right;
+    content: '\25be'; /* 25be is a small downward-pointing triangle */
+    opacity: 0.7;
+}
+
+#tabtriggers li a.closed:before {
+    content: '\25b8'; /* 25b8 is a small right-pointing triangle */
+}
+
+/* things in the "about" area ----------------------------------------- */
+
+#about {
+    padding: 2em;
+    background-color: #444;
+    color: #bbb;
+    position: absolute;
+    top: 50px;
+    left: 16.5%;
+    width: 66%;
+    margin-left: -2em; /* negative the border width, to keep centered */
+    z-index: 10000000;
+    -webkit-border-bottom-right-radius: 1em;
+    -webkit-border-bottom-left-radius: 1em;
+    -moz-border-radius-bottomright: 1em;
+    -moz-border-radius-bottomleft: 1em;
+    border-bottom-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+}
+
+#about .credits {
+    padding-top: 2em;
+    font-size: 75%;
+}
+
+#about a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#about a:hover {
+    text-decoration: underline;
+}
+
+#about img {
+    background-color: #fff;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    border: 1em solid white;
+    float: right;
+    margin: 0 0 0 1em;
+}
+
+#about .ands-image img {
+    float: left;
+    margin: 0 1em 0 0;
+}
 
 /* things in the content area ----------------------------------------- */
 
@@ -105,20 +197,20 @@ html, body {
 .panel {
     position: absolute;
     z-index: 10000;
-    opacity: 0.45;
+    opacity: 0.75;
     background-color: white;
     color: black;
 }
 
 .panel:hover {
-    opacity: 0.75;
+    opacity: 1.0;
 }
 
 .top.panel {
     top: 0;
     left: 0;
     right: 13.1em;
-    padding-right: 1%;
+    padding: 0 0.6em 0.4em 0.4em;
 }
 
 .side.panel {

@@ -130,37 +130,41 @@ function reloadDistributionLayers() {
 }
 
 function addDistributionLayer() {
-    speciesId = Edgar.map.species.id;
-    scenario = Edgar.map.emissionScenario;
-    year = Edgar.map.year;
-    bioData = 'csiro_mk3_5'; //what is this meant to be set to?
-    runs = 'run1.run1'; //what is this meant to be set to?
 
-    //check box will be removed when it is working
-    if($('#use_emission_and_year').is(':checked')){
-        mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
-    } else {
-        mapPath = speciesId+'/1975.asc';
+    if (Edgar.map.species) {
+
+        speciesId = Edgar.map.species.id;
+        scenario = Edgar.map.emissionScenario;
+        year = Edgar.map.year;
+        bioData = 'csiro_mk3_5'; //what is this meant to be set to?
+        runs = 'run1.run1'; //what is this meant to be set to?
+
+        //check box will be removed when it is working
+        if($('#use_emission_and_year').is(':checked')){
+            mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
+        } else {
+            mapPath = speciesId+'/1975.asc';
+        }
+
+        // Species Distribution
+        // ----------------------
+
+        // Our distribution map layer.
+        //
+        // NOTE:
+        // -----
+        //
+        // This code may need to be updated now that we are using mercator.
+        // I believe that OpenLayers will send the correct projection request
+        // to Map Server. I also believe that map script will correctly process the
+        // projection request.
+        // I could be wrong though...
+
+    //    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
     }
 
-    // Species Distribution
-    // ----------------------
-
-    // Our distribution map layer.
-    //
-    // NOTE:
-    // -----
-    //
-    // This code may need to be updated now that we are using mercator.
-    // I believe that OpenLayers will send the correct projection request
-    // to Map Server. I also believe that map script will correctly process the
-    // projection request.
-    // I could be wrong though...
-
-//    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
-
     distribution = new OpenLayers.Layer.WMS(
-        "Distribution",
+        "Climate Suitability",
         mapToolBaseUrl + 'map_with_threshold.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
@@ -265,6 +269,8 @@ function addOccurrencesLayer() {
         cluster_selector = document.getElementById("cluster");
         if (cluster_selector) {
             cluster_strategy = cluster_selector.options[cluster_selector.selectedIndex].value;
+        } else {
+            cluster_strategy = "dotgrid";
         }
 
         // The occurrences layer
@@ -434,22 +440,7 @@ $(function() {
             }
         } // -------------------------------------------------------------
 
-
-//////////////// experimental
-if (event.layer.name == "Occurrences") {
-
-    setTimeout( function() {
-        lspan = layerLabelDom(event.layer);
-        lspan.css('border', '10px solid red');
-        console.log('   occurrences layer label made border on');
-    }, 1000);
-}
-////////////////
-
-
-
         console.log('registering layer ' + event.layer.name);
-
 
         // do stuff when the layer has started loading
         event.layer.events.register('loadstart', null, function(evt) {
