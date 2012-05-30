@@ -46,7 +46,7 @@ $user = AuthComponent::user();
         <?php endif ?>
     </script>
 
-    <link rel="stylesheet/less" type="text/css" href="/css/edgarfullscreen.less">
+    <link rel="stylesheet/less" type="text/css" href="<?php echo $this->Html->url('/'); ?>css/edgarfullscreen.less">
 
     <?php
         echo $this->Html->meta('icon');
@@ -98,7 +98,7 @@ $user = AuthComponent::user();
             ?>
         </div>
         <h1><?php echo $title_for_layout ?></h1>
-
+    
         <ul id="tabtriggers">
             <li><a href="#" id="abouttrigger" for="about">about Edgar</a></li>
             <li><a href="#" id="downloadstrigger" for="downloads" class="closed">downloads</a></li>
