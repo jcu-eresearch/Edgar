@@ -3,6 +3,10 @@
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 //
+
+// convenient debug method
+function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
+
 //global Edgar object
 window.Edgar = window.Edgar || {};
 //vars related to the species map
@@ -440,17 +444,17 @@ $(function() {
             }
         } // -------------------------------------------------------------
 
-        console.log('registering layer ' + event.layer.name);
+        consolelog('registering layer ' + event.layer.name);
 
         // do stuff when the layer has started loading
         event.layer.events.register('loadstart', null, function(evt) {
             // find the layerswitcher
-console.log('start loading layer ' + evt.object.name + '...');
+consolelog('start loading layer ' + evt.object.name + '...');
             var label = layerLabelDom(evt.object);
             if (label) {
                 label.addClass('loading');
             } else {
-console.log('! no matching label for ' + evt.object.name + '!');
+consolelog('! no matching label for ' + evt.object.name + '!');
             }
             layersLoading.push(evt.object.name);
             loadingChanged();
@@ -458,7 +462,7 @@ console.log('! no matching label for ' + evt.object.name + '!');
 
         // do stuff when the layer has finished loading
         event.layer.events.register('loadend', null, function(evt) {
-console.log('... done loading layer ' + evt.object.name);
+consolelog('... done loading layer ' + evt.object.name);
             // find the layerswitcher
             var label = layerLabelDom(evt.object);
             if (label) {
@@ -470,7 +474,7 @@ console.log('... done loading layer ' + evt.object.name);
 /*
         // do stuff when the layer has changed
         event.layer.events.register('visibilitychanged', null, function(evt) {
-console.log('layer visibility changed (' + event.layer.visibility + ') ' + event.layer.name);
+consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.layer.name);
             // find the layerswitcher
             var ls = map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
             var label = layerLabelDom(ls, event.layer);

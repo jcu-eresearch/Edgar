@@ -46,11 +46,13 @@ $user = AuthComponent::user();
         <?php endif ?>
     </script>
 
+    <link rel="stylesheet/less" type="text/css" href="/css/edgarfullscreen.less">
+
     <?php
         echo $this->Html->meta('icon');
         echo $this->Html->css('h5bp');  // html5boilerplate "sanity reset" css
         echo $this->Html->css('edgar');
-        echo $this->Html->css('edgarfullscreen');
+//        echo $this->Html->css('edgarfullscreen');
         echo $this->Html->css('../js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
         echo $this->Html->css('openlayers');
         echo $this->Html->css('openlayers_extended');
@@ -58,6 +60,8 @@ $user = AuthComponent::user();
 
         // include Modernizr for html5 shims and feature detection.  this needs to go early!
     	$this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
+        $this->Html->script('less-1.3.0.min.js', array('inline' => false, 'block'=>'earlyscript'));
+
 
         // Include jQuery and jQueryUI
         $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false, 'block'=>'libscript'));
@@ -102,13 +106,16 @@ $user = AuthComponent::user();
 
     </div>
 
-    <div id="about">
+    <div id="about" class="triggeredtab"><div class="inner">
         <p>
-            Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
-            <a href="http://enable-javascript.com/">JavaScript enabled</a>.
+            &mdash; Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
+            <a href="http://enable-javascript.com/">JavaScript enabled</a> &mdash;
+        </p><p>
+            This is a preliminary demonstration of Edgar and 
+            is unlikely to work correctly in Internet Explorer.
         </p>
 
-        <div class="credits">
+        <div class="credits clearfix">
             <a class="ands-image" href="http://www.ands.org.au/">
                 <img width="154" height="74" title="ANDS" alt="Australian National Data Service"
                 src="https://eresearch.jcu.edu.au/tdh/++resource++tdh.metadata/ands-logo-sml.jpg">
@@ -123,10 +130,14 @@ $user = AuthComponent::user();
             Education Investment Fund (EIF) Super Science Initiative, as well as through the
             <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
         </div>
-    </div>
+    </div></div>
 
-    <div id="downloads">
-    </div>
+    <div id="downloads" class="triggeredtab"><div class="inner">
+        <p>
+            When completed in July 2012, Edgar will make occurrence and modelling data
+            available for researchers to download.
+        </p>
+    </div></div>
 
     <div id="content">
         <?php echo $this->fetch('content') ?>
