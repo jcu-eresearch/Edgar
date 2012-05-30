@@ -100,43 +100,118 @@ $user = AuthComponent::user();
         <h1><?php echo $title_for_layout ?></h1>
     
         <ul id="tabtriggers">
-            <li><a href="#" id="abouttrigger" for="about">about Edgar</a></li>
+            <li><a href="#" id="abouttrigger" for="about" class="closed">about Edgar</a></li>
             <li><a href="#" id="downloadstrigger" for="downloads" class="closed">downloads</a></li>
+            <li><a href="#" id="abouttrigger" for="acknowledgements" class="closed">acknowledgements</a></li>
         </ul>
 
     </div>
 
     <div id="about" class="triggeredtab"><div class="inner">
         <p>
+            The Edgar project will provide users with access to projected environmental
+            suitability maps for Australian bird species under various climate 
+            change scenarios.
+        </p><p>
+            This early demonstration of Edgar shows occurrence records for bird species,
+            and a map of the current climate's suitability for that species across Australia.
+        </p>
+        <div class="additionalcontent">
+            <span class="opener">tell me more</span>
+            <div class="add">
+                <p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p><p>
+                stuff
+                </p>
+            </div>
+        </div>
+    </div></div>
+
+    <div id="downloads" class="triggeredtab"><div class="inner">
+        <p class="significant">
+            When completed in July 2012, Edgar will make occurrence and modelling data
+            available for researchers to download.
+        </p>
+    </div></div>
+
+    <div id="acknowledgements" class="triggeredtab"><div class="inner">
+        <p class="significant">
             &mdash; Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
             <a href="http://enable-javascript.com/">JavaScript enabled</a> &mdash;
-        </p><p>
+        </p><p class="significant">
             This is a preliminary demonstration of Edgar and 
             is unlikely to work correctly in Internet Explorer.
         </p>
 
-        <div class="credits clearfix">
-            <a class="ands-image" href="http://www.ands.org.au/">
-                <img width="154" height="74" title="ANDS" alt="Australian National Data Service"
-                src="https://eresearch.jcu.edu.au/tdh/++resource++tdh.metadata/ands-logo-sml.jpg">
-            </a>
-            <a class="qcif-image" href="http://www.qcif.edu.au/">
-                <img width="88" height="74" title="QCIF" alt="Queensland Cyber Infrastructure Foundation"
-                src="https://eresearch.jcu.edu.au/tdh/++resource++tdh.metadata/qcif_logo_sm.png">
-            </a>
+        <div class="whitelogos">
+            <?php
+                echo $this->Html->image('ctbcc_logo.jpg', array(
+                    'alt'=>'Centre for Tropical Biodiversity &amp; Climate Change',
+                    'url'=>'http://www.jcu.edu.au/ctbcc/'
+                ));
+                echo $this->Html->image('jcu_logo.png', array(
+                    'alt'=>'James Cook University',
+                    'url'=>'http://www.jcu.edu.au/'
+                ));
+                echo $this->Html->image('eresearch_logo.png', array(
+                    'alt'=>'JCU eResearch Centre',
+                    'url'=>'http://eresearch.jcu.edu.au/'
+                ));
+            ?>
+        </div>
+
+        <div class="funding clearfix">
+            <?php
+                echo $this->Html->image('ands_logo.jpg', array(
+                    'alt'=>'Australian National Data Service',
+                    'url'=>'http://www.ands.org.au/',
+                    'class'=>'goleft'
+                ));
+                echo $this->Html->image('qcif_logo.png', array(
+                    'alt'=>'Queensland Cyber Infrastructure Foundation',
+                    'url'=>'http://www.qcif.edu.au/'
+                ));
+            ?>
+
             This project is supported by the 
             <a href="http://www.ands.org.au/">Australian National Data Service (ANDS)</a>
             through the National Collaborative Research Infrastructure Strategy Program and the
             Education Investment Fund (EIF) Super Science Initiative, as well as through the
             <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
         </div>
-    </div></div>
-
-    <div id="downloads" class="triggeredtab"><div class="inner">
-        <p>
-            When completed in July 2012, Edgar will make occurrence and modelling data
-            available for researchers to download.
-        </p>
     </div></div>
 
     <div id="content">

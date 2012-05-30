@@ -62,7 +62,7 @@ html, body {
 
 #header {
     margin: 0;
-    background-color: #333;
+    background-color: #222;
     color: #ccc;
     z-index: 1000000;
     overflow: hidden;
@@ -73,7 +73,7 @@ html, body {
     position: absolute;
     top: 7px;
     left: 4px;
-    content: url(/img/edgarlogo41.png);
+    content: url(../img/edgarlogo41.png);
 }
 
 #header h1 { display: none; }
@@ -89,7 +89,7 @@ html, body {
 #user a {
     display: inline-block;
     background: white;
-    color: #333;
+    color: #222;
     text-decoration: inherit;
     white-space: nowrap;
     padding: 0 13px;
@@ -112,13 +112,11 @@ html, body {
 
 /* tab triggers in the header ----------------------------------------- */
 
-
 #tabtriggers {
     position: absolute;
-    left: 15%;
+    left: 10%;
     margin: 13px 0 0 0;
     padding: 0;
-    font-weight: bold;
     line-height: 24px;
     text-decoration: inherit;
 }
@@ -133,20 +131,23 @@ html, body {
     font-size: 85%;
     border-top: 2px solid #ccc;
     text-decoration: inherit;
-    padding: 0 2em 0;
+    padding: 0 1em 0;
     display: inline-block;
     height: 50px;
     .allrounded(0.5em);
-    background: #444;
+    background: #333;
     color: #ccc;
     white-space: nowrap;
     cursor: pointer;
 }
 
-#tabtriggers a.closed {
-    background: #333;
+#tabtriggers li a:hover {
+    color: white;
+}
+
+#tabtriggers li .closed {
+    background: #222;
     color: #999;
-    padding: 0 2em 0;
     border-top-color: transparent;
 }
 
@@ -168,38 +169,78 @@ html, body {
 .triggeredtab {
     position: absolute;
     top: 50px;
-    left: 15%;
-    width: 70%;
-    background-color: #444;
-    color: #bbb;
+    left: 10%;
+    width: 80%; /* if you change this width also edit tabpanel_setup.js */
+    background-color: #333;
+    color: #ccc;
     z-index: 10000000;
     .rounded(0, 0, 1em, 1em);
 }
 
 .triggeredtab .inner {
+    .borderbox();
+    height: 100%;
     padding: 2em;
+    overflow: auto;
 }
 
-/* things in the "about" area ----------------------------------------- */
-
-#about {
+.triggeredtab p {
+    text-align: left;
+    font-size: 90%;
 }
 
-#about .credits {
+.triggeredtab p.significant {
+    text-align: center;
+    font-size: inherit;
+}
+
+/* additionalcontent in triggeredtabs --------------------------------- */
+
+.triggeredtab .additionalcontent .opener {
+    display: block;
+    text-align: left;
+    padding: 0.1em 0.5em;
+    .allrounded(0.5em);
+    cursor: pointer;
+}
+
+.triggeredtab .additionalcontent .opener:hover {
+    background-color: #555;
+}
+
+.triggeredtab .additionalcontent .opener:after {
+    content: ' \bb';
+}
+
+/* things in the "acknowledgements" area ------------------------------ */
+
+#acknowledgements .whitelogos {
+    text-align: center;
+    background-color: #fff;
+    .allrounded(0.5em);
+}
+
+#acknowledgements .whitelogos img {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0.5em 2em;
+}
+
+#acknowledgements .funding {
     padding-top: 2em;
     font-size: 75%;
 }
 
-#about a {
+#acknowledgements a {
     color: #fff;
     text-decoration: none;
 }
 
-#about a:hover {
+#acknowledgements a:hover {
     text-decoration: underline;
 }
 
-#about img {
+#acknowledgements .funding img {
     background-color: #fff;
     .allrounded(0.5em);
     border: 1em solid white;
@@ -207,7 +248,7 @@ html, body {
     margin: 0 0 0 1em;
 }
 
-#about .ands-image img {
+#acknowledgements .funding img.goleft {
     float: left;
     margin: 0 1em 0 0;
 }
@@ -327,7 +368,7 @@ html, body {
     height: 1.7em;
     vertical-align: bottom; /* OpenLayers adds valign: b to the labelSpan */
     width: auto;
-    margin: 0 0.5em 0 0;
+    margin: 0 0.5em 0 0; 
 }
 
 #toolspanel .labelSpan {
