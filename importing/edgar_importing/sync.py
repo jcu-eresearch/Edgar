@@ -7,7 +7,10 @@ import binascii
 import uuid
 import traceback
 import datetime
+import shapely.wkt
+import shapely.geometry
 from sqlalchemy import func, select
+from geoalchemy import WKTSpatialElement
 
 log = logging.getLogger(__name__)
 
@@ -339,10 +342,8 @@ class Syncer:
         flushed every 1000 occurrences. YOU MUST CALL `flush_upserts` AFTER YOU
         HAVE CALLED THIS METHOD FOR THE FINAL TIME.'''
 
-        if self.mysql_optimise:
-            self.upsert_occurrence_mysql_optimised(occurrence, species_id)
-        else:
-            self.upsert_occurrence_unoptimised(occurrence, species_id)
+        #removed mysql optimisation, as we're moving to postgres
+        self.upsert_occurrence_unoptimised(occurrence, species_id)
 
 
     def upsert_occurrence_unoptimised(self, occurrence, species_id):
@@ -352,18 +353,19 @@ class Syncer:
             execute().\
             fetchone()
 
+        p = shapely.geometry.Point(occurrence.longitude, occurrence.latitude)
+        location = WKTSpatialElement(shapely.wkt.dumps(p))
+
         if existing is None:
             db.occurrences.insert().execute(
-                latitude=occurrence.latitude,
-                longitude=occurrence.longitude,
+                location=location,
                 rating=self.rate_occurrence(occurrence),
                 species_id=species_id,
                 source_id=self.source_row_id,
                 source_record_id=occurrence.uuid.bytes)
         else:
             db.occurrences.update().\
-                values(latitude=occurrence.latitude,
-                       longitude=occurrence.longitude,
+                values(location=location,
                        rating=self.rate_occurrence(occurrence),
                        species_id=species_id).\
                 where(db.occurrences.c.id == existing['id']).\

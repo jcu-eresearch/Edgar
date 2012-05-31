@@ -1,14 +1,16 @@
 import sys
-from sqlalchemy import engine_from_config, MetaData, Table, \
-    Column, ForeignKey, PrimaryKeyConstraint, Index
-from sqlalchemy.types import SmallInteger, String, Integer, \
-    DateTime, Float, Enum, BINARY, Text
+from sqlalchemy import (engine_from_config, MetaData, Table,
+    Column, ForeignKey, PrimaryKeyConstraint, Index)
+from sqlalchemy.types import (SmallInteger, String, Integer,
+    DateTime, Float, Enum, BINARY, Text)
+from geoalchemy import (GeometryExtensionColumn, Point, GeometryDDL,
+    MultiPolygon)
 
 engine = None
 metadata = MetaData()
 
 ratings_enum = Enum('unknown', 'invalid', 'history', 'vagrant', 'irruptive',
-    'non-breeding', 'introduced non-breeding', 'breeding', 
+    'non-breeding', 'introduced non-breeding', 'breeding',
     'introduced breeding');
 
 def connect(engine_config):
@@ -38,8 +40,7 @@ sources = Table('sources', metadata,
 
 occurrences = Table('occurrences', metadata,
     Column('id', Integer(), primary_key=True),
-    Column('latitude', Float(), nullable=False),
-    Column('longitude', Float(), nullable=False),
+    GeometryExtensionColumn('location', Point(2), nullable=False),
     Column('rating', ratings_enum, nullable=False),
     Column('species_id', SmallInteger(), ForeignKey('species.id'),
         nullable=False),
@@ -51,6 +52,7 @@ occurrences = Table('occurrences', metadata,
 
     mysql_engine='MyISAM'
 )
+GeometryDDL(occurrences)
 
 users = Table('users', metadata,
     Column('id', Integer(), primary_key=True),
@@ -62,12 +64,6 @@ ratings = Table('ratings', metadata,
     Column('user_id', Integer(), ForeignKey('users.id'),
         nullable=False),
     Column('comment', Text(), nullable=False),
-    Column('rating', ratings_enum, nullable=False)
-)
-
-occurrences_ratings_bridge = Table('occurrences_ratings_bridge', metadata,
-    Column('occurrence_id', Integer(), nullable=False),
-    Column('rating_id', Integer(), nullable=False),
-
-    PrimaryKeyConstraint('occurrence_id', 'rating_id')
+    Column('rating', ratings_enum, nullable=False),
+    GeometryExtensionColumn('area', MultiPolygon(2), nullable=False)
 )

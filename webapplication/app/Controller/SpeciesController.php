@@ -201,13 +201,13 @@ class SpeciesController extends AppController {
      */
     public function autocomplete() {
         //get what the user typed in
-        $partial = $this->request->query['term'];
+        $partial = strtolower($this->request->query['term']);
 
         //query db
         $matched_species = $this->Species->find('all', array(
             'conditions' => array('OR' => array(
-                array('scientific_name LIKE' => '%'.$partial.'%'),
-                array('common_name LIKE' => '%'.$partial.'%')
+                array('lower(scientific_name) LIKE' => '%'.$partial.'%'),
+                array('lower(common_name) LIKE' => '%'.$partial.'%')
             )),
             'order' => array('common_name DESC')
         ));
