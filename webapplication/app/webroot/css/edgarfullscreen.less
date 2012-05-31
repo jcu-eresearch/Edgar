@@ -127,6 +127,16 @@ html, body {
     display: inline-block;
 }
 
+#tabtriggers li .closed {
+    background: #222;
+    color: #999;
+    border-top-color: transparent;
+}
+
+#tabtriggers li a:hover {
+    color: white;
+}
+
 #tabtriggers li a {
     font-size: 85%;
     border-top: 2px solid #ccc;
@@ -139,16 +149,6 @@ html, body {
     color: #ccc;
     white-space: nowrap;
     cursor: pointer;
-}
-
-#tabtriggers li a:hover {
-    color: white;
-}
-
-#tabtriggers li .closed {
-    background: #222;
-    color: #999;
-    border-top-color: transparent;
 }
 
 #tabtriggers li a:before { /* show a disclosure triangle */
@@ -185,14 +185,26 @@ html, body {
 }
 
 .triggeredtab p {
+    margin: 1em 0;
     text-align: left;
     font-size: 90%;
 }
 
 .triggeredtab p.significant {
+    color: #fff;
     text-align: center;
     font-size: inherit;
 }
+
+.triggeredtab a {
+    color: #fea;
+    text-decoration: none;
+}
+
+.triggeredtab a:hover {
+    text-decoration: underline;
+}
+
 
 /* additionalcontent in triggeredtabs --------------------------------- */
 
@@ -229,15 +241,6 @@ html, body {
 #acknowledgements .funding {
     padding-top: 2em;
     font-size: 75%;
-}
-
-#acknowledgements a {
-    color: #fff;
-    text-decoration: none;
-}
-
-#acknowledgements a:hover {
-    text-decoration: underline;
 }
 
 #acknowledgements .funding img {

@@ -108,13 +108,11 @@ $user = AuthComponent::user();
     </div>
 
     <div id="about" class="triggeredtab"><div class="inner">
-        <p>
-            The Edgar project will provide users with access to projected environmental
-            suitability maps for Australian bird species under various climate 
-            change scenarios.
+        <p class="significant">
+            Edgar is a website where visitors can explore the <strong style="white-space: nowrap">future impact of climate change on Australian birds</strong>.
         </p><p>
-            This early demonstration of Edgar shows occurrence records for bird species,
-            and a map of the current climate's suitability for that species across Australia.
+            This early demonstration of Edgar shows locations where a bird species has been observed,
+            and displays the current climate's suitability for that species across Australia.
         </p>
         <div class="additionalcontent">
             <span class="opener">tell me more</span>
@@ -158,6 +156,13 @@ $user = AuthComponent::user();
                 </p>
             </div>
         </div>
+
+        <p>
+            Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
+            <a href="http://enable-javascript.com/">JavaScript enabled</a>.  This early
+            demonstration site is unlikely to work correctly in Internet Explorer.
+        </p>
+
     </div></div>
 
     <div id="downloads" class="triggeredtab"><div class="inner">
@@ -168,13 +173,6 @@ $user = AuthComponent::user();
     </div></div>
 
     <div id="acknowledgements" class="triggeredtab"><div class="inner">
-        <p class="significant">
-            &mdash; Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
-            <a href="http://enable-javascript.com/">JavaScript enabled</a> &mdash;
-        </p><p class="significant">
-            This is a preliminary demonstration of Edgar and 
-            is unlikely to work correctly in Internet Explorer.
-        </p>
 
         <div class="whitelogos">
             <?php
