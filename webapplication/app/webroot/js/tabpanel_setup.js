@@ -12,6 +12,7 @@ $(function() {
         tab = $(tab).filter(':visible');
         tab.width(width_of_panel * $('#header').width());
         // close any additionals that were open
+        tab.find('.additionalcontent').removeClass('open');
         tab.find('.additionalcontent').children('div').hide();
         // finally, slide it closed
         tab.hide('blind', 'fast', function() {
@@ -36,7 +37,7 @@ $(function() {
 
     tabs.each( function(index, tab) {
         tab = $(tab);
-        tab.hide();
+        tab.hide('blind', 'fast');
 
         // maybe there's show-more content in the tab
         additionals = tab.find('.additionalcontent');
@@ -50,10 +51,12 @@ $(function() {
             opener.click( function(event) {
                 if (content.filter(':visible').length > 0) {
                     // ..then we're already open, so close
+                    add.removeClass('open');
                     content.hide('blind', 'fast');
                     tab.css('bottom', '');
                 } else {
                     // ..we're closed, so open up
+                    add.addClass('open');
                     content.show('blind', 'fast');
                     tab.css('bottom', '1em');
                 }

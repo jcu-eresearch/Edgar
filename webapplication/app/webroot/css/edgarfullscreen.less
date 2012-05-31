@@ -128,7 +128,8 @@ html, body {
 }
 
 #tabtriggers li .closed {
-    background: #222;
+    background-color: #222;
+    background-color: rgba(34,34,34,0.5); /* #222 with 0.5 opacity */
     color: #999;
     border-top-color: transparent;
 }
@@ -184,10 +185,20 @@ html, body {
     overflow: auto;
 }
 
-.triggeredtab p {
-    margin: 1em 0;
+.triggeredtab p, .triggeredtab ul, .triggeredtab dl, .triggeredtab dt, .triggeredtab dd {
     text-align: left;
+    xbackground-color: transparent !important;
+    xcolor: inherit;
+    xfont-size: inherit;
+}
+
+.triggeredtab p, .triggeredtab dl, .triggeredtab ul {
     font-size: 90%;
+    margin: 1em 0;
+}
+
+.triggeredtab dt {
+    margin-top: 0.5em;
 }
 
 .triggeredtab p.significant {
@@ -208,6 +219,10 @@ html, body {
 
 /* additionalcontent in triggeredtabs --------------------------------- */
 
+.triggeredtab .additionalcontent {
+    margin: 1em 0;
+}
+
 .triggeredtab .additionalcontent .opener {
     display: block;
     text-align: left;
@@ -222,6 +237,14 @@ html, body {
 
 .triggeredtab .additionalcontent .opener:after {
     content: ' \bb';
+}
+
+.triggeredtab .additionalcontent.open .opener:after {
+    content: ' \ab';
+}
+
+.triggeredtab .additionalcontent .add {
+    padding-left: 2em;
 }
 
 /* things in the "acknowledgements" area ------------------------------ */

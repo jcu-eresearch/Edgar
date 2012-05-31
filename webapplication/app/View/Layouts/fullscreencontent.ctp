@@ -102,76 +102,18 @@ $user = AuthComponent::user();
         <ul id="tabtriggers">
             <li><a href="#" id="abouttrigger" for="about" class="closed">about Edgar</a></li>
             <li><a href="#" id="downloadstrigger" for="downloads" class="closed">downloads</a></li>
-            <li><a href="#" id="abouttrigger" for="acknowledgements" class="closed">acknowledgements</a></li>
+            <li><a href="#" id="abouttrigger" for="acknowledgements" class="closed">credits</a></li>
         </ul>
 
     </div>
-
-    <div id="about" class="triggeredtab"><div class="inner">
-        <p class="significant">
-            Edgar is a website where visitors can explore the <strong style="white-space: nowrap">future impact of climate change on Australian birds</strong>.
-        </p><p>
-            This early demonstration of Edgar shows locations where a bird species has been observed,
-            and displays the current climate's suitability for that species across Australia.
-        </p>
-        <div class="additionalcontent">
-            <span class="opener">tell me more</span>
-            <div class="add">
-                <p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p><p>
-                stuff
-                </p>
-            </div>
-        </div>
-
-        <p>
-            Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
-            <a href="http://enable-javascript.com/">JavaScript enabled</a>.  This early
-            demonstration site is unlikely to work correctly in Internet Explorer.
-        </p>
-
-    </div></div>
-
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="downloads" class="triggeredtab"><div class="inner">
         <p class="significant">
             When completed in July 2012, Edgar will make occurrence and modelling data
             available for researchers to download.
         </p>
     </div></div>
-
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="acknowledgements" class="triggeredtab"><div class="inner">
 
         <div class="whitelogos">
@@ -189,6 +131,41 @@ $user = AuthComponent::user();
                     'url'=>'http://eresearch.jcu.edu.au/'
                 ));
             ?>
+        </div>
+
+        <p>
+            Edgar is being developed by
+            <a href="http://jcu-eresearch.github.com/Edgar/2012/03/22/the-team">a team</a>
+            at JCU's eResearch Centre.  The project maintains a
+            <a href="http://jcu-eresearch.github.com/Edgar/">development blog</a>
+            and the source code is available on
+            <a href="http://github.com/jcu-eresearch/Edgar">github</a>.
+        </p><p>
+            The primary researcher and project advisor is
+            <a href="http://www.jjvanderwal.com/">Dr Jeremy VanDerWal</a>.
+        </p><div class="additionalcontent">
+            <span class="opener">Contact Dr VanDerWal</span>
+            <div class="add">
+                <dl>
+                    <dt>on the web</dt>
+                    <dd><a href="http://www.jjvanderwal.com/">http://www.jjvanderwal.com/</a></dd>
+
+                    <dt>by post</dt>
+                    <dd>
+                        Centre for Tropical Biodiversity & Climate Change Research<br>
+                        School of Marine and Tropical Biology<br>
+                        James Cook University<br>
+                        Townsville, QLD 4811<br>
+                        Australia
+                    </dd>
+
+                    <dt>via Skype</dt>
+                    <dd>jjvanderwal</dd>
+
+                    <dt>via email</dt>
+                    <dd><a href="mailto:jjvanderwal@gmail.com">jjvanderwal@gmail.com</a></dd>
+                </dl>
+            </div>
         </div>
 
         <div class="funding clearfix">
@@ -211,7 +188,43 @@ $user = AuthComponent::user();
             <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
         </div>
     </div></div>
-
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
+    <div id="about" class="triggeredtab"><div class="inner">
+        <p class="significant">
+            Edgar is a website where visitors can explore the <strong style="white-space: nowrap">future impact of climate change on Australian birds</strong>.
+        </p><p>
+            This early demonstration of Edgar shows locations where a bird species has been observed,
+            and displays the current climate's suitability for that species across Australia.
+        </p>
+        <div class="additionalcontent">
+            <span class="opener">tell me more</span>
+            <div class="add">
+                <p>
+Currently there is a general lack of engagement and knowledge transfer between professional researchers and end-users of research (general public, conservation managers, decision-makers, etc.). This is reflected in a general lack of acceptance and acknowledgement by the general public of the potential impacts of climate change. Indeed, the ABC reported 27 June 2011 that
+                </p><p><cite>
+“The Lowy Institute's annual poll asked about 1,000 people for their opinions ... The poll shows that there has been a steep fall in the number of Australians who think climate change is a serious problem which needs addressing now.”
+                </cite></p><p>
+Research individuals or groups spend considerable time and effort to bring together species occurrence data, but substantial effort is still required and limitations exist with respect to a) the accuracy of the localities, removing only blatantly incorrect records outside known locality, or b) using painstaking manual processes whereby occurrence records are presented as hardcopy maps to “species experts.”  These experts then write metadata (e.g. provenance information), corrections, and other information about further records on the maps and return the comments for interpretation. This is a cumbersome, labour-intensive, and error-prone process which needs to be repeated for each project.
+                </p><p>
+There is currently a scarcity of transparent online tools which integrate species distribution data, locality data with climate change scenarios in an integrated fashion which will facilitate the modelling of current and future species distributions based on climate scenarios.
+                </p><p>
+The Edgar site provides a tool that reuses data available with the <a href="http://www.ala.org.au/">Atlas of Living Australia</a> and the <a href="http://tropicaldatahub.org/">Tropical Data Hub</a> to allow a broad range of end-users to:
+                </p><ul>
+                    <li>
+explore with the potential impacts of climate change on a wide range of species in Australia
+                    </li><li>
+engage in improving our understanding of the species and the modelling of species distributions
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <p>
+            Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
+            <a href="http://enable-javascript.com/">JavaScript enabled</a>.  This early
+            demonstration site is unlikely to work correctly in Internet Explorer.
+        </p>
+    </div></div>
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="content">
         <?php echo $this->fetch('content') ?>
     </div>
