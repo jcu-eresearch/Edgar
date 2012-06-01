@@ -169,13 +169,13 @@ function addDistributionLayer() {
 
     distribution = new OpenLayers.Layer.WMS(
         "Climate Suitability",
-        mapToolBaseUrl + 'map_with_threshold.php', // path to our map script handler.
+        mapToolBaseUrl + 'map_with_auto_determine_threshold.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
         {
             MODE: 'map',
-            MAP: 'edgar_master.map',
+            MAP: 'edgar_demo.map',
             DATA: mapPath,
             SPECIESID: Edgar.map.species.id,
             REASPECT: "true",
