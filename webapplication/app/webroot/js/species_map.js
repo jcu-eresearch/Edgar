@@ -616,10 +616,5 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // Zoom the map to the zoom_bounds specified earlier
     map.zoomToExtent(zoom_bounds);
 
-    addLegend();
-
 });
-
-function addLegend() {
-}
 
