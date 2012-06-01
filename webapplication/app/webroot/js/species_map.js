@@ -54,9 +54,10 @@ function speciesGeoJSONURL() {
 }
 
 function legendURL() {
+    var speciesId = Edgar.map.species.id;
     var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
-    var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
-    return mapToolBaseUrl + 'legend_with_auto_determine_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
+    var data = speciesId + '/1975.asc';
+    return mapToolBaseUrl + 'legend_with_auto_determine_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_demo.map&DATA=' + data;
 }
 
 function updateLegend() {
