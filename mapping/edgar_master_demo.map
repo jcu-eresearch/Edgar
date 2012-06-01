@@ -1,0 +1,113 @@
+#simple version of map file
+
+MAP
+
+    SIZE 256 256
+
+    PROJECTION
+        "init=epsg:900913"
+    END
+
+    #define the image type
+    IMAGETYPE PNG8
+
+    #define the area
+    EXTENT -20037508.34 -20037508.34 20037508.34 20037508.34
+    UNITS meters
+
+    #define the size of output image
+    #    SIZE 256 256
+
+    #define the working folder of this map file
+    SHAPEPATH "/scratch/jc155857/EdgarDemo/models/"
+
+    #define the background color
+    TRANSPARENT ON
+    IMAGECOLOR 0 255 255
+
+    # SCALEBAR object
+    SCALEBAR
+        LABEL
+            COLOR 0 0 0
+            ANTIALIAS true
+            SIZE large 
+        END
+        STATUS ON
+    END
+
+    # LEGEND object
+    LEGEND
+        STATUS ON
+        LABEL
+            COLOR 0 0 255
+        END
+        KEYSIZE 32 16
+    END
+
+    #define the folder that used for generate image
+    WEB
+        IMAGEPATH '/www/html/map_script/tmp/'
+        IMAGEURL 'http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/tmp/'
+    END
+
+    #the layer for raster data. you can put multiple layers in one map file
+    LAYER
+
+        NAME "DISTRIBUTION"
+        TYPE RASTER
+        STATUS ON
+        PROCESSING "SCALE=AUTO"
+
+        PROJECTION
+            "init=epsg:4326"
+        END
+
+        #define the transparent of image. 100 is not transpartent.
+        #0 is totally transparent.
+        TRANSPARENCY 60
+
+        #define the color table. color are define as RGB color from 0 to 255.
+        #EXPRESSION are used to define the style apply to the right rang of data
+        #COLORRANGE and DATARANGE are paired to generate gradient color
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "0.0  - 0.25"
+            KEYIMAGE "ramp_0_25.gif"
+            EXPRESSION ([pixel]>0 AND [pixel]<0.25)
+            STYLE
+                COLORRANGE  0 0 255 0 255 255
+                DATARANGE   0 0.25
+            END
+        END
+
+        CLASS
+            NAME "0.25 - 0.5"
+            KEYIMAGE "ramp_25_50.gif"
+            EXPRESSION ([pixel]>=0.25 AND [pixel]<0.5)
+            STYLE
+                COLORRANGE  0 255 255 0 255 0
+                DATARANGE   0.25 0.5
+            END
+        END
+
+        CLASS
+            NAME "0.5  - 0.75"
+            KEYIMAGE "ramp_50_75.gif"
+            EXPRESSION ([pixel]>=0.5 AND [pixel]<0.75)
+            STYLE
+                COLORRANGE  0 255 0 255 255 0
+                DATARANGE   0.5 0.75
+            END
+        END
+
+        CLASS
+            NAME "0.75 - 1.0"
+            KEYIMAGE "ramp_75_100.gif"
+            EXPRESSION ([pixel]>=0.75)
+            STYLE
+                COLORRANGE  255 255 0 255 0 0
+                DATARANGE   0.75 1
+            END
+        END
+    END
+END
