@@ -16,8 +16,6 @@ $layer = $map->getLayerByName('DISTRIBUTION');
 $layer->set('data', $data);
 
 $threshold = $_GET['THRESHOLD'];
-
-# Add the threshold info to the legend
 $layer->updateFromString(''.
     'CLASSITEM "THRESHOLD" '.
         'CLASS '.

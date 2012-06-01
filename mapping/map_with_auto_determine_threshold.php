@@ -17,7 +17,7 @@
     $layer = $map->getLayerByName('DISTRIBUTION');
     $threshold = $_GET['THRESHOLD'];
 
-    # Pull out every class in the map file.
+    // Pull out every class in the map file.
     while($layer->removeClass(0) != NULL);
 
     $layer->set('data', $data);

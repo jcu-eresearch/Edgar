@@ -15,7 +15,6 @@ $data = $_GET['DATA'];
 $layer = $map->getLayerByName('DISTRIBUTION');
 $layer->set('data', $data);
 
-
 $map_image = $map->draw();
 $legend_image = $map->drawLegend();
 //$legend_image = $map->drawLegend();
