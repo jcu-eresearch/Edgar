@@ -15,11 +15,7 @@ $data = $_GET['DATA'];
 $layer = $map->getLayerByName('DISTRIBUTION');
 $layer->set('data', $data);
 
-$threshold = $_GET['THRESHOLD'];
-
-if(is_numeric($threshold == false)) {
-    $threshold = "0";
-}
+$threshold = "0";
 
 try {
     $shapepath = $map->shapepath;

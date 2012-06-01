@@ -61,6 +61,22 @@
     while($layer->removeClass(0) != NULL);
 
     $layer->set('data', $data);
+
+/*
+    $layer->updateFromString(''.
+        'CLASSITEM "[pixel]" '.
+            'CLASS '.
+                'NAME "0.0  - 0.25" '.
+                'KEYIMAGE "ramp_0_25.gif" '.
+                'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]< 1) '.
+                'STYLE '.
+                    'COLORRANGE  255 255 255 255 0 0'.
+                    'DATARANGE '.$threshold.' 1 '.
+                'END '.
+            'END '.
+        'END');
+        /*
+*/
     $layer->updateFromString(''.
         'CLASSITEM "[pixel]" '.
             'CLASS '.
