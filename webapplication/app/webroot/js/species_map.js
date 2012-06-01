@@ -54,22 +54,18 @@ function speciesGeoJSONURL() {
 }
 
 function legendURL() {
+    var speciesId = Edgar.map.species.id;
     var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
-    var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
-    return mapToolBaseUrl + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + Edgar.map.species.distributionThreshold;
+    var data = speciesId + '/1975.asc';
+    return mapToolBaseUrl + 'legend_with_auto_determine_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_demo.map&DATA=' + data;
 }
 
 function updateLegend() {
-/*
     $('#map_legend_img').attr('src', legendURL());
-*/
 }
 
 function showLegend() {
-/*
     $('#map_legend_img').show();
-*/
 }
 
 function hideLegend() {
@@ -179,10 +175,7 @@ function addDistributionLayer() {
             DATA: mapPath,
             SPECIESID: Edgar.map.species.id,
             REASPECT: "true",
-            TRANSPARENT: 'true',
-            // TODO -> Set the threshold.
-//            THRESHOLD: Edgar.map.species.distributionThreshold
-            THRESHOLD: "0"
+            TRANSPARENT: 'true'
 
         },
         {
@@ -624,10 +617,5 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // Zoom the map to the zoom_bounds specified earlier
     map.zoomToExtent(zoom_bounds);
 
-    addLegend();
-
 });
-
-function addLegend() {
-}
 
