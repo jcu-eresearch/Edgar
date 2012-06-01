@@ -31,7 +31,7 @@ class HPCConfig:
     sshHPCDestination = "login.hpc.jcu.edu.au"
 
     # Determine the paths to the different files
-    workingDir = os.path.join('/', 'home', 'jc155857', 'scratch', 'Edgar', 'modelling')
+    workingDir = os.path.join('/', 'home', 'jc155857', 'scratch', 'EdgarDemo', 'modelling')
     #workingDir = os.path.join('/', 'Users', 'robert', 'Git_WA', 'Edgar', 'modelling')
     importingWorkingDir = os.path.join(workingDir, '../', 'importing')
 

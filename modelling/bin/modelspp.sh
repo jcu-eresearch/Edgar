@@ -79,10 +79,14 @@ mkdir -p "$OUTPUTS_DIR"
 # Model the species distribution
 java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z redoifexists autorun
 
+
 # Cycle through the projections and project the maps
-for PROJ in `find "$PROJECTCLIMATE" -type d`; do
-    java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
-done
+#for PROJ in `find "$PROJECTCLIMATE" -type d`; do
+#    java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
+#done
+
+# Rather than cycle, just get the data for current.
+java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$TRAINCLIMATE" "$TMP_OUTPUT_DIR/"`basename "$TRAINCLIMATE"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
 # TODO
 # Add some sanity checks before removing any existing good output data
