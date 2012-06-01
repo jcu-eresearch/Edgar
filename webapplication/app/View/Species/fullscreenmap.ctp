@@ -113,7 +113,11 @@
 -->
 </div>
 
-<div id="map"></div>
+<div id="map">
+    <div class='map_legend'>
+        <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
+    </div>
+</div>
 
 <div id="spinner"></div>
 
