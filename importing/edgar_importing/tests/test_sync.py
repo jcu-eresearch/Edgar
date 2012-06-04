@@ -8,6 +8,8 @@ import os.path
 import json
 import logging
 from sqlalchemy import select, func
+import pyspatialite
+import sys
 
 
 class TestSync(unittest.TestCase):
@@ -213,8 +215,11 @@ class TestSync(unittest.TestCase):
 
 
 def test_suite():
-    #in memory sqlite db
-    db.connect({'db.url':'sqlite://'})
+    # in memory sqlite db
+    # uses pyspatialite instead of pysqlite2
+    sys.modules['pysqlite2'] = pyspatialite
+    db.connect({'db.url':'sqlite+pysqlite://'})
+    db.engine.execute("SELECT InitSpatialMetaData();")
     db.metadata.create_all()
 
     return unittest.makeSuite(TestSync)

@@ -354,7 +354,7 @@ class Syncer:
             fetchone()
 
         p = shapely.geometry.Point(occurrence.longitude, occurrence.latitude)
-        location = WKTSpatialElement(shapely.wkt.dumps(p))
+        location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
 
         if existing is None:
             db.occurrences.insert().execute(

@@ -40,7 +40,7 @@ sources = Table('sources', metadata,
 
 occurrences = Table('occurrences', metadata,
     Column('id', Integer(), primary_key=True),
-    GeometryExtensionColumn('location', Point(2), nullable=False),
+    GeometryExtensionColumn('location', Point(2, srid=4326), nullable=False),
     Column('rating', ratings_enum, nullable=False),
     Column('species_id', SmallInteger(), ForeignKey('species.id'),
         nullable=False),
@@ -65,5 +65,7 @@ ratings = Table('ratings', metadata,
         nullable=False),
     Column('comment', Text(), nullable=False),
     Column('rating', ratings_enum, nullable=False),
-    GeometryExtensionColumn('area', MultiPolygon(2), nullable=False)
+    GeometryExtensionColumn('area', MultiPolygon(2, srid=4326), nullable=False)
 )
+GeometryDDL(ratings)
+
