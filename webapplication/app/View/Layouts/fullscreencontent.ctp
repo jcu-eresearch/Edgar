@@ -141,16 +141,16 @@ $user = AuthComponent::user();
             and the source code is available on
             <a href="http://github.com/jcu-eresearch/Edgar">github</a>.
         </p><p>
-            The primary researcher and project advisor is
+            The principal researcher and project advisor is
             <a href="http://www.jjvanderwal.com/">Dr Jeremy VanDerWal</a>.
         </p><div class="additionalcontent">
             <span class="opener">Contact Dr VanDerWal</span>
             <div class="add">
                 <dl>
-                    <dt>on the web</dt>
+                    <dt>on the web:</dt>
                     <dd><a href="http://www.jjvanderwal.com/">http://www.jjvanderwal.com/</a></dd>
 
-                    <dt>by post</dt>
+                    <dt>by post:</dt>
                     <dd>
                         Centre for Tropical Biodiversity & Climate Change Research<br>
                         School of Marine and Tropical Biology<br>
@@ -159,10 +159,10 @@ $user = AuthComponent::user();
                         Australia
                     </dd>
 
-                    <dt>via Skype</dt>
-                    <dd>jjvanderwal</dd>
+                    <dt>via <a href="http://www.skype.com">Skype</a>:</dt>
+                    <dd><a href="skype:jjvanderwal?userinfo">jjvanderwal</a></dd>
 
-                    <dt>via email</dt>
+                    <dt>via email:</dt>
                     <dd><a href="mailto:jjvanderwal@gmail.com">jjvanderwal@gmail.com</a></dd>
                 </dl>
             </div>
@@ -191,7 +191,12 @@ $user = AuthComponent::user();
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="about" class="triggeredtab"><div class="inner">
         <p class="significant">
-            Edgar is a website where visitors can explore the <strong style="white-space: nowrap">future impact of climate change on Australian birds</strong>.
+            Edgar is a website where visitors can explore the
+            <strong style="white-space: nowrap">future impact</strong>
+            <strong style="white-space: nowrap">of</strong>
+            <strong style="white-space: nowrap">climate change</strong>
+            <strong style="white-space: nowrap">on</strong>
+            <strong style="white-space: nowrap">Australian birds</strong>.
         </p><p>
             This early demonstration of Edgar shows locations where a bird species has been observed,
             and displays the current climate's suitability for that species across Australia.
@@ -223,6 +228,26 @@ engage in improving our understanding of the species and the modelling of specie
             <a href="http://enable-javascript.com/">JavaScript enabled</a>.  This early
             demonstration site is unlikely to work correctly in Internet Explorer.
         </p>
+
+        <div class="funding clearfix">
+            <?php
+                echo $this->Html->image('ands_logo.jpg', array(
+                    'alt'=>'Australian National Data Service',
+                    'url'=>'http://www.ands.org.au/',
+                    'class'=>'goleft'
+                ));
+                echo $this->Html->image('qcif_logo.png', array(
+                    'alt'=>'Queensland Cyber Infrastructure Foundation',
+                    'url'=>'http://www.qcif.edu.au/'
+                ));
+            ?>
+
+            This project is supported by the 
+            <a href="http://www.ands.org.au/">Australian National Data Service (ANDS)</a>
+            through the National Collaborative Research Infrastructure Strategy Program and the
+            Education Investment Fund (EIF) Super Science Initiative, as well as through the
+            <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
+        </div>
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="content">

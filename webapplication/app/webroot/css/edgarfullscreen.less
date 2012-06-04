@@ -28,6 +28,15 @@
     box-sizing:border-box;
 }
 
+/* openlayers fixups -------------------------------------------------- */
+
+/* hide error tiles (don't show pink tiles with image error icons) */
+.olImageLoadError {
+    background-color: transparent !important;
+    xopacity: 0 !important;
+    xfilter: alpha(opacity=0) !important;
+}
+
 /* overall layout ----------------------------------------------------- */
 
 /* all the main things should be full screen size */
@@ -249,6 +258,26 @@ html, body {
     border-left: 1px solid #444;
 }
 
+/* funding area ------------------------------ */
+
+.triggeredtab .funding {
+    padding-top: 2em;
+    font-size: 75%;
+}
+
+.triggeredtab .funding img {
+    background-color: #fff;
+    .allrounded(0.5em);
+    border: 1em solid white;
+    float: right;
+    margin: 0 0 0 1em;
+}
+
+.triggeredtab .funding img.goleft {
+    float: left;
+    margin: 0 1em 0 0;
+}
+
 /* things in the "acknowledgements" area ------------------------------ */
 
 #acknowledgements .whitelogos {
@@ -263,12 +292,12 @@ html, body {
     margin: 0.5em 2em;
 }
 
-#acknowledgements .funding {
+.triggeredtab .funding {
     padding-top: 2em;
     font-size: 75%;
 }
 
-#acknowledgements .funding img {
+.triggeredtab .funding img {
     background-color: #fff;
     .allrounded(0.5em);
     border: 1em solid white;
@@ -276,7 +305,7 @@ html, body {
     margin: 0 0 0 1em;
 }
 
-#acknowledgements .funding img.goleft {
+.triggeredtab .funding img.goleft {
     float: left;
     margin: 0 1em 0 0;
 }
