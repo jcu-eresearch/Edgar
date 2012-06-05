@@ -101,7 +101,6 @@ class SpeciesController extends AppController {
         }
 
         // Look up the species provided
-        $this->Species->recursive = 1;
         $species = $this->Species->read(null, $id);
 
         // Check if we were provided a bbox (bounding box)

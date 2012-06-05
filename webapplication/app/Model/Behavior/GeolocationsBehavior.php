@@ -33,7 +33,6 @@ class GeolocationsBehavior extends ModelBehavior {
         include 'clustering/dotgrid.php';
         include 'clustering/squaregrid.php';
 
-        $locations = $Model->getLocationsArray();
         $location_features = array();
 
         if ( $cluster_type == "dotradius" ) {
@@ -50,7 +49,7 @@ class GeolocationsBehavior extends ModelBehavior {
 
         } else {
             // unrecognised clustering type, or clustering type == none
-            foreach($locations as $location) {
+            foreach($Model->getLocationsArray() as $location) {
                 $longitude = $location['longitude'];
                 $latitude = $location['latitude'];
                 if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
