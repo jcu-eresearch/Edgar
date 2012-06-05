@@ -140,8 +140,8 @@ class TestSync(unittest.TestCase):
 
         #simulate new records
         new_records = [
-            self.mockala.Occurrence(66, 77, uuid.uuid4()),
-            self.mockala.Occurrence(88, 99, uuid.uuid4())
+            self.mockala.Occurrence(22, 33, uuid.uuid4()),
+            self.mockala.Occurrence(44, 55, uuid.uuid4())
         ]
         self.mockala.mock_add_records(self.s1, new_records)
 
@@ -191,7 +191,7 @@ class TestSync(unittest.TestCase):
 
         #change a record, keeping the same uuid
         old_record = self.records1[-1]
-        new_record = self.mockala.Occurrence(123, 456, old_record.uuid)
+        new_record = self.mockala.Occurrence(12, 34, old_record.uuid)
         self.mockala.mock_update_record(self.s1, new_record,
                 new_species=self.s2)
 
@@ -206,7 +206,9 @@ class TestSync(unittest.TestCase):
                          old_s2_count + 1)
 
         #check that updated record has correct lat/long
-        for occ in db.occurrences.select().execute():
+        query = select(['*', 'ST_X(location::geometry) as longitude', 'ST_Y(location::geometry) as latitude']).\
+                    select_from(db.occurrences)
+        for occ in db.engine.execute(query):
             occ_uuid = uuid.UUID(bytes=occ['source_record_id'])
             if occ_uuid == old_record.uuid:
                 self.assertEqual(occ['latitude'], new_record.latitude)
@@ -215,11 +217,7 @@ class TestSync(unittest.TestCase):
 
 
 def test_suite():
-    # in memory sqlite db
-    # uses pyspatialite instead of pysqlite2
-    sys.modules['pysqlite2'] = pyspatialite
-    db.connect({'db.url':'sqlite+pysqlite://'})
-    db.engine.execute("SELECT InitSpatialMetaData();")
-    db.metadata.create_all()
-
+    test_config_path = os.path.abspath(__file__ + "/../../../config.unittests.json")
+    with open(test_config_path) as f:
+        db.connect(json.load(f))
     return unittest.makeSuite(TestSync)
