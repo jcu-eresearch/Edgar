@@ -5,20 +5,30 @@ import argparse
 import json
 import logging
 from edgar_importing import db
+from shapely.geometry import Polygon
+
+# column indexes in shapefile
+COL_ID = 0
+COL_SPNO = 1
+COL_TAXONID = 2
+COL_RANGE_T = 3
+COL_BR_RNGE_T = 4
 
 _log = logging.getLogger(__name__)
 
+
 class Taxon(object):
 
-    def __init__(self, id=None, common=None, sci=None, db_id=None):
-        self.id = id
+    def __init__(self, spno=None, common=None, sci=None):
+        self.spno = spno
         self.common_name = common
         self.sci_name = sci
-        self.db_id = db_id
+        self.db_id = None
+        self.polys_by_vetting = {}
 
     def __repr__(self):
-        return '<Taxon id="{id}" db_id="{dbid}" sci="{sci}" common="{common}" />'.format(
-                id=self.id,
+        return '<Taxon spno="{spno}" db_id="{dbid}" sci="{sci}" common="{common}" />'.format(
+                spno=self.spno,
                 dbid=self.db_id,
                 sci=self.sci_name,
                 common=self.common_name)
@@ -60,7 +70,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def load_taxons_by_id(csv_path):
+def load_taxons_by_spno(csv_path):
     taxons = {}
 
     with open(csv_path, 'rb') as f:
@@ -71,10 +81,10 @@ def load_taxons_by_id(csv_path):
                 len(row['SpSciName']) > 0)
 
             if is_species:
-                taxon_id = int(row['SpNo'])
-                if taxon_id in taxons:
-                    raise RuntimeError('Duplicate TaxonID: ' + str(taxon_id))
-                taxons[taxon_id] = Taxon(id=taxon_id,
+                taxon_spno = int(row['SpNo'])
+                if taxon_spno in taxons:
+                    raise RuntimeError('Duplicate SpNo: ' + str(taxon_spno))
+                taxons[taxon_spno] = Taxon(spno=taxon_spno,
                                          common=row['SpName'],
                                          sci=row['SpSciName'])
 
@@ -117,21 +127,59 @@ def set_db_id_for_taxons(taxons):
             _log.debug('\tgenus missing')
 
 
+def poly_from_shapefile_shape(shape):
+    # Type 5 is a single polygon in the shapefile format
+    assert shape.shapeType == 5
+
+    if len(shape.points) <= 0:
+        _log.warning('Shape has no points?')
+        return None
+
+    # buffer(0) causes self-intersecting polygons to fix themselves
+    # super important, because self-intersecting polygons break everything
+    p = Polygon(shape.points).buffer(0)
+    if p.is_simple and p.is_valid:
+        return p
+    else:
+        return None
+
+
+def update_poly_on_taxon(taxon, record):
+    poly = poly_from_shapefile_shape(record.shape)
+    if poly is None:
+        _log.warning('Invalid polygon on record: %s', repr(record.record))
+        return
+
+    vetting = record.record[COL_RANGE_T]
+    if vetting in taxon.polys_by_vetting:
+        existing = taxon.polys_by_vetting[vetting]
+        taxon.polys_by_vetting[vetting] = existing.union(poly)
+    else:
+        taxon.polys_by_vetting[vetting] = poly
+
+
+def set_polys_for_taxons(shapef, taxons_by_spno):
+    # each row has an extra column as a deletion marker
+    assert(len(shapef.fields) == 6)
+
+    for record in shapef.shapeRecords():
+        taxon = taxons_by_spno[record.record[COL_SPNO]]
+        update_poly_on_taxon(taxon, record)
+
+
 def main():
     logging.basicConfig()
     logging.root.setLevel(logging.INFO)
     args = parse_args()
 
+    # connect to db
     with open(args.config[0], 'rb') as f:
         db.connect(json.load(f))
 
-    taxons = load_taxons_by_id(args.csv[0])
+    # lookup taxons (species) in BLA and local db
+    taxons = load_taxons_by_spno(args.csv[0])
     set_db_id_for_taxons(taxons.itervalues())
 
-    num_found = len(taxons)
-    for t in taxons.itervalues():
-        if t.db_id is None:
-            num_found -= 1
-            _log.info('Species not found in db: %s', repr(t))
-
-    _log.info('Found %d out of %d species in db', num_found, len(taxons))
+    # load shapefiles
+    sf = shapefile.Reader(args.shapefile[0])
+    set_polys_for_taxons(sf, taxons)
