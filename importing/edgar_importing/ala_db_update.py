@@ -19,7 +19,7 @@ def parse_args():
     parser.add_argument('config', metavar='config_file', type=str, nargs=1,
             help='''The path to the JSON config file.''')
 
-    return parser.parse_args();
+    return parser.parse_args()
 
 
 def main():
