@@ -54,6 +54,28 @@ occurrences = Table('occurrences', metadata,
     mysql_engine='MyISAM'
 )
 
+# exact copy of `occurrences`
+sensitive_occurrences = Table('sensitive_occurrences', metadata,
+    Column('id', Integer(), primary_key=True),
+    Column('latitude', Float(), nullable=False),
+    Column('longitude', Float(), nullable=False),
+    Column('rating', Enum(
+        'known valid',
+        'assumed valid',
+        'known invalid',
+        'assumed invalid'),
+        nullable=False),
+    Column('species_id', SmallInteger(), ForeignKey('species.id'),
+        nullable=False),
+    Column('source_id', SmallInteger(), ForeignKey('sources.id'),
+        nullable=False),
+    Column('source_record_id', BINARY(16), nullable=True),
+
+    Index('idx_sensitive_species_id', 'species_id'),
+
+    mysql_engine='MyISAM'
+)
+
 users = Table('users', metadata,
     Column('id', Integer(), primary_key=True),
     Column('email', String(256), nullable=False)

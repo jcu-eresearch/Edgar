@@ -29,6 +29,9 @@ def main():
 
     db.connect(config)
 
+    if 'alaApiKey' in config and config['alaApiKey'] is not None:
+        ala.set_api_key(config['alaApiKey'])
+
     if 'logLevel' in config:
         logging.basicConfig()
         logging.root.setLevel(logging.__dict__[config['logLevel']])

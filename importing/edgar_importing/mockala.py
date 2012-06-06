@@ -4,6 +4,7 @@ from copy import deepcopy
 
 class MockALA(object):
 
+    Coord = ala.Coord
     Occurrence = ala.Occurrence
     Species = ala.Species
 

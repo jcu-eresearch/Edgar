@@ -74,7 +74,7 @@ def write_csv_for_species_lsid(species_lsid):
     writer = csv.writer(sys.stdout)
     writer.writerow(['SPPCODE', 'LATDEC', 'LONGDEC'])
     for record in ala.occurrences_for_species(species_lsid):
-        writer.writerow([sppCode, record.latitude, record.longitude])
+        writer.writerow([sppCode, record.coord.lati, record.coord.longi])
         num_records += 1
     t = time.time() - t
     log.info('Processed %d total records in %0.2f secs (%0.2f records/sec)',

@@ -75,6 +75,11 @@ PACK_KEYS=1
 ROW_FORMAT=FIXED;
 
 
+-- Exactly like `occurrences` table, except holds sensitive/accurate coordinates
+-- THESE SHOULD NOT BE ACCESSABLE TO THE PUBLIC
+CREATE TABLE IF NOT EXISTS `sensitive_occurrences` LIKE `occurrences`;
+
+
 -- TODO: add extra info required per user
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,

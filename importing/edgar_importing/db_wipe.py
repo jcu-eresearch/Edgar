@@ -24,8 +24,11 @@ def main():
     db.species.delete().execute()
     db.sources.delete().execute()
     db.occurrences.delete().execute()
+    db.sensitive_occurrences.delete().execute()
 
     # insert species
+
+    # Old name for "cracticus tibicen". 400k records.
     db.species.insert().execute(
         scientific_name='Gymnorhina tibicen',
         common_name='Australian Magpie')
@@ -65,6 +68,11 @@ def main():
     db.species.insert().execute(
         scientific_name='Falco (Hierofalco) hypoleucos',
         common_name='Grey Falcon')
+
+    # 1000 records, of which 79 are sensitive
+    db.species.insert().execute(
+        scientific_name='Atrichornis (Atrichornis) rufescens',
+        common_name='Rufous Scrub-bird')
 
     # insert ALA source
     db.sources.insert().execute(
