@@ -22,6 +22,22 @@ td {
     padding: 0.5em;
     height: 5em;
 }
+
+td.new:after {
+    display: inline-block;
+    content: 'new!';
+    color: red;
+    padding: 0.5em;
+    background: yellow;
+    border: 4px dotted red;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-transform: rotate(-30deg);
+    -moz-transform: rotate(-30deg);
+    -ms-transform: rotate(-30deg);
+}
+
 tr:nth-child(2) td:nth-child(1):before { content: 'least suitable'; }
 tr:nth-child(2) td:nth-child(2) { border: 1px solid #ccc; border-right: none; }
 
@@ -32,6 +48,8 @@ td:nth-child(8):before { content: 'most suitable'; }
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
 
 <script>
+
+newsets = ['tanyellowdarkgreen'];
 
 sets = { 
 	'bluegreen': ['03c',
@@ -70,6 +88,12 @@ sets = {
 	                    '390',
 	                    '070'],
 
+	'tanyellowdarkgreen': ['970',
+	                       'ba0',
+	                       'cc0',
+	                       '690',
+	                       '070'],
+
 	'redgreen': ['f00',
 	             'c30',
 	             '960',
@@ -91,9 +115,14 @@ sets = {
 
 $(function() {
     $.each(sets, function(setname, setcolors) {
-        var table = "<table class='" + setname +
-                "'><tr><td colspan='8'>" + setname +
-                "</td></tr><tr><td></td><td></td>";
+        var table = "<table class='" + setname;
+	table = table + "'><tr><td colspan='8'";
+
+        if ($.inArray(setname, newsets) > -1) {
+            table = table + " class='new'";
+        }
+        table = table + ">" + setname +
+            "</td></tr><tr><td></td><td></td>";
         var css = "";
         
         $.each(setcolors, function(index, color) {
