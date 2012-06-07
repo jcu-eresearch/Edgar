@@ -8,8 +8,6 @@ categories: [Development]
 tags:    [progress, vetting, classification, dimensions, occurrences]
 ---
 
-# draft
-
 One of the two major pillars of the Edgar project is vetting bird records.
 
 The selfish reason for doing vetting is because modelling
@@ -68,10 +66,12 @@ a reasonable classification for an occurrence's habitat.
 <style>
     table.occurrenceclassification {
         border-spacing: 0.666em;
+        border-collapse: separate;
         margin: 0;
     }
 
     table.occurrenceclassification table {
+        border-collapse: separate;
         border-spacing: 0.666em;
         margin: 0 0 -5.666em;
     }
@@ -110,8 +110,12 @@ a reasonable classification for an occurrence's habitat.
     .occurrenceclassification h1, .occurrenceclassification p {
         margin: 0;
         padding: 0.666em;
+        line-height: 1.4em;
         font-size: inherit;
         font-weight: inherit;
+    }
+    .occurrenceclassification h1 {
+        line-height: 1.2em;
     }
 
     .occurrenceclassification p {
@@ -231,10 +235,12 @@ sacrificed the pleasure of seeing a nice clean classification for
 the convenience of having a single dimension for our volunteers
 to interact with.
 
-This is a good list if our volunteer bird experts feel like they
-can choose the right classification without feeling constrained 
-by the list they have to choose from.  It's a bad list if none of
-the offered classifications match the expert's opinion.
+I only _think_ this is a good list.  The true test is if our 
+volunteer bird experts feel like they can choose the right 
+classification without feeling constrained 
+by the list they have to choose from.  Conversely, it's a bad 
+list if none of the offered classifications match the expert's
+opinion.
 
 I can detect that by offering the vetting users a comments box 
 as well as a classification selector.  If a user feels like none
@@ -249,9 +255,9 @@ three pinkish ones are combinations of two bi-valued dimensions,
 { breeding | non-breeding } and { introduced | natural }, which
 should give four results.  The one I've left out is the 
 'introduced non-breeding' combination, which Lauren suggested
-was unreasonable given that a non-breeding core area implies a
-migratory bird, and migratory birds are unlikely to stay in an
-area even once they've been "introduced".
+was an unreasonable combination given that a non-breeding core
+area implies a migratory bird, and migratory birds are unlikely
+to stay in an area even once they've been "introduced".
 
 ### How we arrive at an initial classification
 
