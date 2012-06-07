@@ -7,7 +7,7 @@ Edgar, running in all its glory:
 Edgar's developer blog:
 http://jcu-eresearch.github.com/Edgar/
 
-The code running the Edgar website is <a href="http://github.com/jcu-eresearch/Edgar">available from github</a>.
+The code running the Edgar website is [available from github](http://github.com/jcu-eresearch/Edgar).  When completed, Edgar source code will be well suited to other projects that want to display and vet species occurrences, and show projections of future climate change and its effects.
 
 Structure
 ---------
@@ -19,8 +19,13 @@ A modelling section, also mostly Python, handles the ~~[fancy science magic](htt
 
 A mapping section uses [MapServer](http://mapserver.org) to take all the numeric data maps that the modelling creates, and deliver it in pretty map form to the UI.
 
-A web application section written in [CakePHP](http://cakephp.org) does the UI and whatnot, using [OpenLayers](http://openlayers.org) for showing the map.
+A web application section written in [CakePHP](http://cakephp.org) and JavaScript does the UI and whatnot, using [OpenLayers](http://openlayers.org) for showing the map.
 
 Credits
 -------
-(credits go here)
+
+Edgar is being developed by [a team](http://jcu-eresearch.github.com/Edgar/2012/03/22/the-team) at [JCU](http://www.jcu.edu.au/)'s [eResearch Centre](http://eresearch.jcu.edu.au/).
+
+The principal researcher and project advisor is [Dr Jeremy VanDerWal](http://www.jjvanderwal.com/).
+
+Edgar is supported by [the Australian National Data Service (ANDS)](http://www.ands.org.au/) through the National Collaborative Research Infrastructure Strategy Program and the Education Investment Fund (EIF) Super Science Initiative, as well as through the [Queensland Cyber Infrastructure Foundation (QCIF)](http://www.qcif.edu.au/).
