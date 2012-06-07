@@ -9,16 +9,15 @@ from geoalchemy import (GeometryExtensionColumn, Point, GeometryDDL,
 engine = None
 metadata = MetaData()
 
-ratings_enum = Enum('unknown', 'invalid', 'history', 'vagrant', 'irruptive',
-    'non-breeding', 'introduced non-breeding', 'breeding',
-    'introduced breeding');
-
 def connect(engine_config):
     '''Call this before trying to use anything else'''
     global engine
     engine = engine_from_config(engine_config, prefix='db.')
     metadata.bind = engine
 
+ratings_enum = Enum('unknown', 'invalid', 'historic', 'vagrant', 'irruptive',
+    'non-breeding', 'introduced non-breeding', 'breeding',
+    'introduced breeding');
 
 species = Table('species', metadata,
     Column('id', Integer(), primary_key=True),

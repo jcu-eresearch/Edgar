@@ -1,3 +1,5 @@
+import re
+import os.path
 import shapefile
 import shapely
 import csv
@@ -5,7 +7,9 @@ import argparse
 import json
 import logging
 from edgar_importing import db
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, MultiPolygon
+from geoalchemy import WKTSpatialElement
+
 
 # column indexes in shapefile
 COL_ID = 0
@@ -14,6 +18,22 @@ COL_TAXONID = 2
 COL_RANGE_T = 3
 COL_BR_RNGE_T = 4
 
+# map of BLA categories to db rating enum values
+RATINGS_BY_BLA_CATEGORIES = {
+        'irruptive': 'irruptive',
+        'vagrant': 'vagrant',
+        'escaped': 'vagrant',
+        'historic': 'historic',
+        'suspect': 'invalid',
+        'introduced, breeding and non-breeding': 'introduced breeding',
+        'introduced, breeding': 'introduced breeding',
+        'introduced, non-breeding': 'introduced non-breeding',
+        'core, breeding and non-breeding': 'breeding',
+        'core, breeding': 'breeding',
+        'core, non-breeding': 'non-breeding'
+}
+
+# global logger for this module
 _log = logging.getLogger(__name__)
 
 
@@ -24,7 +44,7 @@ class Taxon(object):
         self.common_name = common
         self.sci_name = sci
         self.db_id = None
-        self.polys_by_vetting = {}
+        self.polys_by_rating = {}
 
     def __repr__(self):
         return '<Taxon spno="{spno}" db_id="{dbid}" sci="{sci}" common="{common}" />'.format(
@@ -55,7 +75,7 @@ class Taxon(object):
 def parse_args():
     parser = argparse.ArgumentParser(
         description='''Loads Birdlife Australia shapefiles into the database as
-        vettings/ratings.''')
+        ratings.''')
 
     parser.add_argument('shapefile', type=str, nargs=1, help='''The path to
         the `.shp` file.''')
@@ -66,6 +86,16 @@ def parse_args():
 
     parser.add_argument('config', type=str, nargs=1, help='''The path to the
         JSON config file.''')
+
+    parser.add_argument('user_id', type=int, nargs=1, help='''The id Birdlife
+        Australia user. This user will own the ratings that are added to the
+        database.''')
+
+    parser.add_argument('srid', type=int, nargs=1, help='''The EPSG-compliant
+        SRID of the geometry in the shapefile. The '.prj' file in the shapefile
+        directory contains info about this, but you may have to look up the
+        SRID manually. Last import, the SRID was 4283 (the '.prj' file said the
+        projection was GCS_GDA_1994).''')
 
     return parser.parse_args()
 
@@ -144,18 +174,27 @@ def poly_from_shapefile_shape(shape):
         return None
 
 
+def rating_for_record(rec):
+    category = rec[COL_RANGE_T]
+    if category == 'core' or category == 'introduced':
+        category += ', ' + rec[COL_BR_RNGE_T]
+
+    assert category in RATINGS_BY_BLA_CATEGORIES
+    return RATINGS_BY_BLA_CATEGORIES[category]
+
+
 def update_poly_on_taxon(taxon, record):
     poly = poly_from_shapefile_shape(record.shape)
     if poly is None:
         _log.warning('Invalid polygon on record: %s', repr(record.record))
         return
 
-    vetting = record.record[COL_RANGE_T]
-    if vetting in taxon.polys_by_vetting:
-        existing = taxon.polys_by_vetting[vetting]
-        taxon.polys_by_vetting[vetting] = existing.union(poly)
+    rating = rating_for_record(record.record)
+    if rating in taxon.polys_by_rating:
+        existing = taxon.polys_by_rating[rating]
+        taxon.polys_by_rating[rating] = existing.union(poly)
     else:
-        taxon.polys_by_vetting[vetting] = poly
+        taxon.polys_by_rating[rating] = poly
 
 
 def set_polys_for_taxons(shapef, taxons_by_spno):
@@ -165,6 +204,27 @@ def set_polys_for_taxons(shapef, taxons_by_spno):
     for record in shapef.shapeRecords():
         taxon = taxons_by_spno[record.record[COL_SPNO]]
         update_poly_on_taxon(taxon, record)
+
+
+def insert_ratings_for_taxon(taxon, user_id, srid):
+    if taxon.db_id is None:
+        _log.warning('Skipping species with no db_id: %s', taxon.sci_name)
+        return
+
+    # TODO: make sure the rating polygons don't overlap
+    # TODO: load SRID for shapefile (using 4326 temporarily for debugging)
+
+    for rating, poly in taxon.polys_by_rating.iteritems():
+        # `poly` can be either a `Polygon` or a `MultiPolygon`
+        # postgis expects a `MultiPolygon`, so convert if a `Polygon`
+        if isinstance(poly, Polygon):
+            poly = MultiPolygon([poly])
+
+        db.ratings.insert().execute(
+            user_id=user_id,
+            comment='Polygons imported from Birdlife Australia',
+            rating=rating,
+            area=WKTSpatialElement(shapely.wkt.dumps(poly), srid))
 
 
 def main():
@@ -183,3 +243,10 @@ def main():
     # load shapefiles
     sf = shapefile.Reader(args.shapefile[0])
     set_polys_for_taxons(sf, taxons)
+
+    # wipe existing ratings
+    db.ratings.delete().where(db.ratings.c.user_id == args.user_id[0]).execute()
+
+    # create new ratings
+    for t in taxons.itervalues():
+        insert_ratings_for_taxon(t, args.user_id[0], args.srid[0])
