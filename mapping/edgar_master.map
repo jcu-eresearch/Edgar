@@ -19,7 +19,7 @@ MAP
     #    SIZE 256 256
 
     #define the working folder of this map file
-    SHAPEPATH "/scratch/jc155857/Edgar/models/"
+    SHAPEPATH "/scratch/jc155857/Edgar/modelling/outputs/"
 
     #define the background color
     TRANSPARENT ON
@@ -46,8 +46,8 @@ MAP
 
     #define the folder that used for generate image
     WEB
-        IMAGEPATH '/www/html/map_script/tmp/'
-        IMAGEURL 'http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/tmp/'
+        IMAGEPATH '/www/cake/Edgar/mapping/tmp/'
+        IMAGEURL 'http://www.hpc.jcu.edu.au/tdh-tools-2:80/Edgar/mapping/tmp/'
     END
 
     #the layer for raster data. you can put multiple layers in one map file
