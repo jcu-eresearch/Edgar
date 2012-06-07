@@ -9,7 +9,7 @@
     }
     $species_init_js =
             "var mapSpecies = " . $species_value . ";\n"
-            . 'var mapToolBaseUrl = "http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/";';
+            . 'var mapToolBaseUrl = "http://www.hpc.jcu.edu.au/tdh-tools-2:80/Edgar/mapping/";';
 
     // add the init JS to our scripts content block
     $this->Html->scriptBlock($species_init_js, array('inline'=>false));
