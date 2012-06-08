@@ -3,7 +3,7 @@
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 
-var map, occurrences, distribution, occurrence_select_control;
+var map, occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
 
 // Projections
 // ----------
@@ -93,10 +93,21 @@ function clearExistingSpeciesOccurrencesLayer() {
         map.removeControl(occurrence_select_control);
         occurrence_select_control = undefined;
     }
+
+    if(vettingLayer !== undefined) {
+        console.log('Removing vetting layer');
+        map.removeLayer(vettingLayer);
+        vettingLayerControl.unselectAll();
+        vettingLayerControl.deactivate();
+        map.removeControl(vettingLayerControl);
+        vettingLayer = undefined;
+        vettingLayerControl = undefined;
+    }
 }
 
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
+    addVettingLayer();
     addOccurrencesLayer();
     addDistributionLayer();
     updateLegend();
@@ -154,6 +165,40 @@ function addDistributionLayer() {
     );
 
     map.addLayer(distribution);
+}
+
+function addVettingLayer() {
+    console.log('Adding vetting layer')
+    var format = new OpenLayers.Format.GeoJSON({});
+    var styleMap = new OpenLayers.StyleMap({
+        'default': {
+            'fillColor': '#00FF00',
+            'strokeColor': '#008800',
+            'fillOpacity': 0.7,
+            'strokeOpacity': 0.9
+        }
+    });
+    vettingLayer = new OpenLayers.Layer.Vector('Vetting Areas', {
+        isBaseLayer: false,
+        projection: geographic,
+        strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
+        protocol: new OpenLayers.Protocol.HTTP({
+            url: (Edgar.baseUrl + "species/vetting_geo_json/" + mapSpecies.id + ".json"),
+            format: new OpenLayers.Format.GeoJSON({})
+        }),
+        styleMap: new OpenLayers.StyleMap({
+            'default': {
+                'fillColor': '#00FF00',
+                'strokeColor': '#008800',
+                'fillOpacity': 0.7,
+                'strokeOpacity': 0.9
+            }
+        })
+    });
+    vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: false});
+    map.addLayer(vettingLayer);
+    map.addControl(vettingLayerControl);
+    vettingLayerControl.activate();
 }
 
 function addOccurrencesLayer() {

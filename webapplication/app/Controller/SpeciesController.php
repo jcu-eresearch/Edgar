@@ -132,6 +132,23 @@ class SpeciesController extends AppController {
         $this->set('_serialize', 'geo_object');
     }
 
+    public function vetting_geo_json($species_id = null) {
+        $results = $this->Species->getDataSource()->execute(
+            'SELECT ST_AsGeoJSON(area) FROM ratings '.
+            'WHERE species_id = ? '.
+            'LIMIT 1',
+            array(),
+            array($species_id)
+        );
+
+        if($results){
+            $this->dieWithStatus(200, $results->fetchColumn(0));
+        } else {
+            //TODO: is this correct for empty geo json?
+            $this->dieWithStatus(200, '{}');
+        }
+    }
+
     /**
      * single_upload_json method
      *

@@ -62,6 +62,8 @@ ratings = Table('ratings', metadata,
     Column('id', Integer(), primary_key=True),
     Column('user_id', Integer(), ForeignKey('users.id'),
         nullable=False),
+    Column('species_id', Integer(), ForeignKey('species.id'),
+        nullable=False),
     Column('comment', Text(), nullable=False),
     Column('rating', ratings_enum, nullable=False),
     GeometryExtensionColumn('area', MultiPolygon(2, srid=4326), nullable=False)

@@ -1,5 +1,3 @@
-import re
-import os.path
 import shapefile
 import shapely
 import csv
@@ -222,6 +220,7 @@ def insert_ratings_for_taxon(taxon, user_id, srid):
 
         db.ratings.insert().execute(
             user_id=user_id,
+            species_id=taxon.db_id,
             comment='Polygons imported from Birdlife Australia',
             rating=rating,
             area=WKTSpatialElement(shapely.wkt.dumps(poly), srid))

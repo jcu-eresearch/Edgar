@@ -93,6 +93,7 @@ CREATE TABLE users (
 CREATE TABLE ratings (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id INT NOT NULL, -- foreign key into users.id
+    species_id INT NOT NULL, -- foreign key into species.id
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
     rating rating NOT NULL,
     area geography(MULTIPOLYGON,4326) NOT NULL
@@ -118,4 +119,4 @@ GRANT USAGE, SELECT ON ratings_id_seq TO edgar_backend;
 GRANT SELECT ON species TO edgar_frontend;
 GRANT SELECT ON occurrences TO edgar_frontend;
 GRANT SELECT, INSERT ON ratings TO edgar_frontend;
-GRANT USAGE, SELECT ON ratings_id_seq TO edgar_backend;
+GRANT USAGE, SELECT ON ratings_id_seq TO edgar_frontend;
