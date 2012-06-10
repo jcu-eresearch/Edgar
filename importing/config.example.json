@@ -14,5 +14,8 @@
     "logLevel": "WARNING",
 
     "doco_maxRetrySeconds": "The maximum number of seconds to keep retrying an ALA request, before finally canceling the import",
-    "maxRetrySeconds": 300
+    "maxRetrySeconds": 300,
+
+    "doco_alaApiKey": ">>>THIS IS SECRET. DO NOT MAKE THIS PUBLIC<<<. API key used to access sensitive occurrence coordinates in web requests to ALA",
+    "alaApiKey": null
 }

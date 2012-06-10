@@ -53,6 +53,23 @@ occurrences = Table('occurrences', metadata,
 )
 GeometryDDL(occurrences)
 
+# exact copy of `occurrences`
+sensitive_occurrences = Table('sensitive_occurrences', metadata,
+    Column('id', Integer(), primary_key=True),
+    GeometryExtensionColumn('location', Point(2, srid=4326), nullable=False),
+    Column('rating', ratings_enum, nullable=False),
+    Column('species_id', SmallInteger(), ForeignKey('species.id'),
+        nullable=False),
+    Column('source_id', SmallInteger(), ForeignKey('sources.id'),
+        nullable=False),
+    Column('source_record_id', BINARY(16), nullable=True),
+
+    Index('idx_sensitive_species_id', 'species_id'),
+
+    mysql_engine='MyISAM'
+)
+GeometryDDL(sensitive_occurrences)
+
 users = Table('users', metadata,
     Column('id', Integer(), primary_key=True),
     Column('email', String(256), nullable=False)

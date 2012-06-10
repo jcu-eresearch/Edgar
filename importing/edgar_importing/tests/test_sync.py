@@ -8,11 +8,21 @@ import os.path
 import json
 import logging
 from sqlalchemy import select, func
-import pyspatialite
-import sys
 
 
 class TestSync(unittest.TestCase):
+
+    def make_occ(self, lati, longi, sens_lati=None, sens_longi=None, uuid_in=None):
+        sens_coord = None
+        if sens_lati is not None:
+            assert sens_longi is not None
+            sens_coord = self.mockala.Coord(sens_lati, sens_longi)
+
+        return self.mockala.Occurrence(
+            coord=self.mockala.Coord(lati, longi),
+            sens_coord=sens_coord,
+            uuid_in=(uuid.uuid4() if uuid_in is None else uuid_in)
+        )
 
     def setUp(self):
         self.now = datetime.datetime.utcnow()
@@ -22,6 +32,7 @@ class TestSync(unittest.TestCase):
         #wipe db
         db.species.delete().execute()
         db.occurrences.delete().execute()
+        db.sensitive_occurrences.delete().execute()
         db.sources.delete().execute()
         db.sources.insert().execute(
             name='ALA',
@@ -38,13 +49,13 @@ class TestSync(unittest.TestCase):
 
         # dummy records
         self.records1 = [
-            self.mockala.Occurrence(1, 2, uuid.uuid4()),
-            self.mockala.Occurrence(3, 4, uuid.uuid4()),
-            self.mockala.Occurrence(5, 6, uuid.uuid4())
+            self.make_occ(1, 2),
+            self.make_occ(3, 4),
+            self.make_occ(5, 6, 1005, 1006)
         ]
         self.records2 = [
-            self.mockala.Occurrence(7, 8, uuid.uuid4()),
-            self.mockala.Occurrence(9, 10, uuid.uuid4()),
+            self.make_occ(7, 8),
+            self.make_occ(9, 10)
         ]
         self.mockala.mock_add_records(self.s1, self.records1, self.yesterday)
         self.mockala.mock_add_records(self.s2, self.records2, self.now)
@@ -66,14 +77,16 @@ class TestSync(unittest.TestCase):
             return result['id']
 
 
-    def num_db_occ_for_spec(self, species):
+    def num_db_occ_for_spec(self, species, sensitive_only=False):
         species_id = self.id_for_species(species)
         if species_id is None:
             return 0
 
+        table = db.sensitive_occurrences if sensitive_only else db.occurrences
+
         q = select([func.count("(*)")]).\
-                select_from(db.occurrences).\
-                where(db.occurrences.c.species_id == species_id)
+                select_from(table).\
+                where(table.c.species_id == species_id)
         return db.engine.execute(q).scalar()
 
 
@@ -140,8 +153,8 @@ class TestSync(unittest.TestCase):
 
         #simulate new records
         new_records = [
-            self.mockala.Occurrence(22, 33, uuid.uuid4()),
-            self.mockala.Occurrence(44, 55, uuid.uuid4())
+            self.make_occ(22, 33),
+            self.make_occ(44, 55)
         ]
         self.mockala.mock_add_records(self.s1, new_records)
 
@@ -182,7 +195,7 @@ class TestSync(unittest.TestCase):
 
 
     def test_updated_records_after_sync(self):
-        #sync
+        #syncwheri
         self.syncer.sync()
 
         #remember some counts
@@ -191,7 +204,7 @@ class TestSync(unittest.TestCase):
 
         #change a record, keeping the same uuid
         old_record = self.records1[-1]
-        new_record = self.mockala.Occurrence(12, 34, old_record.uuid)
+        new_record = self.make_occ(12, 34, uuid_in=old_record.uuid)
         self.mockala.mock_update_record(self.s1, new_record,
                 new_species=self.s2)
 
@@ -211,9 +224,61 @@ class TestSync(unittest.TestCase):
         for occ in db.engine.execute(query):
             occ_uuid = uuid.UUID(bytes=occ['source_record_id'])
             if occ_uuid == old_record.uuid:
-                self.assertEqual(occ['latitude'], new_record.latitude)
-                self.assertEqual(occ['longitude'], new_record.longitude)
+                self.assertEqual(occ['latitude'], new_record.coord.lati)
+                self.assertEqual(occ['longitude'], new_record.coord.longi)
                 break
+
+    def test_added_sensitive_records(self):
+        #sync
+        self.syncer.sync()
+
+        #check that sensitive record is there
+        sensitive_records = [x for x in self.records1 if x.sensitive_coord
+                is not None]
+
+        self.assertEqual(len(sensitive_records),
+                self.num_db_occ_for_spec(self.s1, sensitive_only=True))
+
+    def test_added_sensitive_records_after_sync(self):
+        #sync
+        self.syncer.sync()
+
+        #simulate new records
+        new_records = [
+            self.make_occ(66, 77),
+            self.make_occ(88, 99, 1088, 1099)
+        ]
+        self.mockala.mock_add_records(self.s1, new_records)
+
+        #sync again
+        self.syncer = sync.Syncer(self.mockala)
+        self.syncer.sync()
+
+        #check new records added
+        sensitive_records = [x for x in (self.records1 + new_records)
+                if x.sensitive_coord is not None]
+
+        self.assertEqual(len(sensitive_records),
+                         self.num_db_occ_for_spec(self.s1, sensitive_only=True))
+
+
+    def test_deleted_sensitive_records_after_sync(self):
+        #sync
+        self.syncer.sync()
+
+        #delete all sensitive records for s1
+        sensitive_records = [x for x in self.records1
+                if x.sensitive_coord is not None]
+        self.mockala.mock_remove_records(self.s1, sensitive_records)
+
+        #sync again
+        self.syncer = sync.Syncer(self.mockala)
+        self.syncer.sync()
+
+        #check deleted records are deleted
+        self.assertEqual(0,
+                self.num_db_occ_for_spec(self.s1, sensitive_only=True))
+
 
 
 def test_suite():

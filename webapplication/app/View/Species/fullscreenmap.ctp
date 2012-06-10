@@ -9,7 +9,7 @@
     }
     $species_init_js =
             "var mapSpecies = " . $species_value . ";\n"
-            . 'var mapToolBaseUrl = "http://www.hpc.jcu.edu.au/tdh-tools-2:81/map_script/";';
+            . 'var mapToolBaseUrl = "http://www.hpc.jcu.edu.au/tdh-tools-2:80/Edgar/mapping/";';
 
     // add the init JS to our scripts content block
     $this->Html->scriptBlock($species_init_js, array('inline'=>false));
@@ -23,33 +23,65 @@
 
 
 <div id="debugpanel" class="opposite panel debugpanel">
-    <!-- clustering selector -->
-    <fieldset class="clusteroptions" style="float: right">
-        <legend>Clustering Display</legend>
-        <select id="cluster">
-            <option value="dotradius" >Dot Radius (no clustering)</option>
-            <option value="dotgrid" selected>Dot Grid</option>
-            <option value="squaregrid">Square Grid</option>
-        </select>
-    </fieldset>
 </div>
 
 <div id="toolspanel" class="side panel toolspanel">
-    <!-- things here -->    
+
     <div class="tool">
         <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
     </div>
+
     <div class="tool">
         <h1>some tool</h1>
         <div class="toolcontent">
             tool content goes here
         </div>
     </div>
+
     <div class="tool">
-        <h1>another tool</h1>
+        <h1>emissions and time</h1>
         <div class="toolcontent">
-            tool content goes here
+            <!-- the check box will probably be removed when this is working properly -->
+            <input id="use_emission_and_year" type="checkbox" />
+            <select id="emission_scenarios">
+                <option value="sresa1b" selected="selected">sresa1b</option>
+                <option value="sresb1">sresb1</option>
+                <option value="sresa2">sresa2</option>
+            </select>
+            <select id="year_selector">
+                <option value="1990">1990</option>
+                <option value="2000">2000</option>
+                <option value="2010">2010</option>
+                <option value="2020" selected="selected">2020</option>
+                <option value="2030">2030</option>
+                <option value="2040">2040</option>
+                <option value="2050">2050</option>
+                <option value="2060">2060</option>
+                <option value="2070">2070</option>
+                <option value="2080">2080</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="tool">
+        <h1>debug</h1>
+        <div class="toolcontent">
+
+            <!-- clustering selector -->
+            <fieldset class="clusteroptions" style="float: right">
+                <legend>Clustering Display</legend>
+                <select id="cluster">
+                    <option value="dotradius" >Dot Radius (no clustering)</option>
+                    <option value="dotgrid" selected>Dot Grid</option>
+                    <option value="squaregrid">Square Grid</option>
+                </select>
+            </fieldset>
+
+            <hr style="clear: both">
+
+            <button id="go">.go.</button>
+            <label><input id="done" type="checkbox" value="done" />done</label>
         </div>
     </div>
 </div>
@@ -77,4 +109,6 @@
 </div>
 
 <div id="map"></div>
+
+<div id="spinner"></div>
 

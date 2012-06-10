@@ -26,8 +26,8 @@ class TestMockALA(unittest.TestCase):
         # add 2 records yesterday
         when1 = now - oneDay
         records1 = [
-            self.mock.Occurrence(1, 2, uuid.uuid4()),
-            self.mock.Occurrence(3, 4, uuid.uuid4())
+            self.mock.Occurrence(self.mock.Coord(1, 2), None, uuid.uuid4()),
+            self.mock.Occurrence(self.mock.Coord(3, 4), None, uuid.uuid4())
         ]
         self.mock.mock_add_records(s, records1, when1)
         all_occurrences = list(self.mock.occurrences_for_species(s.lsid))
@@ -36,9 +36,9 @@ class TestMockALA(unittest.TestCase):
         # add 3 records tomorrow
         when2 = now + oneDay
         records2 = [
-            self.mock.Occurrence(5, 6, uuid.uuid4()),
-            self.mock.Occurrence(7, 8, uuid.uuid4()),
-            self.mock.Occurrence(9, 10, uuid.uuid4())
+            self.mock.Occurrence(self.mock.Coord(5, 6), None, uuid.uuid4()),
+            self.mock.Occurrence(self.mock.Coord(7, 8), None, uuid.uuid4()),
+            self.mock.Occurrence(self.mock.Coord(9, 10), None, uuid.uuid4())
         ]
         self.mock.mock_add_records(s, records2, when2)
         all_occurrences = list(self.mock.occurrences_for_species(s.lsid))
@@ -64,7 +64,7 @@ class TestMockALA(unittest.TestCase):
         # add mock data
         old = self.mock.Species('Oldy McGoldy', 'Agedus oldii', 'olddddd')
         new = self.mock.Species('Newy McGooey', 'Newbus youngii', 'newwww')
-        old_records = [self.mock.Occurrence(1, 2, uuid.uuid4())]
+        old_records = [self.mock.Occurrence(self.mock.Coord(1, 2), None, uuid.uuid4())]
 
         self.mock.mock_add_species(old)
         self.mock.mock_add_records(old, old_records, datetime.datetime.utcnow())
@@ -130,10 +130,10 @@ class TestMockALA(unittest.TestCase):
         # add dummy data
         s = self.mock.Species('Dodo', 'Dodo dodii', 'dododododod')
         records = [
-            self.mock.Occurrence(1,2,uuid.uuid4()),
-            self.mock.Occurrence(3,4,uuid.uuid4()),
-            self.mock.Occurrence(5,6,uuid.uuid4()),
-            self.mock.Occurrence(7,8,uuid.uuid4())
+            self.mock.Occurrence(self.mock.Coord(1,2), None, uuid.uuid4()),
+            self.mock.Occurrence(self.mock.Coord(3,4), None, uuid.uuid4()),
+            self.mock.Occurrence(self.mock.Coord(5,6), None, uuid.uuid4()),
+            self.mock.Occurrence(self.mock.Coord(7,8), None, uuid.uuid4())
         ]
         self.mock.mock_add_species(s)
         self.mock.mock_add_records(s, records)
@@ -154,17 +154,17 @@ class TestMockALA(unittest.TestCase):
         #add dummy data
         s1 = self.mock.Species('Dodo', 'Dodo dodii', 'dododododod')
         s2 = self.mock.Species('Stealer', 'Stealalaal', 'sssssss')
-        record = self.mock.Occurrence(1,2,uuid.uuid4())
+        record = self.mock.Occurrence(self.mock.Coord(1,2), None, uuid.uuid4())
 
         self.mock.mock_add_species(s1)
         self.mock.mock_add_species(s2)
         self.mock.mock_add_records(s1, [record])
 
-        record.latitude = 88
+        record.coord.lati = 88
 
         # assert changing the local var does not alter the mocked var
         record_in_mock = list(self.mock.occurrences_for_species(s1.lsid))[0]
-        self.assertNotEqual(record.latitude, record_in_mock.latitude)
+        self.assertNotEqual(record.coord.lati, record_in_mock.coord.lati)
 
         # alter the mocked var (changes species and latitude)
         before_update = datetime.datetime.utcnow()
@@ -179,7 +179,7 @@ class TestMockALA(unittest.TestCase):
         record_in_mock = list(self.mock.occurrences_for_species(s2.lsid))[0]
 
         # assert latitude change is present
-        self.assertEqual(record.latitude, record_in_mock.latitude)
+        self.assertEqual(record.coord.lati, record_in_mock.coord.lati)
 
         #assert change date is correct for record
         records_before = self.mock.occurrences_for_species(s2.lsid,

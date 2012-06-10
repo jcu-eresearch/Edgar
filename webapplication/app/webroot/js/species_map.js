@@ -2,6 +2,17 @@
 //
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
+//
+//global Edgar object
+window.Edgar = window.Edgar || {};
+//vars related to the species map
+Edgar.map = Edgar.map || {};
+//(object) current species displayed on the map
+Edgar.map.species = null;
+//(string) identifier of the emission scenario for the distribution map (e.g. "giss_aom")
+Edgar.map.emissionScenario = null;
+//(integer) the year that the distribution map represents (e.g. 2010, or 2020, or 1980)
+Edgar.map.year = null;
 
 var map, occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
 
@@ -35,14 +46,14 @@ zoom_bounds = australia_bounds;
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 
 function speciesGeoJSONURL() {
-    return (Edgar.baseUrl + "species/geo_json_occurrences/" + mapSpecies.id + ".json");
+    return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.map.species.id + ".json");
 }
 
 function legendURL() {
-    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
     var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
     return mapToolBaseUrl + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + mapSpecies.distributionThreshold;
+        '&THRESHOLD=' + Edgar.map.species.distributionThreshold;
 }
 
 function updateLegend() {
@@ -60,6 +71,7 @@ function showLegend() {
 function hideLegend() {
     $('#map_legend_img').hide();
 }
+
 
 // Removes the old layers..
 // Adds the new fresh layers.
@@ -120,7 +132,28 @@ function clearMapPopups() {
     });
 }
 
+function reloadDistributionLayers() {
+    if (distribution !== undefined) {
+        map.removeLayer(distribution);
+        distribution = undefined;
+    }
+    addDistributionLayer();
+}
+
 function addDistributionLayer() {
+    speciesId = Edgar.map.species.id;
+    scenario = Edgar.map.emissionScenario;
+    year = Edgar.map.year;
+    bioData = 'csiro_mk3_5'; //what is this meant to be set to?
+    runs = 'run1.run1'; //what is this meant to be set to?
+
+    //check box will be removed when it is working
+    if($('#use_emission_and_year').is(':checked')){
+        mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
+    } else {
+        mapPath = speciesId+'/1975.asc';
+    }
+
     // Species Distribution
     // ----------------------
 
@@ -135,7 +168,7 @@ function addDistributionLayer() {
     // projection request.
     // I could be wrong though...
 
-//    var sciNameCased = flattenScientificName(mapSpecies.scientificName);
+//    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
 
     distribution = new OpenLayers.Layer.WMS(
         "Distribution",
@@ -144,14 +177,14 @@ function addDistributionLayer() {
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
         {
-            MODE: 'map', 
+            MODE: 'map',
             MAP: 'edgar_master.map',
-            DATA: (mapSpecies.id + '/1975.asc'),
-            SPECIESID: mapSpecies.id,
+            DATA: mapPath,
+            SPECIESID: Edgar.map.species.id,
             REASPECT: "true",
             TRANSPARENT: 'true',
             // TODO -> Set the threshold.
-//            THRESHOLD: mapSpecies.distributionThreshold
+//            THRESHOLD: Edgar.map.species.distributionThreshold
             THRESHOLD: "0"
 
         },
@@ -164,6 +197,7 @@ function addDistributionLayer() {
         }
     );
 
+    registerLayerProgress(distribution, "climate suitability");
     map.addLayer(distribution);
 }
 
@@ -381,6 +415,7 @@ function addOccurrencesLayer() {
             occurrences, {hover: false}
         );
 
+        registerLayerProgress(occurrences, "species occurrences");
         map.addLayer(occurrences);
 
         map.addControl(occurrence_select_control);
@@ -394,13 +429,12 @@ function flattenScientificName(name) {
 function updateWindowHistory() {
     if(window.History.enabled) {
         window.History.replaceState(
-            mapSpecies,
+            Edgar.map.species,
             '',
-            Edgar.baseUrl + 'species/map/' + mapSpecies.id
+            Edgar.baseUrl + 'species/map/' + Edgar.map.species.id
         );
     }
 }
-
 
 $(function() {
 
@@ -426,7 +460,88 @@ $(function() {
 
     });
 
-    // not sure how to position controls while adding them in constructor
+    // I want to show the layer loading status on the layer-switcher, but
+    // OpenLayers keeps remaking the dom elements in the switcher.
+    // I'm attaching behaviour to the layer-added-to-map event that will
+    // hook up all the loading indicators when layers are added.
+    map.events.register('addlayer', null, function(event) {
+
+        // find the label DOM for a given layer --------------------------
+        function layerLabelDom(layer) {
+            var switcher = layer.map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
+            var layerIndicator = $.grep(switcher.dataLayers, function(dl, index) {
+                return (dl.layer === event.layer);
+            });
+            if (layerIndicator && layerIndicator.length > 0) {
+                return $(layerIndicator[0].labelSpan);
+            } else {
+                return null;
+            }
+        } // -------------------------------------------------------------
+
+/*
+//////////////// experimental
+if (event.layer.name == "Occurrences") {
+
+    setTimeout( function() {
+        lspan = layerLabelDom(event.layer);
+        lspan.css('border', '10px solid red');
+        console.log('   occurrences layer label made border on');
+    }, 1000);
+}
+////////////////
+*/
+
+
+        console.log('registering layer ' + event.layer.name);
+
+
+        // do stuff when the layer has started loading
+        event.layer.events.register('loadstart', null, function(evt) {
+            // find the layerswitcher
+console.log('start loading layer ' + evt.object.name + '...');
+            var label = layerLabelDom(evt.object);
+            if (label) {
+                label.addClass('loading');
+            } else {
+console.log('! no matching label for ' + evt.object.name + '!');
+            }
+            layersLoading.push(evt.object.name);
+            loadingChanged();
+        });
+
+        // do stuff when the layer has finished loading
+        event.layer.events.register('loadend', null, function(evt) {
+console.log('... done loading layer ' + evt.object.name);
+            // find the layerswitcher
+            var label = layerLabelDom(evt.object);
+            if (label) {
+                label.removeClass('loading');
+            }
+            layersLoading.splice( $.inArray(evt.object.name, layersLoading), 1 );
+            loadingChanged();
+        });
+/*
+        // do stuff when the layer has changed
+        event.layer.events.register('visibilitychanged', null, function(evt) {
+console.log('layer visibility changed (' + event.layer.visibility + ') ' + event.layer.name);
+            // find the layerswitcher
+            var ls = map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
+            var label = layerLabelDom(ls, event.layer);
+            if (label) {
+                label.addClass('notloading');
+            }
+            layersLoading.splice( $.inArray(event.layer.name, layersLoading), 1 );
+            loadingChanged();
+        });
+*/
+
+
+    });
+
+
+    // not sure how to position controls while adding them in constructor.
+    // instead I'm just adding the control here in the right place.
     map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(5,60));
 
 
@@ -541,45 +656,26 @@ $(function() {
 //    map.addControl(new OpenLayers.Control.MousePosition());
 
     // Let the user change between layers
-//    layer_switcher = new OpenLayers.Control.ExtendedLayerSwitcher();
-    layer_switcher = new OpenLayers.Control.LayerSwitcher({
+//    layerSwitcher = new OpenLayers.Control.ExtendedLayerSwitcher();
+    layerSwitcher = new OpenLayers.Control.LayerSwitcher({
         div: $('#layerstool').get(0),
         roundedCorner: false,
         useLegendGraphics: true
     });
-    layer_switcher.ascending = false;
-//    layer_switcher.useLegendGraphics = false;
+    layerSwitcher.ascending = false;
 
-
-    map.addControl(layer_switcher);
-//    layer_switcher.maximizeControl();
+    map.addControl(layerSwitcher);
+//    layerSwitcher.maximizeControl();
 
     // Add our layers
-//        map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0, occurrences]);
-//    map.addLayers([gphy, gmap, ghyb, gsat, bing_road, bing_hybrid, bing_aerial, osm, vmap0]);
     map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
     map.setBaseLayer(gphy);
 
     // Zoom the map to the zoom_bounds specified earlier
     map.zoomToExtent(zoom_bounds);
 
-    if (mapSpecies !== null) {
-        changeSpecies(mapSpecies);
-    }
-
     addLegend();
-/*
-    setTimeout( function() {
-        var all_controls = map.getControlsByClass( { test: function() {return true;} } );
-        var control_names = "";
-        $(all_controls).each( function(control) {
-            control_names += ", " + control + ":" + typeof(control);
-            var this_one = map.getControl(control);
-            alert(this_one);
-        });
-        alert( control_names );
-    }, 2000);
-*/
+
 });
 
 function addLegend() {

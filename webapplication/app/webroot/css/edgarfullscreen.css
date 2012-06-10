@@ -3,33 +3,115 @@
 /* overall layout ----------------------------------------------------- */
 
 /* all the main things should be full screen size */
-html, body, #map {
+html, body {
     margin: 0;
     width: 100%;
     height: 100%;
 }
 
+#header, #content {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+#header {
+    top: 0;
+    height: 50px;
+}
+
+#content {
+    top: 50px;
+    bottom: 0;
+}
+
 /* things in the main layout */
-#flash, #header, #footer, #sidebar {
+#flash, #footer, #sidebar {
     display: none;
 }
 
-/* things in the species map view */
+/* things in the header ----------------------------------------------- */
+
+#header {
+    margin: 0;
+    padding-left: 100px;
+    background-color: #333;
+    color: #ccc;
+    z-index: 1000000;
+}
+
+#header:before {
+    display: block;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    content: url(/img/logo.png);
+}
+
+/* if the logo was the right size, we woulnd't need this bit */
+#header:before {
+    height: 100px;
+    width: 100px;
+    content: ' '; /* use background instead coz we can resize the background */
+    background-image: url(/img/logo.png);
+    background-size: 60%; /* is a percentage of the image's original size */
+    background-repeat: no-repeat;
+}
+
+#header h1 { display: none; }
+
+#user {
+    float: right;
+    margin: 13px 0;
+    font-size: 13px;
+    height: 24px;
+    line-height: 24px;
+}
+
+#user a {
+    display: inline-block;
+    background: white;
+    color: #333;
+    text-decoration: inherit;
+    white-space: nowrap;
+    padding: 0 13px;
+    margin: 0 13px;
+    border-radius: 0.25em;
+    font-weight: bold;
+}
+
+#user a.login {
+    line-height: inherit;
+}
+
+#user a.logout {
+    background: #999;
+}
+
+#user a:hover {
+    text-decoration: underline;
+}
+
+
+/* things in the content area ----------------------------------------- */
+
 #map {
+    margin: 0;
+    width: 100%;
+    height: 100%;
     z-index: -1;
 }
 
 .panel {
     position: absolute;
     z-index: 10000;
-    opacity: 0.33;
+    opacity: 0.45;
     background-color: white;
     color: black;
 }
 
 .panel:hover {
-    opacity: 0.66;
-    xopacity: 1;
+    opacity: 0.75;
 }
 
 .top.panel {
@@ -116,23 +198,31 @@ html, body, #map {
     border-radius: 0.25em;
 }
 
-#layerstool {
-}
-
-#toolspanel .labelSpan {
-    font-size: inherit;
-    display: inline-block;
-    height: 1.7em;
-    line-height: 1.7em;
+#layerstool br {
+    display: none;
 }
 
 #toolspanel input[type="radio"], #toolspanel input[type="checkbox"] {
+    float: left;
     font-size: inherit;
     height: 1.7em;
     vertical-align: bottom; /* OpenLayers adds valign: b to the labelSpan */
     width: auto;
-    margin: 0 0.4em 0 0;
+    margin: 0 0.5em 0 0;
 }
+
+#toolspanel .labelSpan {
+    font-size: inherit;
+    display: block;
+    height: 1.7em;
+    line-height: 1.7em;
+}
+
+#toolspanel .dataLayersDiv .labelSpan.loading:before {
+    float: right;
+    content: url(../img/loading-bar.gif);
+}
+
 
 /* debug panel content ------------------------------------------------ */
 
@@ -140,12 +230,9 @@ html, body, #map {
     -webkit-border-radius: 0.5em;
     -moz-border-radius: 0.5em;
     border-radius: 0.5em;
-    font-size: 65%;
+    font-size: 80%;
     background: #fff;
-    opacity: 0.5;
     z-index: 1000000;
-    padding: 1em;
-    margin: 1em;
 }
 .clusteroptions legend {
     -webkit-border-radius: 0.5em;
