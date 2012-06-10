@@ -41,7 +41,7 @@ def main():
 
     logging.info("Started at %s", str(datetime.now()))
     try:
-        syncer = sync.Syncer(ala, mysql_upsert_optimisation=config['db.url'].startswith('mysql'))
+        syncer = sync.Syncer(ala)
         syncer.sync(sync_species=config['updateSpecies'],
                     sync_occurrences=config['updateOccurrences'])
     finally:
