@@ -272,7 +272,8 @@ def q_param(species_lsid=None, changed_since=None):
         {lsid}
         {changed}
         (rank:species OR subspecies_name:[* TO *]) AND
-        longitude:[* TO *]
+        longitude:[-180 TO 180] AND
+        latitude:[-90 TO 90] AND
         (
             basis_of_record:HumanObservation OR
             basis_of_record:MachineObservation
