@@ -17,7 +17,7 @@ class Species extends AppModel {
             'className' => 'Occurrence',
             'dependent' => true,
             'order'     => 'rand()',
-            'limit'     => 7500
+            'limit'     => 10000
         )
     );
 

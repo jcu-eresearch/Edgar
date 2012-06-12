@@ -130,13 +130,19 @@ $user = AuthComponent::user();
                     'alt'=>'JCU eResearch Centre',
                     'url'=>'http://eresearch.jcu.edu.au/'
                 ));
+                echo $this->Html->image('ala_logo.jpg', array(
+                    'alt'=>'Altas of Living Australia',
+                    'url'=>'http://www.ala.org.au/'
+                ));
             ?>
         </div>
 
         <p>
             Edgar is being developed by
             <a href="http://jcu-eresearch.github.com/Edgar/2012/03/22/the-team">a team</a>
-            at JCU's eResearch Centre.  The project maintains a
+            at JCU's eResearch Centre and uses data from the
+            <a href="http://www.ala.org.au/">Atlas of Living Australia</a>.
+            The project maintains a
             <a href="http://jcu-eresearch.github.com/Edgar/">development blog</a>
             and the source code is available on
             <a href="http://github.com/jcu-eresearch/Edgar">github</a>.
@@ -191,7 +197,7 @@ $user = AuthComponent::user();
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="about" class="triggeredtab"><div class="inner">
         <p class="significant">
-            Edgar is a website where visitors can explore the
+            Edgar is a website where visitors can explore the <br>
             <strong style="white-space: nowrap">future impact</strong>
             <strong style="white-space: nowrap">of</strong>
             <strong style="white-space: nowrap">climate change</strong>
