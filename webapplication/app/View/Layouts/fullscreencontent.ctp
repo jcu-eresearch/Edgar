@@ -122,6 +122,14 @@ $user = AuthComponent::user();
                     'alt'=>'Centre for Tropical Biodiversity &amp; Climate Change',
                     'url'=>'http://www.jcu.edu.au/ctbcc/'
                 ));
+                echo $this->Html->image('tdh_logo.png', array(
+                    'alt'=>'Tropical Data Hub',
+                    'url'=>'http://tropicaldatahub.org/'
+                ));
+                echo $this->Html->image('ala_logo.jpg', array(
+                    'alt'=>'Altas of Living Australia',
+                    'url'=>'http://www.ala.org.au/'
+                ));
                 echo $this->Html->image('jcu_logo.png', array(
                     'alt'=>'James Cook University',
                     'url'=>'http://www.jcu.edu.au/'
@@ -129,10 +137,6 @@ $user = AuthComponent::user();
                 echo $this->Html->image('eresearch_logo.png', array(
                     'alt'=>'JCU eResearch Centre',
                     'url'=>'http://eresearch.jcu.edu.au/'
-                ));
-                echo $this->Html->image('ala_logo.jpg', array(
-                    'alt'=>'Altas of Living Australia',
-                    'url'=>'http://www.ala.org.au/'
                 ));
             ?>
         </div>
