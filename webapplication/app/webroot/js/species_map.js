@@ -3,6 +3,10 @@
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
 // Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
 //
+
+// convenient debug method
+function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
+
 //global Edgar object
 window.Edgar = window.Edgar || {};
 //vars related to the species map
@@ -130,37 +134,41 @@ function reloadDistributionLayers() {
 }
 
 function addDistributionLayer() {
-    speciesId = Edgar.map.species.id;
-    scenario = Edgar.map.emissionScenario;
-    year = Edgar.map.year;
-    bioData = 'csiro_mk3_5'; //what is this meant to be set to?
-    runs = 'run1.run1'; //what is this meant to be set to?
 
-    //check box will be removed when it is working
-    if($('#use_emission_and_year').is(':checked')){
-        mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
-    } else {
-        mapPath = speciesId+'/1975.asc';
+    if (Edgar.map.species) {
+
+        speciesId = Edgar.map.species.id;
+        scenario = Edgar.map.emissionScenario;
+        year = Edgar.map.year;
+        bioData = 'csiro_mk3_5'; //what is this meant to be set to?
+        runs = 'run1.run1'; //what is this meant to be set to?
+
+        //check box will be removed when it is working
+        if($('#use_emission_and_year').is(':checked')){
+            mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
+        } else {
+            mapPath = speciesId+'/1975.asc';
+        }
+
+        // Species Distribution
+        // ----------------------
+
+        // Our distribution map layer.
+        //
+        // NOTE:
+        // -----
+        //
+        // This code may need to be updated now that we are using mercator.
+        // I believe that OpenLayers will send the correct projection request
+        // to Map Server. I also believe that map script will correctly process the
+        // projection request.
+        // I could be wrong though...
+
+    //    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
     }
 
-    // Species Distribution
-    // ----------------------
-
-    // Our distribution map layer.
-    //
-    // NOTE:
-    // -----
-    //
-    // This code may need to be updated now that we are using mercator.
-    // I believe that OpenLayers will send the correct projection request
-    // to Map Server. I also believe that map script will correctly process the
-    // projection request.
-    // I could be wrong though...
-
-//    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
-
     distribution = new OpenLayers.Layer.WMS(
-        "Distribution",
+        "Climate Suitability",
         mapToolBaseUrl + 'map_with_threshold.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
@@ -265,6 +273,8 @@ function addOccurrencesLayer() {
         cluster_selector = document.getElementById("cluster");
         if (cluster_selector) {
             cluster_strategy = cluster_selector.options[cluster_selector.selectedIndex].value;
+        } else {
+            cluster_strategy = "dotgrid";
         }
 
         // The occurrences layer
@@ -434,32 +444,17 @@ $(function() {
             }
         } // -------------------------------------------------------------
 
-/*
-//////////////// experimental
-if (event.layer.name == "Occurrences") {
-
-    setTimeout( function() {
-        lspan = layerLabelDom(event.layer);
-        lspan.css('border', '10px solid red');
-        console.log('   occurrences layer label made border on');
-    }, 1000);
-}
-////////////////
-*/
-
-
-        console.log('registering layer ' + event.layer.name);
-
+        consolelog('registering layer ' + event.layer.name);
 
         // do stuff when the layer has started loading
         event.layer.events.register('loadstart', null, function(evt) {
             // find the layerswitcher
-console.log('start loading layer ' + evt.object.name + '...');
+consolelog('start loading layer ' + evt.object.name + '...');
             var label = layerLabelDom(evt.object);
             if (label) {
                 label.addClass('loading');
             } else {
-console.log('! no matching label for ' + evt.object.name + '!');
+consolelog('! no matching label for ' + evt.object.name + '!');
             }
             layersLoading.push(evt.object.name);
             loadingChanged();
@@ -467,7 +462,7 @@ console.log('! no matching label for ' + evt.object.name + '!');
 
         // do stuff when the layer has finished loading
         event.layer.events.register('loadend', null, function(evt) {
-console.log('... done loading layer ' + evt.object.name);
+consolelog('... done loading layer ' + evt.object.name);
             // find the layerswitcher
             var label = layerLabelDom(evt.object);
             if (label) {
@@ -479,7 +474,7 @@ console.log('... done loading layer ' + evt.object.name);
 /*
         // do stuff when the layer has changed
         event.layer.events.register('visibilitychanged', null, function(evt) {
-console.log('layer visibility changed (' + event.layer.visibility + ') ' + event.layer.name);
+consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.layer.name);
             // find the layerswitcher
             var ls = map.getControlsByClass('OpenLayers.Control.LayerSwitcher')[0];
             var label = layerLabelDom(ls, event.layer);
