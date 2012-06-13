@@ -7,6 +7,7 @@ import logging
 from edgar_importing import db
 from shapely.geometry import Polygon, MultiPolygon
 from geoalchemy import WKTSpatialElement
+import geoalchemy.functions
 
 
 # column indexes in shapefile
@@ -210,7 +211,6 @@ def insert_ratings_for_taxon(taxon, user_id, srid):
         return
 
     # TODO: make sure the rating polygons don't overlap
-    # TODO: load SRID for shapefile (using 4326 temporarily for debugging)
 
     for rating, poly in taxon.polys_by_rating.iteritems():
         # `poly` can be either a `Polygon` or a `MultiPolygon`
@@ -218,12 +218,16 @@ def insert_ratings_for_taxon(taxon, user_id, srid):
         if isinstance(poly, Polygon):
             poly = MultiPolygon([poly])
 
-        db.ratings.insert().execute(
+        area = WKTSpatialElement(shapely.wkt.dumps(poly), srid)
+
+        q = db.ratings.insert().values(
             user_id=user_id,
             species_id=taxon.db_id,
             comment='Polygons imported from Birdlife Australia',
             rating=rating,
-            area=WKTSpatialElement(shapely.wkt.dumps(poly), srid))
+            area=area)
+
+        q.execute()
 
 
 def main():

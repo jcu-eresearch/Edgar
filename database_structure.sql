@@ -58,8 +58,13 @@ CREATE TABLE occurrences (
     source_id INT NOT NULL, -- foreign key to sources.id
     source_record_id bytea NULL -- the id of the record as obtained from the source (e.g. the uuid from ALA)
 );
+SELECT AddGeometryColumn('occurrences', 'location', 4326, 'POINT', 2);
+ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
 CREATE INDEX occurrences_species_id_idx ON occurrences (species_id);
 CREATE UNIQUE INDEX occurrences_source_record_idx ON occurrences (source_id, source_record_id);
+CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
+CLUSTER occurrences USING occurrences_location_idx;
+VACUUM ANALYSE occurrences;
 
 -- Exactly the same as occurrences, except contains the sensitive (a.k.a "accurate", "unobfuscated")
 -- coordinates. SHOULD NOT BE ACCESSABLE TO THE PUBLIC.
@@ -95,9 +100,11 @@ CREATE TABLE ratings (
     user_id INT NOT NULL, -- foreign key into users.id
     species_id INT NOT NULL, -- foreign key into species.id
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
-    rating rating NOT NULL,
-    area geography(MULTIPOLYGON,4326) NOT NULL
+    rating rating NOT NULL
 );
+SELECT AddGeometryColumn('ratings', 'area', 4326, 'MULTIPOLYGON', 2);
+ALTER TABLE ratings ALTER COLUMN area SET NOT NULL;
+ALTER TABLE ratings ADD CONSTRAINT ratings_area_valid_check CHECK (ST_IsValid(area));
 
 
 -- Permissions

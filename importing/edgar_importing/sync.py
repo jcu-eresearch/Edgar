@@ -329,7 +329,7 @@ class Syncer:
             return 'invalid'
 
 
-    def upsert_occurrence(self, occurrence, species_id):
+    def upsert_occurrence(self, occ, species_id):
         '''Looks up whether `occurrence` (an ala.Occurrence object)
         already exists in the local db. If it does, the db row is updated with
         the information in `occurrence`. If it does not exist, a new row is
@@ -338,21 +338,21 @@ class Syncer:
         `species_id` must be supplied as an argument because it is not
         obtainable from `occurrence`'''
 
-        if occurrence.coord is not None:
-            self.upsert(occurrence, species_id, db.occurrences)
+        if occ.coord is not None:
+            self.upsert(occ, species_id, db.occurrences, occ.coord)
 
-        if occurrence.sensitive_coord is not None:
-            self.upsert(occurrence, species_id, db.sensitive_occurrences)
+        if occ.sensitive_coord is not None:
+            self.upsert(occ, species_id, db.sensitive_occurrences, occ.sensitive_coord)
 
 
-    def upsert(self, occ, species_id, table):
+    def upsert(self, occ, species_id, table, coord):
         existing = table.select().\
             where(table.c.source_record_id == occ.uuid.bytes).\
             where(table.c.source_id == self.source_row_id).\
             execute().\
             fetchone()
 
-        p = shapely.geometry.Point(occ.coord.longi, occ.coord.lati)
+        p = shapely.geometry.Point(coord.longi, coord.lati)
         location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
 
         if existing is None:

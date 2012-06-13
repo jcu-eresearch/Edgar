@@ -217,7 +217,7 @@ function addVettingLayer() {
         projection: geographic,
         strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
         protocol: new OpenLayers.Protocol.HTTP({
-            url: (Edgar.baseUrl + "species/vetting_geo_json/" + mapSpecies.id + ".json"),
+            url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.map.species.id + ".json"),
             format: new OpenLayers.Format.GeoJSON({})
         }),
         styleMap: new OpenLayers.StyleMap({
