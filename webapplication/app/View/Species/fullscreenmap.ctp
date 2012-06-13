@@ -18,6 +18,7 @@
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
+    $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
 ?>
 
@@ -108,7 +109,11 @@
     </table>
 </div>
 
-<div id="map"></div>
+<div id="map">
+    <div class='map_legend'>
+        <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
+    </div>
+</div>
 
 <div id="spinner"></div>
 
