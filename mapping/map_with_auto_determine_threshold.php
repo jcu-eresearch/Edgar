@@ -1,4 +1,6 @@
 <?php
+    require("lib/map_utility_functions.php");
+
     $map_request = ms_newOwsRequestObj();
     $map_request->loadparams();
 
@@ -58,7 +60,7 @@
 
 
     // Pull out every class in the map file.
-    while($layer->removeClass(0) != NULL);
+    mu_removeAllStyleClasses($layer);
 
     $layer->set('data', $data);
 
