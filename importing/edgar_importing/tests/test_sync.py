@@ -82,11 +82,14 @@ class TestSync(unittest.TestCase):
         if species_id is None:
             return 0
 
-        table = db.sensitive_occurrences if sensitive_only else db.occurrences
+        if sensitive_only:
+            table = db.sensitive_occurrences.join(db.occurrences)
+        else:
+            table = db.occurrences
 
         q = select([func.count("(*)")]).\
                 select_from(table).\
-                where(table.c.species_id == species_id)
+                where(db.occurrences.c.species_id == species_id)
         return db.engine.execute(q).scalar()
 
 

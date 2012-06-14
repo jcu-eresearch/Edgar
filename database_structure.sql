@@ -1,4 +1,11 @@
--- SQL compatible with PostgreSQL v8.4
+-- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
+
+
+
+
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+-- CUSTOM TYPES
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -- The ratings enum has these values, in order:
 --     "unknown" - lolwut i don't even
@@ -24,6 +31,12 @@ CREATE TYPE rating AS ENUM(
     'breeding',
     'introduced breeding'
 );
+
+
+
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+-- TABLE DEFINITIONS
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -- Each species has many occurrences, and each occurrence belongs to one species.
 CREATE TABLE species (
@@ -52,34 +65,32 @@ CREATE TABLE sources (
 -- so it should have as few columns as possible.
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
-    location geography(POINT,4326) NOT NULL,
-    rating rating NOT NULL,
+    rating rating NOT NULL, -- The canonical rating (a.k.a "vetting") for the occurrence
     species_id INT NOT NULL, -- foreign key to species.id
     source_id INT NOT NULL, -- foreign key to sources.id
-    source_record_id bytea NULL -- the id of the record as obtained from the source (e.g. the uuid from ALA)
+    source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
+    source_rating rating NOT NULL -- The rating as obtained from the source (i.e. ALA assertions translated to our ratings system)
 );
 SELECT AddGeometryColumn('occurrences', 'location', 4326, 'POINT', 2);
 ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
 CREATE INDEX occurrences_species_id_idx ON occurrences (species_id);
 CREATE UNIQUE INDEX occurrences_source_record_idx ON occurrences (source_id, source_record_id);
 CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
-CLUSTER occurrences USING occurrences_location_idx;
+-- Do this manually, can take hours: CLUSTER occurrences USING occurrences_location_idx;
 VACUUM ANALYSE occurrences;
 
--- Exactly the same as occurrences, except contains the sensitive (a.k.a "accurate", "unobfuscated")
--- coordinates. SHOULD NOT BE ACCESSABLE TO THE PUBLIC.
--- TODO: should the `id` column match the `occurrences.id` column?
-CREATE TABLE sensitive_occurrences (
-    id SERIAL NOT NULL PRIMARY KEY,
-    location geography(POINT,4326) NOT NULL,
-    rating rating NOT NULL,
-    species_id INT NOT NULL, -- foreign key to species.id
-    source_id INT NOT NULL, -- foreign key to sources.id
-    source_record_id bytea NULL -- the id of the record as obtained from the source (e.g. the uuid from ALA)
-);
-CREATE INDEX sensitive_occurrences_species_id_idx ON occurrences (species_id);
-CREATE UNIQUE INDEX sensitive_occurrences_source_record_idx ON occurrences (source_id, source_record_id);
 
+-- SHOULD NOT BE ACCESSABLE TO THE PUBLIC.
+-- Join this table to the occurrences table for access to the sensitive_location
+CREATE TABLE sensitive_occurrences (
+    occurrence_id INT NOT NULL REFERENCES occurrences(id) ON DELETE CASCADE -- foreign key to occurrences.id
+);
+SELECT AddGeometryColumn('sensitive_occurrences', 'sensitive_location', 4326, 'POINT', 2);
+ALTER TABLE sensitive_occurrences ALTER COLUMN sensitive_location SET NOT NULL;
+CREATE UNIQUE INDEX sensitive_occurrences_occurrence_id_idx ON sensitive_occurrences (occurrence_id);
+
+
+-- No passwords for users because ALA handles the auth
 CREATE TABLE users (
     id SERIAL NOT NULL PRIMARY KEY,
     email VARCHAR(256) NOT NULL,
@@ -107,11 +118,15 @@ ALTER TABLE ratings ALTER COLUMN area SET NOT NULL;
 ALTER TABLE ratings ADD CONSTRAINT ratings_area_valid_check CHECK (ST_IsValid(area));
 
 
--- Permissions
---
+
+
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+-- PERMISSIONS
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
 -- Assumes that there are two users/roles: edgar_frontend and edgar_backend.
 -- Also assumes this SQL is running with grant privileges
 
+-- edgar_backend
 GRANT SELECT, INSERT, UPDATE, DELETE ON species TO edgar_backend;
 GRANT SELECT, INSERT, UPDATE, DELETE ON sources TO edgar_backend;
 GRANT SELECT, INSERT, UPDATE, DELETE ON occurrences TO edgar_backend;
@@ -120,10 +135,61 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ratings TO edgar_backend;
 GRANT USAGE, SELECT ON species_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON sources_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON occurrences_id_seq TO edgar_backend;
-GRANT USAGE, SELECT ON sensitive_occurrences_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON ratings_id_seq TO edgar_backend;
 
+-- edgar_frontend
 GRANT SELECT ON species TO edgar_frontend;
 GRANT SELECT ON occurrences TO edgar_frontend;
 GRANT SELECT, INSERT ON ratings TO edgar_frontend;
 GRANT USAGE, SELECT ON ratings_id_seq TO edgar_frontend;
+
+
+
+
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+-- CUSTOM FUNCTIONS
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+-- Recalculates the "rating" (a.k.a vetting) on each occurrence
+-- Uses a painters algorithm. Orders all ratings from least authoritative to
+-- most authoritative, then applies the ratings to the area. This means the
+-- most authoritative rating gets applied last, and therefor has the final
+-- say.
+--
+-- Calls ST_SimplifyPreserveTopology on the rating polygons, because they
+-- can be super high resolution which makes ST_CoveredBy run super slow.
+--
+-- Run this with: SELECT EdgarUpdateRatings(x);
+-- Where `x` is a valid species.id
+
+DROP FUNCTION IF EXISTS EdgarUpdateRatings(species.id%TYPE);
+
+CREATE FUNCTION EdgarUpdateRatings(speciesId species.id%TYPE) RETURNS varchar AS $$
+DECLARE
+    r RECORD;
+BEGIN
+    -- Revert back to original ratings, as obtained from the source
+    UPDATE occurrences
+        SET rating = source_rating
+        WHERE species_id = speciesId;
+
+    -- Apply user ratings using painters algorithm
+    FOR r IN
+        -- TODO: order this loop from least authoritative user to most authoritative.
+        -- TODO: what if two ratings by the same user overlap? What takes precedence?
+        SELECT *
+            FROM ratings
+                JOIN users on ratings.user_id = users.id
+            WHERE ratings.species_id = speciesId
+                AND users.can_rate
+    LOOP
+        UPDATE occurrences
+            SET rating = r.rating
+            WHERE occurrences.species_id = speciesId
+                AND ST_CoveredBy(occurrences.location, ST_SimplifyPreserveTopology(r.area, 0.01));
+    END LOOP;
+
+    RETURN 'DONE';
+END;
+$$ LANGUAGE plpgsql;

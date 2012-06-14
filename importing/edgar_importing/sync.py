@@ -140,7 +140,14 @@ class Syncer:
         for occ in occ_generator:
             self.upsert_occurrence(occ, occ.species_id)
 
-        # delete occurrences that have been deleted at ALA
+        # update last import time for ALA
+        db.sources.update().\
+            where(db.sources.c.id == self.source_row_id).\
+            values(last_import_time=start_time).\
+            execute()
+
+        # Brute force re-download all occurrences if the local and
+        # remote counts don't match
         log.info('Performing re-download of occurrences for species'+
                  'with incorrect occurrence counts');
         self.redownload_occurrences_if_needed()
@@ -153,11 +160,6 @@ class Syncer:
         log.info('Updating number of dirty occurrences')
         self.update_num_dirty_occurrences()
 
-        # update last import time for ALA
-        db.sources.update().\
-            where(db.sources.c.id == self.source_row_id).\
-            values(last_import_time=start_time).\
-            execute()
 
 
     def redownload_occurrences_if_needed(self):
@@ -190,13 +192,10 @@ class Syncer:
             species_to_redownload.append(row)
 
             # delete local records
+            # will cascade into sensitive_occurrences table
             db.occurrences.delete().\
                 where(db.occurrences.c.species_id == row['id']).\
                 where(db.occurrences.c.source_id == self.source_row_id).\
-                execute()
-            db.sensitive_occurrences.delete().\
-                where(db.sensitive_occurrences.c.species_id == row['id']).\
-                where(db.sensitive_occurrences.c.source_id == self.source_row_id).\
                 execute()
 
             # keep track of the deletions and additions
@@ -339,35 +338,63 @@ class Syncer:
         obtainable from `occurrence`'''
 
         if occ.coord is not None:
-            self.upsert(occ, species_id, db.occurrences, occ.coord)
+            occ_id = self.upsert_nonsensitive(occ, species_id)
+            if occ.sensitive_coord is not None:
+                self.upsert_sensitive(occ, occ_id)
 
-        if occ.sensitive_coord is not None:
-            self.upsert(occ, species_id, db.sensitive_occurrences, occ.sensitive_coord)
 
-
-    def upsert(self, occ, species_id, table, coord):
-        existing = table.select().\
-            where(table.c.source_record_id == occ.uuid.bytes).\
-            where(table.c.source_id == self.source_row_id).\
+    def upsert_nonsensitive(self, occ, species_id):
+        existing = db.occurrences.select().\
+            where(db.occurrences.c.source_record_id == occ.uuid.bytes).\
+            where(db.occurrences.c.source_id == self.source_row_id).\
             execute().\
             fetchone()
 
-        p = shapely.geometry.Point(coord.longi, coord.lati)
+        p = shapely.geometry.Point(occ.coord.longi, occ.coord.lati)
         location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
 
+        rating = self.rate_occurrence(occ)
+
         if existing is None:
-            table.insert().execute(
-                location=location,
-                rating=self.rate_occurrence(occ),
-                species_id=species_id,
-                source_id=self.source_row_id,
-                source_record_id=occ.uuid.bytes)
-        else:
-            table.update().\
+            return db.occurrences.insert().\
+                returning(db.occurrences.c.id).\
                 values(location=location,
-                       rating=self.rate_occurrence(occ),
+                       source_rating=rating,
+                       rating=rating,
+                       species_id=species_id,
+                       source_id=self.source_row_id,
+                       source_record_id=occ.uuid.bytes).\
+                execute().\
+                scalar()
+        else:
+            return db.occurrences.update().\
+                returning(db.occurrences.c.id).\
+                values(location=location,
+                       source_rating=self.rate_occurrence(occ),
                        species_id=species_id).\
-                where(table.c.id == existing['id']).\
+                where(db.occurrences.c.id == existing['id']).\
+                execute().\
+                scalar()
+
+
+    def upsert_sensitive(self, occ, occ_id):
+        existing = db.sensitive_occurrences.select().\
+            where(db.sensitive_occurrences.c.occurrence_id == occ_id).\
+            execute().\
+            fetchone()
+
+        p = shapely.geometry.Point(occ.sensitive_coord.longi, occ.sensitive_coord.lati)
+        sens_location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
+
+        if existing is None:
+            db.sensitive_occurrences.insert().\
+                values(occurrence_id=occ_id,
+                       sensitive_location=sens_location).\
+                execute()
+        else:
+            db.sensitive_occurrences.update().\
+                values(sensitive_location=sens_location).\
+                where(db.sensitive_occurrences.c.occurrence_id == occ_id).\
                 execute()
 
 
