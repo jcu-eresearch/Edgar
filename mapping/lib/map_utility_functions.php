@@ -12,6 +12,15 @@ function mu_removeAllStyleClasses($layer)
 function mu_addStyleClasses($layer, $threshold = "0")
 {
     $layer->updateFromString(''.
+        'CLASSITEM "THRESHOLD" '.
+            'CLASS '.
+                'NAME "Threshold: '.$threshold.'" '.
+                'STYLE '.
+                'END '.
+            'END '.
+        'END');
+
+    $layer->updateFromString(''.
         'CLASSITEM "[pixel]" '.
             'CLASS '.
                 'NAME "0.0  - 0.25" '.
