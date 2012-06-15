@@ -10,7 +10,7 @@
     $map->loadOWSParameters($map_request);
 
     $data = null;
-        $data = $_GET['DATA'];
+    $data = $_GET['DATA'];
 
     $layer = $map->getLayerByName('DISTRIBUTION');
     $threshold = $_GET['THRESHOLD'];
