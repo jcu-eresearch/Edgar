@@ -17,7 +17,7 @@
     $requested_map_file = $_GET['MAP'];
 
     // Set full path to map file.
-    $path_to_map_file = realpath($map_dir.'/'.$map_file);
+    $path_to_map_file = realpath($map_dir.'/'.$requested_map_file);
 
     // Create a map object based on above inputs.
     $map = ms_newMapObj($path_to_map_file);
@@ -41,6 +41,7 @@
 
     // Pull out every class in the map file.
     mu_removeAllStyleClasses($layer);
+
     // Add style classes to the layer
     mu_addStyleClasses($layer, $threshold);
 
@@ -50,7 +51,7 @@
     // Render the necessary image.
     if ($request_type === "GetMap") {
         $image_to_render = $map->draw();
-    } else ($request_type === "GetLegendGraphic") {
+    } elseif ($request_type === "GetLegendGraphic") {
         $image_to_render = $map->drawLegend();
     } else {
        throw new Exception('Unexpected request type. Request type was: "'.$request.'", expected GetMap or GetLegendGraphic');

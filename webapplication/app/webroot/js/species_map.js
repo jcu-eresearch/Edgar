@@ -56,7 +56,7 @@ function speciesGeoJSONURL() {
 function legendURL() {
     var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
     var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
-    return mapToolBaseUrl + 'legend_with_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
+    return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
         '&THRESHOLD=' + Edgar.map.species.distributionThreshold;
 }
 
@@ -169,7 +169,7 @@ function addDistributionLayer() {
 
     distribution = new OpenLayers.Layer.WMS(
         "Climate Suitability",
-        mapToolBaseUrl + 'map_with_threshold.php', // path to our map script handler.
+        mapToolBaseUrl + 'wms_with_auto_determined_threshold.php', // path to our map script handler.
 
         // Params to send as part of request (note: keys will be auto-upcased)
         // I'm typing them in caps so I don't get confused.
