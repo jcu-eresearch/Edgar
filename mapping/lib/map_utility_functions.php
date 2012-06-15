@@ -11,14 +11,6 @@ function mu_removeAllStyleClasses($layer)
 // styles to the layer.
 function mu_addStyleClasses($layer, $threshold = "0")
 {
-    $layer->updateFromString(''.
-        'CLASSITEM "THRESHOLD" '.
-            'CLASS '.
-                'NAME "Threshold: '.$threshold.'" '.
-                'STYLE '.
-                'END '.
-            'END '.
-        'END');
 
     $layer->updateFromString(''.
         'CLASSITEM "[pixel]" '.
@@ -72,21 +64,19 @@ function mu_addStyleClasses($layer, $threshold = "0")
             'END '.
         'END');
 
-/*
+   // NOTE: Needs to go at the end, else "blanks"
+   // all other style effects out.
+   // I'm confident there is a much better way of injecting information
+   // into the legend.
     $layer->updateFromString(''.
-        'CLASSITEM "[pixel]" '.
+        'CLASSITEM "THRESHOLD" '.
             'CLASS '.
-                'NAME "0.0  - 0.25" '.
-                'KEYIMAGE "ramp_0_25.gif" '.
-                'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]< 1) '.
+                'NAME "Threshold: '.$threshold.'" '.
                 'STYLE '.
-                    'COLORRANGE  255 255 255 255 0 0'.
-                    'DATARANGE '.$threshold.' 1 '.
                 'END '.
             'END '.
         'END');
-        /*
-*/
+
 }
 
 // Return the threshold, or NULL
