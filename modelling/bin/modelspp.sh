@@ -65,8 +65,10 @@ module load java
 # Move to the species directory
 cd "$WORKING_DIR/inputs/$SPP"
 
+# Generate the name of the tmp output dir (use the PID to uniquely name the dir)
+TMP_DIR_NAME="$SPP-$$"
 # Make an output directory
-TMP_OUTPUT_DIR="$WORKING_DIR/tmp_outputs/$SPP"
+TMP_OUTPUT_DIR="$WORKING_DIR/tmp_outputs/$TMP_DIR_NAME"
 OUTPUTS_DIR="$WORKING_DIR/outputs"
 FINAL_OUTPUT_DIR="$OUTPUTS_DIR/$SPP"
 
