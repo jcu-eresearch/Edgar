@@ -228,6 +228,7 @@ table td.actions a {
 }
 
 /** Scaffold View **/
+/*
 dl {
     line-height: 2em;
     margin: 0em 0em;
@@ -249,7 +250,7 @@ dd {
     margin-top: -2em;
     vertical-align: top;
 }
-
+*/
 /** Forms **/
 form {
     clear: both;
@@ -737,15 +738,6 @@ pre {
 
 .species.map {
     position: relative;
-}
-
-#map_legend_img {
-    position: absolute;
-    background-color: #fff;
-    opacity: 0.8;
-    z-index: 10000;
-    bottom: 40px;
-    left: 0px;
 }
 
 .ui-autocomplete {

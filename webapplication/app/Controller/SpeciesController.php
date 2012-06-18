@@ -247,7 +247,7 @@ class SpeciesController extends AppController {
             'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
             'conditions' => array(
                 'num_dirty_occurrences >' => 0,
-                'remodel_status' => null
+                'current_model_status' => null
             ),
             'order' => array(
                 'is_null' => 'ASC',
@@ -285,11 +285,11 @@ class SpeciesController extends AppController {
         if($jobStatus === 'FINISHED_SUCCESS' || $jobStatus === 'FINISHED_FAILURE'){
             $occurrencesCleared = (int)$this->request->data('dirty_occurrences');
             $species['Species']['num_dirty_occurrences'] -= $occurrencesCleared;
-            $species['Species']['remodel_status'] = null;
+            $species['Species']['current_model_status'] = null;
             $species['Species']['first_requested_remodel'] = null;
         } else {
             //$jobStatusMsg = $this->request->data('job_status_message');
-            $species['Species']['remodel_status'] = $jobStatus;
+            $species['Species']['current_model_status'] = $jobStatus;
         }
 
         $this->Species->save($species);
@@ -332,8 +332,8 @@ class SpeciesController extends AppController {
         if($species['num_dirty_occurrences'] <= 0)
             return 'Up to date';
 
-        if($species['remodel_status'] !== null)
-            return 'Remodelling running with status: ' . $species['remodel_status'];
+        if($species['current_model_status'] !== null)
+            return 'Remodelling running with status: ' . $species['current_model_status'];
 
         if($species['first_requested_remodel'] !== null)
             return 'Priority queued for remodelling';

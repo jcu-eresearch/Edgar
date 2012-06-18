@@ -1,5 +1,6 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
+DROP FUNCTION IF EXISTS EdgarUpdateRatings(species.id%TYPE);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
 DROP TABLE IF EXISTS sources;
@@ -7,7 +8,6 @@ DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS species;
 DROP TABLE IF EXISTS users;
 DROP TYPE IF EXISTS rating;
-DROP FUNCTION IF EXISTS EdgarUpdateRatings(species.id%TYPE);
 
 
 
@@ -52,9 +52,22 @@ CREATE TABLE species (
     scientific_name VARCHAR(256) NOT NULL, -- Format: "Genus (subgenus) species" where "(subgenus)" is optional
     common_name VARCHAR(256) NULL, -- Some species don't have a common name (can be null)
     num_dirty_occurrences INT DEFAULT 0 NOT NULL, -- This is the number of occurrences that have changed since the last modelling run happened
-    distribution_threshold FLOAT DEFAULT 0 NOT NULL, -- the Equate entropy of thresholded and original distributions logistic threshold found in the model output
+    -- Modelling status (current)
     first_requested_remodel TIMESTAMP DEFAULT NULL NULL, -- The first time, since last modelling run, that a user requested a remodel for this species
-    remodel_status VARCHAR(256) DEFAULT NULL NULL -- NULL if no modeling run is happening for this species, otherwise a message indicating the status of the modeling run
+    -- Modelling current
+    current_model_status VARCHAR(256) DEFAULT NULL NULL, -- NULL if no modeling run is happening for this species, otherwise a message indicating the status of the modeling run
+    current_model_queued_time TIMESTAMP DEFAULT NULL NULL, -- NULL if no modelling run is happening for this species, otherwise time the model was queued on the HPC
+    current_model_importance SMALLINT DEFAULT NULL NULL, -- NULL if no modelling run is happening for this species, otherwise an integer representing the importance (priority) of the model
+    -- Modelling most recently completed
+    last_completed_model_queued_time TIMESTAMP DEFAULT NULL NULL, -- The time that the last completed model was queued
+    last_completed_model_finish_time TIMESTAMP DEFAULT NULL NULL, -- The time that the last completed model finished
+    last_completed_model_importance SMALLINT DEFAULT NULL NULL, -- The importance the species had when the last completed model was queued
+    last_completed_model_status VARCHAR(256) DEFAULT NULL NULL, -- The status of the model when it completed. Should be FINISHED_SUCCESS or FINISHED_FAILURE
+    last_completed_model_status_reason VARCHAR(256) DEFAULT NULL NULL, -- The reason for the status of the model when it completed
+    -- Modelling most recently successfully completed
+    last_successfully_completed_model_queued_time TIMESTAMP DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
+    last_successfully_completed_model_finish_time TIMESTAMP DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
+    last_successfully_completed_model_importance SMALLINT DEFAULT NULL NULL -- The importance the species had when the last successfully completed model was queued
 );
 
 
@@ -74,14 +87,14 @@ CREATE TABLE sources (
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
     rating rating NOT NULL, -- The canonical rating (a.k.a "vetting") for the occurrence
-    source_rating rating NOT NULL -- The rating as obtained from the source (i.e. ALA assertions translated to our ratings system)
+    source_rating rating NOT NULL, -- The rating as obtained from the source (i.e. ALA assertions translated to our ratings system)
     source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
     species_id INT NOT NULL REFERENCES species(id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
-    source_id INT NOT NULL REFERENCES source(id)
+    source_id INT NOT NULL REFERENCES sources(id)
         ON UPDATE CASCADE
-        ON DELETE RESTRICT,
+        ON DELETE RESTRICT
 );
 SELECT AddGeometryColumn('occurrences', 'location', 4326, 'POINT', 2);
 ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
@@ -126,7 +139,7 @@ CREATE TABLE ratings (
     user_id INT NOT NULL REFERENCES users(id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
-    species_id INT NOT NULL
+    species_id INT NOT NULL REFERENCES species(id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user

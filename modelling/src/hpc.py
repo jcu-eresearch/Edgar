@@ -16,47 +16,13 @@ import tempfile
 import ala
 import paramiko
 import ssh
+from hpc_config import HPCConfig
 
 log = logging.getLogger()
 
 # Set a default timeout for all socket requests
 socketTimeout = 10
 socket.setdefaulttimeout(socketTimeout)
-
-class HPCConfig:
-    cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
-    #cakeAppBaseURL = "http://localhost/~robert/ap03"
-    nextSpeciesURL= cakeAppBaseURL + "/species/next_job"
-    sshUser = "jc155857"
-    sshHPCDestination = "login.hpc.jcu.edu.au"
-
-    # Determine the paths to the different files
-    workingDir = os.path.join('/', 'home', 'jc155857', 'scratch', 'Edgar', 'modelling')
-    #workingDir = os.path.join('/', 'Users', 'robert', 'Git_WA', 'Edgar', 'modelling')
-    importingWorkingDir = os.path.join(workingDir, '../', 'importing')
-
-    importingConfigPath = os.path.join(importingWorkingDir, 'config.json')
-
-    binDir     = os.path.join(workingDir, 'bin')
-
-    modelSppScriptPath    = os.path.join(binDir, 'modelspp.sh')
-
-    queueJobScriptPath          = os.path.join(binDir, 'queueJob.sh')
-    checkJobStatusScriptPath    = os.path.join(binDir, 'checkJobStatus.sh')
-
-    @staticmethod
-    def getSpeciesReportURL(speciesId):
-        return HPCConfig.cakeAppBaseURL + "/species/job_status/" + speciesId
-
-    @staticmethod
-    def connectDB():
-        config = None
-        with open(HPCConfig.importingConfigPath, 'rb') as f:
-            config = json.load(f)
-
-        db.connect(config)
-
-        return db
 
 # A container for our HPC Job Statuses
 # Any job status not defined here is a qstat status

@@ -18,6 +18,7 @@
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
+    $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
 ?>
 
@@ -38,6 +39,14 @@
             tool content goes here
         </div>
     </div>
+
+    <div class="tool legend startclosed">
+        <h1>suitability legend</h1>
+        <div class="toolcontent">
+            <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
+        </div>
+    </div>
+
 
     <div class="tool">
         <h1>emissions and time</h1>
@@ -108,7 +117,8 @@
     </table>
 </div>
 
-<div id="map"></div>
+<div id="map">
+</div>
 
 <div id="spinner"></div>
 

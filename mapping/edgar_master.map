@@ -19,7 +19,7 @@ MAP
     #    SIZE 256 256
 
     #define the working folder of this map file
-    SHAPEPATH "/scratch/jc155857/Edgar/modelling/outputs/"
+    SHAPEPATH "/scratch/jc155857/EdgarMaster/modelling/outputs/"
 
     #define the background color
     TRANSPARENT ON
