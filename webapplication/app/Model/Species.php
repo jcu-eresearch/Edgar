@@ -24,6 +24,13 @@ class Species extends AppModel {
     // Return an array of locations
     // Needed for the Geolocations behaviour
     public function getLocationsArray() {
-        return $this->data['Occurrence'];
+        $results = $this->getDataSource()->execute(
+            'SELECT ST_X(location::geometry) as longitude, ST_Y(location::geometry) as latitude '.
+            'FROM occurrences '.
+            'WHERE species_id = ?',
+            array(),
+            array($this->data['Species']['id'])
+        );
+        return $results;
     }
 }

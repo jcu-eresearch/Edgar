@@ -8,7 +8,7 @@
 function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
 
 
-var map, occurrences, distribution, occurrence_select_control;
+var map, occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
 
 // Projections
 // ----------
@@ -44,10 +44,11 @@ function speciesGeoJSONURL() {
 }
 
 function legendURL() {
-    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
-    var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
-    return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + Edgar.map.species.distributionThreshold;
+    var speciesId = Edgar.map.species.id;
+    var data = speciesId + '/1975.asc';
+    return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php' +
+        '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
+
 }
 
 function updateLegend() {
@@ -95,10 +96,21 @@ function clearExistingSpeciesOccurrencesLayer() {
         map.removeControl(occurrence_select_control);
         occurrence_select_control = undefined;
     }
+
+    if(vettingLayer !== undefined) {
+        console.log('Removing vetting layer');
+        map.removeLayer(vettingLayer);
+        vettingLayerControl.unselectAll();
+        vettingLayerControl.deactivate();
+        map.removeControl(vettingLayerControl);
+        vettingLayer = undefined;
+        vettingLayerControl = undefined;
+    }
 }
 
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
+    addVettingLayer();
     addOccurrencesLayer();
     addDistributionLayer();
     updateLegend();
@@ -120,14 +132,15 @@ function reloadDistributionLayers() {
 }
 
 function addDistributionLayer() {
+    var mapPath;
 
     if (Edgar.map.species) {
 
-        speciesId = Edgar.map.species.id;
-        scenario = Edgar.map.emissionScenario;
-        year = Edgar.map.year;
-        bioData = 'csiro_mk3_5'; //what is this meant to be set to?
-        runs = 'run1.run1'; //what is this meant to be set to?
+        var speciesId = Edgar.map.species.id;
+        var scenario = Edgar.map.emissionScenario;
+        var year = Edgar.map.year;
+        var bioData = 'csiro_mk3_5'; //what is this meant to be set to?
+        var runs = 'run1.run1'; //what is this meant to be set to?
 
         //check box will be removed when it is working
         if($('#use_emission_and_year').is(':checked')){
@@ -165,11 +178,7 @@ function addDistributionLayer() {
             DATA: mapPath,
             SPECIESID: Edgar.map.species.id,
             REASPECT: "true",
-            TRANSPARENT: 'true',
-            // TODO -> Set the threshold.
-//            THRESHOLD: Edgar.map.species.distributionThreshold
-            THRESHOLD: "0"
-
+            TRANSPARENT: 'true'
         },
         {
             // It's an overlay
@@ -182,6 +191,40 @@ function addDistributionLayer() {
 
     registerLayerProgress(distribution, "climate suitability");
     map.addLayer(distribution);
+}
+
+function addVettingLayer() {
+    console.log('Adding vetting layer')
+    var format = new OpenLayers.Format.GeoJSON({});
+    var styleMap = new OpenLayers.StyleMap({
+        'default': {
+            'fillColor': '#00FF00',
+            'strokeColor': '#008800',
+            'fillOpacity': 0.7,
+            'strokeOpacity': 0.9
+        }
+    });
+    vettingLayer = new OpenLayers.Layer.Vector('Vetting Areas', {
+        isBaseLayer: false,
+        projection: geographic,
+        strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
+        protocol: new OpenLayers.Protocol.HTTP({
+            url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.map.species.id + ".json"),
+            format: new OpenLayers.Format.GeoJSON({})
+        }),
+        styleMap: new OpenLayers.StyleMap({
+            'default': {
+                'fillColor': '#00FF00',
+                'strokeColor': '#008800',
+                'fillOpacity': 0.7,
+                'strokeOpacity': 0.9
+            }
+        })
+    });
+    vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: false});
+    map.addLayer(vettingLayer);
+    map.addControl(vettingLayerControl);
+    vettingLayerControl.activate();
 }
 
 function addOccurrencesLayer() {

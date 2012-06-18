@@ -101,7 +101,6 @@ class SpeciesController extends AppController {
         }
 
         // Look up the species provided
-        $this->Species->recursive = 1;
         $species = $this->Species->read(null, $id);
 
         // Check if we were provided a bbox (bounding box)
@@ -131,6 +130,23 @@ class SpeciesController extends AppController {
 
         // Specify the output for the json view.
         $this->set('_serialize', 'geo_object');
+    }
+
+    public function vetting_geo_json($species_id = null) {
+        $results = $this->Species->getDataSource()->execute(
+            'SELECT ST_AsGeoJSON(area) FROM ratings '.
+            'WHERE species_id = ? '.
+            'LIMIT 1',
+            array(),
+            array($species_id)
+        );
+
+        if($results){
+            $this->dieWithStatus(200, $results->fetchColumn(0));
+        } else {
+            //TODO: is this correct for empty geo json?
+            $this->dieWithStatus(200, '{}');
+        }
     }
 
     /**
@@ -201,13 +217,13 @@ class SpeciesController extends AppController {
      */
     public function autocomplete() {
         //get what the user typed in
-        $partial = $this->request->query['term'];
+        $partial = strtolower($this->request->query['term']);
 
         //query db
         $matched_species = $this->Species->find('all', array(
             'conditions' => array('OR' => array(
-                array('scientific_name LIKE' => '%'.$partial.'%'),
-                array('common_name LIKE' => '%'.$partial.'%')
+                array('lower(scientific_name) LIKE' => '%'.$partial.'%'),
+                array('lower(common_name) LIKE' => '%'.$partial.'%')
             )),
             'order' => array('common_name DESC')
         ));
@@ -231,7 +247,7 @@ class SpeciesController extends AppController {
             'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
             'conditions' => array(
                 'num_dirty_occurrences >' => 0,
-                'remodel_status' => null
+                'current_model_status' => null
             ),
             'order' => array(
                 'is_null' => 'ASC',
@@ -269,11 +285,11 @@ class SpeciesController extends AppController {
         if($jobStatus === 'FINISHED_SUCCESS' || $jobStatus === 'FINISHED_FAILURE'){
             $occurrencesCleared = (int)$this->request->data('dirty_occurrences');
             $species['Species']['num_dirty_occurrences'] -= $occurrencesCleared;
-            $species['Species']['remodel_status'] = null;
+            $species['Species']['current_model_status'] = null;
             $species['Species']['first_requested_remodel'] = null;
         } else {
             //$jobStatusMsg = $this->request->data('job_status_message');
-            $species['Species']['remodel_status'] = $jobStatus;
+            $species['Species']['current_model_status'] = $jobStatus;
         }
 
         $this->Species->save($species);
@@ -307,8 +323,8 @@ class SpeciesController extends AppController {
             'numDirtyOccurrences' => $species['num_dirty_occurrences'],
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
             'remodelStatus' => $this->_speciesRemodelStatusMessage($species),
-            'label' => $species['common_name'].' - '.$species['scientific_name'],
-            'distributionThreshold' => $species['distribution_threshold']
+            'label' => $species['common_name'].' - '.$species['scientific_name']
+            #'distributionThreshold' => $species['distribution_threshold']
         );
     }
 
@@ -316,8 +332,8 @@ class SpeciesController extends AppController {
         if($species['num_dirty_occurrences'] <= 0)
             return 'Up to date';
 
-        if($species['remodel_status'] !== null)
-            return 'Remodelling running with status: ' . $species['remodel_status'];
+        if($species['current_model_status'] !== null)
+            return 'Remodelling running with status: ' . $species['current_model_status'];
 
         if($species['first_requested_remodel'] !== null)
             return 'Priority queued for remodelling';

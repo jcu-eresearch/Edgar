@@ -7,7 +7,10 @@ import binascii
 import uuid
 import traceback
 import datetime
+import shapely.wkt
+import shapely.geometry
 from sqlalchemy import func, select
+from geoalchemy import WKTSpatialElement
 
 log = logging.getLogger(__name__)
 
@@ -35,31 +38,21 @@ class Syncer:
 
 
     def sync(self, sync_species=True, sync_occurrences=True):
-        # add/delete species
+        # add species
+        # species are never deleted, because occassionally ALA does
+        # not return the full list of species, which would cause species to be
+        # deleted locally and orphan their occurrences.
         if sync_species:
             log.info('Syncing species list')
             added_species, deleted_species = self.added_and_deleted_species()
             for species in added_species:
                 self.add_species(species)
-            for species in deleted_species:
-                self.delete_species(species)
+
 
         # update occurrences
         if sync_occurrences:
             log.info('Syncing occurrence records')
             self.sync_occurrences()
-
-            # remove orphaned occurrences
-            db.engine.execute('''
-                delete from occurrences
-                where species_id not in
-                (select id from species)''');
-
-        # delete species without any occurrences
-        if sync_species:
-            log.info('Deleting species with 0 occurrences')
-            for species in self.local_species_with_no_occurrences():
-                self.delete_species(species)
 
 
     def local_species(self):
@@ -137,7 +130,14 @@ class Syncer:
         for occ in occ_generator:
             self.upsert_occurrence(occ, occ.species_id)
 
-        # delete occurrences that have been deleted at ALA
+        # update last import time for ALA
+        db.sources.update().\
+            where(db.sources.c.id == self.source_row_id).\
+            values(last_import_time=start_time).\
+            execute()
+
+        # Brute force re-download all occurrences if the local and
+        # remote counts don't match
         log.info('Performing re-download of occurrences for species'+
                  'with incorrect occurrence counts');
         self.redownload_occurrences_if_needed()
@@ -150,11 +150,6 @@ class Syncer:
         log.info('Updating number of dirty occurrences')
         self.update_num_dirty_occurrences()
 
-        # update last import time for ALA
-        db.sources.update().\
-            where(db.sources.c.id == self.source_row_id).\
-            values(last_import_time=start_time).\
-            execute()
 
 
     def redownload_occurrences_if_needed(self):
@@ -187,13 +182,10 @@ class Syncer:
             species_to_redownload.append(row)
 
             # delete local records
+            # will cascade into sensitive_occurrences table
             db.occurrences.delete().\
                 where(db.occurrences.c.species_id == row['id']).\
                 where(db.occurrences.c.source_id == self.source_row_id).\
-                execute()
-            db.sensitive_occurrences.delete().\
-                where(db.sensitive_occurrences.c.species_id == row['id']).\
-                where(db.sensitive_occurrences.c.source_id == self.source_row_id).\
                 execute()
 
             # keep track of the deletions and additions
@@ -321,12 +313,12 @@ class Syncer:
         '''Returns an occurrences.rating enum value for an ala.Occurrence'''
         # TODO: determine rating better using lists of assertions
         if occurrence.is_geospatial_kosher:
-            return 'assumed valid'
+            return 'irruptive'
         else:
-            return 'assumed invalid'
+            return 'invalid'
 
 
-    def upsert_occurrence(self, occurrence, species_id):
+    def upsert_occurrence(self, occ, species_id):
         '''Looks up whether `occurrence` (an ala.Occurrence object)
         already exists in the local db. If it does, the db row is updated with
         the information in `occurrence`. If it does not exist, a new row is
@@ -335,35 +327,64 @@ class Syncer:
         `species_id` must be supplied as an argument because it is not
         obtainable from `occurrence`'''
 
-        if occurrence.coord is not None:
-            self.upsert(occurrence, species_id, db.occurrences)
+        if occ.coord is not None:
+            occ_id = self.upsert_nonsensitive(occ, species_id)
+            if occ.sensitive_coord is not None:
+                self.upsert_sensitive(occ, occ_id)
 
-        if occurrence.sensitive_coord is not None:
-            self.upsert(occurrence, species_id, db.sensitive_occurrences)
 
-
-    def upsert(self, occ, species_id, table):
-        existing = table.select().\
-            where(table.c.source_record_id == occ.uuid.bytes).\
-            where(table.c.source_id == self.source_row_id).\
+    def upsert_nonsensitive(self, occ, species_id):
+        existing = db.occurrences.select().\
+            where(db.occurrences.c.source_record_id == occ.uuid.bytes).\
+            where(db.occurrences.c.source_id == self.source_row_id).\
             execute().\
             fetchone()
 
+        p = shapely.geometry.Point(occ.coord.longi, occ.coord.lati)
+        location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
+
+        rating = self.rate_occurrence(occ)
+
         if existing is None:
-            table.insert().execute(
-                latitude=occ.coord.lati,
-                longitude=occ.coord.longi,
-                rating=self.rate_occurrence(occ),
-                species_id=species_id,
-                source_id=self.source_row_id,
-                source_record_id=occ.uuid.bytes)
+            return db.occurrences.insert().\
+                returning(db.occurrences.c.id).\
+                values(location=location,
+                       source_rating=rating,
+                       rating=rating,
+                       species_id=species_id,
+                       source_id=self.source_row_id,
+                       source_record_id=occ.uuid.bytes).\
+                execute().\
+                scalar()
         else:
-            table.update().\
-                values(latitude=occ.coord.lati,
-                       longitude=occ.coord.longi,
-                       rating=self.rate_occurrence(occ),
+            return db.occurrences.update().\
+                returning(db.occurrences.c.id).\
+                values(location=location,
+                       source_rating=self.rate_occurrence(occ),
                        species_id=species_id).\
-                where(table.c.id == existing['id']).\
+                where(db.occurrences.c.id == existing['id']).\
+                execute().\
+                scalar()
+
+
+    def upsert_sensitive(self, occ, occ_id):
+        existing = db.sensitive_occurrences.select().\
+            where(db.sensitive_occurrences.c.occurrence_id == occ_id).\
+            execute().\
+            fetchone()
+
+        p = shapely.geometry.Point(occ.sensitive_coord.longi, occ.sensitive_coord.lati)
+        sens_location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
+
+        if existing is None:
+            db.sensitive_occurrences.insert().\
+                values(occurrence_id=occ_id,
+                       sensitive_location=sens_location).\
+                execute()
+        else:
+            db.sensitive_occurrences.update().\
+                values(sensitive_location=sens_location).\
+                where(db.sensitive_occurrences.c.occurrence_id == occ_id).\
                 execute()
 
 
@@ -394,6 +415,9 @@ class Syncer:
             if species is None:
                 log.warning("Should have ALA.Species for %s, but don't",
                             sciname)
+            elif species.scientific_name != sciname:
+                #old species that has been renamed, don't fetch
+                pass
             else:
                 args = (species, species_row['id'], since)
                 pool.apply_async(_mp_fetch_occurrences, args)

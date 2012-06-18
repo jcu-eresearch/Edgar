@@ -30,9 +30,9 @@ class TestSync(unittest.TestCase):
         self.tomorrow = self.now + datetime.timedelta(1)
 
         #wipe db
-        db.species.delete().execute()
-        db.occurrences.delete().execute()
         db.sensitive_occurrences.delete().execute()
+        db.occurrences.delete().execute()
+        db.species.delete().execute()
         db.sources.delete().execute()
         db.sources.insert().execute(
             name='ALA',
@@ -82,11 +82,14 @@ class TestSync(unittest.TestCase):
         if species_id is None:
             return 0
 
-        table = db.sensitive_occurrences if sensitive_only else db.occurrences
+        if sensitive_only:
+            table = db.sensitive_occurrences.join(db.occurrences)
+        else:
+            table = db.occurrences
 
         q = select([func.count("(*)")]).\
                 select_from(table).\
-                where(table.c.species_id == species_id)
+                where(db.occurrences.c.species_id == species_id)
         return db.engine.execute(q).scalar()
 
 
@@ -117,22 +120,11 @@ class TestSync(unittest.TestCase):
         self.syncer = sync.Syncer(self.mockala)
         self.syncer.sync()
 
-        #make sure s1 is missing
-        self.assertEqual(self.id_for_species(self.s1), None)
-
         #make sure sRenamed exists
         self.assertNotEqual(self.id_for_species(sRenamed), None)
 
         #make sure all records have been moved across
         self.assertEqual(num_records, self.num_db_occ_for_spec(sRenamed))
-
-
-    def test_removes_species_with_no_records(self):
-        sNone = self.mockala.Species('no records', 'sciNone', 'nr');
-        self.mockala.mock_add_species(sNone)
-        self.syncer.sync()
-
-        self.assertEqual(self.id_for_species(sNone), None)
 
 
     def test_added_records(self):
@@ -153,8 +145,8 @@ class TestSync(unittest.TestCase):
 
         #simulate new records
         new_records = [
-            self.make_occ(66, 77),
-            self.make_occ(88, 99)
+            self.make_occ(22, 33),
+            self.make_occ(44, 55)
         ]
         self.mockala.mock_add_records(self.s1, new_records)
 
@@ -204,7 +196,7 @@ class TestSync(unittest.TestCase):
 
         #change a record, keeping the same uuid
         old_record = self.records1[-1]
-        new_record = self.make_occ(123, 456, uuid_in=old_record.uuid)
+        new_record = self.make_occ(12, 34, uuid_in=old_record.uuid)
         self.mockala.mock_update_record(self.s1, new_record,
                 new_species=self.s2)
 
@@ -219,7 +211,9 @@ class TestSync(unittest.TestCase):
                          old_s2_count + 1)
 
         #check that updated record has correct lat/long
-        for occ in db.occurrences.select().execute():
+        query = select(['*', 'ST_X(location::geometry) as longitude', 'ST_Y(location::geometry) as latitude']).\
+                    select_from(db.occurrences)
+        for occ in db.engine.execute(query):
             occ_uuid = uuid.UUID(bytes=occ['source_record_id'])
             if occ_uuid == old_record.uuid:
                 self.assertEqual(occ['latitude'], new_record.coord.lati)
@@ -280,8 +274,7 @@ class TestSync(unittest.TestCase):
 
 
 def test_suite():
-    #in memory sqlite db
-    db.connect({'db.url':'sqlite://'})
-    db.metadata.create_all()
-
+    test_config_path = os.path.abspath(__file__ + "/../../../config.unittests.json")
+    with open(test_config_path) as f:
+        db.connect(json.load(f))
     return unittest.makeSuite(TestSync)

@@ -8,6 +8,7 @@ You may need a couple of yum packages installed before running buildout:
 
 sudo yum install python-devel
 sudo yum install mysql-devel
+sudo yum install postgresql-devel
 
 Run the standard buildout setup using Python2.6 (this will install all
 dependencies):
