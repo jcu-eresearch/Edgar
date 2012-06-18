@@ -246,7 +246,7 @@ def create_request(url, params=None, use_get=True, use_api_key=False):
             params = None
 
     _log.debug('Created request for: ' + url)
-    return urllib2.Request(url, params)
+    return urllib2.Request(url, params, {'User-Agent': 'Edgar/Python-urllib2'})
 
 
 def q_param(species_lsid=None, changed_since=None):
