@@ -30,9 +30,9 @@ class TestSync(unittest.TestCase):
         self.tomorrow = self.now + datetime.timedelta(1)
 
         #wipe db
-        db.species.delete().execute()
-        db.occurrences.delete().execute()
         db.sensitive_occurrences.delete().execute()
+        db.occurrences.delete().execute()
+        db.species.delete().execute()
         db.sources.delete().execute()
         db.sources.insert().execute(
             name='ALA',
@@ -120,22 +120,11 @@ class TestSync(unittest.TestCase):
         self.syncer = sync.Syncer(self.mockala)
         self.syncer.sync()
 
-        #make sure s1 is missing
-        self.assertEqual(self.id_for_species(self.s1), None)
-
         #make sure sRenamed exists
         self.assertNotEqual(self.id_for_species(sRenamed), None)
 
         #make sure all records have been moved across
         self.assertEqual(num_records, self.num_db_occ_for_spec(sRenamed))
-
-
-    def test_removes_species_with_no_records(self):
-        sNone = self.mockala.Species('no records', 'sciNone', 'nr');
-        self.mockala.mock_add_species(sNone)
-        self.syncer.sync()
-
-        self.assertEqual(self.id_for_species(sNone), None)
 
 
     def test_added_records(self):

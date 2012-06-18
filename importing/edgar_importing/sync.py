@@ -38,31 +38,21 @@ class Syncer:
 
 
     def sync(self, sync_species=True, sync_occurrences=True):
-        # add/delete species
+        # add species
+        # species are never deleted, because occassionally ALA does
+        # not return the full list of species, which would cause species to be
+        # deleted locally and orphan their occurrences.
         if sync_species:
             log.info('Syncing species list')
             added_species, deleted_species = self.added_and_deleted_species()
             for species in added_species:
                 self.add_species(species)
-            for species in deleted_species:
-                self.delete_species(species)
+
 
         # update occurrences
         if sync_occurrences:
             log.info('Syncing occurrence records')
             self.sync_occurrences()
-
-            # remove orphaned occurrences
-            db.engine.execute('''
-                delete from occurrences
-                where species_id not in
-                (select id from species)''');
-
-        # delete species without any occurrences
-        if sync_species:
-            log.info('Deleting species with 0 occurrences')
-            for species in self.local_species_with_no_occurrences():
-                self.delete_species(species)
 
 
     def local_species(self):
@@ -425,6 +415,9 @@ class Syncer:
             if species is None:
                 log.warning("Should have ALA.Species for %s, but don't",
                             sciname)
+            elif species.scientific_name != sciname:
+                #old species that has been renamed, don't fetch
+                pass
             else:
                 args = (species, species_row['id'], since)
                 pool.apply_async(_mp_fetch_occurrences, args)

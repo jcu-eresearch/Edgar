@@ -25,8 +25,6 @@ species = Table('species', metadata,
     Column('common_name', String(256), nullable=True),
     Column('num_dirty_occurrences', Integer(), nullable=False,
         default=0),
-    Column('distribution_threshold', Float(), nullable=False,
-        default=0),
 
     mysql_charset='utf8'
 )
