@@ -16,7 +16,7 @@ import tempfile
 import ala
 import paramiko
 import ssh
-import hpc_config
+from hpc_config import HPCConfig
 
 log = logging.getLogger()
 

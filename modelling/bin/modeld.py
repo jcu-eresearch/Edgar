@@ -8,7 +8,7 @@ import json
 from time import sleep
 import os
 from subprocess import Popen, PIPE
-from hpc import HPCConfig, HPCJob, HPCJobStatus
+from hpc import HPCJob, HPCJobStatus
 import urllib2
 from datetime import datetime
 import traceback
