@@ -740,15 +740,6 @@ pre {
     position: relative;
 }
 
-#map_legend_img {
-    position: absolute;
-    background-color: #fff;
-    opacity: 0.8;
-    z-index: 10000;
-    bottom: 40px;
-    left: 0px;
-}
-
 .ui-autocomplete {
     z-index: 99999 !important; /* puts it above the map controls */
 }

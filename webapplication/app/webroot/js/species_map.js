@@ -61,15 +61,11 @@ function legendURL() {
 }
 
 function updateLegend() {
-/*
     $('#map_legend_img').attr('src', legendURL());
-*/
 }
 
 function showLegend() {
-/*
     $('#map_legend_img').show();
-*/
 }
 
 function hideLegend() {
