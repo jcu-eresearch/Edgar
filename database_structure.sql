@@ -1,5 +1,13 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
+DROP TABLE IF EXISTS sensitive_occurrences;
+DROP TABLE IF EXISTS occurrences;
+DROP TABLE IF EXISTS sources;
+DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS species;
+DROP TABLE IF EXISTS users;
+DROP TYPE IF EXISTS rating;
+DROP FUNCTION IF EXISTS EdgarUpdateRatings(species.id%TYPE);
 
 
 
@@ -41,7 +49,7 @@ CREATE TYPE rating AS ENUM(
 -- Each species has many occurrences, and each occurrence belongs to one species.
 CREATE TABLE species (
     id SERIAL NOT NULL PRIMARY KEY,
-    scientific_name VARCHAR(256) NOT NULL, -- Format: Genus (subgenus) species
+    scientific_name VARCHAR(256) NOT NULL, -- Format: "Genus (subgenus) species" where "(subgenus)" is optional
     common_name VARCHAR(256) NULL, -- Some species don't have a common name (can be null)
     num_dirty_occurrences INT DEFAULT 0 NOT NULL, -- This is the number of occurrences that have changed since the last modelling run happened
     distribution_threshold FLOAT DEFAULT 0 NOT NULL, -- the Equate entropy of thresholded and original distributions logistic threshold found in the model output
@@ -66,24 +74,31 @@ CREATE TABLE sources (
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
     rating rating NOT NULL, -- The canonical rating (a.k.a "vetting") for the occurrence
-    species_id INT NOT NULL, -- foreign key to species.id
-    source_id INT NOT NULL, -- foreign key to sources.id
-    source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
     source_rating rating NOT NULL -- The rating as obtained from the source (i.e. ALA assertions translated to our ratings system)
+    source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
+    species_id INT NOT NULL REFERENCES species(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    source_id INT NOT NULL REFERENCES source(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
 );
 SELECT AddGeometryColumn('occurrences', 'location', 4326, 'POINT', 2);
 ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
 CREATE INDEX occurrences_species_id_idx ON occurrences (species_id);
 CREATE UNIQUE INDEX occurrences_source_record_idx ON occurrences (source_id, source_record_id);
 CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
--- Do this manually, can take hours: CLUSTER occurrences USING occurrences_location_idx;
+-- Do this manually, can take hours:
+-- CLUSTER occurrences USING occurrences_location_idx;
 VACUUM ANALYSE occurrences;
 
 
 -- SHOULD NOT BE ACCESSABLE TO THE PUBLIC.
 -- Join this table to the occurrences table for access to the sensitive_location
 CREATE TABLE sensitive_occurrences (
-    occurrence_id INT NOT NULL REFERENCES occurrences(id) ON DELETE CASCADE -- foreign key to occurrences.id
+    occurrence_id INT NOT NULL REFERENCES occurrences(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 SELECT AddGeometryColumn('sensitive_occurrences', 'sensitive_location', 4326, 'POINT', 2);
 ALTER TABLE sensitive_occurrences ALTER COLUMN sensitive_location SET NOT NULL;
@@ -108,8 +123,12 @@ CREATE TABLE users (
 -- occurrences.
 CREATE TABLE ratings (
     id SERIAL NOT NULL PRIMARY KEY,
-    user_id INT NOT NULL, -- foreign key into users.id
-    species_id INT NOT NULL, -- foreign key into species.id
+    user_id INT NOT NULL REFERENCES users(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    species_id INT NOT NULL
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
     rating rating NOT NULL
 );
@@ -163,7 +182,6 @@ GRANT USAGE, SELECT ON ratings_id_seq TO edgar_frontend;
 -- Run this with: SELECT EdgarUpdateRatings(x);
 -- Where `x` is a valid species.id
 
-DROP FUNCTION IF EXISTS EdgarUpdateRatings(species.id%TYPE);
 
 CREATE FUNCTION EdgarUpdateRatings(speciesId species.id%TYPE) RETURNS varchar AS $$
 DECLARE
