@@ -7,16 +7,6 @@
 // convenient debug method
 function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
 
-//global Edgar object
-window.Edgar = window.Edgar || {};
-//vars related to the species map
-Edgar.map = Edgar.map || {};
-//(object) current species displayed on the map
-Edgar.map.species = null;
-//(string) identifier of the emission scenario for the distribution map (e.g. "giss_aom")
-Edgar.map.emissionScenario = null;
-//(integer) the year that the distribution map represents (e.g. 2010, or 2020, or 1980)
-Edgar.map.year = null;
 
 var map, occurrences, distribution, occurrence_select_control;
 

@@ -89,9 +89,14 @@ $user = AuthComponent::user();
         <div id="user">
             <?php
                 $user = AuthComponent::user();
-                if($user === NULL){
+                if($user === NULL) {
+                    // user not logged in -- show login btn
                     echo $this->Html->link('Log In', '/users/login', array('class'=>'login'));
                 } else {
+                    // note the user for JS usage
+                    $user_js = "Edgar.user = '" . Sanitize::html($user['email']) . "'";
+                    echo $this->Html->scriptBlock($user_js);
+                    // write the user & logout btn into the header
                     echo 'Logged in as ' . Sanitize::html($user['email']);
                     echo $this->Html->link('Log Out', '/users/logout', array('class'=>'logout'));
                 }

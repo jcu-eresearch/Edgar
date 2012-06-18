@@ -20,6 +20,10 @@
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
+
+    // the init stuff needs to go early
+    $this->Html->script('init_setup', array('inline'=>false, 'block'=>'earlyscript'));
+
 ?>
 
 
@@ -27,6 +31,24 @@
 </div>
 
 <div id="toolspanel" class="side panel toolspanel">
+
+    <div id="oldvets" class="tool">
+        <h1>my previous vettings</h1>
+        <div class="toolcontent">
+            <form id="vetlist">
+                list of old vets goes here
+            </form>
+        </div>
+    </div>
+
+    <div id="newvet" class="tool">
+        <h1>new vetting</h1>
+        <div class="toolcontent">
+            <form class="vetform">
+                new vet form goes here
+            </form>
+        </div>
+    </div>
 
     <div class="tool">
         <h1>showing on the map</h1>
