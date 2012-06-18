@@ -17,6 +17,7 @@ import ala
 import paramiko
 import ssh
 from hpc_config import HPCConfig
+import sqlalchemy
 
 log = logging.getLogger()
 
@@ -136,12 +137,24 @@ class HPCJob:
                 writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
 
                 # Select the occurrences for this species
-                occurrence_rows = db.occurrences.select()\
-                        .where(db.occurrences.c.species_id == self.speciesId)\
-                        .execute()
+                occurrence_rows = sqlalchemy.select([
+                    'ST_X(location) as longitude',
+                    'ST_Y(location) as latitude',
+                    'ST_X(sensitive_location) as sensitive_longitude',
+                    'ST_Y(sensitive_location) as sensitive_latitude']).\
+                    select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
+                    where(db.occurrences.c.species_id == self.speciesId).\
+                    execute()
+
                 # Iterate over the occurrences, and write them to the csv
                 for occurrence_row in occurrence_rows:
-                    writer.writerow([self.speciesId, occurrence_row['latitude'], occurrence_row['longitude']])
+                    if occurrence_row['sensitive_longitude'] is None:
+                        lat = occurrence_row['latitude']
+                        lon = occurrence_row['longitude']
+                    else:
+                        lat = occurrence_row['sensitive_latitude']
+                        lon = occurrence_row['sensitive_longitude']
+                    writer.writerow([self.speciesId, lat, lon])
 
                 # Be a good file citizen, and close the file handle
                 f.close()
