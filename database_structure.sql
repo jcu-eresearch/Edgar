@@ -21,12 +21,34 @@ CREATE TABLE IF NOT EXISTS `species` (
         COMMENT "Some species don't have a common name",
     -- This is the number of occurrences that have changed since the last modelling run happened
     `num_dirty_occurrences` INT UNSIGNED DEFAULT 0 NOT NULL,
-    `distribution_threshold` FLOAT UNSIGNED DEFAULT 0 NOT NULL
-        COMMENT "the Equate entropy of thresholded and original distributions logistic threshold found in the model output",
+    -- Modelling status (current)
     `first_requested_remodel` DATETIME DEFAULT NULL NULL
         COMMENT "The first time, since last modelling run, that a user requested a remodel for this species",
-    `remodel_status` VARCHAR(256) DEFAULT NULL NULL
-        COMMENT "NULL if no modeling run is happening for this species, otherwise a message indicating the status of the modeling run"
+    -- Modelling current
+    `current_model_status` VARCHAR(256) DEFAULT NULL NULL
+        COMMENT "NULL if no modelling run is happening for this species, otherwise a message indicating the status of the modelling run",
+    `current_model_queued_time` DATETIME DEFAULT NULL NULL
+        COMMENT "NULL if no modelling run is happening for this species, otherwise time the model was queued on the HPC",
+    `current_model_importance` SMALLINT UNSIGNED DEFAULT NULL NULL
+        COMMENT "NULL if no modelling run is happening for this species, otherwise an integer representing the importance (priority) of the model",
+    -- Modelling most recently completed
+    `last_completed_model_queued_time` DATETIME DEFAULT NULL NULL
+        COMMENT "The time that the last completed model was queued",
+    `last_completed_model_finish_time` DATETIME DEFAULT NULL NULL
+        COMMENT "The time that the last completed model finished",
+    `last_completed_model_importance` SMALLINT UNSIGNED DEFAULT NULL NULL
+        COMMENT "The importance the species had when the last completed model was queued",
+    `last_completed_model_status` VARCHAR(256) DEFAULT NULL NULL
+        COMMENT "The status of the model when it completed. Should be FINISHED_SUCCESS or FINISHED_FAILURE",
+    `last_completed_model_status_reason` VARCHAR(256) DEFAULT NULL NULL
+        COMMENT "The reason for the status of the model when it completed",
+    -- Modelling most recently successfully completed
+    `last_successfully_completed_model_queued_time` DATETIME DEFAULT NULL NULL
+        COMMENT "The importance the species had when the last successfully completed model was queued",
+    `last_successfully_completed_model_finish_time` DATETIME DEFAULT NULL NULL
+        COMMENT "The importance the species had when the last successfully completed model was queued",
+    `last_successfully_completed_model_importance` SMALLINT UNSIGNED DEFAULT NULL NULL
+        COMMENT "The importance the species had when the last successfully completed model was queued"
 )
 CHARSET=utf8;
 
