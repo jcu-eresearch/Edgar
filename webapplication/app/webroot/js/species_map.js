@@ -54,10 +54,11 @@ function speciesGeoJSONURL() {
 }
 
 function legendURL() {
-    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
-    var data = (sciNameCased + '/outputs/' + sciNameCased + '.asc');
-    return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data +
-        '&THRESHOLD=' + Edgar.map.species.distributionThreshold;
+    var speciesId = Edgar.map.species.id;
+    var data = speciesId + '/1975.asc';
+    return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php' +
+        '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
+
 }
 
 function updateLegend() {
@@ -141,14 +142,15 @@ function reloadDistributionLayers() {
 }
 
 function addDistributionLayer() {
+    var mapPath;
 
     if (Edgar.map.species) {
 
-        speciesId = Edgar.map.species.id;
-        scenario = Edgar.map.emissionScenario;
-        year = Edgar.map.year;
-        bioData = 'csiro_mk3_5'; //what is this meant to be set to?
-        runs = 'run1.run1'; //what is this meant to be set to?
+        var speciesId = Edgar.map.species.id;
+        var scenario = Edgar.map.emissionScenario;
+        var year = Edgar.map.year;
+        var bioData = 'csiro_mk3_5'; //what is this meant to be set to?
+        var runs = 'run1.run1'; //what is this meant to be set to?
 
         //check box will be removed when it is working
         if($('#use_emission_and_year').is(':checked')){
@@ -186,11 +188,7 @@ function addDistributionLayer() {
             DATA: mapPath,
             SPECIESID: Edgar.map.species.id,
             REASPECT: "true",
-            TRANSPARENT: 'true',
-            // TODO -> Set the threshold.
-//            THRESHOLD: Edgar.map.species.distributionThreshold
-            THRESHOLD: "0"
-
+            TRANSPARENT: 'true'
         },
         {
             // It's an overlay

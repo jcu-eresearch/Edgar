@@ -239,9 +239,10 @@ class HPCJob:
     def checkStatus(self):
         log.debug("Checking status of job %s (%s)", self.jobId, self.speciesId)
 
-        # TODO should check isDone before isExpired
-
-        if self.isExpired():
+        if self.isDone():
+            # The job is done, no need to check status
+            return True
+        elif self.isExpired():
             # The job is too old, expire it
             log.warn("Current job took too long to complete, expiring job.")
             self._setJobExpired()
