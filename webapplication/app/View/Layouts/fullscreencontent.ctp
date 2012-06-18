@@ -59,7 +59,7 @@ $user = AuthComponent::user();
         echo $this->Html->css('openlayers_google');
 
         // include Modernizr for html5 shims and feature detection.  this needs to go early!
-    	$this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
+        $this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
         $this->Html->script('less-1.3.0.min.js', array('inline' => false, 'block'=>'earlyscript'));
 
 
