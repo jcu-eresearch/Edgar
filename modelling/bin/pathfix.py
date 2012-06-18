@@ -6,5 +6,5 @@ import os.path
 modellingsrcpath = os.path.realpath(os.path.dirname(__file__) + '/../src')
 sys.path.append(modellingsrcpath)
 
-importingsrcpath = os.path.realpath(os.path.dirname(__file__) + '/../../importing/src')
+importingsrcpath = os.path.realpath(os.path.dirname(__file__) + '/../../importing/edgar_importing')
 sys.path.append(importingsrcpath)
