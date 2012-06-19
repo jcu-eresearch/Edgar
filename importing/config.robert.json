@@ -2,7 +2,7 @@
     "doco_": "Any key starting with 'doco_' is not a config value, it's documentation only.",
 
     "doco_db": "Everything with a 'db.' prefix is passed to sqlalchemy.engine_from_config",
-    "db.url": "mysql://ap03:password@localhost/ap03_rob_dev?charset=utf8",
+    "db.url": "postgresql+psycopg2://edgar_backend:edgar_backend@/edgar"
 
     "doco_updateSpecies": "true/false, whether or not to add/update/delete species",
     "updateSpecies": true,
