@@ -2,6 +2,16 @@
 
 import pathfix
 import sys
+sys.path[0:0] = [
+    '/scratch/jc155857/EdgarMaster/importing',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/psycopg2-2.4.5-py2.6-linux-x86_64.egg',
+    '/usr/lib/python2.6/site-packages/argparse-1.2.1-py2.6.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/SQLAlchemy-0.7.8-py2.6-linux-x86_64.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/GeoAlchemy-0.7.1-py2.6.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/Shapely-1.2.14-py2.6-linux-x86_64.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/pyshp-1.1.4-py2.6.egg',
+    ]
 import logging
 import logging.handlers
 import json
