@@ -132,7 +132,15 @@ class SpeciesController extends AppController {
         $this->set('_serialize', 'geo_object');
     }
 
+    /*
+        Get the vetting geojson for the given species.
+    */
     public function vetting_geo_json($species_id = null) {
+        $this->Species->id = $species_id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException(__('Invalid species'));
+        }
+
         $results = $this->Species->getDataSource()->execute(
             'SELECT ST_AsGeoJSON(area) FROM ratings '.
             'WHERE species_id = ? '.
@@ -141,13 +149,44 @@ class SpeciesController extends AppController {
             array($species_id)
         );
 
-        if($results){
-            $this->dieWithStatus(200, $results->fetchColumn(0));
-        } else {
-            //TODO: is this correct for empty geo json?
-            $this->dieWithStatus(200, '{}');
+        $json_output = "{}";
+        if($results) {
+            $result = $results->fetchColumn(0);
+            if($result) {
+                $json_output = $result;
+            }
         }
+        $this->set('json_output', $json_output);
     }
+
+    /*
+        Insert vetting geojson for the given species.
+    */
+    /*
+    public function insert_vetting_geo_json($species_id = null) {
+        $this->Species->id = $species_id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException(__('Invalid species'));
+        }
+
+        $results = $this->Species->getDataSource()->execute(
+            'SELECT ST_AsGeoJSON(area) FROM ratings '.
+            'WHERE species_id = ? '.
+            'LIMIT 1',
+            array(),
+            array($species_id)
+        );
+
+        $json_output = "{}";
+        if($results) {
+            $result = $results->fetchColumn(0);
+            if($result) {
+                $json_output = $result;
+            }
+        }
+        $this->set('json_output', $json_output);
+    }
+    */
 
     /**
      * single_upload_json method
@@ -206,7 +245,7 @@ class SpeciesController extends AppController {
                 throw new NotFoundException(__('Invalid species'));
             }
         }
-        
+
         // use the fullscreen map view
         $this->render('fullscreenmap');
     }
