@@ -193,24 +193,26 @@ def species_for_scientific_name(scientific_name):
 
 
 def all_bird_species():
-    '''Generator for Species objects'''
+    '''Generator for Species objects '''
 
-    url = BIE + 'search.json'
-    params = (('fq', 'speciesGroup:Birds'),
-              ('fq', 'rank:species'),
-              ('fq', 'idxtype:TAXON'))
-    total_key_path = ('searchResults', 'totalRecords')
+    return _fetch_species_list(
+            ('fq', 'speciesGroup:Birds'),
+            ('fq', 'rank:species'),
+            ('fq', 'idxtype:TAXON'))
 
-    for page in _json_pages(url, params, total_key_path, 'start'):
-        for result in page['searchResults']['results']:
-            if result['occCount'] > 0:
-                s = Species()
-                s.lsid = result['guid']
-                s.scientific_name = result['nameComplete'].strip()
-                if result['commonNameSingle'] is not None:
-                    s.common_name = result['commonNameSingle'].strip()
 
-                yield s
+def all_vertebrate_species():
+    '''Generator for Species objects under subphylum Vertebrata'''
+
+    j = _fetch_json(create_request(BIE + 'species/VERTEBRATA.json'))
+    assert j['taxonConcept']['rankString'] == 'subphylum'
+    left = j['taxonConcept']['left']
+    right = j['taxonConcept']['right']
+
+    return _fetch_species_list(
+            ('fq', 'rank:species'),
+            ('fq', 'idxtype:TAXON'),
+            ('fq', 'left:[{0} TO {1}]'.format(left, right)))
 
 
 def num_occurrences_for_lsid(lsid):
@@ -279,6 +281,24 @@ def q_param(species_lsid=None, changed_since=None):
             basis_of_record:MachineObservation
         )
         '''.format(lsid=species_lsid, changed=changed_since))
+
+
+def _fetch_species_list(params):
+    '''Generator for Species objects'''
+
+    url = BIE + 'search.json'
+    total_key_path = ('searchResults', 'totalRecords')
+
+    for page in _json_pages(url, params, total_key_path, 'start'):
+        for result in page['searchResults']['results']:
+            if result['occCount'] > 0:
+                s = Species()
+                s.lsid = result['guid']
+                s.scientific_name = result['nameComplete'].strip()
+                if result['commonNameSingle'] is not None:
+                    s.common_name = result['commonNameSingle'].strip()
+
+                yield s
 
 
 def _retry(delay=10.0):
@@ -424,7 +444,6 @@ def _json_pages(url, params, total_key_path, offset_key, use_api_key=False):
         req = create_request(url, params, use_api_key=use_api_key)
         response = _fetch_json(req)
         yield response
-
 
         # calculate total num pages from response (only once)
         if total_pages is None:
