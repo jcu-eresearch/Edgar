@@ -196,9 +196,10 @@ def all_bird_species():
     '''Generator for Species objects '''
 
     return _fetch_species_list(
-            ('fq', 'speciesGroup:Birds'),
-            ('fq', 'rank:species'),
-            ('fq', 'idxtype:TAXON'))
+        (('fq', 'speciesGroup:Birds'),
+         ('fq', 'rank:species'),
+         ('fq', 'idxtype:TAXON'))
+    )
 
 
 def all_vertebrate_species():
@@ -210,9 +211,10 @@ def all_vertebrate_species():
     right = j['taxonConcept']['right']
 
     return _fetch_species_list(
-            ('fq', 'rank:species'),
-            ('fq', 'idxtype:TAXON'),
-            ('fq', 'left:[{0} TO {1}]'.format(left, right)))
+        (('fq', 'rank:species'),
+         ('fq', 'idxtype:TAXON'),
+         ('fq', 'left:[{0} TO {1}]'.format(left, right)))
+    )
 
 
 def num_occurrences_for_lsid(lsid):

@@ -221,13 +221,12 @@ def insert_ratings_for_taxon(taxon, user_id, srid):
         area = WKTSpatialElement(shapely.wkt.dumps(poly), srid)
 
         q = db.ratings.insert().values(
-            user_id=user_id,
-            species_id=taxon.db_id,
-            comment='Polygons imported from Birdlife Australia',
-            rating=rating,
-            area=area)
-
-        q.execute()
+                user_id=user_id,
+                species_id=taxon.db_id,
+                comment='Polygons imported from Birdlife Australia',
+                rating=rating,
+                area=area
+            ).execute()
 
 
 def main():

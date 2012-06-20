@@ -33,14 +33,16 @@ sudo vim /var/lib/pgsql/data/pg_hba.conf
 restart postgres:
     centos: sudo service postgresql restart
     debian: sudo /etc/init.d/postgresql restart
-    
-    
+
+
 cd ~/Edgar/importing
 python2.6 bootstrap.py
 bin/buildout
 cp config.example.json config.json
 vim config.json
-    "db.url": "postgresql+psycopg2://edgar_backend:backend@/edgar"
+    "db.url": "postgresql+psycopg2://edgar_backend:backend_password@/edgar"
+sudo -u postgres psql edgar
+    INSERT INTO sources(name) VALUES('ALA');
 
 
 vim ~/Edgar/webapplication/app/Config/database.php
