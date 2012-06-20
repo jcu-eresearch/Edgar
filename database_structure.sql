@@ -170,7 +170,7 @@ GRANT USAGE, SELECT ON occurrences_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON ratings_id_seq TO edgar_backend;
 
 -- edgar_frontend
-GRANT SELECT ON species TO edgar_frontend;
+GRANT SELECT, UPDATE ON species TO edgar_frontend;
 GRANT SELECT ON occurrences TO edgar_frontend;
 GRANT SELECT, INSERT ON ratings TO edgar_frontend;
 GRANT USAGE, SELECT ON ratings_id_seq TO edgar_frontend;
