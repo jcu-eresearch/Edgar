@@ -45,9 +45,25 @@
     <div id="newvet" class="tool">
         <h1>new vetting</h1>
         <div class="toolcontent">
-            <form class="vetform">
-                <button>DO IT</button>
-                new vet form goes here
+            <!-- new vet form -->
+            <form id="new_vet_form">
+                <legend>Classification
+                    <select id="classification">
+                        <option value="unknown" selected>unknown</option>
+                        <option value="invalid">invalid</option>
+                        <option value="historic">historic</option>
+                        <option value="vagrant">vagrant</option>
+                        <option value="irruptive">irruptive</option>
+                        <option value="non-breeding">non-breeding</option>
+                        <option value="introduced non-breeding">introduced non-breeding</option>
+                        <option value="breeding">breeding</option>
+                        <option value="introduced breeding">introduced breeding</option>
+                    </select>
+                </legend>
+                <legend>Comment
+                    <textarea id="comment"></textarea>
+                </legend>
+                <button id="vet">vet</button>
             </form>
         </div>
     </div>
@@ -117,6 +133,7 @@
             <label><input id="done" type="checkbox" value="done" />done</label>
         </div>
     </div>
+
 </div>
 
 <div id="speciespanel" class="top panel speciespanel clearfix">
@@ -126,7 +143,7 @@
 
     <!-- Species Selector -->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
-    
+
     <table>
         <tr>
             <th>Modeling Status</th>
