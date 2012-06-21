@@ -39,7 +39,7 @@ The lowest level of authority comes from the source of the records. When records
 
 ## Applying Vettings To Records
 
-Calculating the correct classification for each record is done using a custom (PL/pgSQL)]http://www.postgresql.org/docs/8.4/static/plpgsql.html] function in Postgres. The code for the function is in [database_structure.sql](https://github.com/jcu-eresearch/Edgar/blob/master/database_structure.sql). It uses a [painters algorithm](http://en.wikipedia.org/wiki/Painter's_algorithm) so that the higher-authority vettings are &ldquo;painted over&rdquo; the lower-authority vettings.
+Calculating the correct classification for each record is done using a custom (PL/pgSQL)[http://www.postgresql.org/docs/8.4/static/plpgsql.html] function in Postgres. The code for the function is in [database_structure.sql](https://github.com/jcu-eresearch/Edgar/blob/master/database_structure.sql). It uses a [painters algorithm](http://en.wikipedia.org/wiki/Painter's_algorithm) so that the higher-authority vettings are &ldquo;painted over&rdquo; the lower-authority vettings.
 
 The algorithm works roughly like this:
 
