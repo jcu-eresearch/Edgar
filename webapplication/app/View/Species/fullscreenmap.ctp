@@ -13,7 +13,7 @@
 
     // add the init JS to our scripts content block
     $this->Html->scriptBlock($species_init_js, array('inline'=>false));
-    
+
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));

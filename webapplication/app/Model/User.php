@@ -7,7 +7,7 @@ class User extends AppModel {
 
     static public function canRequestRemodel($user) {
         if($user){
-            return (bool)$user['can_rate'];
+            return (bool)$user['can_vet'];
         } else {
             return false;
         }

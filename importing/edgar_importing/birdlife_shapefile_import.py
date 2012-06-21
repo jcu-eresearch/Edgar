@@ -17,8 +17,8 @@ COL_TAXONID = 2
 COL_RANGE_T = 3
 COL_BR_RNGE_T = 4
 
-# map of BLA categories to db rating enum values
-RATINGS_BY_BLA_CATEGORIES = {
+# map of BLA categories to db classification enum values
+CLASSIFICATIONS_BY_BLA_CATEGORIES = {
         'irruptive': 'irruptive',
         'vagrant': 'vagrant',
         'escaped': 'vagrant',
@@ -43,7 +43,7 @@ class Taxon(object):
         self.common_name = common
         self.sci_name = sci
         self.db_id = None
-        self.polys_by_rating = {}
+        self.polys_by_classification = {}
 
     def __repr__(self):
         return '<Taxon spno="{spno}" db_id="{dbid}" sci="{sci}" common="{common}" />'.format(
@@ -74,7 +74,7 @@ class Taxon(object):
 def parse_args():
     parser = argparse.ArgumentParser(
         description='''Loads Birdlife Australia shapefiles into the database as
-        ratings.''')
+        vettings.''')
 
     parser.add_argument('shapefile', type=str, nargs=1, help='''The path to
         the `.shp` file.''')
@@ -87,7 +87,7 @@ def parse_args():
         JSON config file.''')
 
     parser.add_argument('user_id', type=int, nargs=1, help='''The id Birdlife
-        Australia user. This user will own the ratings that are added to the
+        Australia user. This user will own the vettings that are added to the
         database.''')
 
     parser.add_argument('srid', type=int, nargs=1, help='''The EPSG-compliant
@@ -173,13 +173,13 @@ def poly_from_shapefile_shape(shape):
         return None
 
 
-def rating_for_record(rec):
+def classification_for_record(rec):
     category = rec[COL_RANGE_T]
     if category == 'core' or category == 'introduced':
         category += ', ' + rec[COL_BR_RNGE_T]
 
-    assert category in RATINGS_BY_BLA_CATEGORIES
-    return RATINGS_BY_BLA_CATEGORIES[category]
+    assert category in CLASSIFICATIONS_BY_BLA_CATEGORIES
+    return CLASSIFICATIONS_BY_BLA_CATEGORIES[category]
 
 
 def update_poly_on_taxon(taxon, record):
@@ -188,12 +188,12 @@ def update_poly_on_taxon(taxon, record):
         _log.warning('Invalid polygon on record: %s', repr(record.record))
         return
 
-    rating = rating_for_record(record.record)
-    if rating in taxon.polys_by_rating:
-        existing = taxon.polys_by_rating[rating]
-        taxon.polys_by_rating[rating] = existing.union(poly)
+    classification = classification_for_record(record.record)
+    if classification in taxon.polys_by_classification:
+        existing = taxon.polys_by_classification[classification]
+        taxon.polys_by_classification[classification] = existing.union(poly)
     else:
-        taxon.polys_by_rating[rating] = poly
+        taxon.polys_by_classification[classification] = poly
 
 
 def set_polys_for_taxons(shapef, taxons_by_spno):
@@ -205,14 +205,14 @@ def set_polys_for_taxons(shapef, taxons_by_spno):
         update_poly_on_taxon(taxon, record)
 
 
-def insert_ratings_for_taxon(taxon, user_id, srid):
+def insert_vettings_for_taxon(taxon, user_id, srid):
     if taxon.db_id is None:
         _log.warning('Skipping species with no db_id: %s', taxon.sci_name)
         return
 
-    # TODO: make sure the rating polygons don't overlap
+    # TODO: make sure the classification polygons don't overlap
 
-    for rating, poly in taxon.polys_by_rating.iteritems():
+    for classification, poly in taxon.polys_by_classification.iteritems():
         # `poly` can be either a `Polygon` or a `MultiPolygon`
         # postgis expects a `MultiPolygon`, so convert if a `Polygon`
         if isinstance(poly, Polygon):
@@ -220,11 +220,11 @@ def insert_ratings_for_taxon(taxon, user_id, srid):
 
         area = WKTSpatialElement(shapely.wkt.dumps(poly), srid)
 
-        q = db.ratings.insert().values(
+        q = db.vettings.insert().values(
                 user_id=user_id,
                 species_id=taxon.db_id,
                 comment='Polygons imported from Birdlife Australia',
-                rating=rating,
+                classification=classification,
                 area=area
             ).execute()
 
@@ -246,9 +246,9 @@ def main():
     sf = shapefile.Reader(args.shapefile[0])
     set_polys_for_taxons(sf, taxons)
 
-    # wipe existing ratings
-    db.ratings.delete().where(db.ratings.c.user_id == args.user_id[0]).execute()
+    # wipe existing vettings 
+    db.vettings.delete().where(db.vettings.c.user_id == args.user_id[0]).execute()
 
-    # create new ratings
+    # create new vettings
     for t in taxons.itervalues():
-        insert_ratings_for_taxon(t, args.user_id[0], args.srid[0])
+        insert_vettings_for_taxon(t, args.user_id[0], args.srid[0])

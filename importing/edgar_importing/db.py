@@ -15,7 +15,7 @@ def connect(engine_config):
     engine = engine_from_config(engine_config, prefix='db.')
     metadata.bind = engine
 
-ratings_enum = Enum('unknown', 'invalid', 'historic', 'vagrant', 'irruptive',
+classification_enum = Enum('unknown', 'invalid', 'historic', 'vagrant', 'irruptive',
     'non-breeding', 'introduced non-breeding', 'breeding',
     'introduced breeding');
 
@@ -38,13 +38,13 @@ sources = Table('sources', metadata,
 occurrences = Table('occurrences', metadata,
     Column('id', Integer(), primary_key=True),
     GeometryExtensionColumn('location', Point(2, srid=4326), nullable=False),
-    Column('rating', ratings_enum, nullable=False),
+    Column('classification', classification_enum, nullable=False),
     Column('species_id', SmallInteger(), ForeignKey('species.id'),
         nullable=False),
     Column('source_id', SmallInteger(), ForeignKey('sources.id'),
         nullable=False),
     Column('source_record_id', BINARY(16), nullable=True),
-    Column('source_rating', ratings_enum, nullable=False),
+    Column('source_classification', classification_enum, nullable=False),
 
     Index('idx_species_id', 'species_id'),
 
@@ -62,15 +62,15 @@ sensitive_occurrences = Table('sensitive_occurrences', metadata,
 )
 GeometryDDL(sensitive_occurrences)
 
-ratings = Table('ratings', metadata,
+vettings = Table('vettings', metadata,
     Column('id', Integer(), primary_key=True),
     Column('user_id', Integer(), ForeignKey('users.id'),
         nullable=False),
     Column('species_id', Integer(), ForeignKey('species.id'),
         nullable=False),
     Column('comment', Text(), nullable=False),
-    Column('rating', ratings_enum, nullable=False),
+    Column('classification', classification_enum, nullable=False),
     GeometryExtensionColumn('area', MultiPolygon(2, srid=4326), nullable=False)
 )
-GeometryDDL(ratings)
+GeometryDDL(vettings)
 

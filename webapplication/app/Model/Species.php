@@ -18,6 +18,12 @@ class Species extends AppModel {
             'dependent' => true,
 //            'order'     => 'rand()',
 //            'limit'     => 10000
+        ),
+        'Vetting' => array(
+            'className' => 'Vetting',
+            'dependent' => true,
+//            'order'     => 'rand()',
+//            'limit'     => 10000
         )
     );
 

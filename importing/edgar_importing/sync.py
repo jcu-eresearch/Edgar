@@ -322,9 +322,9 @@ class Syncer:
             self.ala_species_by_sname[scientific_name] = species
             return species
 
-    def rate_occurrence(self, occurrence):
-        '''Returns an occurrences.rating enum value for an ala.Occurrence'''
-        # TODO: determine rating better using lists of assertions
+    def vet_occurrence(self, occurrence):
+        '''Returns an occurrences.classification enum value for an ala.Occurrence'''
+        # TODO: determine classification better using lists of assertions
         if occurrence.is_geospatial_kosher:
             return 'irruptive'
         else:
@@ -356,14 +356,14 @@ class Syncer:
         p = shapely.geometry.Point(occ.coord.longi, occ.coord.lati)
         location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
 
-        rating = self.rate_occurrence(occ)
+        classification = self.vet_occurrence(occ)
 
         if existing is None:
             return db.occurrences.insert().\
                 returning(db.occurrences.c.id).\
                 values(location=location,
-                       source_rating=rating,
-                       rating=rating,
+                       source_classification=classification,
+                       classification=classification,
                        species_id=species_id,
                        source_id=self.source_row_id,
                        source_record_id=occ.uuid.bytes).\
@@ -373,7 +373,7 @@ class Syncer:
             return db.occurrences.update().\
                 returning(db.occurrences.c.id).\
                 values(location=location,
-                       source_rating=self.rate_occurrence(occ),
+                       source_classification=self.vet_occurrence(occ),
                        species_id=species_id).\
                 where(db.occurrences.c.id == existing['id']).\
                 execute().\

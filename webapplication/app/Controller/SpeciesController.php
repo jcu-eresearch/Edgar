@@ -142,7 +142,7 @@ class SpeciesController extends AppController {
         }
 
         $results = $this->Species->getDataSource()->execute(
-            'SELECT ST_AsGeoJSON(area) FROM ratings '.
+            'SELECT ST_AsGeoJSON(area) FROM vettings '.
             'WHERE species_id = ? '.
             'LIMIT 1',
             array(),
@@ -162,31 +162,45 @@ class SpeciesController extends AppController {
     /*
         Insert vetting geojson for the given species.
     */
-    /*
-    public function insert_vetting_geo_json($species_id = null) {
-        $this->Species->id = $species_id;
-        if (!$this->Species->exists()) {
-            throw new NotFoundException(__('Invalid species'));
-        }
+    public function insert_vetting($species_id = null) {
+        if ($this->request->is('post')) {
+            $this->Species->recursive = 0;
+            $this->Species->id = $species_id;
+            if (!$this->Species->exists()) {
+                throw new NotFoundException(__('Invalid species'));
+            }
+            $this->set('species', $this->Species->read(null, $species_id));
 
-        $results = $this->Species->getDataSource()->execute(
-            'SELECT ST_AsGeoJSON(area) FROM ratings '.
-            'WHERE species_id = ? '.
-            'LIMIT 1',
-            array(),
-            array($species_id)
-        );
+            // Specify the output for the json view.
+            $this->set('_serialize', 'species');
 
-        $json_output = "{}";
-        if($results) {
-            $result = $results->fetchColumn(0);
-            if($result) {
-                $json_output = $result;
+            $jsonData = json_decode(utf8_encode(trim(file_get_contents('php://input'))), true);
+
+            if ($jsonData !== null) {
+                // At this point, we have the json data.
+                // Do the work on it.
+                $this->set('jsonData', $jsonData);
+                $area = $jsonData['area'];
+                print_r($area);
+                $this->set('_serialize', 'jsonData');
+                $userId = 1;
+                // TODO: Get User ID From Logged in user var.
+                $comment = $jsonData['comment'];
+                $classification = $jsonData['classification'];
+
+                $dbo = $this->Species->Vetting->getDataSource();
+                $escaped_area = $dbo->value($area);
+                $dbo->execute(
+                    "INSERT INTO vettings (user_id, species_id, comment, classification, area) VALUES ( ? , ? , ? , ? , ( ST_GeomFromText(".$escaped_area.", 4326) ) )",
+                    array(),
+                    array($userId, $species_id, $comment, $classification)
+                );
+
+            } else {
+                $this->dieWithStatus(400, "Bad JSON Input");
             }
         }
-        $this->set('json_output', $json_output);
     }
-    */
 
     /**
      * single_upload_json method
