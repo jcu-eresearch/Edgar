@@ -39,14 +39,14 @@ The lowest level of authority comes from the source of the records. When records
 
 ## Applying Vettings To Records
 
-Calculating the correct classification for each record is done using a custom (PL/pgSQL)]http://www.postgresql.org/docs/8.4/static/plpgsql.html] function in Postgres. The code for the function is in (database_structure.sql)[https://github.com/jcu-eresearch/Edgar/blob/master/database_structure.sql]. It uses a (painters algorithm)[http://en.wikipedia.org/wiki/Painter's_algorithm] so that the higher-authority vettings are &ldquo;painted over&rdquo; the lower-authority vettings.
+Calculating the correct classification for each record is done using a custom (PL/pgSQL)]http://www.postgresql.org/docs/8.4/static/plpgsql.html] function in Postgres. The code for the function is in [database_structure.sql](https://github.com/jcu-eresearch/Edgar/blob/master/database_structure.sql). It uses a [painters algorithm](http://en.wikipedia.org/wiki/Painter's_algorithm) so that the higher-authority vettings are &ldquo;painted over&rdquo; the lower-authority vettings.
 
 The algorithm works roughly like this:
 
 1. For every record:
-   1. Set the records classification to the one from the source (i.e., the classification translated from ALA's assertions)
+    1. Set the records classification to the one from the source (i.e., the classification translated from ALA's assertions)
 2. For every vetting, <strong>ordered from lowest-authority to highest-authority</strong>:
-   1. For every record inside the vetting area:
-      1. Set the records classification to the vettings classification
+    1. For every record inside the vetting area:
+        1. Set the records classification to the vettings classification
 
 Basically, the record classifications are reset to their original value. Then, every vetting is &ldquo;painted&rdquo; over the records by setting the classification for all records in the vettings polygons. Each vetting possibly &ldquo;paints over&rdquo; previous vettings, which is why they are applied in order from lowest-priority to highest-priority.
