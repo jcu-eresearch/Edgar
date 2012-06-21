@@ -46,7 +46,7 @@
         <h1>new vetting</h1>
         <div class="toolcontent">
             <!-- new vet form -->
-            <form id="new_vet_form">
+            <form id="vetform">
                 <legend>Classification
                     <select id="classification">
                         <option value="unknown" selected>unknown</option>

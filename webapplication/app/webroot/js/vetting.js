@@ -12,7 +12,7 @@ $(function() {
         alert('Cylon says: BUTTON PRESSED');
 
         createNewVetting();
-        
+
         e.preventDefault();
     });
 
