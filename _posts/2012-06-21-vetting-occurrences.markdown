@@ -43,10 +43,27 @@ Calculating the correct classification for each record is done using a custom (P
 
 The algorithm works roughly like this:
 
-1. For every record:
-    1. Set the records classification to the one from the source (i.e., the classification translated from ALA's assertions)
-2. For every vetting, <strong>ordered from lowest-authority to highest-authority</strong>:
-    1. For every record inside the vetting area:
-        1. Set the records classification to the vettings classification
+<ol>
+    <li>
+        For every record:
+        <ol>
+            <li>Set the records classification to the one from the source (i.e., 
+            the classification translated from ALA's assertions)</li>
+        </ol>
+    </li>
+    <li>
+        For every vetting, <strong>ordered from lowest-authority to 
+        highest-authority</strong>:
+        <ol>
+            <li>
+                For every record inside the vetting area:
+                <ol>
+                    <li>Set the records classification to the vettings 
+                    classification</li>
+                </ol>
+            </li>
+        </ol>
+    </li>
+</ol>
 
 Basically, the record classifications are reset to their original value. Then, every vetting is &ldquo;painted&rdquo; over the records by setting the classification for all records in the vettings polygons. Each vetting possibly &ldquo;paints over&rdquo; previous vettings, which is why they are applied in order from lowest-priority to highest-priority.
