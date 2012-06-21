@@ -1,9 +1,22 @@
 /*
-set up the tools panels
+JS for doing vetting
 */
-$(function() {
-    var tools = $('#toolspanel .tool');
 
+
+$(function() {
+
+    var vetpanel = $('#newvet');
+    var vetform = $('#vetform');
+
+    vetpanel.find('button').click( function(e) {
+        alert('Cylon says: BUTTON PRESSED');
+
+        createNewVetting();
+        
+        e.preventDefault();
+    });
+
+/*
     // go through each tool panel and add opne/close behaviour to the header
     tools.each( function(index, tool) {
         tool = $(tool);
@@ -51,5 +64,5 @@ $(function() {
     Edgar.mapdata.year = parseInt($('#year_selector').val());
     reloadDistributionLayers();
 
-
+*/
 });

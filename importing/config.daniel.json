@@ -2,7 +2,7 @@
     "doco_": "Any key starting with 'doco_' is not a config value, it's documentation only.",
 
     "doco_db": "Everything with a 'db.' prefix is passed to sqlalchemy.engine_from_config",
-    "db.url": "mysql://edgar_import:password@localhost/edgar_dev?charset=utf8",
+    "db.url": "postgresql+psycopg2://edgar_backend:edgar_backend@localhost/edgar",
 
     "doco_updateSpecies": "true/false, whether or not to add/update/delete species",
     "updateSpecies": true,
@@ -11,5 +11,11 @@
     "updateOccurrences": true,
 
     "doco_logLevel": "string, any level from the python logging module (i.e. DEBUG, INFO, WARNING, ERROR, CRITICAL)",
-    "logLevel": "INFO"
+    "logLevel": "DEBUG",
+
+    "doco_maxRetrySeconds": "The maximum number of seconds to keep retrying an ALA request, before finally canceling the import",
+    "maxRetrySeconds": 300,
+
+    "doco_alaApiKey": ">>>THIS IS SECRET. DO NOT MAKE THIS PUBLIC<<<. API key used to access sensitive occurrence coordinates in web requests to ALA",
+    "alaApiKey": null
 }

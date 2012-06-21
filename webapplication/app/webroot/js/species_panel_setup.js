@@ -7,7 +7,7 @@ function changeSpecies(species) {
 
     clearExistingSpeciesOccurrencesAndDistributionLayers();
 
-    Edgar.map.species = species;
+    Edgar.mapdata.species = species;
 
     if (species !== null) {
 
@@ -44,7 +44,7 @@ function changeSpecies(species) {
 function updateSpeciesShowingLabel() {
     setTimeout(function() {
         var selector = $('#species_autocomplete');
-        if (Edgar.map.species === null) {
+        if (Edgar.mapdata.species === null) {
             $('#species_showing_label').text('choose a species for display');
         } else {
             $('#species_showing_label').text('now showing');
@@ -72,7 +72,7 @@ $(function() {
     });
 
     $('#model_rerun_button').click(function() {
-        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.map.species.id });
+        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.mapdata.species.id });
         $(this).fadeOut('fast', function(){
             $('#model_rerun_requested').fadeIn();
         });

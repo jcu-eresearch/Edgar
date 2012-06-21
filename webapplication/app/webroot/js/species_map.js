@@ -8,7 +8,7 @@
 function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
 
 
-var map, occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
+var occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
 
 // Projections
 // ----------
@@ -40,11 +40,11 @@ zoom_bounds = australia_bounds;
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 
 function speciesGeoJSONURL() {
-    return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.map.species.id + ".json");
+    return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.mapdata.species.id + ".json");
 }
 
 function legendURL() {
-    var speciesId = Edgar.map.species.id;
+    var speciesId = Edgar.mapdata.species.id;
     var data = speciesId + '/1975.asc';
     return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php' +
         '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
@@ -73,7 +73,7 @@ function clearExistingSpeciesOccurrencesAndDistributionLayers() {
     clearExistingSpeciesOccurrencesLayer();
 
     if (distribution !== undefined) {
-        map.removeLayer(distribution);
+        Edgar.map.removeLayer(distribution);
         distribution = undefined;
     }
 
@@ -85,7 +85,7 @@ function clearExistingSpeciesOccurrencesAndDistributionLayers() {
 function clearExistingSpeciesOccurrencesLayer() {
     // Remove old layers.
     if (occurrences !== undefined) {
-        map.removeLayer(occurrences);
+        Edgar.map.removeLayer(occurrences);
         occurrences = undefined;
     }
 
@@ -93,16 +93,16 @@ function clearExistingSpeciesOccurrencesLayer() {
     if (occurrence_select_control !== undefined) {
         occurrence_select_control.unselectAll();
         occurrence_select_control.deactivate();
-        map.removeControl(occurrence_select_control);
+        Edgar.map.removeControl(occurrence_select_control);
         occurrence_select_control = undefined;
     }
 
     if(vettingLayer !== undefined) {
         console.log('Removing vetting layer');
-        map.removeLayer(vettingLayer);
+        Edgar.map.removeLayer(vettingLayer);
         vettingLayerControl.unselectAll();
         vettingLayerControl.deactivate();
-        map.removeControl(vettingLayerControl);
+        Edgar.map.removeControl(vettingLayerControl);
         vettingLayer = undefined;
         vettingLayerControl = undefined;
     }
@@ -118,14 +118,14 @@ function addSpeciesOccurrencesAndDistributionLayers() {
 }
 
 function clearMapPopups() {
-    $.each(map.popups, function(index, popup) {
-        map.removePopup(popup);
+    $.each(Edgar.map.popups, function(index, popup) {
+        Edgar.map.removePopup(popup);
     });
 }
 
 function reloadDistributionLayers() {
     if (distribution !== undefined) {
-        map.removeLayer(distribution);
+        Edgar.map.removeLayer(distribution);
         distribution = undefined;
     }
     addDistributionLayer();
@@ -134,11 +134,11 @@ function reloadDistributionLayers() {
 function addDistributionLayer() {
     var mapPath;
 
-    if (Edgar.map.species) {
+    if (Edgar.mapdata.species) {
 
-        var speciesId = Edgar.map.species.id;
-        var scenario = Edgar.map.emissionScenario;
-        var year = Edgar.map.year;
+        var speciesId = Edgar.mapdata.species.id;
+        var scenario = Edgar.mapdata.emissionScenario;
+        var year = Edgar.mapdata.year;
         var bioData = 'csiro_mk3_5'; //what is this meant to be set to?
         var runs = 'run1.run1'; //what is this meant to be set to?
 
@@ -163,34 +163,34 @@ function addDistributionLayer() {
         // projection request.
         // I could be wrong though...
 
-    //    var sciNameCased = flattenScientificName(Edgar.map.species.scientificName);
+        //    var sciNameCased = flattenScientificName(Edgar.mapdata.species.scientificName);
+
+        distribution = new OpenLayers.Layer.WMS(
+            "Climate Suitability",
+            mapToolBaseUrl + 'wms_with_auto_determined_threshold.php', // path to our map script handler.
+
+            // Params to send as part of request (note: keys will be auto-upcased)
+            // I'm typing them in caps so I don't get confused.
+            {
+                MODE: 'map',
+                MAP: 'edgar_master.map',
+                DATA: mapPath,
+                SPECIESID: Edgar.mapdata.species.id,
+                REASPECT: "true",
+                TRANSPARENT: 'true'
+            },
+            {
+                // It's an overlay
+                isBaseLayer: false,
+                transitionEffect: 'resize',
+                singleTile: true,
+                ratio: 1.5,
+            }
+        );
+
+        registerLayerProgress(distribution, "climate suitability");
+        Edgar.map.addLayer(distribution);
     }
-
-    distribution = new OpenLayers.Layer.WMS(
-        "Climate Suitability",
-        mapToolBaseUrl + 'wms_with_auto_determined_threshold.php', // path to our map script handler.
-
-        // Params to send as part of request (note: keys will be auto-upcased)
-        // I'm typing them in caps so I don't get confused.
-        {
-            MODE: 'map',
-            MAP: 'edgar_master.map',
-            DATA: mapPath,
-            SPECIESID: Edgar.map.species.id,
-            REASPECT: "true",
-            TRANSPARENT: 'true'
-        },
-        {
-            // It's an overlay
-            isBaseLayer: false,
-            transitionEffect: 'resize',
-            singleTile: true,
-            ratio: 1.5,
-        }
-    );
-
-    registerLayerProgress(distribution, "climate suitability");
-    map.addLayer(distribution);
 }
 
 function addVettingLayer() {
@@ -209,7 +209,7 @@ function addVettingLayer() {
         projection: geographic,
         strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
         protocol: new OpenLayers.Protocol.HTTP({
-            url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.map.species.id + ".json"),
+            url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.mapdata.species.id + ".json"),
             format: new OpenLayers.Format.GeoJSON({})
         }),
         styleMap: new OpenLayers.StyleMap({
@@ -222,8 +222,8 @@ function addVettingLayer() {
         })
     });
     vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: false});
-    map.addLayer(vettingLayer);
-    map.addControl(vettingLayerControl);
+    Edgar.map.addLayer(vettingLayer);
+    Edgar.map.addControl(vettingLayerControl);
     vettingLayerControl.activate();
 }
 
@@ -375,7 +375,7 @@ function addOccurrencesLayer() {
                 null, true, onPopupClose);
                 feature.popup = popup;
                 popup.feature = feature;
-                map.addPopup(popup);
+                Edgar.map.addPopup(popup);
         }
 
         // what to do when a feature is no longed seected
@@ -383,7 +383,7 @@ function addOccurrencesLayer() {
             feature = evt.feature;
             if (feature.popup) {
                 popup.feature = null;
-                map.removePopup(feature.popup);
+                Edgar.map.removePopup(feature.popup);
                 feature.popup.destroy();
                 feature.popup = null;
             }
@@ -397,7 +397,7 @@ function addOccurrencesLayer() {
 
         // Clear any popups when the zoom changes.
         // If we don't do this, the popup can become stuck (can't be closed).
-        map.events.on({
+        Edgar.map.events.on({
             'zoomend': clearMapPopups
         });
 
@@ -410,9 +410,9 @@ function addOccurrencesLayer() {
         );
 
         registerLayerProgress(occurrences, "species occurrences");
-        map.addLayer(occurrences);
+        Edgar.map.addLayer(occurrences);
 
-        map.addControl(occurrence_select_control);
+        Edgar.map.addControl(occurrence_select_control);
         occurrence_select_control.activate();
 }
 
@@ -423,9 +423,9 @@ function flattenScientificName(name) {
 function updateWindowHistory() {
     if(window.History.enabled) {
         window.History.replaceState(
-            Edgar.map.species,
+            Edgar.mapdata.species,
             '',
-            Edgar.baseUrl + 'species/map/' + Edgar.map.species.id
+            Edgar.baseUrl + 'species/map/' + Edgar.mapdata.species.id
         );
     }
 }
@@ -435,7 +435,7 @@ $(function() {
     // The Map Object
     // ----------
 
-    map = new OpenLayers.Map('map', {
+    Edgar.map = new OpenLayers.Map('map', {
         projection: mercator,
         displayProjection: geographic,
         units: "m",
@@ -458,7 +458,7 @@ $(function() {
     // OpenLayers keeps remaking the dom elements in the switcher.
     // I'm attaching behaviour to the layer-added-to-map event that will
     // hook up all the loading indicators when layers are added.
-    map.events.register('addlayer', null, function(event) {
+    Edgar.map.events.register('addlayer', null, function(event) {
 
         // find the label DOM for a given layer --------------------------
         function layerLabelDom(layer) {
@@ -521,7 +521,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
 
     // not sure how to position controls while adding them in constructor.
     // instead I'm just adding the control here in the right place.
-    map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(5,60));
+    Edgar.map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(5,60));
 
 
     // VMap0
@@ -631,8 +631,8 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // -------------
 
     // Add the standard set of map controls
-//    map.addControl(new OpenLayers.Control.Permalink());
-//    map.addControl(new OpenLayers.Control.MousePosition());
+//    Edgar.map.addControl(new OpenLayers.Control.Permalink());
+//    Edgar.map.addControl(new OpenLayers.Control.MousePosition());
 
     // Let the user change between layers
 //    layerSwitcher = new OpenLayers.Control.ExtendedLayerSwitcher();
@@ -643,15 +643,15 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     });
     layerSwitcher.ascending = false;
 
-    map.addControl(layerSwitcher);
+    Edgar.map.addControl(layerSwitcher);
 //    layerSwitcher.maximizeControl();
 
     // Add our layers
-    map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
-    map.setBaseLayer(gphy);
+    Edgar.map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
+    Edgar.map.setBaseLayer(gphy);
 
     // Zoom the map to the zoom_bounds specified earlier
-    map.zoomToExtent(zoom_bounds);
+    Edgar.map.zoomToExtent(zoom_bounds);
 
     addLegend();
 

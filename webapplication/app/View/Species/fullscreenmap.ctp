@@ -20,6 +20,7 @@
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
+    $this->Html->script('vetting', array('inline'=>false));
 
     // the init stuff needs to go early
     $this->Html->script('init_setup', array('inline'=>false, 'block'=>'earlyscript'));
@@ -45,6 +46,7 @@
         <h1>new vetting</h1>
         <div class="toolcontent">
             <form class="vetform">
+                <button>DO IT</button>
                 new vet form goes here
             </form>
         </div>
