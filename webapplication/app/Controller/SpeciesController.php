@@ -11,6 +11,13 @@ class SpeciesController extends AppController {
     public $components = array('RequestHandler');
     public $helpers = array('Form', 'Html', 'Js', 'Time');
 
+    // Don't allow a user to insert a vetting unless they are logged in.
+    public function beforeFilter() {
+        parent::beforeFilter();
+        $this->Auth->deny('insert_vetting');
+    }
+
+
     /**
      * index method
      *
@@ -163,6 +170,11 @@ class SpeciesController extends AppController {
         Insert vetting geojson for the given species.
     */
     public function insert_vetting($species_id = null) {
+
+        // Get the auth'd user.
+        // NOTE: Prefilter means the user can't be here unless they are logged in.
+        $user_id = $this->Auth->user('id');
+
         if ($this->request->is('post')) {
             $this->Species->recursive = 0;
             $this->Species->id = $species_id;
@@ -181,10 +193,7 @@ class SpeciesController extends AppController {
                 // Do the work on it.
                 $this->set('jsonData', $jsonData);
                 $area = $jsonData['area'];
-                print_r($area);
                 $this->set('_serialize', 'jsonData');
-                $userId = 1;
-                // TODO: Get User ID From Logged in user var.
                 $comment = $jsonData['comment'];
                 $classification = $jsonData['classification'];
 
@@ -193,14 +202,16 @@ class SpeciesController extends AppController {
                 $dbo->execute(
                     "INSERT INTO vettings (user_id, species_id, comment, classification, area) VALUES ( ? , ? , ? , ? , ( ST_GeomFromText(".$escaped_area.", 4326) ) )",
                     array(),
-                    array($userId, $species_id, $comment, $classification)
+                    array($user_id, $species_id, $comment, $classification)
                 );
 
+                $this->dieWithStatus(200, "Inserted JSON");
             } else {
                 $this->dieWithStatus(400, "Bad JSON Input");
             }
         }
     }
+
 
     /**
      * single_upload_json method
