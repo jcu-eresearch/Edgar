@@ -40,7 +40,7 @@ $user = AuthComponent::user();
             Edgar.user = null;
         <?php else: ?>
             Edgar.user = {
-                canRate: <?php print ($user['can_rate'] ? 'true' : 'false') ?>,
+                canVet: <?php print ($user['can_vet'] ? 'true' : 'false') ?>,
                 canRequestRemodel: <?php print (User::canRequestRemodel($user) ? 'true' : 'false') ?>
             }
         <?php endif ?>

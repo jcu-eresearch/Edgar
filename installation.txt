@@ -1,0 +1,59 @@
+install postgres 8.4
+    sudo yum install postgresql-server postgresql
+install postgis 1.5
+    sudo yum install postgis
+install postgres php plugin (and restart apache)
+    sudo yum install php-pgsql
+    sudo service apache2 restart
+
+
+sudo find / -iname postgis.sql
+    on centos: /usr/share/pgsql/contrib/postgis.sql
+    on debian: /usr/share/postgresql/8.4/contrib/postgis-1.5/postgis.sql
+cd /usr/share/pgsql/contrib
+sudo -u postgres createdb edgar
+sudo -u postgres createlang plpgsql edgar
+sudo -u postgres psql -d edgar -f postgis.sql
+sudo -u postgres psql -d edgar -f spatial_ref_sys.sql
+cd ~/Edgar
+sudo -u postgres psql edgar < database_structure.sql
+
+
+sudo -u postgres psql
+    create user edgar_frontend with password 'frontend_password'
+    create user edgar_backend with password 'backend_password'
+sudo find / -iname pg_hba.conf
+    on centos: /var/lib/pgsql/data/pg_hba.conf
+    on debian: /etc/postgresql/8.4/main/pg_hba.conf
+sudo vim /var/lib/pgsql/data/pg_hba.conf
+    local  edgar  edgar_frontend                md5
+    local  edgar  edgar_backend                 md5
+    host   edgar  edgar_frontend  127.0.0.1/32  md5
+    host   edgar  edgar_backend   127.0.0.1/32  md5
+restart postgres:
+    centos: sudo service postgresql restart
+    debian: sudo /etc/init.d/postgresql restart
+
+
+cd ~/Edgar/importing
+python2.6 bootstrap.py
+bin/buildout
+cp config.example.json config.json
+vim config.json
+    "db.url": "postgresql+psycopg2://edgar_backend:backend_password@/edgar"
+sudo -u postgres psql edgar
+    INSERT INTO sources(name) VALUES('ALA');
+
+
+vim ~/Edgar/webapplication/app/Config/database.php
+    public $default = array(
+        'datasource' => 'Database/Postgres',
+        'persistent' => false,
+        'host' => '127.0.0.1',
+        'port' => 5432,
+        'login' => 'edgar_frontend',
+        'password' => 'frontend_password',
+        'database' => 'edgar',
+        'prefix' => '',
+        'encoding' => 'utf8'
+    );

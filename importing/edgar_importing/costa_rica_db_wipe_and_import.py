@@ -152,7 +152,7 @@ def main():
                         longitude=in_decimal_longitude,
                         source_id=db_source_id,
                         source_record_id=in_record_number,
-                        rating='irruptive'
+                        classification='irruptive'
                     )
                 else:
                     result = db.occurrences.insert().execute(
@@ -161,7 +161,7 @@ def main():
                         longitude=in_decimal_longitude,
                         source_id=db_source_id,
         #                source_record_id=in_record_number,
-                        rating='irruptive'
+                        classification='irruptive'
                     )
 
 

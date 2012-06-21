@@ -2,20 +2,28 @@
 
 import pathfix
 import sys
+sys.path[0:0] = [
+    '/scratch/jc155857/EdgarMaster/importing',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/psycopg2-2.4.5-py2.6-linux-x86_64.egg',
+    '/usr/lib/python2.6/site-packages/argparse-1.2.1-py2.6.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/SQLAlchemy-0.7.8-py2.6-linux-x86_64.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/GeoAlchemy-0.7.1-py2.6.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/Shapely-1.2.14-py2.6-linux-x86_64.egg',
+    '/scratch/jc155857/EdgarMaster/importing/eggs/pyshp-1.1.4-py2.6.egg',
+    ]
 import logging
 import logging.handlers
 import json
 from time import sleep
 import os
+import random
 from subprocess import Popen, PIPE
 from hpc import HPCJob, HPCJobStatus
 import urllib2
 from datetime import datetime
 import traceback
 
-
-# How long to sleep between cycles (in seconds)
-sleepTime = 5
 
 # Setup the logger
 log = logging.getLogger()
@@ -27,9 +35,18 @@ log.debug("Starting modeld.py")
 currentJob = None
 currentCycle = 0
 
+minSleepTime = 30
+maxSleepTime = 600
 
 # The Main Loop
 while True:
+
+    # Sleep a time, then go round again
+    # Inject randomness into the sleep time to reduce likelihood of multiple
+    # scripts running against the same species.
+    randSleepTime = random.randint(minSleepTime, maxSleepTime)
+    log.debug("Sleeping %i seconds.", randSleepTime)
+    sleep(randSleepTime)
 
     currentCycle += 1
     log.debug("Loop %i (%s). Current Job: %s", currentCycle, datetime.today(), currentJob)
@@ -85,5 +102,3 @@ while True:
             # swallow any exceptions
             log.error("Error while trying to proccess an existing job: %s", traceback.format_exc())
 
-    # Sleep a time, then go round again
-    sleep(sleepTime)

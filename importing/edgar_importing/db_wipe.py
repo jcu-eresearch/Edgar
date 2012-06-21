@@ -28,9 +28,9 @@ def main():
 
     # insert species
 
-    # Old name for "cracticus tibicen". 400k records.
+    # 400k records.
     db.species.insert().execute(
-        scientific_name='Gymnorhina tibicen',
+        scientific_name='Cracticus tibicen',
         common_name='Australian Magpie')
 
     db.species.insert().execute(

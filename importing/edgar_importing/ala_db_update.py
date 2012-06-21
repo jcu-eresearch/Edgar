@@ -19,6 +19,10 @@ def parse_args():
     parser.add_argument('config', metavar='config_file', type=str, nargs=1,
             help='''The path to the JSON config file.''')
 
+    parser.add_argument('--species_type', type=str, nargs=1, default=["birds"],
+            choices=["birds", "vertebrates"], help='''Type of species to
+            sync. Default is birds.''')
+
     return parser.parse_args()
 
 
@@ -41,7 +45,7 @@ def main():
 
     logging.info("Started at %s", str(datetime.now()))
     try:
-        syncer = sync.Syncer(ala)
+        syncer = sync.Syncer(ala, args.species_type[0])
         syncer.sync(sync_species=config['updateSpecies'],
                     sync_occurrences=config['updateOccurrences'])
     finally:

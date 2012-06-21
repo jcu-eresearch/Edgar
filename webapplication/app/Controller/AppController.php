@@ -41,6 +41,8 @@ class AppController extends Controller {
     );
 
     public function beforeFilter() {
+        parent::beforeFilter();
+
         $this->Auth->authenticate = array(
             'Cas' => array(
                 'userModel' => 'User',
@@ -53,9 +55,7 @@ class AppController extends Controller {
             ),
             'Form' => array('userModel' => 'User')
         );
-        $this->Auth->allow('*');
-
-        parent::beforeFilter();
+        $this->Auth->allow();
     }
 
     public function dieWithStatus($statusCode, $msg = null) {

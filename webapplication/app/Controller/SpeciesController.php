@@ -11,6 +11,13 @@ class SpeciesController extends AppController {
     public $components = array('RequestHandler');
     public $helpers = array('Form', 'Html', 'Js', 'Time');
 
+    // Don't allow a user to insert a vetting unless they are logged in.
+    public function beforeFilter() {
+        parent::beforeFilter();
+        $this->Auth->deny('insert_vetting');
+    }
+
+
     /**
      * index method
      *
@@ -132,22 +139,79 @@ class SpeciesController extends AppController {
         $this->set('_serialize', 'geo_object');
     }
 
+    /*
+        Get the vetting geojson for the given species.
+    */
     public function vetting_geo_json($species_id = null) {
+        $this->Species->id = $species_id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException(__('Invalid species'));
+        }
+
         $results = $this->Species->getDataSource()->execute(
-            'SELECT ST_AsGeoJSON(area) FROM ratings '.
+            'SELECT ST_AsGeoJSON(area) FROM vettings '.
             'WHERE species_id = ? '.
             'LIMIT 1',
             array(),
             array($species_id)
         );
 
-        if($results){
-            $this->dieWithStatus(200, $results->fetchColumn(0));
-        } else {
-            //TODO: is this correct for empty geo json?
-            $this->dieWithStatus(200, '{}');
+        $json_output = "{}";
+        if($results) {
+            $result = $results->fetchColumn(0);
+            if($result) {
+                $json_output = $result;
+            }
+        }
+        $this->set('json_output', $json_output);
+    }
+
+    /*
+        Insert vetting geojson for the given species.
+    */
+    public function insert_vetting($species_id = null) {
+
+        // Get the auth'd user.
+        // NOTE: Prefilter means the user can't be here unless they are logged in.
+        $user_id = $this->Auth->user('id');
+
+        if ($this->request->is('post')) {
+            $this->Species->recursive = 0;
+            $this->Species->id = $species_id;
+            if (!$this->Species->exists()) {
+                throw new NotFoundException(__('Invalid species'));
+            }
+            $this->set('species', $this->Species->read(null, $species_id));
+
+            // Specify the output for the json view.
+            $this->set('_serialize', 'species');
+
+            $jsonData = json_decode(utf8_encode(trim(file_get_contents('php://input'))), true);
+
+            if ($jsonData !== null) {
+                // At this point, we have the json data.
+                // Do the work on it.
+                $this->set('jsonData', $jsonData);
+                $area = $jsonData['area'];
+                $this->set('_serialize', 'jsonData');
+                $comment = $jsonData['comment'];
+                $classification = $jsonData['classification'];
+
+                $dbo = $this->Species->Vetting->getDataSource();
+                $escaped_area = $dbo->value($area);
+                $dbo->execute(
+                    "INSERT INTO vettings (user_id, species_id, comment, classification, area) VALUES ( ? , ? , ? , ? , ( ST_GeomFromText(".$escaped_area.", 4326) ) )",
+                    array(),
+                    array($user_id, $species_id, $comment, $classification)
+                );
+
+                $this->dieWithStatus(200, "Inserted JSON");
+            } else {
+                $this->dieWithStatus(400, "Bad JSON Input");
+            }
         }
     }
+
 
     /**
      * single_upload_json method
@@ -206,7 +270,7 @@ class SpeciesController extends AppController {
                 throw new NotFoundException(__('Invalid species'));
             }
         }
-        
+
         // use the fullscreen map view
         $this->render('fullscreenmap');
     }

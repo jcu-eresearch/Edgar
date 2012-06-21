@@ -1,13 +1,13 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
-DROP FUNCTION IF EXISTS EdgarUpdateRatings(species.id%TYPE);
+DROP FUNCTION IF EXISTS EdgarUpdateVettings(species.id%TYPE);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
 DROP TABLE IF EXISTS sources;
-DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS vettings;
 DROP TABLE IF EXISTS species;
 DROP TABLE IF EXISTS users;
-DROP TYPE IF EXISTS rating;
+DROP TYPE IF EXISTS classification;
 
 
 
@@ -15,7 +15,7 @@ DROP TYPE IF EXISTS rating;
 -- CUSTOM TYPES
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
--- The ratings enum has these values, in order:
+-- The classification enum has these values, in order:
 --     "unknown" - lolwut i don't even
 --     "invalid" - nope, you didn't see the bird here
 --     "historic" - bird was there when you saw it in 1960, but they don't live there now
@@ -26,9 +26,9 @@ DROP TYPE IF EXISTS rating;
 --     "breeding" - bird lives there, some or all of the year, and breeds there
 --     "introduced breeding" - like breeding, but it was introduced to the habitat by humans
 --
--- The occurrence should be used in modelling if the rating is "irruptive" or better.
+-- The occurrence should be used in modelling if the vetting's classification is "irruptive" or better.
 
-CREATE TYPE rating AS ENUM(
+CREATE TYPE classification AS ENUM(
     'unknown',
     'invalid',
     'historic',
@@ -86,8 +86,8 @@ CREATE TABLE sources (
 -- so it should have as few columns as possible.
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
-    rating rating NOT NULL, -- The canonical rating (a.k.a "vetting") for the occurrence
-    source_rating rating NOT NULL, -- The rating as obtained from the source (i.e. ALA assertions translated to our ratings system)
+    classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
+    source_classification classification NOT NULL, -- The vetting classification as obtained from the source (i.e. ALA assertions translated to our vettings system)
     source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
     species_id INT NOT NULL REFERENCES species(id)
         ON UPDATE CASCADE
@@ -124,17 +124,17 @@ CREATE TABLE users (
     email VARCHAR(256) NOT NULL,
     fname VARCHAR(256) NOT NULL,
     lname VARCHAR(256) NOT NULL,
-    can_rate BOOLEAN DEFAULT TRUE NOT NULL,
+    can_vet BOOLEAN DEFAULT TRUE NOT NULL,
     is_admin BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 
--- These are the user ratings (a.k.a vetting information) for
--- occurrences. Each row is arbitrary area to which a specific rating enum
+-- These are the user vettings (a.k.a vetting information) for
+-- occurrences. Each row is arbitrary area to which a specific classification enum
 -- value applies, by a single user for a single species. ALA has a system of
--- "assertions" that doesn't match up very will to the way we will be rating
+-- "assertions" that doesn't match up very will to the way we will be vetting 
 -- occurrences.
-CREATE TABLE ratings (
+CREATE TABLE vettings (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id)
         ON UPDATE CASCADE
@@ -143,11 +143,11 @@ CREATE TABLE ratings (
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
-    rating rating NOT NULL
+    classification classification NOT NULL
 );
-SELECT AddGeometryColumn('ratings', 'area', 4326, 'MULTIPOLYGON', 2);
-ALTER TABLE ratings ALTER COLUMN area SET NOT NULL;
-ALTER TABLE ratings ADD CONSTRAINT ratings_area_valid_check CHECK (ST_IsValid(area));
+SELECT AddGeometryColumn('vettings', 'area', 4326, 'MULTIPOLYGON', 2);
+ALTER TABLE vettings ALTER COLUMN area SET NOT NULL;
+ALTER TABLE vettings ADD CONSTRAINT vettings_area_valid_check CHECK (ST_IsValid(area));
 
 
 
@@ -163,17 +163,19 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON species TO edgar_backend;
 GRANT SELECT, INSERT, UPDATE, DELETE ON sources TO edgar_backend;
 GRANT SELECT, INSERT, UPDATE, DELETE ON occurrences TO edgar_backend;
 GRANT SELECT, INSERT, UPDATE, DELETE ON sensitive_occurrences TO edgar_backend;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ratings TO edgar_backend;
+GRANT SELECT, INSERT, UPDATE, DELETE ON vettings TO edgar_backend;
 GRANT USAGE, SELECT ON species_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON sources_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON occurrences_id_seq TO edgar_backend;
-GRANT USAGE, SELECT ON ratings_id_seq TO edgar_backend;
+GRANT USAGE, SELECT ON vettings_id_seq TO edgar_backend;
 
 -- edgar_frontend
-GRANT SELECT ON species TO edgar_frontend;
+GRANT SELECT, UPDATE ON species TO edgar_frontend;
+GRANT SELECT, INSERT ON users TO edgar_frontend;
 GRANT SELECT ON occurrences TO edgar_frontend;
-GRANT SELECT, INSERT ON ratings TO edgar_frontend;
-GRANT USAGE, SELECT ON ratings_id_seq TO edgar_frontend;
+GRANT SELECT, INSERT ON vettings TO edgar_frontend;
+GRANT USAGE, SELECT ON vettings_id_seq TO edgar_frontend;
+GRANT USAGE, SELECT ON users_id_seq TO edgar_frontend;
 
 
 
@@ -183,40 +185,40 @@ GRANT USAGE, SELECT ON ratings_id_seq TO edgar_frontend;
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
--- Recalculates the "rating" (a.k.a vetting) on each occurrence
--- Uses a painters algorithm. Orders all ratings from least authoritative to
--- most authoritative, then applies the ratings to the area. This means the
--- most authoritative rating gets applied last, and therefor has the final
+-- Recalculates the "classification" (a.k.a vetting) on each occurrence
+-- Uses a painters algorithm. Orders all vettings from least authoritative to
+-- most authoritative, then applies the vettings to the area. This means the
+-- most authoritative vettings gets applied last, and therefore has the final
 -- say.
 --
--- Calls ST_SimplifyPreserveTopology on the rating polygons, because they
+-- Calls ST_SimplifyPreserveTopology on the vetting polygons, because they
 -- can be super high resolution which makes ST_CoveredBy run super slow.
 --
--- Run this with: SELECT EdgarUpdateRatings(x);
+-- Run this with: SELECT EdgarUpdateVettings(x);
 -- Where `x` is a valid species.id
 
 
-CREATE FUNCTION EdgarUpdateRatings(speciesId species.id%TYPE) RETURNS varchar AS $$
+CREATE FUNCTION EdgarUpdateVettings(speciesId species.id%TYPE) RETURNS varchar AS $$
 DECLARE
     r RECORD;
 BEGIN
-    -- Revert back to original ratings, as obtained from the source
+    -- Revert back to original vettings, as obtained from the source
     UPDATE occurrences
-        SET rating = source_rating
+        SET classification = source_classification
         WHERE species_id = speciesId;
 
-    -- Apply user ratings using painters algorithm
+    -- Apply user vettings using painters algorithm
     FOR r IN
         -- TODO: order this loop from least authoritative user to most authoritative.
-        -- TODO: what if two ratings by the same user overlap? What takes precedence?
+        -- TODO: what if two vettings by the same user overlap? What takes precedence?
         SELECT *
-            FROM ratings
-                JOIN users on ratings.user_id = users.id
-            WHERE ratings.species_id = speciesId
-                AND users.can_rate
+            FROM vettings
+                JOIN users on vettings.user_id = users.id
+            WHERE vettings.species_id = speciesId
+                AND users.can_vet
     LOOP
         UPDATE occurrences
-            SET rating = r.rating
+            SET classification = r.classification
             WHERE occurrences.species_id = speciesId
                 AND ST_CoveredBy(occurrences.location, ST_SimplifyPreserveTopology(r.area, 0.01));
     END LOOP;

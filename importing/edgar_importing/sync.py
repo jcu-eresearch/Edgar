@@ -17,10 +17,12 @@ log = logging.getLogger(__name__)
 
 class Syncer:
 
-    def __init__(self, ala):
+    def __init__(self, ala, species_type="birds"):
         '''The `ala` param is the ala.py module. This is passed in a a ctor
         param because it will be substituded with mockala.py during unit
-        testing.'''
+        testing.
+
+        species_type can be "birds" or "vertebrates".'''
 
         row = db.sources.select()\
                 .where(db.sources.c.name == 'ALA')\
@@ -33,6 +35,7 @@ class Syncer:
         self.last_import_time = row['last_import_time']
         self.num_dirty_records_by_species_id = {}
         self.ala = ala
+        self.species_type = species_type
         self.ala_species_occurrence_counts = None  # lazy loaded
         self.ala_species_by_sname = None  # lazy loaded
 
@@ -71,10 +74,20 @@ class Syncer:
 
 
     def _cache_all_remote_species(self):
-        if self.ala_species_by_sname is None:
-            self.ala_species_by_sname = {}
-            for bird in self.ala.all_bird_species():
-                self.ala_species_by_sname[bird.scientific_name] = bird
+        if self.ala_species_by_sname is not None:
+            return # already cached
+
+        if self.species_type == "birds":
+            all_species = self.ala.all_bird_species()
+        elif self.species_type == "vertebrates":
+            all_species = self.ala.all_vertebrate_species()
+        else:
+            raise RuntimeError("Unknown species_type: " + self.species_type)
+
+        log.info("Fetching all %s from ALA", self.species_type)
+        self.ala_species_by_sname = {}
+        for species in all_species:
+            self.ala_species_by_sname[species.scientific_name] = species
 
 
     def added_and_deleted_species(self):
@@ -309,9 +322,9 @@ class Syncer:
             self.ala_species_by_sname[scientific_name] = species
             return species
 
-    def rate_occurrence(self, occurrence):
-        '''Returns an occurrences.rating enum value for an ala.Occurrence'''
-        # TODO: determine rating better using lists of assertions
+    def vet_occurrence(self, occurrence):
+        '''Returns an occurrences.classification enum value for an ala.Occurrence'''
+        # TODO: determine classification better using lists of assertions
         if occurrence.is_geospatial_kosher:
             return 'irruptive'
         else:
@@ -343,14 +356,14 @@ class Syncer:
         p = shapely.geometry.Point(occ.coord.longi, occ.coord.lati)
         location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
 
-        rating = self.rate_occurrence(occ)
+        classification = self.vet_occurrence(occ)
 
         if existing is None:
             return db.occurrences.insert().\
                 returning(db.occurrences.c.id).\
                 values(location=location,
-                       source_rating=rating,
-                       rating=rating,
+                       source_classification=classification,
+                       classification=classification,
                        species_id=species_id,
                        source_id=self.source_row_id,
                        source_record_id=occ.uuid.bytes).\
@@ -360,7 +373,7 @@ class Syncer:
             return db.occurrences.update().\
                 returning(db.occurrences.c.id).\
                 values(location=location,
-                       source_rating=self.rate_occurrence(occ),
+                       source_classification=self.vet_occurrence(occ),
                        species_id=species_id).\
                 where(db.occurrences.c.id == existing['id']).\
                 execute().\
