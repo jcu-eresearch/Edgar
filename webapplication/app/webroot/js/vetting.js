@@ -2,6 +2,24 @@
 JS for doing vetting
 */
 
+var vectors, editControl;
+
+function initVetting() {
+    console.log("Set-up vetting");
+
+    vectors = new OpenLayers.Layer.Vector("New Vetting Layer");
+    editControl = new OpenLayers.Control.EditingToolbar(vectors);
+
+    var editControlPos = new OpenLayers.Pixel(15,250);
+    Edgar.map.addLayers([vectors]);
+    Edgar.map.addControl(editControl)
+    editControl.moveTo(editControlPos);
+    console.log("Finished setting up vetting");
+}
+
+function createNewVetting() {
+    console.log("Processing create new vetting");
+}
 
 $(function() {
 
@@ -9,12 +27,13 @@ $(function() {
     var vetform = $('#vetform');
 
     vetpanel.find('button').click( function(e) {
-        alert('Cylon says: BUTTON PRESSED');
-
+        alert('Cylon says: Create New Vetting Pressed');
         createNewVetting();
-
         e.preventDefault();
+
     });
+
+    initVetting();
 
 /*
     // go through each tool panel and add opne/close behaviour to the header
