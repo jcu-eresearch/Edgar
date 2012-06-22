@@ -67,6 +67,7 @@ $user = AuthComponent::user();
         $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false, 'block'=>'libscript'));
         $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js', array('inline' => false, 'block'=>'libscript'));
         $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js', array('inline' => false, 'block'=>'libscript'));
+        $this->Html->script('json2.js', array('inline' => false));
         $this->append('libscript');
             // Include Google API
             // Note: API Key is Robert's.

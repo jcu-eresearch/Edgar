@@ -151,19 +151,28 @@ class SpeciesController extends AppController {
         $results = $this->Species->getDataSource()->execute(
             'SELECT ST_AsGeoJSON(area) FROM vettings '.
             'WHERE species_id = ? '.
-            'LIMIT 1',
+            'LIMIT 1000',
             array(),
             array($species_id)
         );
 
-        $json_output = "{}";
+
+        // Convert the received vettings into a geometry collection.
+        $geo_json = '{ "type": "GeometryCollection", "geometries": [';
+
         if($results) {
-            $result = $results->fetchColumn(0);
-            if($result) {
-                $json_output = $result;
+            $first = true;
+            while ($area_json = $results->fetchColumn(0)) {
+                if( $first ) {
+                    $first = false;
+                } else {
+                    $geo_json = $geo_json.',';
+                }
+                $geo_json = $geo_json.$area_json;
             }
         }
-        $this->set('json_output', $json_output);
+        $geo_json = $geo_json." ] }";
+        $this->set('json_output', $geo_json);
     }
 
     /*
@@ -205,7 +214,7 @@ class SpeciesController extends AppController {
                     array($user_id, $species_id, $comment, $classification)
                 );
 
-                $this->dieWithStatus(200, "Inserted JSON");
+                $this->dieWithStatus(200, '{ "result": "success" }');
             } else {
                 $this->dieWithStatus(400, "Bad JSON Input");
             }

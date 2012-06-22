@@ -56,12 +56,13 @@ $user = AuthComponent::user();
         echo $this->Html->css('openlayers_google');
 
         // include Modernizr for html5 shims and feature detection.  this needs to go early!
-    	$this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
+        $this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
 
         // Include jQuery and jQueryUI
         $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false));
         $this->Html->script('jquery-ui-1.8.18/js/jquery-ui-1.8.18.custom.min.js', array('inline' => false));
         $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js', array('inline' => false));
+        $this->Html->script('json2.js', array('inline' => false));
         $this->append('script');
             // Include Google API
             // Note: API Key is Robert's.

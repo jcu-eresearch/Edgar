@@ -48,7 +48,7 @@
             <!-- new vet form -->
             <form id="vetform">
                 <legend>Classification
-                    <select id="classification">
+                    <select id="vetclassification" name="classification">
                         <option value="unknown" selected>unknown</option>
                         <option value="invalid">invalid</option>
                         <option value="historic">historic</option>
@@ -61,7 +61,7 @@
                     </select>
                 </legend>
                 <legend>Comment
-                    <textarea id="comment"></textarea>
+                    <textarea id="vetcomment" name="comment"></textarea>
                 </legend>
                 <button id="vet">vet</button>
             </form>
