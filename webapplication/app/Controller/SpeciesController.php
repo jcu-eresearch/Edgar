@@ -158,7 +158,7 @@ class SpeciesController extends AppController {
 
 
         // Convert the received vettings into a geometry collection.
-        $geo_json = '{ "type": "GeometryCollection", "geometries": [';
+        $geo_json = '{ "type": "FeatureCollection", "features": [';
 
         if($results) {
             $first = true;
@@ -168,7 +168,8 @@ class SpeciesController extends AppController {
                 } else {
                     $geo_json = $geo_json.',';
                 }
-                $geo_json = $geo_json.$area_json;
+                $geo_json = $geo_json.'{ "type": "Feature", "geometry": ';
+                $geo_json = $geo_json.$area_json.', "properties": {} }';
             }
         }
         $geo_json = $geo_json." ] }";
