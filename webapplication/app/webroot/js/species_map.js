@@ -196,12 +196,19 @@ function addDistributionLayer() {
 function addVettingLayer() {
     console.log('Adding vetting layer')
     var format = new OpenLayers.Format.GeoJSON({});
-    var styleMap = new OpenLayers.StyleMap({
+
+    var vettingStyleMap = new OpenLayers.StyleMap({
         'default': {
-            'fillColor': '#00FF00',
-            'strokeColor': '#008800',
-            'fillOpacity': 0.7,
-            'strokeOpacity': 0.9
+            'fillOpacity': 0.3,
+            'strokeOpacity': 0.9,
+            'fillColor': '${fill_color}',
+            'strokeColor': '${stroke_color}',
+            'fontColor': '${font_color}',
+            'label': "${label}",
+        },
+        'select': {
+            'fillOpacity': 1.0,
+            'strokeOpacity': 1.0
         }
     });
     vettingLayer = new OpenLayers.Layer.Vector('Vetting Areas', {
@@ -212,16 +219,13 @@ function addVettingLayer() {
             url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.mapdata.species.id + ".json"),
             format: new OpenLayers.Format.GeoJSON({})
         }),
-        styleMap: new OpenLayers.StyleMap({
-            'default': {
-                'fillColor': '#00FF00',
-                'strokeColor': '#008800',
-                'fillOpacity': 0.7,
-                'strokeOpacity': 0.9
-            }
-        })
+        styleMap: vettingStyleMap
     });
-    vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: false});
+    vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: true});
+    // NOTE: can't have two SelectFeature controls active at the same time...
+    // SO.. TODO:
+    //            convert code to use a single select feature control,
+    //            and inject/remove layers from that select feature as necessary.
     Edgar.map.addLayer(vettingLayer);
     Edgar.map.addControl(vettingLayerControl);
     vettingLayerControl.activate();
