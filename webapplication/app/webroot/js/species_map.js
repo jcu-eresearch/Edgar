@@ -204,7 +204,7 @@ function addVettingLayer() {
             'fillColor': '${fill_color}',
             'strokeColor': '${stroke_color}',
             'fontColor': '${font_color}',
-            'label': "${label}",
+            'label': '${classification}',
         },
         'select': {
             'fillOpacity': 1.0,
