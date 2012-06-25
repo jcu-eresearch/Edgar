@@ -1,6 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
 App::uses('User', 'Model');
+App::uses('Vetting', 'Model');
 
 /**
  * Species Controller
@@ -149,7 +150,7 @@ class SpeciesController extends AppController {
         }
 
         $results = $this->Species->getDataSource()->execute(
-            'SELECT ST_AsGeoJSON(area) FROM vettings '.
+            'SELECT ST_AsGeoJSON(area), classification FROM vettings '.
             'WHERE species_id = ? '.
             'LIMIT 1000',
             array(),
@@ -162,14 +163,22 @@ class SpeciesController extends AppController {
 
         if($results) {
             $first = true;
-            while ($area_json = $results->fetchColumn(0)) {
+            while ($row = $results->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
+                $area_json = $row[0];
+                $classification = $row[1];
                 if( $first ) {
                     $first = false;
                 } else {
                     $geo_json = $geo_json.',';
                 }
-                $geo_json = $geo_json.'{ "type": "Feature", "geometry": ';
-                $geo_json = $geo_json.$area_json.', "properties": {} }';
+
+                $properties_json = Vetting::getPropertiesJSONString($classification);
+                $geo_json = $geo_json.
+                '{ '.
+                    '"type": "Feature",'.
+                    '"geometry": '.$area_json.','.
+                    $properties_json.
+                '}';
             }
         }
         $geo_json = $geo_json." ] }";
