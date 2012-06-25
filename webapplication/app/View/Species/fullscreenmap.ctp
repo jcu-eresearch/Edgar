@@ -45,6 +45,7 @@
     <div id="newvet" class="tool">
         <h1>new vetting</h1>
         <div class="toolcontent">
+            <div id="newvet_control" class="newvet_control olControlEditingToolbar"></div>
             <!-- new vet form -->
             <form id="vetform">
                 <legend>Classification

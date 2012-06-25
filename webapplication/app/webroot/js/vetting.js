@@ -20,12 +20,15 @@ function initVetting() {
         'geometryType': OpenLayers.Geometry.Polygon
     };
     new_vet_vectors = new OpenLayers.Layer.Vector("New Vetting Layer", new_vet_vectors_options);
-    new_vet_edit_control = new OpenLayers.Control.EditingToolbar(new_vet_vectors);
+    new_vet_edit_control = new OpenLayers.Control.EditingToolbar(
+        new_vet_vectors,
+        {
+            div: $('#newvet_control').get(0)
+        }
+    );
 
-    var new_vet_edit_control_pos= new OpenLayers.Pixel(15,250);
     Edgar.map.addLayers([new_vet_vectors]);
     Edgar.map.addControl(new_vet_edit_control)
-    new_vet_edit_control.moveTo(new_vet_edit_control_pos);
 
     console.log("Finished init vetting");
 }
