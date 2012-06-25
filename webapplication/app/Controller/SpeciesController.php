@@ -150,7 +150,7 @@ class SpeciesController extends AppController {
         }
 
         $results = $this->Species->getDataSource()->execute(
-            'SELECT ST_AsGeoJSON(area), classification FROM vettings '.
+            'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
             'WHERE species_id = ? '.
             'LIMIT 1000',
             array(),
@@ -166,13 +166,14 @@ class SpeciesController extends AppController {
             while ($row = $results->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
                 $area_json = $row[0];
                 $classification = $row[1];
+                $comment = $row[2];
                 if( $first ) {
                     $first = false;
                 } else {
                     $geo_json = $geo_json.',';
                 }
 
-                $properties_json = Vetting::getPropertiesJSONString($classification);
+                $properties_json = Vetting::getPropertiesJSONString($classification, $comment);
                 $geo_json = $geo_json.
                 '{ '.
                     '"type": "Feature",'.
