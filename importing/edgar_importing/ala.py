@@ -17,7 +17,7 @@ import uuid
 from datetime import datetime
 
 
-PAGE_SIZE = 1000  # occurrence records per request
+PAGE_SIZE = 2000  # occurrence records per request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
 
@@ -122,15 +122,20 @@ def set_max_retry_secs(max_retry_secs):
     _max_retry_secs = max_retry_secs;
 
 
-def occurrences_for_species(species_lsid, changed_since=None):
+def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=False):
     '''A generator for Occurrenceobjects fetched from ALA'''
 
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
         'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude',
-        'facet': 'off',
+        'facet': 'off'
     }
+
+    if sensitive_only:
+        params['fq'] = 'sensitive:generalised'
+        if _api_key is None:
+            raise RuntimeError("Can't fetch sensitive coords without API key")
 
     for page in _json_pages(url, params, ('totalRecords',), 'startIndex', use_api_key=True):
         for occ in page['occurrences']:
@@ -278,6 +283,7 @@ def q_param(species_lsid=None, changed_since=None):
         (rank:species OR subspecies_name:[* TO *]) AND
         longitude:[-180 TO 180] AND
         latitude:[-90 TO 90] AND
+        NOT sensitive:alreadyGeneralised AND
         (
             basis_of_record:HumanObservation OR
             basis_of_record:MachineObservation
