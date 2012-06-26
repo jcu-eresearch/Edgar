@@ -2,7 +2,7 @@
 JS for doing vetting
 */
 
-var new_vet_vectors, new_vet_edit_control, wkt;
+var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control;
 
 function initVetting() {
     console.log("Starting to init vetting");
@@ -17,18 +17,60 @@ function initVetting() {
     wkt = new OpenLayers.Format.WKT(wkt_in_options);
 
     var new_vet_vectors_options = {
-        'geometryType': OpenLayers.Geometry.Polygon
+// NOTE: Due to OpenLayers Bug.. can't do this.
+//       The modify feature control draws points onto the vector layer
+//       to show vertice drag points.. these drag points fail the geometryType
+//       test.
+//        'geometryType': OpenLayers.Geometry.Polygon
     };
     new_vet_vectors = new OpenLayers.Layer.Vector("New Vetting Layer", new_vet_vectors_options);
+
+    new_vet_draw_polygon_control = new OpenLayers.Control.DrawFeature(
+        new_vet_vectors,
+        OpenLayers.Handler.Polygon
+    );
+
+    new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors);
+
+    // Specify the modify mode as re-shape
+    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
+
+    $('#newvet_draw_polygon_button').click( function(e) {
+        e.preventDefault();
+
+        $(e.srcElement).toggleClass('button_down');
+        if ( $(e.srcElement).hasClass('button_down') ) {
+            new_vet_draw_polygon_control.activate();
+        } else {
+            new_vet_draw_polygon_control.deactivate();
+        }
+    });
+
+    $('#newvet_modify_polygon_button').click( function(e) {
+        e.preventDefault();
+
+        $(e.srcElement).toggleClass('button_down');
+        if ( $(e.srcElement).hasClass('button_down') ) {
+            new_vet_modify_polygon_control.activate();
+        } else {
+            new_vet_modify_polygon_control.deactivate();
+        }
+
+    });
+
+
+/*
     new_vet_edit_control = new OpenLayers.Control.EditingToolbar(
         new_vet_vectors,
         {
             div: $('#newvet_control').get(0)
         }
     );
+*/
 
     Edgar.map.addLayers([new_vet_vectors]);
-    Edgar.map.addControl(new_vet_edit_control)
+    Edgar.map.addControl(new_vet_draw_polygon_control)
+    Edgar.map.addControl(new_vet_modify_polygon_control)
 
     console.log("Finished init vetting");
 }
@@ -90,7 +132,7 @@ $(function() {
     var vetpanel = $('#newvet');
     var vetform = $('#vetform');
 
-    vetpanel.find('button').click( function(e) {
+    $('#vet').click( function(e) {
         e.preventDefault();
 
         alert('Cylon says: Create New Vetting Pressed');

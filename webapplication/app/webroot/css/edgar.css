@@ -743,3 +743,7 @@ pre {
 .ui-autocomplete {
     z-index: 99999 !important; /* puts it above the map controls */
 }
+
+button.button_down {
+    background-color: pink;
+}
