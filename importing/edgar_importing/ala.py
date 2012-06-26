@@ -143,7 +143,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 uuid_in=uuid.UUID(occ['uuid']),
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
-                kosher=occ['geospatialKosher']
+                kosher=(True if occ['geospatialKosher'] == "true" else False)
             )
 
 
