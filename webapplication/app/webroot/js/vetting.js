@@ -160,6 +160,9 @@ $(function() {
     $('#vet').click( function(e) {
         e.preventDefault();
 
+        // Drop out of any editing mode.
+        clearNewVettingMode();
+
         alert('Cylon says: Create New Vetting Pressed');
         createNewVetting();
 
