@@ -45,7 +45,10 @@
     <div id="newvet" class="tool">
         <h1>new vetting</h1>
         <div class="toolcontent">
-            <div id="newvet_control" class="newvet_control olControlEditingToolbar"></div>
+            <div id="newvet_control" class="newvet_control">
+                <button id="newvet_draw_polygon_button" class="draw_polygon">&#9997;</button>
+                <button id="newvet_modify_polygon_button" class="modify_polygon">&#9988;</button>
+            </div>
             <!-- new vet form -->
             <form id="vetform">
                 <legend>Classification
