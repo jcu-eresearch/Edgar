@@ -4,6 +4,16 @@ JS for doing vetting
 
 var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control;
 
+function clearNewVettingMode() {
+    console.log("Clearing current mode");
+
+    new_vet_draw_polygon_control.deactivate();
+    $('#newvet_draw_polygon_button').removeClass('button_down');
+
+    new_vet_modify_polygon_control.deactivate();
+    $('#newvet_modify_polygon_button').removeClass('button_down');
+}
+
 function initVetting() {
     console.log("Starting to init vetting");
 
@@ -35,29 +45,44 @@ function initVetting() {
     // Specify the modify mode as re-shape
     new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
 
+
+    // handle draw polygon press
     $('#newvet_draw_polygon_button').click( function(e) {
         e.preventDefault();
 
-        $(e.srcElement).toggleClass('button_down');
         if ( $(e.srcElement).hasClass('button_down') ) {
-            new_vet_draw_polygon_control.activate();
+            clearNewVettingMode();
         } else {
-            new_vet_draw_polygon_control.deactivate();
+            clearNewVettingMode();
+            $(e.srcElement).toggleClass('button_down');
+            new_vet_draw_polygon_control.activate();
         }
     });
 
+    // handle modify polygon press
     $('#newvet_modify_polygon_button').click( function(e) {
         e.preventDefault();
 
-        $(e.srcElement).toggleClass('button_down');
         if ( $(e.srcElement).hasClass('button_down') ) {
-            new_vet_modify_polygon_control.activate();
+            clearNewVettingMode();
         } else {
-            new_vet_modify_polygon_control.deactivate();
+            clearNewVettingMode();
+            $(e.srcElement).toggleClass('button_down');
+            new_vet_modify_polygon_control.activate();
         }
 
     });
 
+    // handle clear polygon press
+    $('#newvet_clear_polygon_button').click( function(e) {
+        e.preventDefault();
+
+        clearNewVettingMode();
+
+        $(e.srcElement).effect("highlight", {}, 3000)
+        new_vet_vectors.removeAllFeatures();
+
+    });
 
 /*
     new_vet_edit_control = new OpenLayers.Control.EditingToolbar(

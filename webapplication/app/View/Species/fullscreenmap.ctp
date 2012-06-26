@@ -46,8 +46,9 @@
         <h1>new vetting</h1>
         <div class="toolcontent">
             <div id="newvet_control" class="newvet_control">
-                <button id="newvet_draw_polygon_button" class="draw_polygon">&#9997;</button>
-                <button id="newvet_modify_polygon_button" class="modify_polygon">&#9988;</button>
+                <button id="newvet_draw_polygon_button" class="draw_polygon" title="draw vetting polygons">&#9997;</button>
+                <button id="newvet_modify_polygon_button" class="modify_polygon" title="modify vetting polygons">&#9988;</button>
+                <button id="newvet_clear_polygon_button" class="clear_polygon" title="clear vetting polygons">&#9851;</button>
             </div>
             <!-- new vet form -->
             <form id="vetform">
