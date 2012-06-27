@@ -744,6 +744,51 @@ pre {
     z-index: 99999 !important; /* puts it above the map controls */
 }
 
-button.button_down {
-    background-color: pink;
+/** Vetting Specific Styles **/
+
+#newvet button {
+    font-family: "Lucida Sans Unicode", "Lucida Grande","Arial Unicode MS", sans-serif;
+    padding: 0.3em;
+    text-align: left;
+    margin: 0.2em 0;
 }
+
+#newvet_control button {
+    width: 100%;
+}
+
+/* General Toolbar Styles */
+div.hint p {
+    margin: 0.2em 0;
+    padding: 0.3em;
+    font-style: italic;
+    background-color: #ffa;
+    border-radius: 0.3em;
+    background-color: #ccf;
+    border: dotted 1px #00f;
+}
+
+div.hint p:before {
+    content: "i";
+    background-color: #33f;
+    margin-right: 0.3em;
+    font-weight: bolder;
+    font-family: serif;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 0.8em;
+    line-height: 1.6em;
+    color: #fff;
+    text-align: center;
+    float: left;
+
+}
+
+div.hint .info {
+}
+
+button.button_down {
+    background-color: #ff6;
+    border: #000 solid 2px;
+}
+

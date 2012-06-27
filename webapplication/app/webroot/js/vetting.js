@@ -2,9 +2,12 @@
 JS for doing vetting
 */
 
-var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control;
+var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control, new_vet_move_polyogn_control;
+// buttons 100%..
+// buttons text
+// make button to drop in polygon..
 
-function clearNewVettingMode() {
+function clearNewVettingMode(e) {
     console.log("Clearing current mode");
 
     new_vet_draw_polygon_control.deactivate();
@@ -12,6 +15,66 @@ function clearNewVettingMode() {
 
     new_vet_modify_polygon_control.deactivate();
     $('#newvet_modify_polygon_button').removeClass('button_down');
+
+    new_vet_modify_polygon_control.deactivate();
+    $('#newvet_modify_polygon_button').removeClass('button_down');
+}
+
+function handleDrawPolygonClick(e) {
+    e.preventDefault();
+
+    if ( $(e.srcElement).hasClass('button_down') ) {
+        clearNewVettingMode();
+    } else {
+        clearNewVettingMode();
+        $(e.srcElement).toggleClass('button_down');
+        new_vet_draw_polygon_control.activate();
+    }
+    updateHint();
+}
+
+function handleModifyPolygonClick(e) {
+    e.preventDefault();
+
+    if ( $(e.srcElement).hasClass('button_down') ) {
+        clearNewVettingMode();
+    } else {
+        clearNewVettingMode();
+        $(e.srcElement).toggleClass('button_down');
+        new_vet_modify_polygon_control.activate();
+    }
+    updateHint();
+}
+
+function handleClearPolygonClick(e) {
+    e.preventDefault();
+
+    clearNewVettingMode();
+
+    new_vet_vectors.removeAllFeatures();
+
+    updateHint();
+}
+
+
+// Sets the vetting hint to a random hint
+function updateHint() {
+    var drawPolygonHints = [
+        ''
+    ];
+    var modifyPolygonHints = [
+        '<p>Press <strong>Delete</strong> while over a vertice to delete it</p>'
+    ];
+
+    if (new_vet_modify_polygon_control.active) {
+        var hint = modifyPolygonHints[Math.floor(Math.random()*modifyPolygonHints.length)]
+        $('#vethint').html(hint);
+    } else if (new_vet_draw_polygon_control) {
+        var hint = drawPolygonHints[Math.floor(Math.random()*drawPolygonHints.length)]
+        $('#vethint').html(hint);
+    } else {
+        $('#vethint').html('');
+    }
 }
 
 function initVetting() {
@@ -23,15 +86,16 @@ function initVetting() {
     var wkt_in_options = {
          'internalProjection': Edgar.map.baseLayer.projection,
          'externalProjection': geographic_proj
-     };
+    };
     wkt = new OpenLayers.Format.WKT(wkt_in_options);
 
-    var new_vet_vectors_options = {
+
 // NOTE: Due to OpenLayers Bug.. can't do this.
 //       The modify feature control draws points onto the vector layer
 //       to show vertice drag points.. these drag points fail the geometryType
 //       test.
-//        'geometryType': OpenLayers.Geometry.Polygon
+    var new_vet_vectors_options = {
+//       'geometryType': OpenLayers.Geometry.Polygon
     };
     new_vet_vectors = new OpenLayers.Layer.Vector("New Vetting Layer", new_vet_vectors_options);
 
@@ -48,50 +112,17 @@ function initVetting() {
 
     // handle draw polygon press
     $('#newvet_draw_polygon_button').click( function(e) {
-        e.preventDefault();
-
-        if ( $(e.srcElement).hasClass('button_down') ) {
-            clearNewVettingMode();
-        } else {
-            clearNewVettingMode();
-            $(e.srcElement).toggleClass('button_down');
-            new_vet_draw_polygon_control.activate();
-        }
+        handleDrawPolygonClick(e);
     });
 
     // handle modify polygon press
     $('#newvet_modify_polygon_button').click( function(e) {
-        e.preventDefault();
-
-        if ( $(e.srcElement).hasClass('button_down') ) {
-            clearNewVettingMode();
-        } else {
-            clearNewVettingMode();
-            $(e.srcElement).toggleClass('button_down');
-            new_vet_modify_polygon_control.activate();
-        }
-
+        handleModifyPolygonClick(e);
     });
 
     // handle clear polygon press
     $('#newvet_clear_polygon_button').click( function(e) {
-        e.preventDefault();
-
-        clearNewVettingMode();
-
-        $(e.srcElement).effect("highlight", {}, 3000)
-        new_vet_vectors.removeAllFeatures();
-
     });
-
-/*
-    new_vet_edit_control = new OpenLayers.Control.EditingToolbar(
-        new_vet_vectors,
-        {
-            div: $('#newvet_control').get(0)
-        }
-    );
-*/
 
     Edgar.map.addLayers([new_vet_vectors]);
     Edgar.map.addControl(new_vet_draw_polygon_control)
@@ -157,66 +188,19 @@ $(function() {
     var vetpanel = $('#newvet');
     var vetform = $('#vetform');
 
-    $('#vet').click( function(e) {
+    $('#vet_submit').click( function(e) {
         e.preventDefault();
 
         // Drop out of any editing mode.
         clearNewVettingMode();
 
         alert('Cylon says: Create New Vetting Pressed');
+
+        // Submit the vetting
         createNewVetting();
 
     });
 
     initVetting();
 
-/*
-    // go through each tool panel and add opne/close behaviour to the header
-    tools.each( function(index, tool) {
-        tool = $(tool);
-        var header = $(tool).children('h1').first();
-        var body = tool.children('.toolcontent').first();
-        header.disableSelection();
-        header.click( function() {
-            header.toggleClass('closed');
-            body.toggle('blind', 'fast');
-            return false;
-        });
-    });
-
-    //
-    // close all the tools that wanted to start closed
-    //
-
-    var fx = jQuery.fx.off; // disable fx animation
-    jQuery.fx.off = true;
-    var closetools = $('#toolspanel .tool.startclosed');
-    closetools.each( function(index, tool) {
-        // click the header of each tool to close it
-        $(tool).children('h1').first().click();
-    });
-    // restore fx animation
-    jQuery.fx.off = fx;
-
-    //
-    // set up the emission selecting stuff
-    //
-
-    $('#emission_scenarios').change(function() {
-        Edgar.mapdata.emissionScenario = $(this).val();
-        reloadDistributionLayers();
-    });
-
-    $('#year_selector').change(function() {
-        Edgar.mapdata.year = $(this).val();
-        reloadDistributionLayers();
-    });
-
-    $('#use_emission_and_year').change(reloadDistributionLayers);
-
-    Edgar.mapdata.emissionScenario = $('#emission_scenarios').val();
-    Edgar.mapdata.year = parseInt($('#year_selector').val());
-    reloadDistributionLayers();
-
-*/
 });
