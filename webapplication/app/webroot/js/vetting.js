@@ -122,6 +122,7 @@ function initVetting() {
 
     // handle clear polygon press
     $('#newvet_clear_polygon_button').click( function(e) {
+        handleClearPolygonClick(e);
     });
 
     Edgar.map.addLayers([new_vet_vectors]);
