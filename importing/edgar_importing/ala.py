@@ -54,10 +54,11 @@ class Coord(object):
 class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
-    def __init__(self, coord=None, sens_coord=None, uuid_in=None, kosher=False):
+    def __init__(self, coord=None, sens_coord=None, uuid_in=None, kosher=False, assertions=[]):
         self.coord = coord
         self.sensitive_coord = sens_coord
         self.is_geospatial_kosher = bool(kosher)
+        self.assertions = set(assertions)
 
         if uuid_in is None:
             self.uuid = None
@@ -128,7 +129,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
-        'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude',
+        'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude,assertions',
         'facet': 'off'
     }
 
@@ -143,7 +144,8 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 uuid_in=uuid.UUID(occ['uuid']),
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
-                kosher=(True if occ['geospatialKosher'] == "true" else False)
+                kosher=(True if occ['geospatialKosher'] == "true" else False),
+                assertions=(occ['assertions'] if 'assertions' in occ else set())
             )
 
 

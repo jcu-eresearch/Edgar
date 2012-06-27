@@ -474,10 +474,25 @@ class Syncer:
 
 def classification_for_occurrence(occ):
     '''Returns an occurrences.classification enum value for an ala.Occurrence'''
-    if occ.is_geospatial_kosher:
-        return 'irruptive'
-    else:
+
+    assertions = occ.assertions
+
+    # geospatial kosher is False if any of these assertions are present:
+    #     - habitatMismatch
+    #     - zeroCoordinates
+    #     - coordinatesCentreOfStateProvince
+    #     - coordinatesOutOfRange
+    #     - geospatialIssue
+    #     - coordinatesCentreOfCountry
+    #     - detectedOutlier
+    if not occ.is_geospatial_kosher:
         return 'invalid'
+    elif 'stateCoordinateMismatch' in assertions:
+        return 'unknown'
+    elif 'identificationIncorrect' in assertions:
+        return 'invalid'
+    else:
+        return 'irruptive'
 
 
 def postgres_escape_bytea(b):
