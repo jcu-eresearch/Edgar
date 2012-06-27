@@ -12,7 +12,7 @@ def main():
         print "Don't use this in production!"
         print
         print "Usage:"
-        print "\t{0} --go".format(sys.argv[0])
+        print "\t{0} --go [--big]".format(sys.argv[0])
         print
         sys.exit()
 
@@ -26,13 +26,12 @@ def main():
     db.occurrences.delete().execute()
     db.sensitive_occurrences.delete().execute()
 
+    # insert ALA source
+    db.sources.insert().execute(
+        name='ALA',
+        last_import_time=None)
+
     # insert species
-
-    # 400k records.
-    db.species.insert().execute(
-        scientific_name='Cracticus tibicen',
-        common_name='Australian Magpie')
-
     db.species.insert().execute(
         scientific_name='Motacilla flava',
         common_name='Yellow Wagtail')
@@ -40,10 +39,6 @@ def main():
     db.species.insert().execute(
         scientific_name='Ninox (Rhabdoglaux) strenua',
         common_name='Powerful Owl')
-
-    db.species.insert().execute(
-        scientific_name='Dacelo (Dacelo) leachii',
-        common_name='Blue-winged Kookaburra')
 
     db.species.insert().execute(
         scientific_name='Ninox (Hieracoglaux) connivens',
@@ -54,18 +49,6 @@ def main():
         common_name='Barn Owl')
 
     db.species.insert().execute(
-        scientific_name='Tyto (Megastrix) novaehollandiae',
-        common_name='Masked Owl')
-
-    db.species.insert().execute(
-        scientific_name='Ninox (Ninox) novaeseelandiae',
-        common_name='Southern Boobook')
-
-    db.species.insert().execute(
-        scientific_name='Corvus tasmanicus',
-        common_name='Forest Raven')
-
-    db.species.insert().execute(
         scientific_name='Falco (Hierofalco) hypoleucos',
         common_name='Grey Falcon')
 
@@ -74,7 +57,25 @@ def main():
         scientific_name='Atrichornis (Atrichornis) rufescens',
         common_name='Rufous Scrub-bird')
 
-    # insert ALA source
-    db.sources.insert().execute(
-        name='ALA',
-        last_import_time=None)
+    if '--big' in sys.argv:
+        # 400k records.
+        db.species.insert().execute(
+            scientific_name='Cracticus tibicen',
+            common_name='Australian Magpie')
+
+        db.species.insert().execute(
+            scientific_name='Dacelo (Dacelo) leachii',
+            common_name='Blue-winged Kookaburra')
+
+        db.species.insert().execute(
+            scientific_name='Tyto (Megastrix) novaehollandiae',
+            common_name='Masked Owl')
+
+        db.species.insert().execute(
+            scientific_name='Ninox (Ninox) novaeseelandiae',
+            common_name='Southern Boobook')
+
+        db.species.insert().execute(
+            scientific_name='Corvus tasmanicus',
+            common_name='Forest Raven')
+
