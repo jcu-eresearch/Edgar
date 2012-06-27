@@ -9,8 +9,10 @@ import traceback
 import datetime
 import shapely.wkt
 import shapely.geometry
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from geoalchemy import WKTSpatialElement
+from cStringIO import StringIO
+
 
 log = logging.getLogger(__name__)
 
@@ -322,14 +324,6 @@ class Syncer:
             self.ala_species_by_sname[scientific_name] = species
             return species
 
-    def vet_occurrence(self, occurrence):
-        '''Returns an occurrences.classification enum value for an ala.Occurrence'''
-        # TODO: determine classification better using lists of assertions
-        if occurrence.is_geospatial_kosher:
-            return 'irruptive'
-        else:
-            return 'invalid'
-
 
     def upsert_occurrence(self, occ, species_id):
         '''Looks up whether `occurrence` (an ala.Occurrence object)
@@ -338,67 +332,32 @@ class Syncer:
         inserted.
 
         `species_id` must be supplied as an argument because it is not
-        obtainable from `occurrence`'''
+        obtainable from `occ` alone. Also expects `occ.classification` to be
+        valid.'''
 
-        if occ.coord is not None:
-            occ_id = self.upsert_nonsensitive(occ, species_id)
-            if occ.sensitive_coord is not None:
-                self.upsert_sensitive(occ, occ_id)
+        sql = '''SELECT EdgarUpsertOccurrence(
+            {classi},
+            {srid},
+            {lat},
+            {lon},
+            {slat},
+            {slon},
+            {species_id},
+            {source_id},
+            {record_id});'''.format(
+                classi=''.join(("'", occ.classification, "'")),
+                srid='4326',
+                lat=str(float(occ.coord.lati)),
+                lon=str(float(occ.coord.longi)),
+                slat=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.lati))),
+                slon=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.longi))),
+                species_id=str(int(species_id)),
+                source_id=str(int(self.source_row_id)),
+                record_id=postgres_escape_bytea(occ.uuid.bytes)
+            )
 
+        db.engine.execute(text(sql).execution_options(autocommit=True))
 
-    def upsert_nonsensitive(self, occ, species_id):
-        existing = db.occurrences.select().\
-            where(db.occurrences.c.source_record_id == occ.uuid.bytes).\
-            where(db.occurrences.c.source_id == self.source_row_id).\
-            execute().\
-            fetchone()
-
-        p = shapely.geometry.Point(occ.coord.longi, occ.coord.lati)
-        location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
-
-        classification = self.vet_occurrence(occ)
-
-        if existing is None:
-            return db.occurrences.insert().\
-                returning(db.occurrences.c.id).\
-                values(location=location,
-                       source_classification=classification,
-                       classification=classification,
-                       species_id=species_id,
-                       source_id=self.source_row_id,
-                       source_record_id=occ.uuid.bytes).\
-                execute().\
-                scalar()
-        else:
-            return db.occurrences.update().\
-                returning(db.occurrences.c.id).\
-                values(location=location,
-                       source_classification=self.vet_occurrence(occ),
-                       species_id=species_id).\
-                where(db.occurrences.c.id == existing['id']).\
-                execute().\
-                scalar()
-
-
-    def upsert_sensitive(self, occ, occ_id):
-        existing = db.sensitive_occurrences.select().\
-            where(db.sensitive_occurrences.c.occurrence_id == occ_id).\
-            execute().\
-            fetchone()
-
-        p = shapely.geometry.Point(occ.sensitive_coord.longi, occ.sensitive_coord.lati)
-        sens_location = WKTSpatialElement(shapely.wkt.dumps(p), 4326)
-
-        if existing is None:
-            db.sensitive_occurrences.insert().\
-                values(occurrence_id=occ_id,
-                       sensitive_location=sens_location).\
-                execute()
-        else:
-            db.sensitive_occurrences.update().\
-                values(sensitive_location=sens_location).\
-                where(db.sensitive_occurrences.c.occurrence_id == occ_id).\
-                execute()
 
 
     def mp_fetch_occurrences(self, since, record_dirty=False, species_to_fetch=None):
@@ -513,6 +472,35 @@ class Syncer:
                 execute()
 
 
+def classification_for_occurrence(occ):
+    '''Returns an occurrences.classification enum value for an ala.Occurrence'''
+    if occ.is_geospatial_kosher:
+        return 'irruptive'
+    else:
+        return 'invalid'
+
+
+def postgres_escape_bytea(b):
+    '''Escapes a byte string into an SQL literal, suitable for adding directly
+    into an SQL string'''
+
+    strio = StringIO()
+    strio.write("E'")
+
+    for ch in b:
+        part = oct(ord(ch))
+        if len(part) > 3:
+            part = part.lstrip('0')
+        if len(part) < 3:
+            part = part.rjust(3, '0')
+
+        strio.write(r'\\')
+        strio.write(part)
+
+    strio.write("'::bytea")
+    return strio.getvalue()
+
+
 def _mp_init(output_q, ala):
     '''Called when a subprocess is started. See Syncer.mp_fetch_occurrences'''
     _mp_init.ala = ala
@@ -543,7 +531,11 @@ def _mp_fetch_occurrences(species, species_id, since_date):
     failure message string in it.
 
     Adds a `species_id` attribute to each ala.Occurrence object set to
-    the argument given to this function.'''
+    the argument given to this function.
+
+    Also adds a `classification` attribute to each ala.Occurrence object,
+    which is the classification converted from the ALA assertions. Better to
+    do it here on a separate thread, than do it on the main thread.'''
 
     _mp_init.log.setLevel(_mp_init.log_level);
 
@@ -563,6 +555,7 @@ def _mp_fetch_occurrences_inner(species, species_id, since_date):
     num_records = 0
     for record in _mp_init.ala.occurrences_for_species(species.lsid, since_date):
         record.species_id = species_id
+        record.classification = classification_for_occurrence(record)
         _mp_init.output_q.put(record)
         num_records += 1
 

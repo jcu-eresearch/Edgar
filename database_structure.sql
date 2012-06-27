@@ -1,6 +1,7 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
-DROP FUNCTION IF EXISTS EdgarUpdateVettings(species.id%TYPE);
+DROP FUNCTION IF EXISTS EdgarUpdateVettings(INT);
+DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, bytea);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
 DROP TABLE IF EXISTS sources;
@@ -198,7 +199,7 @@ GRANT USAGE, SELECT ON users_id_seq TO edgar_frontend;
 -- Where `x` is a valid species.id
 
 
-CREATE FUNCTION EdgarUpdateVettings(speciesId species.id%TYPE) RETURNS varchar AS $$
+CREATE FUNCTION EdgarUpdateVettings(speciesId INT) RETURNS VOID AS $$
 DECLARE
     r RECORD;
 BEGIN
@@ -223,6 +224,76 @@ BEGIN
                 AND ST_CoveredBy(occurrences.location, ST_SimplifyPreserveTopology(r.area, 0.01));
     END LOOP;
 
-    RETURN 'DONE';
+    RETURN;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+-- Inserts/updates (upserts) an occurrence, and its related
+-- sensitive_occurrence if necessary. This is a slow operation in python, and
+-- is about twice as fast using a stored procedure.
+
+CREATE FUNCTION EdgarUpsertOccurrence(
+    inClassification classification,
+    inSRID INT,
+    inLat FLOAT,
+    inLon FLOAT,
+    inSensLat FLOAT,
+    inSensLon FLOAT,
+    inSpeciesId INT,
+    inSourceId INT,
+    inSourceRecordId bytea) RETURNS VOID AS $$
+DECLARE
+    inOccurrenceId INT;
+BEGIN
+    inOccurrenceId := NULL;
+
+    -- try update first
+    UPDATE occurrences
+        SET
+            location = ST_SetSRID(ST_Point(inLon, inLat), inSRID),
+            species_id = inSpeciesId,
+            source_classification = inClassification
+        WHERE
+            source_id = inSourceId
+            AND source_record_id = inSourceRecordId
+        RETURNING id INTO inOccurrenceId;
+
+    -- if nothing was updated, insert new row
+    IF inOccurrenceId IS NULL THEN
+        INSERT INTO occurrences
+            (location,
+                source_classification,
+                classification,
+                species_id,
+                source_id,
+                source_record_id)
+            VALUES
+                (ST_SetSRID(ST_Point(inLon, inLat), inSRID),
+                    inClassification,
+                    inClassification,
+                    inSpeciesId,
+                    inSourceId,
+                    inSourceRecordId)
+            RETURNING id INTO inOccurrenceId;
+    END IF;
+
+    -- stop if no sensitive coord
+    IF inSensLat IS NULL OR inSensLon IS NULL THEN
+        RETURN;
+    END IF;
+
+    -- try update sensitive coord
+    UPDATE sensitive_occurrences
+        SET sensitive_location = ST_SetSRID(ST_Point(inSensLon, inSensLat), inSRID)
+        WHERE occurrence_id = inOccurrenceId;
+
+    -- if nothing was updated, insert new row
+    IF NOT FOUND THEN
+        INSERT INTO sensitive_occurrences(occurrence_id, sensitive_location)
+            VALUES(inOccurrenceId, ST_SetSRID(ST_Point(inSensLon, inSensLat), inSRID));
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+

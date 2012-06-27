@@ -12,5 +12,6 @@ setup(
         fetch_occur_csv = edgar_importing.fetch_occur_csv:main
         birdlife_shapefile_import = edgar_importing.birdlife_shapefile_import:main
         csvs_from_db = edgar_importing.csvs_from_db:main
+        dbtest = edgar_importing.dbtest:main
         ''')
 )
