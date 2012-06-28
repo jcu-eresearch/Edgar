@@ -46,22 +46,22 @@
         <h1>new vetting</h1>
         <div class="toolcontent">
             <div id="newvet_control" class="newvet_control">
-                <button id="newvet_draw_polygon_button" class="draw_polygon" title="draw vetting polygons">&#9997; Draw Vetting Polygons</button>
-                <button id="newvet_reshape_polygon_button" class="reshape_polygon" title="reshape vetting polygons">&#9988; Reshape Vetting Polygons</button>
-                <button id="newvet_move_polygon_button" class="move_polygon" title="move vetting polygons">&#10012; Move Vetting Polygons</button>
-                <button id="newvet_clear_polygon_button" class="clear_polygon" title="clear vetting polygons">&#9760; Clear Vetting Polygons</button>
+                <!-- <button id="newvet_draw_polygon_button" class="toggle draw_polygon" title="draw vetting polygons">&#9997; Draw Vetting Polygons</button> -->
+                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button>
+                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify area"><span class="ui-icon ui-icon-pencil"></span>Modify An Area</button>
+                <button id="newvet_clear_polygon_button" class="ui-state-default ui-corner-all non_toggle clear_polygon" title="clear area"><span class="ui-icon ui-icon-trash"></span>Clear All Areas</button>
             </div>
             <!-- new vet form -->
             <form id="vetform">
                 <legend>Classification
                     <select id="vetclassification" name="classification">
-                        <option value="unknown" selected>unknown</option>
+                        <option value="" selected=true>-- classify these areas --</option>
+                        <option value="unknown">unknown</option>
                         <option value="invalid">invalid</option>
                         <option value="historic">historic</option>
                         <option value="vagrant">vagrant</option>
                         <option value="irruptive">irruptive</option>
                         <option value="non-breeding">non-breeding</option>
-                        <option value="introduced non-breeding">introduced non-breeding</option>
                         <option value="breeding">breeding</option>
                         <option value="introduced breeding">introduced breeding</option>
                     </select>
@@ -69,7 +69,7 @@
                 <legend>Comment
                     <textarea id="vetcomment" name="comment"></textarea>
                 </legend>
-                <button id="vet_submit">vet</button>
+                <button id="vet_submit" class='ui-state-default ui-corner-all'><span class="ui-icon ui-icon-disk"></span>Save this vetting</button>
             </form>
 
             <div id="vethint" class="hint"></div>

@@ -12,58 +12,97 @@ function clearNewVettingMode(e) {
 
     // Deactivate draw polygon control
     new_vet_draw_polygon_control.deactivate();
-    $('#newvet_draw_polygon_button').removeClass('button_down');
+    $('#newvet_draw_polygon_button').removeClass('ui-state-active');
 
-    // Deactivate reshape polygon control
-    // Deactivate move polygon control
+    // Deactivate modify polygon control
     new_vet_modify_polygon_control.deactivate();
-    $('#newvet_reshape_polygon_button').removeClass('button_down');
-    $('#newvet_move_polygon_button').removeClass('button_down');
+    $('#newvet_modify_polygon_button').removeClass('ui-state-active');
+
+    updateHint();
+}
+
+function activateDrawPolygonMode() {
+    clearNewVettingMode();
+    $('#newvet_draw_polygon_button').addClass('ui-state-active');
+    new_vet_draw_polygon_control.activate();
+    updateHint();
+}
+
+function activateModifyPolygonMode() {
+    clearNewVettingMode();
+    $('#newvet_modify_polygon_button').addClass('ui-state-active');
+
+    // Specify the modify mode as reshape and drag 
+    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
+    new_vet_modify_polygon_control.activate();
+    updateHint();
+}
+
+function handleToggleButtonClick(e, onActivatingButton, onDeactivatingButton) {
+    e.preventDefault();
+    if ( $(e.srcElement).hasClass('ui-state-active') ) {
+        onDeactivatingButton();
+    } else {
+        onActivatingButton();
+    }
 }
 
 function handleDrawPolygonClick(e) {
-    e.preventDefault();
-
-    if ( $(e.srcElement).hasClass('button_down') ) {
-        clearNewVettingMode();
-    } else {
-        clearNewVettingMode();
-        $(e.srcElement).toggleClass('button_down');
-        new_vet_draw_polygon_control.activate();
-    }
-    updateHint();
+    handleToggleButtonClick(e, activateDrawPolygonMode, clearNewVettingMode);
 }
 
-function handleReshapePolygonClick(e) {
-    e.preventDefault();
-
-    if ( $(e.srcElement).hasClass('button_down') ) {
-        clearNewVettingMode();
-    } else {
-        clearNewVettingMode();
-        $(e.srcElement).toggleClass('button_down');
-
-        // Specify the modify mode as re-shape
-        new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
-        new_vet_modify_polygon_control.activate();
-    }
-    updateHint();
+function handleModifyPolygonClick(e) {
+    handleToggleButtonClick(e, activateModifyPolygonMode, clearNewVettingMode);
 }
 
-function handleMovePolygonClick(e) {
+function handleAddPolygonClick(e) {
     e.preventDefault();
 
-    if ( $(e.srcElement).hasClass('button_down') ) {
-        clearNewVettingMode();
-    } else {
-        clearNewVettingMode();
-        $(e.srcElement).toggleClass('button_down');
+    clearNewVettingMode();
 
-        // Specify the modify mode as drag 
-        new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.DRAG;
-        new_vet_modify_polygon_control.activate();
+    // Determine position to add polygon..
+    // then add it.
+    // Get the center of the map.
+    var centerOfMap = Edgar.map.getCenter();
+    var mapBounds   = Edgar.map.getExtent();
+    var mapHeight   = mapBounds.top   - mapBounds.bottom;
+    var mapWidth    = mapBounds.right - mapBounds.left;
+
+    var calcDimension = null;
+    if (mapHeight > mapWidth) {
+        calcDimension = mapHeight;
+    } else {
+        calcDimension = mapWidth;
     }
-    updateHint();
+
+    var largerFraction = calcDimension / 10;
+    var minorFraction = calcDimension / 14;
+
+    var points = [
+        new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - largerFraction),
+        new OpenLayers.Geometry.Point(centerOfMap.lon - largerFraction, centerOfMap.lat),
+        new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction),
+        new OpenLayers.Geometry.Point(centerOfMap.lon + largerFraction, centerOfMap.lat),
+        new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - largerFraction)
+    ];
+/*
+    var points = [
+        new OpenLayers.Geometry.Point(0, 0),
+        new OpenLayers.Geometry.Point(0, 100),
+        new OpenLayers.Geometry.Point(100, 100),
+        new OpenLayers.Geometry.Point(100, 0)
+    ];
+*/
+    var ring = new OpenLayers.Geometry.LinearRing(points);
+    var polygon = new OpenLayers.Geometry.Polygon([ring]);
+
+    // create some attributes for the feature
+    var attributes = {};
+
+    var feature = new OpenLayers.Feature.Vector(polygon, attributes);
+    new_vet_vectors.addFeatures([feature]);
+
+    activateModifyPolygonMode();
 }
 
 function handleClearPolygonClick(e) {
@@ -83,7 +122,7 @@ function updateHint() {
         ''
     ];
 
-    var reshapePolygonHints = [
+    var modifyPolygonHints = [
         '<p>Press <strong>Delete</strong> while over a corner to delete it</p>'
     ];
 
@@ -93,20 +132,8 @@ function updateHint() {
 
     // Modify feature is active
     if (new_vet_modify_polygon_control.active) {
-
-        // Check what mode the modify control is in...
-        // If in the reshape (RESHAPE) mode
-        if(new_vet_modify_polygon_control.mode === OpenLayers.Control.ModifyFeature.RESHAPE) {
-            var hint = reshapePolygonHints[Math.floor(Math.random()*reshapePolygonHints.length)]
-            $('#vethint').html(hint);
-        // Else if it is in move (DRAG) mode
-        } else if(new_vet_modify_polygon_control.mode === OpenLayers.Control.ModifyFeature.DRAG) {
-            var hint = movePolygonHints[Math.floor(Math.random()*movePolygonHints.length)]
-            $('#vethint').html(hint);
-        // Else (we shouldn't be here...)
-        } else {
-            $('#vethint').html('');
-        }
+        var hint = modifyPolygonHints[Math.floor(Math.random()*modifyPolygonHints.length)]
+        $('#vethint').html(hint);
     } else if (new_vet_draw_polygon_control) {
         var hint = drawPolygonHints[Math.floor(Math.random()*drawPolygonHints.length)]
         $('#vethint').html(hint);
@@ -129,7 +156,7 @@ function initVetting() {
 
 
 // NOTE: Due to OpenLayers Bug.. can't do this.
-//       The reshape feature control draws points onto the vector layer
+//       The modify feature control draws points onto the vector layer
 //       to show vertice drag points.. these drag points fail the geometryType
 //       test.
     var new_vet_vectors_options = {
@@ -143,6 +170,7 @@ function initVetting() {
     );
 
     new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors);
+    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
 
 
 
@@ -151,20 +179,30 @@ function initVetting() {
         handleDrawPolygonClick(e);
     });
 
-    // handle reshape polygon press
-    $('#newvet_reshape_polygon_button').click( function(e) {
-        handleReshapePolygonClick(e);
+    // handle add polygon press
+    $('#newvet_add_polygon_button').click( function(e) {
+        handleAddPolygonClick(e);
     });
 
-    // handle move polygon press
-    $('#newvet_move_polygon_button').click( function(e) {
-        handleMovePolygonClick(e);
+    // handle modify polygon press
+    $('#newvet_modify_polygon_button').click( function(e) {
+        handleModifyPolygonClick(e);
     });
 
     // handle clear polygon press
     $('#newvet_clear_polygon_button').click( function(e) {
         handleClearPolygonClick(e);
     });
+
+    // toggle the ui-state-hover class on hover events
+    $('#newvet :button').hover(
+        function(){ 
+            $(this).addClass("ui-state-hover"); 
+        },
+        function(){ 
+            $(this).removeClass("ui-state-hover"); 
+        }
+    )
 
     Edgar.map.addLayers([new_vet_vectors]);
     Edgar.map.addControl(new_vet_draw_polygon_control)
@@ -235,8 +273,6 @@ $(function() {
 
         // Drop out of any editing mode.
         clearNewVettingMode();
-
-        alert('Cylon says: Create New Vetting Pressed');
 
         // Submit the vetting
         createNewVetting();
