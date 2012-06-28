@@ -103,6 +103,9 @@ function handleAddPolygonClick(e) {
     new_vet_vectors.addFeatures([feature]);
 
     activateModifyPolygonMode();
+    new_vet_modify_polygon_control.selectFeature(feature);
+
+    new_vet_vectors.redraw();
 }
 
 function handleClearPolygonClick(e) {
@@ -171,7 +174,6 @@ function initVetting() {
 
     new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors);
     new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
-
 
 
     // handle draw polygon press
