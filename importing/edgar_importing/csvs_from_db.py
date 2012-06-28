@@ -21,16 +21,18 @@ def coords_for_species_id(species_id):
         'ST_X(location) as longitude',
         'ST_Y(location) as latitude',
         'ST_X(sensitive_location) as sensitive_longitude',
-        'ST_Y(sensitive_location) as sensitive_latitude']).\
+        'ST_Y(sensitive_location) as sensitive_latitude',
+        'uncertainty']).\
         select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
         where(db.occurrences.c.species_id == species_id).\
+        where(db.occurrences.c.classification > 'irruptive').\
         execute()
 
     for row in q:
         if row['sensitive_longitude'] is None:
-            yield row['longitude'], row['latitude']
+            yield row['longitude'], row['latitude'], row['uncertainty']
         else:
-            yield row['sensitive_longitude'], row['sensitive_latitude']
+            yield row['sensitive_longitude'], row['sensitive_latitude'], row['uncertainty']
 
 
 def write_csv_for_species(species):
@@ -38,14 +40,14 @@ def write_csv_for_species(species):
     f = None
     num_records = 0
 
-    for lon, lat in coords_for_species_id(species['id']):
+    for lon, lat, uncertainty in coords_for_species_id(species['id']):
         # lazy open file, incase this species has 0 records
         if writer is None:
             f = open(species['scientific_name'] + '.csv', 'wb')
             writer = csv.writer(f)
-            writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
+            writer.writerow(["SPPCODE", "LATDEC", "LONGDEC", "UNCERTAINTY"])
 
-        writer.writerow([species['id'], lat, lon])
+        writer.writerow([species['id'], lat, lon, uncertainty])
         num_records += 1
 
     if f is not None:

@@ -54,11 +54,13 @@ class Coord(object):
 class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
-    def __init__(self, coord=None, sens_coord=None, uuid_in=None, kosher=False, assertions=[]):
+    def __init__(self, coord=None, sens_coord=None,
+            uuid_in=None, kosher=False, assertions=[], uncertainty=None):
         self.coord = coord
         self.sensitive_coord = sens_coord
         self.is_geospatial_kosher = bool(kosher)
         self.assertions = set(assertions)
+        self.uncertainty = uncertainty # in meters (not sure if radius, or AABB)
 
         if uuid_in is None:
             self.uuid = None
@@ -129,7 +131,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
-        'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude,assertions',
+        'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude,assertions,coordinate_uncertainty',
         'facet': 'off'
     }
 
@@ -145,7 +147,8 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
                 kosher=(True if occ['geospatialKosher'] == "true" else False),
-                assertions=(occ['assertions'] if 'assertions' in occ else set())
+                assertions=(occ['assertions'] if 'assertions' in occ else set()),
+                uncertainty=int(occ['coordinateUncertaintyInMeters'])
             )
 
 
@@ -285,6 +288,7 @@ def q_param(species_lsid=None, changed_since=None):
         (rank:species OR subspecies_name:[* TO *]) AND
         longitude:[-180 TO 180] AND
         latitude:[-90 TO 90] AND
+        coordinate_uncertainty:[* TO 25000] AND
         NOT sensitive:alreadyGeneralised AND
         (
             basis_of_record:HumanObservation OR

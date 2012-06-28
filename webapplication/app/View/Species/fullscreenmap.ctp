@@ -17,6 +17,7 @@
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
+    $this->Html->script('yearslider', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
@@ -106,18 +107,8 @@
                 <option value="sresb1">sresb1</option>
                 <option value="sresa2">sresa2</option>
             </select>
-            <select id="year_selector">
-                <option value="1990">1990</option>
-                <option value="2000">2000</option>
-                <option value="2010">2010</option>
-                <option value="2020" selected="selected">2020</option>
-                <option value="2030">2030</option>
-                <option value="2040">2040</option>
-                <option value="2050">2050</option>
-                <option value="2060">2060</option>
-                <option value="2070">2070</option>
-                <option value="2080">2080</option>
-            </select>
+            <span id="year_label"></span>
+            <div id="year_slider"></div>
         </div>
     </div>
 

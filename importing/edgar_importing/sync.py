@@ -342,6 +342,7 @@ class Syncer:
             {lon},
             {slat},
             {slon},
+            {uncertainty},
             {species_id},
             {source_id},
             {record_id});'''.format(
@@ -351,6 +352,7 @@ class Syncer:
                 lon=str(float(occ.coord.longi)),
                 slat=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.lati))),
                 slon=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.longi))),
+                uncertainty=str(int(occ.uncertainty)),
                 species_id=str(int(species_id)),
                 source_id=str(int(self.source_row_id)),
                 record_id=postgres_escape_bytea(occ.uuid.bytes)
