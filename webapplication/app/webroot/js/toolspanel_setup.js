@@ -40,10 +40,24 @@ $(function() {
         reloadDistributionLayers();
     });
 
+    $("#year_slider").slider({
+        min: 1990,
+        max: 2080,
+        step: 10,
+        value: 2010,
+        change: function(event, ui) {
+            Edgar.mapdata.year = ui.value;
+            reloadDistributionLayers();
+            $('#year_label').text(''+ui.value);
+        }
+    });
+
+    /*
     $('#year_selector').change(function() {
         Edgar.mapdata.year = $(this).val();
         reloadDistributionLayers();
     });
+    */
 
     $('#use_emission_and_year').change(reloadDistributionLayers);
 
