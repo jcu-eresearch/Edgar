@@ -24,6 +24,7 @@ def coords_for_species_id(species_id):
         'ST_Y(sensitive_location) as sensitive_latitude']).\
         select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
         where(db.occurrences.c.species_id == species_id).\
+        where(db.occurrences.c.classification > 'irruptive').\
         execute()
 
     for row in q:
