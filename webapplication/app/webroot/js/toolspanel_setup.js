@@ -20,7 +20,7 @@ $(function() {
     //
     // close all the tools that wanted to start closed
     //
-    
+
     var fx = jQuery.fx.off; // disable fx animation
     jQuery.fx.off = true;
     var closetools = $('#toolspanel .tool.startclosed');
@@ -34,36 +34,18 @@ $(function() {
     //
     // set up the emission selecting stuff
     //
-
-    $('#emission_scenarios').change(function() {
-        Edgar.mapdata.emissionScenario = $(this).val();
-        reloadDistributionLayers();
+    Edgar.yearSlider = new Edgar.YearSlider({
+        sliderElem: '#year_slider',
+        scenarioElem: '#emission_scenarios',
+        map: Edgar.map,
+        yearLabelElem: '#year_label'
     });
 
-    $("#year_slider").slider({
-        min: 1990,
-        max: 2080,
-        step: 10,
-        value: 2010,
-        change: function(event, ui) {
-            Edgar.mapdata.year = ui.value;
-            reloadDistributionLayers();
-            $('#year_label').text(''+ui.value);
-        }
+    $('#use_emission_and_year').change(function(){
+        var sid = null;
+        if($(this).is(':checked'))
+            sid = Edgar.mapdata.species.id;
+        Edgar.yearSlider.setSpeciesId(sid);
     });
-
-    /*
-    $('#year_selector').change(function() {
-        Edgar.mapdata.year = $(this).val();
-        reloadDistributionLayers();
-    });
-    */
-
-    $('#use_emission_and_year').change(reloadDistributionLayers);
-
-    Edgar.mapdata.emissionScenario = $('#emission_scenarios').val();
-    Edgar.mapdata.year = parseInt($('#year_selector').val());
-    reloadDistributionLayers();
-
 
 });

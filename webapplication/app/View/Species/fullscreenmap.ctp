@@ -17,6 +17,7 @@
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
+    $this->Html->script('yearslider', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
