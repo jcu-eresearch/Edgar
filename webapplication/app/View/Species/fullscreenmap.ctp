@@ -70,8 +70,8 @@
                 <legend>Comment
                     <textarea id="vetcomment" name="comment"></textarea>
                 </legend>
-                <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this vetting</button>
             </form>
+            <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this vetting</button>
 
             <div id="vethint" class="hint"></div>
         </div>
