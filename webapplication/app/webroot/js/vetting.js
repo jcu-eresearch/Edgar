@@ -103,9 +103,9 @@ function handleAddPolygonClick(e) {
     new_vet_vectors.addFeatures([feature]);
 
     activateModifyPolygonMode();
-    new_vet_modify_polygon_control.selectFeature(feature);
+    //new_vet_modify_polygon_control.selectFeature(feature);
 
-    new_vet_vectors.redraw();
+    //new_vet_vectors.redraw();
 }
 
 function handleClearPolygonClick(e) {
