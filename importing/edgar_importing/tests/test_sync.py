@@ -21,7 +21,8 @@ class TestSync(unittest.TestCase):
         return self.mockala.Occurrence(
             coord=self.mockala.Coord(lati, longi),
             sens_coord=sens_coord,
-            uuid_in=(uuid.uuid4() if uuid_in is None else uuid_in)
+            uuid_in=(uuid.uuid4() if uuid_in is None else uuid_in),
+            uncertainty=100
         )
 
     def setUp(self):

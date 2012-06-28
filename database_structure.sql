@@ -1,7 +1,7 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
 DROP FUNCTION IF EXISTS EdgarUpdateVettings(INT);
-DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, bytea);
+DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, INT, bytea);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
 DROP TABLE IF EXISTS sources;
@@ -87,6 +87,7 @@ CREATE TABLE sources (
 -- so it should have as few columns as possible.
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
+    uncertainty INT NOT NULL, -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box. Bounding box makes sense, if the lat/lon are rounded.
     classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
     source_classification classification NOT NULL, -- The vetting classification as obtained from the source (i.e. ALA assertions translated to our vettings system)
     source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
@@ -241,6 +242,7 @@ CREATE FUNCTION EdgarUpsertOccurrence(
     inLon FLOAT,
     inSensLat FLOAT,
     inSensLon FLOAT,
+    inUncertainty INT,
     inSpeciesId INT,
     inSourceId INT,
     inSourceRecordId bytea) RETURNS VOID AS $$
@@ -254,7 +256,8 @@ BEGIN
         SET
             location = ST_SetSRID(ST_Point(inLon, inLat), inSRID),
             species_id = inSpeciesId,
-            source_classification = inClassification
+            source_classification = inClassification,
+            uncertainty = inUncertainty
         WHERE
             source_id = inSourceId
             AND source_record_id = inSourceRecordId
@@ -266,6 +269,7 @@ BEGIN
             (location,
                 source_classification,
                 classification,
+                uncertainty,
                 species_id,
                 source_id,
                 source_record_id)
@@ -273,6 +277,7 @@ BEGIN
                 (ST_SetSRID(ST_Point(inLon, inLat), inSRID),
                     inClassification,
                     inClassification,
+                    inUncertainty,
                     inSpeciesId,
                     inSourceId,
                     inSourceRecordId)
