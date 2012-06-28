@@ -10,14 +10,15 @@ var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_c
 function clearNewVettingMode(e) {
     console.log("Clearing current mode");
 
+    // Deactivate draw polygon control
     new_vet_draw_polygon_control.deactivate();
     $('#newvet_draw_polygon_button').removeClass('button_down');
 
+    // Deactivate reshape polygon control
+    // Deactivate move polygon control
     new_vet_modify_polygon_control.deactivate();
-    $('#newvet_modify_polygon_button').removeClass('button_down');
-
-    new_vet_modify_polygon_control.deactivate();
-    $('#newvet_modify_polygon_button').removeClass('button_down');
+    $('#newvet_reshape_polygon_button').removeClass('button_down');
+    $('#newvet_move_polygon_button').removeClass('button_down');
 }
 
 function handleDrawPolygonClick(e) {
@@ -33,7 +34,7 @@ function handleDrawPolygonClick(e) {
     updateHint();
 }
 
-function handleModifyPolygonClick(e) {
+function handleReshapePolygonClick(e) {
     e.preventDefault();
 
     if ( $(e.srcElement).hasClass('button_down') ) {
@@ -41,6 +42,25 @@ function handleModifyPolygonClick(e) {
     } else {
         clearNewVettingMode();
         $(e.srcElement).toggleClass('button_down');
+
+        // Specify the modify mode as re-shape
+        new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
+        new_vet_modify_polygon_control.activate();
+    }
+    updateHint();
+}
+
+function handleMovePolygonClick(e) {
+    e.preventDefault();
+
+    if ( $(e.srcElement).hasClass('button_down') ) {
+        clearNewVettingMode();
+    } else {
+        clearNewVettingMode();
+        $(e.srcElement).toggleClass('button_down');
+
+        // Specify the modify mode as drag 
+        new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.DRAG;
         new_vet_modify_polygon_control.activate();
     }
     updateHint();
@@ -62,13 +82,31 @@ function updateHint() {
     var drawPolygonHints = [
         ''
     ];
-    var modifyPolygonHints = [
-        '<p>Press <strong>Delete</strong> while over a vertice to delete it</p>'
+
+    var reshapePolygonHints = [
+        '<p>Press <strong>Delete</strong> while over a corner to delete it</p>'
     ];
 
+    var movePolygonHints = [
+        ''
+    ];
+
+    // Modify feature is active
     if (new_vet_modify_polygon_control.active) {
-        var hint = modifyPolygonHints[Math.floor(Math.random()*modifyPolygonHints.length)]
-        $('#vethint').html(hint);
+
+        // Check what mode the modify control is in...
+        // If in the reshape (RESHAPE) mode
+        if(new_vet_modify_polygon_control.mode === OpenLayers.Control.ModifyFeature.RESHAPE) {
+            var hint = reshapePolygonHints[Math.floor(Math.random()*reshapePolygonHints.length)]
+            $('#vethint').html(hint);
+        // Else if it is in move (DRAG) mode
+        } else if(new_vet_modify_polygon_control.mode === OpenLayers.Control.ModifyFeature.DRAG) {
+            var hint = movePolygonHints[Math.floor(Math.random()*movePolygonHints.length)]
+            $('#vethint').html(hint);
+        // Else (we shouldn't be here...)
+        } else {
+            $('#vethint').html('');
+        }
     } else if (new_vet_draw_polygon_control) {
         var hint = drawPolygonHints[Math.floor(Math.random()*drawPolygonHints.length)]
         $('#vethint').html(hint);
@@ -91,7 +129,7 @@ function initVetting() {
 
 
 // NOTE: Due to OpenLayers Bug.. can't do this.
-//       The modify feature control draws points onto the vector layer
+//       The reshape feature control draws points onto the vector layer
 //       to show vertice drag points.. these drag points fail the geometryType
 //       test.
     var new_vet_vectors_options = {
@@ -106,8 +144,6 @@ function initVetting() {
 
     new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors);
 
-    // Specify the modify mode as re-shape
-    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE;
 
 
     // handle draw polygon press
@@ -115,9 +151,14 @@ function initVetting() {
         handleDrawPolygonClick(e);
     });
 
-    // handle modify polygon press
-    $('#newvet_modify_polygon_button').click( function(e) {
-        handleModifyPolygonClick(e);
+    // handle reshape polygon press
+    $('#newvet_reshape_polygon_button').click( function(e) {
+        handleReshapePolygonClick(e);
+    });
+
+    // handle move polygon press
+    $('#newvet_move_polygon_button').click( function(e) {
+        handleMovePolygonClick(e);
     });
 
     // handle clear polygon press

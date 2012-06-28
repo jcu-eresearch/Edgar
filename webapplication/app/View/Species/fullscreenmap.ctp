@@ -47,7 +47,7 @@
         <div class="toolcontent">
             <div id="newvet_control" class="newvet_control">
                 <button id="newvet_draw_polygon_button" class="draw_polygon" title="draw vetting polygons">&#9997; Draw Vetting Polygons</button>
-                <button id="newvet_modify_polygon_button" class="modify_polygon" title="modify vetting polygons">&#9988; Modify Vetting Polygons</button>
+                <button id="newvet_reshape_polygon_button" class="reshape_polygon" title="reshape vetting polygons">&#9988; Reshape Vetting Polygons</button>
                 <button id="newvet_move_polygon_button" class="move_polygon" title="move vetting polygons">&#10012; Move Vetting Polygons</button>
                 <button id="newvet_clear_polygon_button" class="clear_polygon" title="clear vetting polygons">&#9760; Clear Vetting Polygons</button>
             </div>
