@@ -34,7 +34,6 @@
             self._$slider.slider({
                 min: self.MIN_YEAR,
                 max: self.MAX_YEAR,
-                step: 10,
                 value: self._year,
                 change: function(event, ui){
                     self.setYear(ui.value);
@@ -127,6 +126,7 @@
                 {
                     isBaseLayer: false,
                     transitionEffect: 'resize',
+                    displayInLayerSwitcher: false,
                     singleTile: true,
                     ratio: 1.5
                 }
@@ -136,15 +136,42 @@
         }
 
         this._setLayerOpacities = function(){
-            //TODO: do this with interpolated opacities
+            if(!this._speciesId) return;
+
             var currentYear = this._year;
-            $.each(this._layersByYear, function(year, layer){
-                if(currentYear == year){
-                    layer.setOpacity(1);
+            var sortedYears = $.map(this._layersByYear, function(layer, year){ return parseInt(year); });
+            sortedYears.sort();
+
+            //find two closest years to interpolate between
+            var lowerYear = sortedYears[0];
+            var upperYear = null;
+            $.each(sortedYears, function(idx, year){
+                if(year >= currentYear){
+                    upperYear = year;
+                    return false; //stops iteration
                 } else {
-                    layer.setOpacity(0);
+                    lowerYear = year;
                 }
             });
+
+            //if exactly on a year, no interpolation necessary
+            if(upperYear == currentYear){
+                $.each(this._layersByYear, function(year, layer){
+                    layer.setOpacity((year == currentYear ? 1 : 0));
+                });
+            } else {
+                //else, interpolate
+                $.each(this._layersByYear, function(year, layer){
+                    var interp = (currentYear - lowerYear) / (upperYear - lowerYear);
+                    var opacity = 0;
+                    if(year == upperYear){
+                        opacity = interp;
+                    } else if(year == lowerYear){
+                        opacity = 1 - interp;
+                    }
+                    layer.setOpacity(opacity);
+                });
+            }
         }
     };
 
