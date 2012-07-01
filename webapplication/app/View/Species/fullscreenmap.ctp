@@ -108,6 +108,7 @@
                 <option value="sresa2">sresa2</option>
             </select>
             <span id="year_label"></span>
+            <button id="play_slider_button">Play</button>
             <div id="year_slider"></div>
         </div>
     </div>

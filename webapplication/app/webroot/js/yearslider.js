@@ -7,15 +7,13 @@
             sliderElem: null,   // REQUIRED: empty div that will be converted into a slider
             scenarioElem: null, // REQUIRED: <select> element containing emission scenario names
             map: null,          // REQUIRED: the open layers map object
-            yearLabelElem: null,     // Will change the inner text of this elem when the year changes
+            yearLabelElem: null,// Will change the inner text of this elem when the year changes
             defaultYear: 2010,
-            minYear: 1990,
-            maxYear: 2080,
             defaultScenario: 'sresa1b'
         }, options);
 
-        this.MIN_YEAR = parseInt(options.minYear);
-        this.MAX_YEAR = parseInt(options.maxYear);
+        this.MIN_YEAR = 1990;
+        this.MAX_YEAR = 2080;
 
         //member vars (private)
         this._year = parseInt(options.defaultYear);
@@ -55,6 +53,7 @@
             if(this._year == year) return;
 
             this._year = year;
+            this._$slider.slider("value", this._year);
 
             if(this._year > 2050){
                 //TODO: change site logo to cyborg raven
@@ -83,6 +82,18 @@
 
             this._scenario = scenario;
             this._reloadLayers();
+        }
+
+        this.playAnimation = function(){
+            var self = this;
+            var dummyElem = $('<div></div>').css('height', this.MIN_YEAR);
+            dummyElem.animate({height: this.MAX_YEAR}, {
+                duration: 5000,
+                easing: 'linear',
+                step: function(year){
+                    self.setYear(year);
+                }
+            });
         }
 
         this._reloadLayers = function(){

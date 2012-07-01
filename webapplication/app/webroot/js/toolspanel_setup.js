@@ -48,4 +48,8 @@ $(function() {
         Edgar.yearSlider.setSpeciesId(sid);
     });
 
+    $('#play_slider_button').click(function(){
+        Edgar.yearSlider.playAnimation();
+    });
+
 });
