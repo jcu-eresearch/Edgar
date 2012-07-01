@@ -160,17 +160,27 @@ def poly_from_shapefile_shape(shape):
     # Type 5 is a single polygon in the shapefile format
     assert shape.shapeType == 5
 
-    if len(shape.points) <= 0:
-        _log.warning('Shape has no points?')
-        return None
+    # get each part as an individual polygon
+    poly = None
+    partEnd = len(shape.points)
+    for partStart in reversed(shape.parts):
+        p = Polygon(shape.points[partStart:partEnd])
+        # buffer(0) causes self-intersecting polygons to fix themselves
+        # super important, because self-intersecting polygons break everything
+        p = p.buffer(0)
+        partEnd = partStart
 
-    # buffer(0) causes self-intersecting polygons to fix themselves
-    # super important, because self-intersecting polygons break everything
-    p = Polygon(shape.points).buffer(0)
-    if p.is_simple and p.is_valid:
-        return p
-    else:
-        return None
+        if poly is None:
+            poly = p
+        else:
+            if poly.disjoint(p):
+                poly = poly.union(p)
+            else:
+                # overlapping polygons are tricky. Ignoring them for now.
+                # TODO: here
+                _log.warning('Overlapping polygon parts found. Ignoring.')
+
+    return poly
 
 
 def classification_for_record(rec):
@@ -201,8 +211,9 @@ def set_polys_for_taxons(shapef, taxons_by_spno):
     assert(len(shapef.fields) == 6)
 
     for record in shapef.shapeRecords():
-        taxon = taxons_by_spno[record.record[COL_SPNO]]
-        update_poly_on_taxon(taxon, record)
+        if len(record.shape.points) > 0: # getting wierd shapes without points
+            taxon = taxons_by_spno[record.record[COL_SPNO]]
+            update_poly_on_taxon(taxon, record)
 
 
 def insert_vettings_for_taxon(taxon, user_id, srid):
@@ -246,7 +257,7 @@ def main():
     sf = shapefile.Reader(args.shapefile[0])
     set_polys_for_taxons(sf, taxons)
 
-    # wipe existing vettings 
+    # wipe existing vettings
     db.vettings.delete().where(db.vettings.c.user_id == args.user_id[0]).execute()
 
     # create new vettings
