@@ -1,7 +1,7 @@
 from sqlalchemy import (engine_from_config, MetaData, Table,
     Column, ForeignKey, PrimaryKeyConstraint, Index)
 from sqlalchemy.types import (SmallInteger, String, Integer,
-    DateTime, Float, Enum, BINARY, Text)
+    DateTime, Float, Enum, BINARY, Text, Date)
 from geoalchemy import (GeometryExtensionColumn, Point, GeometryDDL,
     MultiPolygon)
 
@@ -35,6 +35,7 @@ occurrences = Table('occurrences', metadata,
     Column('id', Integer(), primary_key=True),
     GeometryExtensionColumn('location', Point(2, srid=4326), nullable=False),
     Column('uncertainty', Integer(), nullable=False),
+    Column('date', Date(), nullable=True),
     Column('classification', classification_enum, nullable=False),
     Column('species_id', SmallInteger(), ForeignKey('species.id'), nullable=False),
     Column('source_id', SmallInteger(), ForeignKey('sources.id'), nullable=False),
