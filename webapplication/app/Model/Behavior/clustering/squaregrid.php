@@ -9,7 +9,7 @@
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-function get_features_squaregrid(Model $Model, $bounds = array() ) {
+function get_features_squaregrid(Model $Model, $bounds ) {
 
     $MAX_SQUARES_LONG = 90;    // how many longitude slices to make, at most
     $SIDE_LENGTH_OPTIONS = array(8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);  // four per parent
@@ -20,21 +20,7 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
 
     $single_obs_radius = 4; // pixels
 
-    $locations = $Model->getLocationsArray();
     $location_features = array();
-
-    if ( !array_key_exists('min_latitude', $bounds) ) {
-        throw new BadRequestException(__('min_latitude bounds required when request is clustered.'));
-    }
-    if ( !array_key_exists('max_latitude', $bounds) ) {
-        throw new BadRequestException(__('max_latitude bounds required when request is clustered.'));
-    }
-    if ( !array_key_exists('min_longitude', $bounds) ) {
-        throw new BadRequestException(__('min_longitude bounds required when request is clustered.'));
-    }
-    if ( !array_key_exists('max_longitude', $bounds) ) {
-        throw new BadRequestException(__('max_longitude bounds required when request is clustered.'));
-    }
 
     // The grid is based on the bounds.
     $min_long = $bounds['min_longitude'];
@@ -81,22 +67,19 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
     );
 
     // Iterate over the locations (pass instance location by reference)
-    foreach($locations as $location) {
+    foreach($Model->occurrencesInBounds($bounds) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
-        // If the location is within the bounds,
-        // then place the location's id within the transformed array at the transformed grid location
-        if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
-            // transform the latitude and longitude into our grid co-ordinates
-            $transformed_longitude = floor( ( $longitude - $min_long ) / $side );
-            $transformed_latitude  = floor( ( $latitude - $min_lat ) / $side );
 
-            // Look up the grid array for this transformed location
-            $this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
+        // transform the latitude and longitude into our grid co-ordinates
+        $transformed_longitude = floor( ( $longitude - $min_long ) / $side );
+        $transformed_latitude  = floor( ( $latitude - $min_lat ) / $side );
 
-            // Append the location into the grid's array
-            $this_locations_array[] = $location;
-        }
+        // Look up the grid array for this transformed location
+        $this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
+
+        // Append the location into the grid's array
+        $this_locations_array[] = $location;
     }
 
     // just to be fancy, work out the ordered list of cluster sizes
@@ -120,7 +103,7 @@ function get_features_squaregrid(Model $Model, $bounds = array() ) {
 
                 $lat_min = (    $j    * $side) + $min_lat;
                 $lat_max = ( ($j + 1) * $side) + $min_lat;
-                
+
                 $coords = array(
                     array($long_min, $lat_min),
                     array($long_min, $lat_max),

@@ -17,6 +17,7 @@
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
+    $this->Html->script('yearslider', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
@@ -47,22 +48,23 @@
         <h1>new vetting</h1>
         <div class="toolcontent">
             <div id="newvet_control" class="newvet_control">
-                <button id="newvet_draw_polygon_button" class="draw_polygon" title="draw vetting polygons">&#9997; Draw Vetting Polygons</button>
-                <button id="newvet_reshape_polygon_button" class="reshape_polygon" title="reshape vetting polygons">&#9988; Reshape Vetting Polygons</button>
-                <button id="newvet_move_polygon_button" class="move_polygon" title="move vetting polygons">&#10012; Move Vetting Polygons</button>
-                <button id="newvet_clear_polygon_button" class="clear_polygon" title="clear vetting polygons">&#9760; Clear Vetting Polygons</button>
+                <!-- <button id="newvet_draw_polygon_button" class="toggle draw_polygon" title="draw vetting polygons">&#9997; Draw Vetting Polygons</button> -->
+                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button>
+                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-pencil"></span>Modify An Area</button>
+                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button>
+<!--                <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="delete all areas"><span class="ui-icon ui-icon-trash"></span>Delete All Areas</button> -->
             </div>
             <!-- new vet form -->
             <form id="vetform">
                 <legend>Classification
                     <select id="vetclassification" name="classification">
-                        <option value="unknown" selected>unknown</option>
+                        <option value="" selected=true>-- classify these areas --</option>
+                        <option value="unknown">unknown</option>
                         <option value="invalid">invalid</option>
                         <option value="historic">historic</option>
                         <option value="vagrant">vagrant</option>
                         <option value="irruptive">irruptive</option>
                         <option value="non-breeding">non-breeding</option>
-                        <option value="introduced non-breeding">introduced non-breeding</option>
                         <option value="breeding">breeding</option>
                         <option value="introduced breeding">introduced breeding</option>
                     </select>
@@ -70,8 +72,8 @@
                 <legend>Comment
                     <textarea id="vetcomment" name="comment"></textarea>
                 </legend>
-                <button id="vet_submit">vet</button>
             </form>
+            <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this vetting</button>
 
             <div id="vethint" class="hint"></div>
         </div>
@@ -107,18 +109,9 @@
                 <option value="sresb1">sresb1</option>
                 <option value="sresa2">sresa2</option>
             </select>
-            <select id="year_selector">
-                <option value="1990">1990</option>
-                <option value="2000">2000</option>
-                <option value="2010">2010</option>
-                <option value="2020" selected="selected">2020</option>
-                <option value="2030">2030</option>
-                <option value="2040">2040</option>
-                <option value="2050">2050</option>
-                <option value="2060">2060</option>
-                <option value="2070">2070</option>
-                <option value="2080">2080</option>
-            </select>
+            <span id="year_label"></span>
+            <button id="play_slider_button">Play</button>
+            <div id="year_slider"></div>
         </div>
     </div>
 

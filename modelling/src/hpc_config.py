@@ -51,3 +51,11 @@ class HPCConfig:
         db.connect(config)
 
         return db
+
+    @staticmethod
+    def disposeDB():
+        db.engine.dispose()
+
+    @staticmethod
+    def closeDB():
+        db.engine.close()

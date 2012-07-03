@@ -111,57 +111,61 @@ class HPCJob:
         try:
             # Connect the DB
             HPCConfig.connectDB()
+            try:
+                # Select the species row that matches this job's species
+                species_row = db.species.select()\
+                        .where(db.species.c.id == self.speciesId)\
+                        .execute().fetchone()
+                if species_row == None:
+                    # We didn't find the species in the table..
+                    # this shouldn't happen...
+                   raise Exception("Couldn't find species with id " + self.speciesId + " in table. This shouldn't happen.")
+                else:
+                    # We foudn it
+                    # Now record the no. of dirtyOccurrences
+                    dirtyOccurrences = species_row['num_dirty_occurrences']
+                    self._setDirtyOccurrences(dirtyOccurrences)
+                    log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
 
-            # Select the species row that matches this job's species
-            species_row = db.species.select()\
-                    .where(db.species.c.id == self.speciesId)\
-                    .execute().fetchone()
-            if species_row == None:
-                # We didn't find the species in the table..
-                # this shouldn't happen...
-               raise Exception("Couldn't find species with id " + self.speciesId + " in table. This shouldn't happen.")
-            else:
-                # We foudn it
-                # Now record the no. of dirtyOccurrences
-                dirtyOccurrences = species_row['num_dirty_occurrences']
-                self._setDirtyOccurrences(dirtyOccurrences)
-                log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
+                    # Create a tempfile to write our csv file to
+                    f = tempfile.NamedTemporaryFile(delete=False)
+                    try:
+                        # Remember the path to the csv file
+                        self._setTempfile(f.name)
+                        log.debug("Writing csv to: %s", f.name)
+                        writer = csv.writer(f)
+                        # Write the header
+                        writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
 
-                # Create a tempfile to write our csv file to
-                f = tempfile.NamedTemporaryFile(delete=False)
-                # Remember the path to the csv file
-                self._setTempfile(f.name)
-                log.debug("Writing csv to: %s", f.name)
-                writer = csv.writer(f)
-                # Write the header
-                writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
+                        # Select the occurrences for this species
+                        occurrence_rows = sqlalchemy.select([
+                            'ST_X(location) as longitude',
+                            'ST_Y(location) as latitude',
+                            'ST_X(sensitive_location) as sensitive_longitude',
+                            'ST_Y(sensitive_location) as sensitive_latitude']).\
+                            select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
+                            where(db.occurrences.c.species_id == self.speciesId).\
+                            execute()
 
-                # Select the occurrences for this species
-                occurrence_rows = sqlalchemy.select([
-                    'ST_X(location) as longitude',
-                    'ST_Y(location) as latitude',
-                    'ST_X(sensitive_location) as sensitive_longitude',
-                    'ST_Y(sensitive_location) as sensitive_latitude']).\
-                    select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
-                    where(db.occurrences.c.species_id == self.speciesId).\
-                    execute()
+                        # Iterate over the occurrences, and write them to the csv
+                        for occurrence_row in occurrence_rows:
+                            if occurrence_row['sensitive_longitude'] is None:
+                                lat = occurrence_row['latitude']
+                                lon = occurrence_row['longitude']
+                            else:
+                                lat = occurrence_row['sensitive_latitude']
+                                lon = occurrence_row['sensitive_longitude']
+                            writer.writerow([self.speciesId, lat, lon])
 
-                # Iterate over the occurrences, and write them to the csv
-                for occurrence_row in occurrence_rows:
-                    if occurrence_row['sensitive_longitude'] is None:
-                        lat = occurrence_row['latitude']
-                        lon = occurrence_row['longitude']
-                    else:
-                        lat = occurrence_row['sensitive_latitude']
-                        lon = occurrence_row['sensitive_longitude']
-                    writer.writerow([self.speciesId, lat, lon])
-
-                # Be a good file citizen, and close the file handle
-                f.close()
+                    finally:
+                        # Be a good file citizen, and close the file handle
+                        f.close()
+            finally:
+                # Close the DB
+                HPCConfig.closeDB();
         except Exception as e:
             log.warn("Exception while trying to write CSV file species. Exception: %s", e)
             raise
-
     # Allow someone to use this class with the *with* syntax
     def __enter__(self):
         return self

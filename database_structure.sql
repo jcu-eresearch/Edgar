@@ -1,7 +1,7 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
 DROP FUNCTION IF EXISTS EdgarUpdateVettings(INT);
-DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, INT, bytea);
+DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, DATE, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, INT, bytea);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
 DROP TABLE IF EXISTS sources;
@@ -88,6 +88,7 @@ CREATE TABLE sources (
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
     uncertainty INT NOT NULL, -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box. Bounding box makes sense, if the lat/lon are rounded.
+    date DATE NULL, -- when the occurrence/sighting happened
     classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
     source_classification classification NOT NULL, -- The vetting classification as obtained from the source (i.e. ALA assertions translated to our vettings system)
     source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
@@ -103,8 +104,9 @@ ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
 CREATE INDEX occurrences_species_id_idx ON occurrences (species_id);
 CREATE UNIQUE INDEX occurrences_source_record_idx ON occurrences (source_id, source_record_id);
 CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
--- Do this manually, can take hours:
--- CLUSTER occurrences USING occurrences_location_idx;
+-- Reduces disk access for queries with `where species_id = ?` (which is like 100% of queries)
+-- Do this manually, can take hours and a double the disk space of the table:
+-- CLUSTER occurrences USING occurrences_species_id_idx;
 VACUUM ANALYSE occurrences;
 
 
@@ -237,6 +239,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION EdgarUpsertOccurrence(
     inClassification classification,
+    inDate DATE,
     inSRID INT,
     inLat FLOAT,
     inLon FLOAT,
@@ -257,6 +260,7 @@ BEGIN
             location = ST_SetSRID(ST_Point(inLon, inLat), inSRID),
             species_id = inSpeciesId,
             source_classification = inClassification,
+            date = inDate,
             uncertainty = inUncertainty
         WHERE
             source_id = inSourceId
@@ -265,23 +269,25 @@ BEGIN
 
     -- if nothing was updated, insert new row
     IF inOccurrenceId IS NULL THEN
-        INSERT INTO occurrences
-            (location,
+        INSERT INTO occurrences (
+                location,
                 source_classification,
                 classification,
+                date,
                 uncertainty,
                 species_id,
                 source_id,
-                source_record_id)
-            VALUES
-                (ST_SetSRID(ST_Point(inLon, inLat), inSRID),
-                    inClassification,
-                    inClassification,
-                    inUncertainty,
-                    inSpeciesId,
-                    inSourceId,
-                    inSourceRecordId)
-            RETURNING id INTO inOccurrenceId;
+                source_record_id
+            ) VALUES (
+                ST_SetSRID(ST_Point(inLon, inLat), inSRID),
+                inClassification,
+                inClassification,
+                inDate,
+                inUncertainty,
+                inSpeciesId,
+                inSourceId,
+                inSourceRecordId
+            ) RETURNING id INTO inOccurrenceId;
     END IF;
 
     -- stop if no sensitive coord

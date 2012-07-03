@@ -54,9 +54,10 @@ function addMapModes(theMap) {
         //
 
         // illegal transitions
-        if (oldMode === 'blank' && newMode === 'future')   // can't skip current
-        || (oldMode === 'blank' && newMode === 'vetting')  // can't skip current
-        || (newMode === 'blank') {                         // can't return to blank
+        if ( (oldMode === 'blank' && newMode === 'future') ||  // can't skip current
+             (oldMode === 'blank' && newMode === 'vetting') || // can't skip current
+             (newMode === 'blank')
+        ) {                           // can't return to blank
             consolelog('illegal mode transition: cannot move from "' + oldMode + '" to "' + newMode + '".');
         }
 
@@ -88,16 +89,8 @@ function addMapModes(theMap) {
     // bind a handler that remembers the destination mode for later use
     $map.bind('changemode', function(event, newMode) {
         theMap.destinationMode = newMode;
-consolelog('one ============');
-event.preventDefault();
     });
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// bind a 2nd handler
-$map.bind('changemode', function(event, newMode) {
-    theMap.destinationMode = newMode;
-consolelog('one ++++++++++++++');
-event.preventDefault();
-});
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

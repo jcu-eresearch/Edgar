@@ -9,31 +9,14 @@
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-function get_features_dotgrid(Model $Model, $bounds = array() ) {
+function get_features_dotgrid(Model $Model, $bounds ) {
 
     $GRID_RANGE_LONGITUDE = 120;    // how many longitude slices to make (cut into GRID_RANGE_LONGITUDE along the x axis)
     $MIN_FEATURE_RADIUS   = 3;     // pixels
 
-    $locations = $Model->getLocationsArray();
     $location_features = array();
 
-    if ( !array_key_exists('min_latitude', $bounds) ) {
-        throw new BadRequestException(__('min_latitude bounds required when request is clustered.'));
-    }
-    if ( !array_key_exists('max_latitude', $bounds) ) {
-        throw new BadRequestException(__('max_latitude bounds required when request is clustered.'));
-    }
-    if ( !array_key_exists('min_longitude', $bounds) ) {
-        throw new BadRequestException(__('min_longitude bounds required when request is clustered.'));
-    }
-    if ( !array_key_exists('max_longitude', $bounds) ) {
-        throw new BadRequestException(__('max_longitude bounds required when request is clustered.'));
-    }
-
-    // Use a grid cluster technique.
-    // Cut the map up into a grid of GRID_RANGE_LONGITUDE x GRID_RANGE_LATITUDE
     // The grid is based on the bounds.
-    // Transform all locations to the nearest grid position
     $min_longitude = $bounds['min_longitude'];
     $max_longitude = $bounds['max_longitude'];
     $min_latitude = $bounds['min_latitude'];
@@ -72,22 +55,19 @@ function get_features_dotgrid(Model $Model, $bounds = array() ) {
     );
 
     // Iterate over the locations (pass instance location by reference)
-    foreach($locations as $location) {
+    foreach($Model->occurrencesInBounds($bounds) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
-        // If the location is within the bounds,
-        // then place the location's id within the transformed array at the transformed grid location
-        if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
-            // transform the latitude and longitude into our grid co-ordinates
-            $transformed_longitude = floor( ( $longitude - $min_longitude ) / $transform_longitude );
-            $transformed_latitude  = floor( ( $latitude - $min_latitude ) / $transform_latitude );
 
-            // Look up the grid array for this transformed location
-            $this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
+        // transform the latitude and longitude into our grid co-ordinates
+        $transformed_longitude = floor( ( $longitude - $min_longitude ) / $transform_longitude );
+        $transformed_latitude  = floor( ( $latitude - $min_latitude ) / $transform_latitude );
 
-            // Append the location's id into the grid's array
-            $this_locations_array[] = $location['id'];
-        }
+        // Look up the grid array for this transformed location
+        $this_locations_array = &$transformed_array[$transformed_longitude][$transformed_latitude];
+
+        // Append the location's id into the grid's array
+        $this_locations_array[] = $location['id'];
     }
 
     // Iterate over our transformed array (our grid array)

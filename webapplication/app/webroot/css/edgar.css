@@ -751,10 +751,13 @@ pre {
     padding: 0.3em;
     text-align: left;
     margin: 0.2em 0;
+    width: 100%;
+    line-height: 16px;
 }
 
-#newvet_control button {
-    width: 100%;
+#newvet button .ui-icon {
+    float: left;
+    margin-right: 1em;
 }
 
 /* General Toolbar Styles */
@@ -787,8 +790,6 @@ div.hint p:before {
 div.hint .info {
 }
 
-button.button_down {
-    background-color: #ff6;
-    border: #000 solid 2px;
+button.ui-state-active {
 }
 
