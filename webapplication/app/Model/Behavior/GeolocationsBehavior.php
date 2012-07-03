@@ -27,7 +27,7 @@ class GeolocationsBehavior extends ModelBehavior {
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-    public function toGeoJSONArray(Model $Model, $bounds = array(), $cluster_type="dotradius" ) {
+    public function toGeoJSONArray(Model $Model, $bounds = null, $cluster_type="dotradius" ) {
 
         include 'clustering/dotradius.php';
         include 'clustering/dotgrid.php';
@@ -49,23 +49,21 @@ class GeolocationsBehavior extends ModelBehavior {
 
         } else {
             // unrecognised clustering type, or clustering type == none
-            foreach($Model->getLocationsArray() as $location) {
+            foreach($Model->occurrencesInBounds($bounds) as $location) {
                 $longitude = $location['longitude'];
                 $latitude = $location['latitude'];
-                if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
-                    $location_features[] = array(
-                        "type" => "Feature",
-                        'properties' => array(
-                            'title' => "Occurrence",
-                            'description' => "<dl><dt>Latitude</dt><dd>$latitude</dd><dt>Longitude</dt><dd>$longitude</dd>",
-                            'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS
-                        ),
-                        'geometry' => array(
-                            'type' => 'Point',
-                            'coordinates' => array($location['longitude'], $location['latitude']),
-                        ),
-                    );
-                }
+                $location_features[] = array(
+                    "type" => "Feature",
+                    'properties' => array(
+                        'title' => "Occurrence",
+                        'description' => "<dl><dt>Latitude</dt><dd>$latitude</dd><dt>Longitude</dt><dd>$longitude</dd>",
+                        'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS
+                    ),
+                    'geometry' => array(
+                        'type' => 'Point',
+                        'coordinates' => array($longitude, $latitude),
+                    ),
+                );
             }
         }
 
@@ -75,62 +73,4 @@ class GeolocationsBehavior extends ModelBehavior {
         );
         return $geoObject;
     }
-
-    public static function getLocationsWithinBounds($locations, $bounds = array()) {
-        $returnArray = array();
-        foreach($locations as $location) {
-            $longitude = $location['longitude'];
-            $latitude = $location['latitude'];
-            if ( GeolocationsBehavior::withinBounds($longitude, $latitude, $bounds) ) {
-                array_push($returnArray,$location);
-            }
-        }
-        return $returnArray;
-    }
-
-    /**
-     * Returns true if the locations's latitude and longitude are within bounds.
-     *
-     * Only checks against bounds' existing keys.
-     * bounds' keys are:
-     *  min_latitude
-     *  max_latitude
-     *  min_longitude
-     *  max_longitude
-     *
-     * Bounds can be an empty array.
-     */
-    public static function withinBounds($longitude, $latitude, $bounds = array()) {
-        // > max lon
-        if ( array_key_exists('max_longitude', $bounds) ) {
-            if ( $longitude > $bounds['max_longitude'] ) {
-                return false;
-            }
-        }
-
-        // < max lon
-        if ( array_key_exists('min_longitude', $bounds) ) {
-            if ( $longitude < $bounds['min_longitude'] ) {
-                return false;
-            }
-        }
-
-        // > max lat
-        if ( array_key_exists('max_latitude', $bounds) ) {
-            if ( $latitude > $bounds['max_latitude'] ) {
-                return false;
-            }
-        }
-
-        // < min lat
-        if ( array_key_exists('min_latitude', $bounds) ) {
-            if ( $latitude < $bounds['min_latitude'] ) {
-                return false;
-            }
-        }
-
-        return true;
-
-    }
-
 }

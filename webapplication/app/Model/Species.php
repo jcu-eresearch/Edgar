@@ -27,16 +27,25 @@ class Species extends AppModel {
         )
     );
 
-    // Return an array of locations
-    // Needed for the Geolocations behaviour
-    public function getLocationsArray() {
-        $results = $this->getDataSource()->execute(
-            'SELECT ST_X(location::geometry) as longitude, ST_Y(location::geometry) as latitude '.
-            'FROM occurrences '.
-            'WHERE species_id = ?',
+    // Returns a PDOStatement of occurrence rows within the bounding box for this species
+    public function occurrencesInBounds($bounds=null) {
+        $sql = 'SELECT ST_X(location) as longitude, ST_Y(location) as latitude '.
+               'FROM occurrences '.
+               'WHERE species_id = ? ';
+
+        if($bounds !== null){
+            $bounds = sprintf("SetSRID('BOX(%.12F %.12F,%.12F %.12F)'::box2d,4326)",
+                              $bounds['min_longitude'],
+                              $bounds['min_latitude'],
+                              $bounds['max_longitude'],
+                              $bounds['max_latitude']);
+            $sql .= 'AND location && ' . $bounds;
+        }
+
+        return $this->getDataSource()->execute(
+            $sql,
             array(),
             array($this->data['Species']['id'])
         );
-        return $results;
     }
 }
