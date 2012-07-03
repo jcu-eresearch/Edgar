@@ -105,6 +105,16 @@ function handleDeleteSelectedPolygonClick(e) {
     e.preventDefault();
     currentFeature = new_vet_modify_polygon_control.feature;
     if(currentFeature) {
+        // Unselect the feature.
+        new_vet_modify_polygon_control.unselectFeature(currentFeature);
+        // Delete any modify control vertices.
+        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.virtualVertices, { silent: true });
+        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.vertices, { silent: true });
+        // Delete the radius handle.
+        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.radiusHandle, { silent: true });
+        // Delete the drag handle.
+        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.dragHandle, { silent: true });
+        // Delete the selected feature
         new_vet_vectors.removeFeatures(currentFeature);
     }
 }
