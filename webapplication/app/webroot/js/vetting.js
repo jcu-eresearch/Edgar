@@ -295,6 +295,11 @@ function validateNewVetForm() {
     // Get features from the vector layer (which are all known to be polygons)
     var new_vet_polygon_features = new_vet_vectors.features;
 
+    if(Edgar.mapdata.species === null) {
+        alert("No species selected");
+        return false;
+    }
+
     if (new_vet_polygon_features.length === 0) {
         alert("No polygons provided");
         $('#newvet_add_polygon_button').effect("highlight", {}, 5000);
