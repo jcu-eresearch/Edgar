@@ -55,7 +55,3 @@ class HPCConfig:
     @staticmethod
     def disposeDB():
         db.engine.dispose()
-
-    @staticmethod
-    def closeDB():
-        db.engine.close()

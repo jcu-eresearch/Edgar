@@ -161,8 +161,8 @@ class HPCJob:
                         # Be a good file citizen, and close the file handle
                         f.close()
             finally:
-                # Close the DB
-                HPCConfig.closeDB();
+                # Dispose the DB
+                HPCConfig.disposeDB();
         except Exception as e:
             log.warn("Exception while trying to write CSV file species. Exception: %s", e)
             raise
