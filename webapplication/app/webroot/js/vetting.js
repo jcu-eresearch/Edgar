@@ -116,7 +116,14 @@ function handleDeleteSelectedPolygonClick(e) {
         new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.dragHandle, { silent: true });
         // Delete the selected feature
         new_vet_vectors.removeFeatures(currentFeature);
+
+        // If all Features are now deleted,
+        // clear the vetting mode (get out of modify mode)
+        if (new_vet_vectors.features.length === 0) {
+            clearNewVettingMode();
+        }
     }
+
 }
 
 function handleDeleteAllPolygonClick(e) {
