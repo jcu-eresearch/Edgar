@@ -50,7 +50,8 @@
                 <!-- <button id="newvet_draw_polygon_button" class="toggle draw_polygon" title="draw vetting polygons">&#9997; Draw Vetting Polygons</button> -->
                 <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button>
                 <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-pencil"></span>Modify An Area</button>
-                <button id="newvet_clear_polygon_button" class="ui-state-default ui-corner-all non_toggle clear_polygon" title="clear areas"><span class="ui-icon ui-icon-trash"></span>Clear All Areas</button>
+                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button>
+<!--                <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="delete all areas"><span class="ui-icon ui-icon-trash"></span>Delete All Areas</button> -->
             </div>
             <!-- new vet form -->
             <form id="vetform">

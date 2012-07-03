@@ -2,7 +2,7 @@
 JS for doing vetting
 */
 
-var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control, new_vet_move_polyogn_control;
+var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control;
 // buttons 100%..
 // buttons text
 // make button to drop in polygon..
@@ -85,14 +85,7 @@ function handleAddPolygonClick(e) {
         new OpenLayers.Geometry.Point(centerOfMap.lon + largerFraction, centerOfMap.lat),
         new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - largerFraction)
     ];
-/*
-    var points = [
-        new OpenLayers.Geometry.Point(0, 0),
-        new OpenLayers.Geometry.Point(0, 100),
-        new OpenLayers.Geometry.Point(100, 100),
-        new OpenLayers.Geometry.Point(100, 0)
-    ];
-*/
+
     var ring = new OpenLayers.Geometry.LinearRing(points);
     var polygon = new OpenLayers.Geometry.Polygon([ring]);
 
@@ -108,7 +101,15 @@ function handleAddPolygonClick(e) {
     //new_vet_vectors.redraw();
 }
 
-function handleClearPolygonClick(e) {
+function handleDeleteSelectedPolygonClick(e) {
+    e.preventDefault();
+    currentFeature = new_vet_modify_polygon_control.feature;
+    if(currentFeature) {
+        new_vet_vectors.removeFeatures(currentFeature);
+    }
+}
+
+function handleDeleteAllPolygonClick(e) {
     e.preventDefault();
 
     clearNewVettingMode();
@@ -172,8 +173,16 @@ function initVetting() {
         OpenLayers.Handler.Polygon
     );
 
-    new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors);
-    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
+    new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors, {
+        mode: OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG,
+        beforeSelectFeature: function(feature) { 
+            $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled");
+        },
+        unselectFeature: function(feature) { 
+            $('#newvet_delete_selected_polygon_button').attr("disabled", true).addClass("ui-state-disabled");
+        }
+    });
+//    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
 
 
     // handle draw polygon press
@@ -191,9 +200,14 @@ function initVetting() {
         handleModifyPolygonClick(e);
     });
 
-    // handle clear polygon press
-    $('#newvet_clear_polygon_button').click( function(e) {
-        handleClearPolygonClick(e);
+    // handle delete selected polygon press
+    $('#newvet_delete_selected_polygon_button').click( function(e) {
+        handleDeleteSelectedPolygonClick(e);
+    });
+
+    // handle delete all polygon press
+    $('#newvet_delete_all_polygons_button').click( function(e) {
+        handleDeleteAllPolygonClick(e);
     });
 
     // toggle the ui-state-hover class on hover events
