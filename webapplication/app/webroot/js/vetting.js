@@ -246,13 +246,6 @@ function initVetting() {
 
 function createNewVetting() {
     console.log("Processing create new vetting");
-    // Get features from the vector layer (which are all known to be polygons)
-    var new_vet_polygon_features = new_vet_vectors.features;
-
-    if (new_vet_polygon_features.length === 0) {
-        alert("No polygons provided");
-        return false;
-    }
 
     // Now convert our array of features into an array of geometries.
     var new_vet_polygon_geoms = [];
@@ -296,6 +289,27 @@ function createNewVetting() {
     return true;
 }
 
+// Returns true if valid
+// Returns false else
+function validateNewVetForm() {
+    // Get features from the vector layer (which are all known to be polygons)
+    var new_vet_polygon_features = new_vet_vectors.features;
+
+    if (new_vet_polygon_features.length === 0) {
+        alert("No polygons provided");
+        $('#newvet_add_polygon_button').effect("highlight", {}, 5000);
+        return false;
+    }
+
+    if ($('#vetclassification').val() === '') {
+        alert("No classification provided");
+        $('#vetclassification').effect("highlight", {}, 5000);
+        return false;
+    }
+
+    return true;
+}
+
 $(function() {
 
     var vetpanel = $('#newvet');
@@ -307,8 +321,13 @@ $(function() {
         // Drop out of any editing mode.
         clearNewVettingMode();
 
-        // Submit the vetting
-        createNewVetting();
+        // if the form was vetting
+        // else
+        if(validateNewVetForm()) {
+            // Submit the vetting
+            createNewVetting();
+        }
+
 
     });
 
