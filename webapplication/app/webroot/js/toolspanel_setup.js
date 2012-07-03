@@ -51,5 +51,9 @@ $(function() {
     Edgar.mapdata.year = parseInt($('#year_selector').val());
     reloadDistributionLayers();
 
+    // 
+    $('#go').click( function() {
+        $(Edgar.map).trigger('changemode', 'future');
+    });
 
 });
