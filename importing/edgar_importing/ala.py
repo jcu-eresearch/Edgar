@@ -14,7 +14,7 @@ import zipfile
 import time
 import logging
 import uuid
-from datetime import datetime
+import datetime
 
 
 PAGE_SIZE = 2000  # occurrence records per request
@@ -55,12 +55,14 @@ class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
     def __init__(self, coord=None, sens_coord=None,
-            uuid_in=None, kosher=False, assertions=[], uncertainty=None):
+            uuid_in=None, kosher=False, assertions=[], uncertainty=None,
+            date=None):
         self.coord = coord
         self.sensitive_coord = sens_coord
         self.is_geospatial_kosher = bool(kosher)
         self.assertions = set(assertions)
         self.uncertainty = uncertainty # in meters (not sure if radius, or AABB)
+        self.date = date # datetime.date or None
 
         if uuid_in is None:
             self.uuid = None
@@ -131,7 +133,10 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
-        'fl': 'id,latitude,longitude,geospatial_kosher,sensitive_longitude,sensitive_latitude,assertions,coordinate_uncertainty',
+        'fl': ','.join(('id', 'latitude', 'longitude', 'geospatial_kosher',
+            'sensitive_longitude', 'sensitive_latitude', 'assertions',
+            'coordinate_uncertainty', 'sensitive_coordinate_uncertainty',
+            'occurrence_date')),
         'facet': 'off'
     }
 
@@ -142,13 +147,27 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
 
     for page in _json_pages(url, params, ('totalRecords',), 'startIndex', use_api_key=True):
         for occ in page['occurrences']:
+
+            uncertainty = None
+            if 'sensitiveCoordinateUncertaintyInMeters' in occ:
+                uncertainty = occ['sensitiveCoordinateUncertaintyInMeters']
+            else:
+                uncertainty = occ['coordinateUncertaintyInMeters']
+
+            date = None
+            if 'eventDate' in occ:
+                # unix timestamp, but in milliseconds instead of seconds
+                ts = occ['eventDate'] / 1000
+                date = datetime.date.fromtimestamp(ts)
+
             yield Occurrence(
                 uuid_in=uuid.UUID(occ['uuid']),
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
                 kosher=(True if occ['geospatialKosher'] == "true" else False),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
-                uncertainty=int(occ['coordinateUncertaintyInMeters'])
+                uncertainty=int(uncertainty),
+                date=date
             )
 
 
@@ -369,7 +388,7 @@ def _q_date_range(from_date, to_date):
     '''Formats a start and end date into a date range string for use in ALA
     queries
 
-    >>> _q_date_range(datetime(2012, 12, 14, 13, 33, 2), None)
+    >>> _q_date_range(datetime.datetime(2012, 12, 14, 13, 33, 2), None)
     '[2012-12-14T13:33:02Z TO *]'
     '''
 
@@ -382,7 +401,7 @@ def _q_date(d):
     The datetime must be naive (without a tzinfo) and represent a UTC time. It
     can also be None, indicating 'any date'.
 
-    >>> _q_date(datetime(2012, 12, 14, 13, 33, 2))
+    >>> _q_date(datetime.datetime(2012, 12, 14, 13, 33, 2))
     '2012-12-14T13:33:02Z'
     >>> _q_date(None)
     '*'

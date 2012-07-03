@@ -337,6 +337,7 @@ class Syncer:
 
         sql = '''SELECT EdgarUpsertOccurrence(
             {classi},
+            {date},
             {srid},
             {lat},
             {lon},
@@ -346,7 +347,8 @@ class Syncer:
             {species_id},
             {source_id},
             {record_id});'''.format(
-                classi=''.join(("'", occ.classification, "'")),
+                classi="'{0}'".format(occ.classification),
+                date=('NULL' if occ.date is None else "'{0}'".format(occ.date.isoformat())),
                 srid='4326',
                 lat=str(float(occ.coord.lati)),
                 lon=str(float(occ.coord.longi)),
