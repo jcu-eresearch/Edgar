@@ -300,10 +300,10 @@ class SpeciesController extends AppController {
      * Returns JSON for a jQuery UI autocomplete box
      */
     public function autocomplete() {
-        //get what the user typed in
+        // get what the user typed in
         $partial = strtolower($this->request->query['term']);
 
-        //query db
+        // query db
         $matched_species = $this->Species->find('all', array(
             'conditions' => array('OR' => array(
                 array('lower(scientific_name) LIKE' => '%'.$partial.'%'),
@@ -312,13 +312,13 @@ class SpeciesController extends AppController {
             'order' => array('common_name DESC')
         ));
 
-        //convert $matched_species into json format expected by jquery ui
+        // convert $matched_species into json format expected by jquery ui
         foreach($matched_species as $key => $value){
             $species = $this->_speciesToJson($value['Species']);
             $matched_species[$key] = $species;
         }
 
-        //render json
+        // render json
         $this->set('results', $matched_species);
         $this->set('_serialize', 'results');
     }
@@ -330,8 +330,18 @@ class SpeciesController extends AppController {
         $species = $this->Species->find('first', array(
             'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
             'conditions' => array(
-                'num_dirty_occurrences >' => 0,
-                'current_model_status' => null
+                'OR' => array(
+                    // Run any models that haven't started yet...
+                    array(
+                        'num_dirty_occurrences >' => 0,
+                        'current_model_status' => null
+                    ),
+                    // Run old models again...
+                    array(
+                        'num_dirty_occurrences >' => 0,
+                        'current_model_queued_time <' => date(DATE_ISO8601, strtotime("-1 days"))
+                    )
+                )
             ),
             'order' => array(
                 'is_null' => 'ASC',
@@ -366,13 +376,48 @@ class SpeciesController extends AppController {
             $this->dieWithStatus(404, 'No species found with given id');
 
         $jobStatus = $this->request->data('job_status');
-        if($jobStatus === 'FINISHED_SUCCESS' || $jobStatus === 'FINISHED_FAILURE'){
-            $occurrencesCleared = (int)$this->request->data('dirty_occurrences');
-            $species['Species']['num_dirty_occurrences'] -= $occurrencesCleared;
+
+        // Starting a JOB
+        if($jobStatus === 'QUEUED') {
+            // Update current model info for species
+            $species['Species']['current_model_status'] = $jobStatus;
+            // Record when the job started
+            $species['Species']['current_model_queued_time'] = date(DATE_ISO8601);
+            // Record the importance of the job
+            if($species['Species']['first_requested_remodel'] !== null) {
+                $species['Species']['current_model_importance'] = 2;
+            } else {
+                $species['Species']['current_model_importance'] = 1;
+            }
+        // Finished a JOB
+        } elseif($jobStatus === 'FINISHED_SUCCESS' or $jobStatus === 'FINISHED_FAILURE') {
+            // Get job status message
+            $jobStatusMessage = $this->request->data('job_status_message');
+
+            // Update last completed model info
+            $species['Species']['last_completed_model_queued_time']   = $species['Species']['current_model_queued_time'];
+            $species['Species']['last_completed_model_finish_time']   = date(DATE_ISO8601);
+            $species['Species']['last_completed_model_importance']    = $species['Species']['current_model_importance'];
+            $species['Species']['last_completed_model_status']        = $jobStatus;
+            $species['Species']['last_completed_model_status_reason'] = $jobStatusMessage;
+
+            // Update last successfully completed model info
+            if($jobStatus === 'FINISHED_SUCCESS') {
+                $species['Species']['last_successfully_completed_model_queued_time'] = $species['Species']['last_completed_model_queued_time'];
+                $species['Species']['last_successfully_completed_model_finish_time'] = $species['Species']['last_completed_model_finish_time'];
+                $species['Species']['last_successfully_completed_model_importance']  = $species['Species']['last_completed_model_importance'];
+
+                $occurrencesCleared = (int)$this->request->data('dirty_occurrences');
+                $species['Species']['num_dirty_occurrences'] -= $occurrencesCleared;
+            }
+
             $species['Species']['current_model_status'] = null;
+            $species['Species']['current_model_importance'] = null;
+            $species['Species']['current_model_queued_time'] = null;
             $species['Species']['first_requested_remodel'] = null;
+
+        // Part way through a JOB
         } else {
-            //$jobStatusMsg = $this->request->data('job_status_message');
             $species['Species']['current_model_status'] = $jobStatus;
         }
 
