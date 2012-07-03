@@ -104,8 +104,9 @@ ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
 CREATE INDEX occurrences_species_id_idx ON occurrences (species_id);
 CREATE UNIQUE INDEX occurrences_source_record_idx ON occurrences (source_id, source_record_id);
 CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
--- Do this manually, can take hours:
--- CLUSTER occurrences USING occurrences_location_idx;
+-- Reduces disk access for queries with `where species_id = ?` (which is like 100% of queries)
+-- Do this manually, can take hours and a double the disk space of the table:
+-- CLUSTER occurrences USING occurrences_species_id_idx;
 VACUUM ANALYSE occurrences;
 
 
