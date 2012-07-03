@@ -6,8 +6,7 @@
 
 // convenient debug method
 function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
-
-
+// ------------------------------------------------------------------
 var occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
 
 // Projections
@@ -38,11 +37,11 @@ zoom_bounds = australia_bounds;
 // Edgar bing api key.
 // (registered under Robert's name)
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
-
+// ------------------------------------------------------------------
 function speciesGeoJSONURL() {
     return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.mapdata.species.id + ".json");
 }
-
+// ------------------------------------------------------------------
 function legendURL() {
     var speciesId = Edgar.mapdata.species.id;
     var data = speciesId + '/1975.asc';
@@ -50,20 +49,19 @@ function legendURL() {
         '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
 
 }
-
+// ------------------------------------------------------------------
 function updateLegend() {
     $('#map_legend_img').attr('src', legendURL());
 }
-
+// ------------------------------------------------------------------
 function showLegend() {
     $('#map_legend_img').show();
 }
-
+// ------------------------------------------------------------------
 function hideLegend() {
     $('#map_legend_img').hide();
 }
-
-
+// ------------------------------------------------------------------
 // Removes the old layers..
 // Adds the new fresh layers.
 // Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
@@ -81,7 +79,7 @@ function clearExistingSpeciesOccurrencesAndDistributionLayers() {
     clearMapPopups();
     hideLegend();
 }
-
+// ------------------------------------------------------------------
 function clearExistingSpeciesOccurrencesLayer() {
     // Remove old layers.
     if (occurrences !== undefined) {
@@ -107,7 +105,7 @@ function clearExistingSpeciesOccurrencesLayer() {
         vettingLayerControl = undefined;
     }
 }
-
+// ------------------------------------------------------------------
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
     addVettingLayer();
@@ -116,13 +114,13 @@ function addSpeciesOccurrencesAndDistributionLayers() {
     updateLegend();
     showLegend();
 }
-
+// ------------------------------------------------------------------
 function clearMapPopups() {
     $.each(Edgar.map.popups, function(index, popup) {
         Edgar.map.removePopup(popup);
     });
 }
-
+// ------------------------------------------------------------------
 function reloadDistributionLayers() {
     if (distribution !== undefined) {
         Edgar.map.removeLayer(distribution);
@@ -130,7 +128,7 @@ function reloadDistributionLayers() {
     }
     addDistributionLayer();
 }
-
+// ------------------------------------------------------------------
 function addDistributionLayer() {
     var mapPath;
 
@@ -192,7 +190,7 @@ function addDistributionLayer() {
         Edgar.map.addLayer(distribution);
     }
 }
-
+// ------------------------------------------------------------------
 function addVettingLayer() {
     console.log('Adding vetting layer')
     var format = new OpenLayers.Format.GeoJSON({});
@@ -230,10 +228,9 @@ function addVettingLayer() {
     Edgar.map.addControl(vettingLayerControl);
     vettingLayerControl.activate();
 }
-
+// ------------------------------------------------------------------
 function addOccurrencesLayer() {
         // Occurrences Layer
-        // -----------------
 
         // See: http://geojson.org/geojson-spec.html For the GeoJSON spec.
         var occurrences_format = new OpenLayers.Format.GeoJSON({
@@ -419,11 +416,11 @@ function addOccurrencesLayer() {
         Edgar.map.addControl(occurrence_select_control);
         occurrence_select_control.activate();
 }
-
+// ------------------------------------------------------------------
 function flattenScientificName(name) {
     return $.trim(name).replace(/\./g, '').replace(/\s/g, '_');
 }
-
+// ------------------------------------------------------------------
 function updateWindowHistory() {
     if(window.History.enabled) {
         window.History.replaceState(
@@ -433,7 +430,8 @@ function updateWindowHistory() {
         );
     }
 }
-
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
 $(function() {
 
     // The Map Object
@@ -657,10 +655,13 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // Zoom the map to the zoom_bounds specified earlier
     Edgar.map.zoomToExtent(zoom_bounds);
 
+    addMapModes(Edgar.map);
+
     addLegend();
 
 });
-
+// ------------------------------------------------------------------
 function addLegend() {
 }
+// ------------------------------------------------------------------
 

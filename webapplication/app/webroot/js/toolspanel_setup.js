@@ -48,8 +48,20 @@ $(function() {
         Edgar.yearSlider.setSpeciesId(sid);
     });
 
+    $('#use_emission_and_year').change(reloadDistributionLayers);
+
+    Edgar.mapdata.emissionScenario = $('#emission_scenarios').val();
+    Edgar.mapdata.year = parseInt($('#year_selector').val());
+    reloadDistributionLayers();
+
     $('#play_slider_button').click(function(){
         Edgar.yearSlider.playAnimation();
+    });
+
+    // test the mode changing stuff
+    
+    $('#go').click( function() {
+        $(Edgar.map).trigger('changemode', 'future');
     });
 
 });

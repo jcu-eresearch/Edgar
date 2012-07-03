@@ -103,8 +103,8 @@ function loadingChanged() {
 // ------------------------------------------------------------------
 $(function() {
     // animate the map opacity
-    $('#go').click( function() {
-        loading();
-    });
+//    $('#go').click( function() {
+//        loading();
+//    });
 });
 // ------------------------------------------------------------------

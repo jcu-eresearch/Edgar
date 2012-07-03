@@ -21,6 +21,7 @@
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
+    $this->Html->script('mapmodes', array('inline'=>false));
     $this->Html->script('vetting', array('inline'=>false));
 
     // the init stuff needs to go early
