@@ -20,5 +20,7 @@ Edgar.mapdata.emissionScenario = null; //(string) identifier for current emissio
 Edgar.mapdata.year = null; //(integer) the year that the suitability map represents (e.g. 2010)
 
 // logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
-Edgar.user = null;
+if(!Edgar.user) {
+    Edgar.user = null;
+}
 

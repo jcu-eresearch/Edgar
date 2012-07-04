@@ -25,6 +25,10 @@ function initExistingVettingInterface() {
             'strokeOpacity': 1.0
         }
     });
+
+    console.log("USER:");
+    console.log(Edgar);
+
     vettingLayer = new OpenLayers.Layer.Vector('Vetting Areas', {
         isBaseLayer: false,
         projection: geographic_proj,
@@ -32,6 +36,9 @@ function initExistingVettingInterface() {
         protocol: new OpenLayers.Protocol.HTTP({
             url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.mapdata.species.id + ".json"),
             format: new OpenLayers.Format.GeoJSON({}),
+            params: {
+                by_user_id: Edgar.user.id
+            }
         }),
         styleMap: vettingStyleMap
     });
@@ -51,8 +58,8 @@ function initExistingVettingInterface() {
 
 function vettingLayerUpdated() {
     // Clear the list of existing features
-    var other_peoples_vettings_list = $('#other_peoples_vettings_list');
-    other_peoples_vettings_list.empty();
+    var $my_vettings_list = $('#my_vettings_list');
+    $my_vettings_list.empty();
 
     // Process Vetting Layer Features.
     var vetting_features = vettingLayer.features;
@@ -64,9 +71,9 @@ function vettingLayerUpdated() {
         console.log(feature_data);
         var classification = feature_data['classification'];
         var comment = feature_data['comment'];
-        var li_vetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span></li>');
-        li_vetting.data('feature', feature);
-        li_vetting.hover(
+        var $li_vetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span></li>');
+        $li_vetting.data('feature', feature);
+        $li_vetting.hover(
             function(){ 
                 // Select the feature
                 var feature = $(this).data('feature');
@@ -80,7 +87,7 @@ function vettingLayerUpdated() {
                 $(this).removeClass("ui-state-hover"); 
             }
         )
-        other_peoples_vettings_list.append(li_vetting);
+        $my_vettings_list.append($li_vetting);
     }
 
 }
