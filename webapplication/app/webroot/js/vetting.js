@@ -1,11 +1,109 @@
 /*
-JS for doing vetting
+JS for browsing existing vettings,
+and for adding and modifying vettings.
 */
 
+// ************************** New Vetting Code *******************************
 var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_control;
-// buttons 100%..
-// buttons text
-// make button to drop in polygon..
+
+function initNewVettingInterface() {
+    console.log("Starting to init new vetting");
+
+    // DecLat, DecLng 
+    var geographic_proj = new OpenLayers.Projection("EPSG:4326");
+
+    var wkt_in_options = {
+         'internalProjection': Edgar.map.baseLayer.projection,
+         'externalProjection': geographic_proj
+    };
+    wkt = new OpenLayers.Format.WKT(wkt_in_options);
+
+
+// NOTE: Due to OpenLayers Bug.. can't do this.
+//       The modify feature control draws points onto the vector layer
+//       to show vertice drag points.. these drag points fail the geometryType
+//       test.
+    var new_vet_vectors_options = {
+//       'geometryType': OpenLayers.Geometry.Polygon
+    };
+    new_vet_vectors = new OpenLayers.Layer.Vector("New Vetting Layer", new_vet_vectors_options);
+
+    new_vet_draw_polygon_control = new OpenLayers.Control.DrawFeature(
+        new_vet_vectors,
+        OpenLayers.Handler.Polygon
+    );
+
+    new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors, {
+        mode: OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG,
+        beforeSelectFeature: function(feature) { 
+            $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled");
+        },
+        unselectFeature: function(feature) { 
+            $('#newvet_delete_selected_polygon_button').attr("disabled", true).addClass("ui-state-disabled");
+        }
+    });
+
+    // handle draw polygon press
+    $('#newvet_draw_polygon_button').click( function(e) {
+        handleDrawPolygonClick(e);
+    });
+
+    // handle add polygon press
+    $('#newvet_add_polygon_button').click( function(e) {
+        handleAddPolygonClick(e);
+    });
+
+    // handle modify polygon press
+    $('#newvet_modify_polygon_button').click( function(e) {
+        handleModifyPolygonClick(e);
+    });
+
+    // handle delete selected polygon press
+    $('#newvet_delete_selected_polygon_button').click( function(e) {
+        handleDeleteSelectedPolygonClick(e);
+    });
+
+    // handle delete all polygon press
+    $('#newvet_delete_all_polygons_button').click( function(e) {
+        handleDeleteAllPolygonClick(e);
+    });
+
+    // toggle the ui-state-hover class on hover events
+    $('#newvet :button').hover(
+        function(){ 
+            $(this).addClass("ui-state-hover"); 
+        },
+        function(){ 
+            $(this).removeClass("ui-state-hover"); 
+        }
+    )
+
+    var vetpanel = $('#newvet');
+    var vetform = $('#vetform');
+
+    // Add click handler to vet_submit form
+    $('#vet_submit').click( function(e) {
+        e.preventDefault();
+
+        // Drop out of any editing mode.
+        clearNewVettingMode();
+
+        // if the form was vetting
+        // else
+        if(validateNewVetForm()) {
+            // Submit the vetting
+            createNewVetting();
+        }
+
+    });
+
+
+    Edgar.map.addLayers([new_vet_vectors]);
+    Edgar.map.addControl(new_vet_draw_polygon_control)
+    Edgar.map.addControl(new_vet_modify_polygon_control)
+
+    console.log("Finished init new vetting");
+}
 
 function clearNewVettingMode(e) {
     console.log("Clearing current mode");
@@ -20,14 +118,14 @@ function clearNewVettingMode(e) {
     new_vet_modify_polygon_control.deactivate();
     $('#newvet_modify_polygon_button').removeClass('ui-state-active');
 
-    updateHint();
+    updateNewVetHint();
 }
 
 function activateDrawPolygonMode() {
     clearNewVettingMode();
     $('#newvet_draw_polygon_button').addClass('ui-state-active');
     new_vet_draw_polygon_control.activate();
-    updateHint();
+    updateNewVetHint();
 }
 
 function activateModifyPolygonMode() {
@@ -37,7 +135,7 @@ function activateModifyPolygonMode() {
     // Specify the modify mode as reshape and drag 
     new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
     new_vet_modify_polygon_control.activate();
-    updateHint();
+    updateNewVetHint();
 }
 
 function handleToggleButtonClick(e, onActivatingButton, onDeactivatingButton) {
@@ -136,12 +234,12 @@ function handleDeleteAllPolygonClick(e) {
 
     new_vet_vectors.removeAllFeatures();
 
-    updateHint();
+    updateNewVetHint();
 }
 
 
 // Sets the vetting hint to a random hint
-function updateHint() {
+function updateNewVetHint() {
     var drawPolygonHints = [
         ''
     ];
@@ -166,86 +264,6 @@ function updateHint() {
     }
 }
 
-function initVetting() {
-    console.log("Starting to init vetting");
-
-    // DecLat, DecLng 
-    var geographic_proj = new OpenLayers.Projection("EPSG:4326");
-
-    var wkt_in_options = {
-         'internalProjection': Edgar.map.baseLayer.projection,
-         'externalProjection': geographic_proj
-    };
-    wkt = new OpenLayers.Format.WKT(wkt_in_options);
-
-
-// NOTE: Due to OpenLayers Bug.. can't do this.
-//       The modify feature control draws points onto the vector layer
-//       to show vertice drag points.. these drag points fail the geometryType
-//       test.
-    var new_vet_vectors_options = {
-//       'geometryType': OpenLayers.Geometry.Polygon
-    };
-    new_vet_vectors = new OpenLayers.Layer.Vector("New Vetting Layer", new_vet_vectors_options);
-
-    new_vet_draw_polygon_control = new OpenLayers.Control.DrawFeature(
-        new_vet_vectors,
-        OpenLayers.Handler.Polygon
-    );
-
-    new_vet_modify_polygon_control = new OpenLayers.Control.ModifyFeature(new_vet_vectors, {
-        mode: OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG,
-        beforeSelectFeature: function(feature) { 
-            $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled");
-        },
-        unselectFeature: function(feature) { 
-            $('#newvet_delete_selected_polygon_button').attr("disabled", true).addClass("ui-state-disabled");
-        }
-    });
-//    new_vet_modify_polygon_control.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
-
-
-    // handle draw polygon press
-    $('#newvet_draw_polygon_button').click( function(e) {
-        handleDrawPolygonClick(e);
-    });
-
-    // handle add polygon press
-    $('#newvet_add_polygon_button').click( function(e) {
-        handleAddPolygonClick(e);
-    });
-
-    // handle modify polygon press
-    $('#newvet_modify_polygon_button').click( function(e) {
-        handleModifyPolygonClick(e);
-    });
-
-    // handle delete selected polygon press
-    $('#newvet_delete_selected_polygon_button').click( function(e) {
-        handleDeleteSelectedPolygonClick(e);
-    });
-
-    // handle delete all polygon press
-    $('#newvet_delete_all_polygons_button').click( function(e) {
-        handleDeleteAllPolygonClick(e);
-    });
-
-    // toggle the ui-state-hover class on hover events
-    $('#newvet :button').hover(
-        function(){ 
-            $(this).addClass("ui-state-hover"); 
-        },
-        function(){ 
-            $(this).removeClass("ui-state-hover"); 
-        }
-    )
-
-    Edgar.map.addLayers([new_vet_vectors]);
-    Edgar.map.addControl(new_vet_draw_polygon_control)
-    Edgar.map.addControl(new_vet_modify_polygon_control)
-
-    console.log("Finished init vetting");
-}
 
 function createNewVetting() {
     console.log("Processing create new vetting");
@@ -320,26 +338,104 @@ function validateNewVetForm() {
     return true;
 }
 
-$(function() {
 
-    var vetpanel = $('#newvet');
-    var vetform = $('#vetform');
+// ************************** Existing Vettings Code *******************************
+var vettingLayer, vettingLayerControl;
 
-    $('#vet_submit').click( function(e) {
-        e.preventDefault();
+function initExistingVettingInterface() {
+    console.log("Starting to init existing vetting");
 
-        // Drop out of any editing mode.
-        clearNewVettingMode();
+    var geographic_proj = new OpenLayers.Projection("EPSG:4326");
+    var format = new OpenLayers.Format.GeoJSON({});
 
-        // if the form was vetting
-        // else
-        if(validateNewVetForm()) {
-            // Submit the vetting
-            createNewVetting();
+    var vettingStyleMap = new OpenLayers.StyleMap({
+        'default': {
+            'fillOpacity': 0.3,
+            'strokeOpacity': 0.9,
+            'fillColor': '${fill_color}',
+            'strokeColor': '${stroke_color}',
+            'fontColor': '${font_color}',
+            'label': '${classification}',
+        },
+        'select': {
+            'fillOpacity': 1.0,
+            'strokeOpacity': 1.0
         }
-
     });
+    vettingLayer = new OpenLayers.Layer.Vector('Vetting Areas', {
+        isBaseLayer: false,
+        projection: geographic_proj,
+        strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
+        protocol: new OpenLayers.Protocol.HTTP({
+            url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.mapdata.species.id + ".json"),
+            format: new OpenLayers.Format.GeoJSON({}),
+        }),
+        styleMap: vettingStyleMap
+    });
+    vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: true});
+    vettingLayer.events.register('loadend', null, vettingLayerUpdated);
 
-    initVetting();
+    // NOTE: can't have two SelectFeature controls active at the same time...
+    // SO.. TODO:
+    //            convert code to use a single select feature control,
+    //            and inject/remove layers from that select feature as necessary.
+    Edgar.map.addLayer(vettingLayer);
+    Edgar.map.addControl(vettingLayerControl);
+    vettingLayerControl.activate();
 
+    console.log("Finished init existing vetting");
+}
+
+function vettingLayerUpdated() {
+    // Clear the list of existing features
+    var other_peoples_vettings_list = $('#other_peoples_vettings_list');
+    other_peoples_vettings_list.empty();
+
+    // Process Vetting Layer Features.
+    var vetting_features = vettingLayer.features;
+    console.log(vetting_features);
+    for (var feature_index in vetting_features) {
+        var feature = vetting_features[feature_index];
+        var feature_data = feature.data;
+        console.log(feature);
+        console.log(feature_data);
+        var classification = feature_data['classification'];
+        var comment = feature_data['comment'];
+        var li_vetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span></li>');
+        li_vetting.data('feature', feature);
+        li_vetting.hover(
+            function(){ 
+                // Select the feature
+                var feature = $(this).data('feature');
+                vettingLayerControl.select(feature);
+                console.log(feature);
+                $(this).addClass("ui-state-hover"); 
+            },
+            function(){ 
+                // Unselect the feature
+                vettingLayerControl.unselectAll();
+                $(this).removeClass("ui-state-hover"); 
+            }
+        )
+        other_peoples_vettings_list.append(li_vetting);
+    }
+
+}
+
+function destroyExistingVettingInterface() {
+    if(vettingLayer !== undefined) {
+        console.log('Removing vetting layer');
+        Edgar.map.removeLayer(vettingLayer);
+        vettingLayerControl.unselectAll();
+        vettingLayerControl.deactivate();
+        Edgar.map.removeControl(vettingLayerControl);
+        vettingLayer = undefined;
+        vettingLayerControl = undefined;
+        console.log('Removed vetting layer');
+    }
+}
+
+$(function() {
+    initExistingVettingInterface();
+    initNewVettingInterface();
 });
