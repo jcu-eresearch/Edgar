@@ -381,7 +381,7 @@ class Syncer:
             species_to_fetch = db.species.select().execute();
 
         input_q = multiprocessing.Queue(10000)
-        pool = multiprocessing.Pool(8, _mp_init, [input_q, self.ala])
+        pool = multiprocessing.Pool(5, _mp_init, [input_q, self.ala])
         active_workers = 0
 
         # fill the pool full with every species
