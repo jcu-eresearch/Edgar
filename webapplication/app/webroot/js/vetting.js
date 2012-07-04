@@ -338,7 +338,6 @@ $(function() {
             createNewVetting();
         }
 
-
     });
 
     initVetting();

@@ -36,11 +36,18 @@
 <div id="toolspanel" class="side panel toolspanel">
 
     <div id="oldvets" class="tool">
-        <h1>my previous vettings</h1>
+        <h1>vettings</h1>
         <div class="toolcontent">
-            <form id="vetlist">
-                list of old vets goes here
-            </form>
+            <h2>other people's vettings</h2>
+            <ul id="other_peoples_vettings_list">
+                <li>test A</li>
+                <li>test B</li>
+                <li>test C</li>
+            </ul>
+            <h2>my vettings</h2>
+            <ul id="my_vettings_list">
+                <li>test A</li>
+            </ul>
         </div>
     </div>
 
