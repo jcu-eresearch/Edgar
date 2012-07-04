@@ -17,7 +17,8 @@ import uuid
 import datetime
 
 
-PAGE_SIZE = 2000  # occurrence records per request
+OCC_PAGE_SIZE = 2000  # occurrence records per biocache request
+SPECIES_PAGE_SIZE = 500  # species per BIE request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
 
@@ -133,7 +134,8 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
         'fl': ','.join(('id', 'latitude', 'longitude', 'sensitive_longitude',
             'sensitive_latitude', 'assertions', 'coordinate_uncertainty',
             'sensitive_coordinate_uncertainty', 'occurrence_date')),
-        'facet': 'off'
+        'facet': 'off',
+        'pageSize': OCC_PAGE_SIZE
     }
 
     if sensitive_only:
@@ -222,7 +224,8 @@ def all_bird_species():
     return _fetch_species_list(
         (('fq', 'speciesGroup:Birds'),
          ('fq', 'rank:species'),
-         ('fq', 'idxtype:TAXON'))
+         ('fq', 'idxtype:TAXON'),
+         ('pageSize', SPECIES_PAGE_SIZE))
     )
 
 
@@ -237,7 +240,8 @@ def all_vertebrate_species():
     return _fetch_species_list(
         (('fq', 'rank:species'),
          ('fq', 'idxtype:TAXON'),
-         ('fq', 'left:[{0} TO {1}]'.format(left, right)))
+         ('fq', 'left:[{0} TO {1}]'.format(left, right)),
+         ('pageSize', SPECIES_PAGE_SIZE))
     )
 
 
@@ -445,16 +449,13 @@ def _strip_n_squeeze(q):
 def _json_pages_params_filter(params, offset_key):
     '''Returns filtered_params, page_size
 
-    If 'pageSize' is not present in params, adds it with value = PAGE_SIZE.
+    'pageSize' must be present in the params.
     Strips out any offset_key ('startIndex') params. Turns params into a list.
 
     >>> params = {'q':'query', 'pageSize': 666, 'startIndex': 10}
     >>> _json_pages_params_filter(params, 'startIndex')
     ([('q', 'query'), ('pageSize', 666)], 100)
 
-    >>> params = (('fq', 'filter1'), ('fq', 'filter2'))
-    >>> _json_pages_params_filter(params, 'start')
-    ([('fq', 'filter1'), ('fq', 'filter2'), ('pageSize', 1000)], 1000)
     '''
 
     # convert to iterable
@@ -468,16 +469,11 @@ def _json_pages_params_filter(params, offset_key):
         if name == offset_key:
             continue
         if name == 'pageSize':
-            if page_size is None:
-                page_size = value
-            else:
-                raise RuntimeError('"pageSize" param defined twice (or more)')
+            page_size = value
         filtered_params.append((name, value))
 
     # add 'pageSize' if not present
-    if page_size is None:
-        filtered_params.append(('pageSize', PAGE_SIZE))
-        page_size = PAGE_SIZE
+    assert page_size is not None
 
     return filtered_params, int(page_size);
 
