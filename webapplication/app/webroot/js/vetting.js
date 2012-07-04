@@ -247,6 +247,8 @@ function initVetting() {
 function createNewVetting() {
     console.log("Processing create new vetting");
 
+    // Get features from the vector layer (which are all known to be polygons)
+    var new_vet_polygon_features = new_vet_vectors.features;
     // Now convert our array of features into an array of geometries.
     var new_vet_polygon_geoms = [];
     for (var i = 0; i < new_vet_polygon_features.length; i++) {

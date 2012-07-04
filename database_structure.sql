@@ -147,7 +147,10 @@ CREATE TABLE vettings (
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
-    classification classification NOT NULL
+    classification classification NOT NULL,
+
+    created_on TIMESTAMP NOT NULL DEFAULT now(), -- The time the vetting was created
+    updated_on TIMESTAMP NOT NULL DEFAULT now()  -- The time the vetting was updated
 );
 SELECT AddGeometryColumn('vettings', 'area', 4326, 'MULTIPOLYGON', 2);
 ALTER TABLE vettings ALTER COLUMN area SET NOT NULL;
