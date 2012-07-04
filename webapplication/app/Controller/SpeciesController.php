@@ -142,20 +142,65 @@ class SpeciesController extends AppController {
 
     /*
         Get the vetting geojson for the given species.
+
+        By default, gets all vettings for given species id.
+
+        Can be filtered to only include vettings by a specific user.
+        Filter can be inversed (i.e. all vettings NOT by specific user).
+
+        TODO: Remove magic numbers from the SQL LIMIT
+
+        params:
+        * species_id: the species to get the vettings for
+        * by_user_id: get vettings by a specific user_id
+        * inverse_user_id_filter: if set, will get vettings NOT by by_user_id
     */
     public function vetting_geo_json($species_id = null) {
+
         $this->Species->id = $species_id;
         if (!$this->Species->exists()) {
             throw new NotFoundException(__('Invalid species'));
         }
 
-        $results = $this->Species->getDataSource()->execute(
-            'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
-            'WHERE species_id = ? '.
-            'LIMIT 1000',
-            array(),
-            array($species_id)
-        );
+        // Process any filter variables
+        $by_user_id = false;
+        $inverse_user_id_filter = false;
+
+        if (array_key_exists('by_user_id', $this->request->query)) {
+            $by_user_id = (int)$this->request->query['by_user_id'];
+        }
+
+        if(array_key_exists('inverse_user_id_filter', $this->request->query)) {
+            $inverse_user_id_filter = $this->request->query['inverse_user_id_filter'];
+        }
+
+        $results = null;
+
+        if ($by_user_id and $inverse_user_id_filter) {
+            $results = $this->Species->getDataSource()->execute(
+                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'WHERE species_id = ? AND user_id <> ? '.
+                'LIMIT 1000',
+                array(),
+                array($species_id, $by_user_id)
+            );
+        } elseif ($by_user_id) {
+            $results = $this->Species->getDataSource()->execute(
+                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'WHERE species_id = ? AND user_id = ? '.
+                'LIMIT 1000',
+                array(),
+                array($species_id, $by_user_id)
+            );
+        } else {
+            $results = $this->Species->getDataSource()->execute(
+                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'WHERE species_id = ? '.
+                'LIMIT 1000',
+                array(),
+                array($species_id)
+            );
+        }
 
 
         // Convert the received vettings into a geometry collection.
