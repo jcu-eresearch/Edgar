@@ -54,12 +54,10 @@ class Coord(object):
 class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
-    def __init__(self, coord=None, sens_coord=None,
-            uuid_in=None, kosher=False, assertions=[], uncertainty=None,
-            date=None):
+    def __init__(self, coord=None, sens_coord=None, uuid_in=None,
+            assertions=[], uncertainty=None, date=None):
         self.coord = coord
         self.sensitive_coord = sens_coord
-        self.is_geospatial_kosher = bool(kosher)
         self.assertions = set(assertions)
         self.uncertainty = uncertainty # in meters (not sure if radius, or AABB)
         self.date = date # datetime.date or None
@@ -80,8 +78,7 @@ class Occurrence(object):
         if type(other) is type(self):
             return (self.uuid == other.uuid and
                     self.coord == other.coord and
-                    self.sensitive_coord == other.sensitive_coord and
-                    self.is_geospatial_kosher == other.is_geospatial_kosher)
+                    self.sensitive_coord == other.sensitive_coord)
         else:
             return False
 
@@ -133,10 +130,9 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
-        'fl': ','.join(('id', 'latitude', 'longitude', 'geospatial_kosher',
-            'sensitive_longitude', 'sensitive_latitude', 'assertions',
-            'coordinate_uncertainty', 'sensitive_coordinate_uncertainty',
-            'occurrence_date')),
+        'fl': ','.join(('id', 'latitude', 'longitude', 'sensitive_longitude',
+            'sensitive_latitude', 'assertions', 'coordinate_uncertainty',
+            'sensitive_coordinate_uncertainty', 'occurrence_date')),
         'facet': 'off'
     }
 
@@ -164,7 +160,6 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 uuid_in=uuid.UUID(occ['uuid']),
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
-                kosher=(True if occ['geospatialKosher'] == "true" else False),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
                 uncertainty=int(uncertainty),
                 date=date
@@ -301,19 +296,42 @@ def q_param(species_lsid=None, changed_since=None):
             (last_processed_date:{0} OR last_assertion_date:{0}) AND
             '''.format(daterange)
 
-    return _strip_n_squeeze('''
+    return _strip_n_squeeze(''.join((
+        #limit by species and/or date modified
+        '''
         {lsid}
         {changed}
+        '''.format(lsid=species_lsid, changed=changed_since),
+
+        # aggregate subspecies records into species
+        '''
         (rank:species OR subspecies_name:[* TO *]) AND
-        longitude:[-180 TO 180] AND
-        latitude:[-90 TO 90] AND
+        ''',
+
+        # bounding box of australia
+        '''
+        longitude:[112.60412597657 TO 154.44006347657] AND
+        latitude:[-43.734590478689 TO -9.9190742304658] AND
+        ''',
+
+        # filters (assertions, uncertainty, etc)
+        '''
         coordinate_uncertainty:[* TO 25000] AND
-        NOT sensitive:alreadyGeneralised AND
+        NOT assertions:zeroCoordinates AND
+        NOT assertions:coordinatesCentreOfStateProvince AND
+        NOT assertions:uncertaintyNotSpecified AND
+        NOT assertions:coordinatesCentreOfCountry AND
+        NOT assertions:invalidGeodeticDatum AND
+        NOT assertions:invalidScientificName AND
+        NOT assertions:unknownKingdom AND
+        NOT assertions:ambiguousName AND
+        NOT assertions:inferredDuplicateRecord AND
         (
             basis_of_record:HumanObservation OR
-            basis_of_record:MachineObservation
+            basis_of_record:MachineObservation OR
+            assertions:missingBasisOfRecord
         )
-        '''.format(lsid=species_lsid, changed=changed_since))
+        ''')))
 
 
 def _fetch_species_list(params):
