@@ -17,7 +17,7 @@ import uuid
 import datetime
 
 
-OCC_PAGE_SIZE = 2000  # occurrence records per biocache request
+OCC_PAGE_SIZE = 1000  # occurrence records per biocache request
 SPECIES_PAGE_SIZE = 500  # species per BIE request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
@@ -356,7 +356,7 @@ def _fetch_species_list(params):
                 yield s
 
 
-def _retry(delay=10.0):
+def _retry(delay=5.0):
     '''A decorator that retries a function or method until it succeeds (success
     is when the function completes and no exception is raised).
 
