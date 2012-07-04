@@ -41,7 +41,9 @@ $user = AuthComponent::user();
         <?php else: ?>
             Edgar.user = {
                 canVet: <?php print ($user['can_vet'] ? 'true' : 'false') ?>,
-                canRequestRemodel: <?php print (User::canRequestRemodel($user) ? 'true' : 'false') ?>
+                canRequestRemodel: <?php print (User::canRequestRemodel($user) ? 'true' : 'false') ?>,
+                id: "<?php print Sanitize::html($user['id']) ?>",
+                email: "<?php print Sanitize::html($user['email']) ?>"
             }
         <?php endif ?>
     </script>
@@ -95,8 +97,8 @@ $user = AuthComponent::user();
                     echo $this->Html->link('Log In', '/users/login', array('class'=>'login'));
                 } else {
                     // note the user for JS usage
-                    $user_js = "Edgar.user = '" . Sanitize::html($user['email']) . "'";
-                    echo $this->Html->scriptBlock($user_js);
+                    //$user_js = "Edgar.user = '" . Sanitize::html($user['email']) . "'";
+                    //echo $this->Html->scriptBlock($user_js);
                     // write the user & logout btn into the header
                     echo 'Logged in as ' . Sanitize::html($user['email']);
                     echo $this->Html->link('Log Out', '/users/logout', array('class'=>'logout'));
