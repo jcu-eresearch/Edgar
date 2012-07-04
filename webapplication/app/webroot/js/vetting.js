@@ -10,6 +10,8 @@ var new_vet_vectors, wkt, new_vet_draw_polygon_control, new_vet_modify_polygon_c
 function clearNewVettingMode(e) {
     console.log("Clearing current mode");
 
+    removeModifyFeatureHandlesAndVertices();
+
     // Deactivate draw polygon control
     new_vet_draw_polygon_control.deactivate();
     $('#newvet_draw_polygon_button').removeClass('ui-state-active');
@@ -96,9 +98,16 @@ function handleAddPolygonClick(e) {
     new_vet_vectors.addFeatures([feature]);
 
     activateModifyPolygonMode();
-    //new_vet_modify_polygon_control.selectFeature(feature);
+}
 
-    //new_vet_vectors.redraw();
+function removeModifyFeatureHandlesAndVertices() {
+    // Delete any modify control vertices.
+    new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.virtualVertices, { silent: true });
+    new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.vertices, { silent: true });
+    // Delete the radius handle.
+    new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.radiusHandle, { silent: true });
+    // Delete the drag handle.
+    new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.dragHandle, { silent: true });
 }
 
 function handleDeleteSelectedPolygonClick(e) {
@@ -107,13 +116,7 @@ function handleDeleteSelectedPolygonClick(e) {
     if(currentFeature) {
         // Unselect the feature.
         new_vet_modify_polygon_control.unselectFeature(currentFeature);
-        // Delete any modify control vertices.
-        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.virtualVertices, { silent: true });
-        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.vertices, { silent: true });
-        // Delete the radius handle.
-        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.radiusHandle, { silent: true });
-        // Delete the drag handle.
-        new_vet_vectors.removeFeatures(new_vet_modify_polygon_control.dragHandle, { silent: true });
+        removeModifyFeatureHandlesAndVertices();
         // Delete the selected feature
         new_vet_vectors.removeFeatures(currentFeature);
 
