@@ -374,28 +374,7 @@ class SpeciesController extends AppController {
      */
     public function get_next_job_and_assume_queued() {
         if ($this->request->is('post')) {
-            $species = $this->Species->find('first', array(
-                'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
-                'conditions' => array(
-                    'OR' => array(
-                        // Run any models that haven't started yet...
-                        array(
-                            'num_dirty_occurrences >' => 0,
-                            'current_model_status' => null
-                        ),
-                        // Run old models again...
-                        array(
-                            'num_dirty_occurrences >' => 0,
-                            'current_model_queued_time <' => date(DATE_ISO8601, strtotime("-1 days"))
-                        )
-                    )
-                ),
-                'order' => array(
-                    'is_null' => 'ASC',
-                    'first_requested_remodel' => 'ASC',
-                    'num_dirty_occurrences' => 'DESC',
-                )
-            ));
+            $species = $this->_next_job();
 
             if($species){
                 // Update current model info for species
@@ -420,29 +399,8 @@ class SpeciesController extends AppController {
      * Return next species to run a modelling job for
      */
     public function next_job() {
-        $species = $this->Species->find('first', array(
-            'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
-            'conditions' => array(
-                'OR' => array(
-                    // Run any models that haven't started yet...
-                    array(
-                        'num_dirty_occurrences >' => 0,
-                        'current_model_status' => null
-                    ),
-                    // Run old models again...
-                    array(
-                        'num_dirty_occurrences >' => 0,
-                        'current_model_queued_time <' => date(DATE_ISO8601, strtotime("-1 days"))
-                    )
-                )
-            ),
-            'order' => array(
-                'is_null' => 'ASC',
-                'first_requested_remodel' => 'ASC',
-                'num_dirty_occurrences' => 'DESC',
-            )
-        ));
 
+        $species = $this->_next_job();
         if($species){
             $this->dieWithStatus(200, $species['Species']['id']);
         } else {
@@ -571,5 +529,39 @@ class SpeciesController extends AppController {
             return 'Priority queued for remodelling';
 
         return 'Automatically queued for remodelling';
+    }
+
+    private function _next_job() {
+        $species = $this->Species->find('first', array(
+            'fields' => array('*', 'first_requested_remodel IS NULL AS is_null'),
+            'conditions' => array(
+                'OR' => array(
+                    // Run any models that haven't started yet...
+                    array(
+                        'num_dirty_occurrences >' => 0,
+                        'current_model_status' => null
+                    ),
+                    // Run old models again
+                    array(
+                        'num_dirty_occurrences >' => 0,
+                        'current_model_queued_time <' => date(DATE_ISO8601, strtotime("-1 days"))
+                    ),
+                    // Run any models with a status, but no recorded queued time
+                    // (these should never happen)
+                    array(
+                        'current_model_status <>' => null,
+                        'current_model_queued_time' => null
+                    )
+
+                )
+            ),
+            'order' => array(
+                'is_null' => 'ASC',
+                'first_requested_remodel' => 'ASC',
+                'num_dirty_occurrences' => 'DESC',
+            )
+        ));
+
+        return $species;
     }
 }
