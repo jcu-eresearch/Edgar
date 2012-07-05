@@ -35,7 +35,8 @@ function addMapModes(theMap) {
         // what modes are we changing between?
         var oldMode = Edgar.mapmode;
         var newMode = theMap.destinationMode;
-        
+
+        // do nothing if there was no adjustment of mode
         if (oldMode === newMode) {
             return;
         }
@@ -62,14 +63,13 @@ function addMapModes(theMap) {
         }
 
         if (oldMode === 'blank'   && newMode === 'current') {
+            
         }
 
         if (oldMode === 'current' && newMode === 'future' ) {
         }
 
         if (oldMode === 'current' && newMode === 'vetting') {
-            // switch off the climate suitability layer
-            
         }
 
         if (oldMode === 'future'  && newMode === 'current') {

@@ -5,7 +5,7 @@
 //
 
 // convenient debug method
-function consolelog() { if (window.console){ console.log.apply(console, arguments); } }
+function consolelog(arg1, arg2, arg3) { if (window.console){ console.log(arg1, arg2, arg3); } }
 // ------------------------------------------------------------------
 var occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
 

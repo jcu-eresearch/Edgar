@@ -335,22 +335,23 @@ html, body {
     top: 0;
     left: 0;
     right: 13.1em;
-    padding: 0 0.6em 0.4em 0.4em;
+    padding: 0 0.6em 0 0.4em;
+
+    right: 0;
+    height: 5em;
 }
 
 .side.panel {
     right: 0;
     top: 0;
     width: 13em;
-    max-height: 100%;
     overflow: auto;
     background-color: transparent;
-}
 
-.opposite.panel {
-    background: transparent;
-    left: 50px;
-    top: 30%;
+    top: 5em; /* height of top panel */
+    max-height: ~"-moz-calc(100% - 5em)";
+    max-height: ~"-webkit-calc(100% - 5em)";
+    max-height: ~"calc(100% - 5em)";
 }
 
 /* species panel content ------------------------------------------------ */
@@ -381,7 +382,7 @@ html, body {
     text-align: left;
     margin: 0.15em;
     padding: 0.2em;
-    .allrounded(0.25em);
+    .allrounded(0.25em);   
 }
 
 #toolspanel .tool h1 {
