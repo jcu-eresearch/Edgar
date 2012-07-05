@@ -42,7 +42,10 @@ class HPCJob:
     def getNextSpeciesId():
         log.debug("Determining the next species Id, %s", HPCConfig.nextSpeciesURL)
         try:
-            connection = urllib2.urlopen(HPCConfig.nextSpeciesURL)
+            values = {}
+            data = urllib.urlencode(values)
+            req = urllib2.Request(HPCConfig.nextSpeciesURL, data)
+            connection = urllib2.urlopen(req)
             responseCode = connection.getcode()
             log.debug("Response code: %s", responseCode)
 
