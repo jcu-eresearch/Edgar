@@ -477,17 +477,15 @@ class Syncer:
 
 
 def classification_for_occurrence(occ):
-    '''Returns an occurrences.classification enum value for an ala.Occurrence.
-
-    Basically just determines whether the record is "suspect" or not, all
-    bad records should have been filtered out by this point.'''
+    '''Returns an occurrences.classification enum value for an
+    ala.Occurrence.'''
 
     if 'detectedOutlier' in occ.assertions:
-        return 'unknown' # suspect
+        return 'vagrant'
     elif 'habitatMismatch' in occ.assertions:
-        return 'unknown' # suspect
+        return 'invalid'
     else:
-        return 'irruptive' # not suspect
+        return 'unknown'
 
 
 def postgres_escape_bytea(b):
