@@ -483,9 +483,9 @@ def classification_for_occurrence(occ):
     bad records should have been filtered out by this point.'''
 
     if 'detectedOutlier' in occ.assertions:
-        return 'invalid' # suspect
+        return 'unknown' # suspect
     elif 'habitatMismatch' in occ.assertions:
-        return 'invalid' # suspect
+        return 'unknown' # suspect
     else:
         return 'irruptive' # not suspect
 
