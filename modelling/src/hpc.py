@@ -18,6 +18,7 @@ import paramiko
 import ssh
 from hpc_config import HPCConfig
 import sqlalchemy
+from sqlalchemy import or_
 
 log = logging.getLogger()
 
