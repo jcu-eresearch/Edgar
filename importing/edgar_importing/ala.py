@@ -17,7 +17,8 @@ import uuid
 import datetime
 
 
-PAGE_SIZE = 2000  # occurrence records per request
+OCC_PAGE_SIZE = 1000  # occurrence records per biocache request
+SPECIES_PAGE_SIZE = 500  # species per BIE request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
 
@@ -54,12 +55,10 @@ class Coord(object):
 class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
-    def __init__(self, coord=None, sens_coord=None,
-            uuid_in=None, kosher=False, assertions=[], uncertainty=None,
-            date=None):
+    def __init__(self, coord=None, sens_coord=None, uuid_in=None,
+            assertions=[], uncertainty=None, date=None):
         self.coord = coord
         self.sensitive_coord = sens_coord
-        self.is_geospatial_kosher = bool(kosher)
         self.assertions = set(assertions)
         self.uncertainty = uncertainty # in meters (not sure if radius, or AABB)
         self.date = date # datetime.date or None
@@ -80,8 +79,7 @@ class Occurrence(object):
         if type(other) is type(self):
             return (self.uuid == other.uuid and
                     self.coord == other.coord and
-                    self.sensitive_coord == other.sensitive_coord and
-                    self.is_geospatial_kosher == other.is_geospatial_kosher)
+                    self.sensitive_coord == other.sensitive_coord)
         else:
             return False
 
@@ -133,11 +131,11 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
-        'fl': ','.join(('id', 'latitude', 'longitude', 'geospatial_kosher',
-            'sensitive_longitude', 'sensitive_latitude', 'assertions',
-            'coordinate_uncertainty', 'sensitive_coordinate_uncertainty',
-            'occurrence_date')),
-        'facet': 'off'
+        'fl': ','.join(('id', 'latitude', 'longitude', 'sensitive_longitude',
+            'sensitive_latitude', 'assertions', 'coordinate_uncertainty',
+            'sensitive_coordinate_uncertainty', 'occurrence_date')),
+        'facet': 'off',
+        'pageSize': OCC_PAGE_SIZE
     }
 
     if sensitive_only:
@@ -164,7 +162,6 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 uuid_in=uuid.UUID(occ['uuid']),
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
-                kosher=(True if occ['geospatialKosher'] == "true" else False),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
                 uncertainty=int(uncertainty),
                 date=date
@@ -227,7 +224,8 @@ def all_bird_species():
     return _fetch_species_list(
         (('fq', 'speciesGroup:Birds'),
          ('fq', 'rank:species'),
-         ('fq', 'idxtype:TAXON'))
+         ('fq', 'idxtype:TAXON'),
+         ('pageSize', SPECIES_PAGE_SIZE))
     )
 
 
@@ -242,7 +240,8 @@ def all_vertebrate_species():
     return _fetch_species_list(
         (('fq', 'rank:species'),
          ('fq', 'idxtype:TAXON'),
-         ('fq', 'left:[{0} TO {1}]'.format(left, right)))
+         ('fq', 'left:[{0} TO {1}]'.format(left, right)),
+         ('pageSize', SPECIES_PAGE_SIZE))
     )
 
 
@@ -301,19 +300,42 @@ def q_param(species_lsid=None, changed_since=None):
             (last_processed_date:{0} OR last_assertion_date:{0}) AND
             '''.format(daterange)
 
-    return _strip_n_squeeze('''
+    return _strip_n_squeeze(''.join((
+        #limit by species and/or date modified
+        '''
         {lsid}
         {changed}
+        '''.format(lsid=species_lsid, changed=changed_since),
+
+        # aggregate subspecies records into species
+        '''
         (rank:species OR subspecies_name:[* TO *]) AND
-        longitude:[-180 TO 180] AND
-        latitude:[-90 TO 90] AND
+        ''',
+
+        # bounding box of australia
+        '''
+        longitude:[112.60412597657 TO 154.44006347657] AND
+        latitude:[-43.734590478689 TO -9.9190742304658] AND
+        ''',
+
+        # filters (assertions, uncertainty, etc)
+        '''
         coordinate_uncertainty:[* TO 25000] AND
-        NOT sensitive:alreadyGeneralised AND
+        NOT assertions:zeroCoordinates AND
+        NOT assertions:coordinatesCentreOfStateProvince AND
+        NOT assertions:uncertaintyNotSpecified AND
+        NOT assertions:coordinatesCentreOfCountry AND
+        NOT assertions:invalidGeodeticDatum AND
+        NOT assertions:invalidScientificName AND
+        NOT assertions:unknownKingdom AND
+        NOT assertions:ambiguousName AND
+        NOT assertions:inferredDuplicateRecord AND
         (
             basis_of_record:HumanObservation OR
-            basis_of_record:MachineObservation
+            basis_of_record:MachineObservation OR
+            assertions:missingBasisOfRecord
         )
-        '''.format(lsid=species_lsid, changed=changed_since))
+        ''')))
 
 
 def _fetch_species_list(params):
@@ -334,7 +356,7 @@ def _fetch_species_list(params):
                 yield s
 
 
-def _retry(delay=10.0):
+def _retry(delay=5.0):
     '''A decorator that retries a function or method until it succeeds (success
     is when the function completes and no exception is raised).
 
@@ -427,16 +449,13 @@ def _strip_n_squeeze(q):
 def _json_pages_params_filter(params, offset_key):
     '''Returns filtered_params, page_size
 
-    If 'pageSize' is not present in params, adds it with value = PAGE_SIZE.
+    'pageSize' must be present in the params.
     Strips out any offset_key ('startIndex') params. Turns params into a list.
 
     >>> params = {'q':'query', 'pageSize': 666, 'startIndex': 10}
     >>> _json_pages_params_filter(params, 'startIndex')
     ([('q', 'query'), ('pageSize', 666)], 100)
 
-    >>> params = (('fq', 'filter1'), ('fq', 'filter2'))
-    >>> _json_pages_params_filter(params, 'start')
-    ([('fq', 'filter1'), ('fq', 'filter2'), ('pageSize', 1000)], 1000)
     '''
 
     # convert to iterable
@@ -450,16 +469,11 @@ def _json_pages_params_filter(params, offset_key):
         if name == offset_key:
             continue
         if name == 'pageSize':
-            if page_size is None:
-                page_size = value
-            else:
-                raise RuntimeError('"pageSize" param defined twice (or more)')
+            page_size = value
         filtered_params.append((name, value))
 
     # add 'pageSize' if not present
-    if page_size is None:
-        filtered_params.append(('pageSize', PAGE_SIZE))
-        page_size = PAGE_SIZE
+    assert page_size is not None
 
     return filtered_params, int(page_size);
 

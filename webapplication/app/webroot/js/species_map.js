@@ -7,7 +7,7 @@
 // convenient debug method
 function consolelog(arg1, arg2, arg3) { if (window.console){ console.log(arg1, arg2, arg3); } }
 // ------------------------------------------------------------------
-var occurrences, distribution, occurrence_select_control, vettingLayer, vettingLayerControl;
+var occurrences, distribution, occurrence_select_control;
 
 // Projections
 // ----------
@@ -95,6 +95,7 @@ function clearExistingSpeciesOccurrencesLayer() {
         occurrence_select_control = undefined;
     }
 
+/*
     if(vettingLayer !== undefined) {
         console.log('Removing vetting layer');
         Edgar.map.removeLayer(vettingLayer);
@@ -104,11 +105,12 @@ function clearExistingSpeciesOccurrencesLayer() {
         vettingLayer = undefined;
         vettingLayerControl = undefined;
     }
+*/
 }
 // ------------------------------------------------------------------
 // Add our species specific layers.
 function addSpeciesOccurrencesAndDistributionLayers() {
-    addVettingLayer();
+//    addVettingLayer();
     addOccurrencesLayer();
     addDistributionLayer();
     updateLegend();
@@ -191,6 +193,7 @@ function addDistributionLayer() {
     }
 }
 // ------------------------------------------------------------------
+/*
 function addVettingLayer() {
     console.log('Adding vetting layer')
     var format = new OpenLayers.Format.GeoJSON({});
@@ -228,6 +231,8 @@ function addVettingLayer() {
     Edgar.map.addControl(vettingLayerControl);
     vettingLayerControl.activate();
 }
+*/
+
 // ------------------------------------------------------------------
 function addOccurrencesLayer() {
         // Occurrences Layer

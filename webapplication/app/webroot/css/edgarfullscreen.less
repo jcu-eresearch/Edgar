@@ -385,12 +385,16 @@ html, body {
     .allrounded(0.25em);   
 }
 
-#toolspanel .tool h1 {
+#toolspanel .tool h1, #toolspanel .tool h2 {
+    color: #003d4c;
     background-color: white;
     margin: 0;
     .allrounded(0.25em);
     padding: 0.1em 0.2em;
     font-size: inherit;
+}
+
+#toolspanel .tool h1 {
     cursor: pointer;
 }
 
@@ -414,6 +418,19 @@ html, body {
     font-size: 90%;
     padding: 0.5em;
     .allrounded(0.25em);
+}
+
+#toolspanel .tool ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0.5em;
+}
+
+#toolspanel .tool ul li {
+    list-style: none;
+    padding: 0.2em;
+    margin: 0.1em;
+
 }
 
 #layerstool br {
@@ -483,3 +500,11 @@ html, body {
     display: none;
 }
 
+
+/* vetting customisations ------------------------------------------ */
+ul.vetting_list li .classification {
+    font-weight: bold;
+    margin-right: 1em;
+    display: inline-block;
+    width: 50%;
+}

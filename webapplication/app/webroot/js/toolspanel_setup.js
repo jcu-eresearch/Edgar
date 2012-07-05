@@ -59,7 +59,6 @@ $(function() {
     });
 
     // test the mode changing stuff
-    
     $('#go').click( function() {
         $(Edgar.map).trigger('changemode', 'future');
     });
