@@ -1,21 +1,10 @@
-import shapefile
-import shapely
 import csv
 import argparse
 import json
 import logging
 from edgar_importing import db
-from shapely.geometry import Polygon, MultiPolygon
 from geoalchemy import WKTSpatialElement
 import geoalchemy.functions
-
-
-# column indexes in shapefile
-COL_ID = 0
-COL_SPNO = 1
-COL_TAXONID = 2
-COL_RANGE_T = 3
-COL_BR_RNGE_T = 4
 
 # map of BLA categories to db classification enum values
 CLASSIFICATIONS_BY_BLA_CATEGORIES = {
@@ -76,9 +65,6 @@ def parse_args():
         description='''Loads Birdlife Australia shapefiles into the database as
         vettings.''')
 
-    parser.add_argument('shapefile', type=str, nargs=1, help='''The path to
-        the `.shp` file.''')
-
     parser.add_argument('csv', type=str, nargs=1, help='''The path the the csv
         file, which was converted from the TaxonList_May11.xlsx file supplied
         by Birdlife Australia''')
@@ -89,12 +75,6 @@ def parse_args():
     parser.add_argument('user_id', type=int, nargs=1, help='''The id Birdlife
         Australia user. This user will own the vettings that are added to the
         database.''')
-
-    parser.add_argument('srid', type=int, nargs=1, help='''The EPSG-compliant
-        SRID of the geometry in the shapefile. The '.prj' file in the shapefile
-        directory contains info about this, but you may have to look up the
-        SRID manually. Last import, the SRID was 4283 (the '.prj' file said the
-        projection was GCS_GDA_1994).''')
 
     return parser.parse_args()
 
@@ -156,88 +136,43 @@ def set_db_id_for_taxons(taxons):
             _log.debug('\tgenus missing')
 
 
-def poly_from_shapefile_shape(shape):
-    # Type 5 is a single polygon in the shapefile format
-    assert shape.shapeType == 5
-
-    # get each part as an individual polygon
-    poly = None
-    partEnd = len(shape.points)
-    for partStart in reversed(shape.parts):
-        p = Polygon(shape.points[partStart:partEnd])
-        # buffer(0) causes self-intersecting polygons to fix themselves
-        # super important, because self-intersecting polygons break everything
-        p = p.buffer(0)
-        partEnd = partStart
-
-        if poly is None:
-            poly = p
-        else:
-            if poly.disjoint(p):
-                poly = poly.union(p)
-            else:
-                # overlapping polygons are tricky. Ignoring them for now.
-                # TODO: here
-                _log.warning('Overlapping polygon parts found. Ignoring.')
-
-    return poly
-
-
-def classification_for_record(rec):
-    category = rec[COL_RANGE_T]
+def classification_for_bla_row(row):
+    category = row['range_t']
     if category == 'core' or category == 'introduced':
-        category += ', ' + rec[COL_BR_RNGE_T]
+        category += ', ' + rec['br_rnge_t']
 
     assert category in CLASSIFICATIONS_BY_BLA_CATEGORIES
     return CLASSIFICATIONS_BY_BLA_CATEGORIES[category]
 
 
-def update_poly_on_taxon(taxon, record):
-    poly = poly_from_shapefile_shape(record.shape)
-    if poly is None:
-        _log.warning('Invalid polygon on record: %s', repr(record.record))
-        return
+def polys_for_taxon(taxon):
+    q = db.birdlife_import.select()\
+        .where(db.birdlife_import.c.spno == taxon.spno)\
+        .execute()
 
-    classification = classification_for_record(record.record)
-    if classification in taxon.polys_by_classification:
-        existing = taxon.polys_by_classification[classification]
-        taxon.polys_by_classification[classification] = existing.union(poly)
-    else:
-        taxon.polys_by_classification[classification] = poly
+    for row in q:
+        print str(dict(row))
+        yield classification_for_bla_row(row), row['the_geom']
 
 
-def set_polys_for_taxons(shapef, taxons_by_spno):
-    # each row has an extra column as a deletion marker
-    assert(len(shapef.fields) == 6)
-
-    for record in shapef.shapeRecords():
-        if len(record.shape.points) > 0: # getting wierd shapes without points
-            taxon = taxons_by_spno[record.record[COL_SPNO]]
-            update_poly_on_taxon(taxon, record)
-
-
-def insert_vettings_for_taxon(taxon, user_id, srid):
+def insert_vettings_for_taxon(taxon, user_id):
     if taxon.db_id is None:
         _log.warning('Skipping species with no db_id: %s', taxon.sci_name)
         return
 
-    # TODO: make sure the classification polygons don't overlap
-
-    for classification, poly in taxon.polys_by_classification.iteritems():
-        # `poly` can be either a `Polygon` or a `MultiPolygon`
-        # postgis expects a `MultiPolygon`, so convert if a `Polygon`
-        if isinstance(poly, Polygon):
-            poly = MultiPolygon([poly])
-
-        area = WKTSpatialElement(shapely.wkt.dumps(poly), srid)
-
+    num_inserted = 0
+    for classification, poly in polys_for_taxon(taxon):
         q = db.vettings.insert().values(
                 user_id=user_id,
                 species_id=taxon.db_id,
                 comment='Polygons imported from Birdlife Australia',
                 classification=classification,
-                area=area
+                area=poly
             ).execute()
+
+        num_inserted += 1
+
+    _log.info('Inserted %d vettings for %s', num_inserted, taxon.sci_name)
 
 
 def main():
@@ -253,13 +188,9 @@ def main():
     taxons = load_taxons_by_spno(args.csv[0])
     set_db_id_for_taxons(taxons.itervalues())
 
-    # load shapefiles
-    sf = shapefile.Reader(args.shapefile[0])
-    set_polys_for_taxons(sf, taxons)
-
     # wipe existing vettings
     db.vettings.delete().where(db.vettings.c.user_id == args.user_id[0]).execute()
 
     # create new vettings
     for t in taxons.itervalues():
-        insert_vettings_for_taxon(t, args.user_id[0], args.srid[0])
+        insert_vettings_for_taxon(t, args.user_id[0])
