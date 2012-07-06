@@ -10,7 +10,6 @@ import datetime
 import shapely.wkt
 import shapely.geometry
 from sqlalchemy import func, select, text
-from geoalchemy import WKTSpatialElement
 from cStringIO import StringIO
 
 

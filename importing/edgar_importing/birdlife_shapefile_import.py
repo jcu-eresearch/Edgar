@@ -5,6 +5,9 @@ import logging
 from edgar_importing import db
 from geoalchemy import WKTSpatialElement
 import geoalchemy.functions
+import sqlalchemy
+import shapely.wkt
+from shapely.geometry import Polygon, MultiPolygon
 
 # map of BLA categories to db classification enum values
 CLASSIFICATIONS_BY_BLA_CATEGORIES = {
@@ -139,20 +142,40 @@ def set_db_id_for_taxons(taxons):
 def classification_for_bla_row(row):
     category = row['range_t']
     if category == 'core' or category == 'introduced':
-        category += ', ' + rec['br_rnge_t']
+        category += ', ' + row['br_rnge_t']
 
     assert category in CLASSIFICATIONS_BY_BLA_CATEGORIES
     return CLASSIFICATIONS_BY_BLA_CATEGORIES[category]
 
 
 def polys_for_taxon(taxon):
-    q = db.birdlife_import.select()\
+    q = sqlalchemy.select([
+        'range_t',
+        'br_rnge_t',
+        'ST_AsText(the_geom) as the_geom'])\
+        .select_from(db.birdlife_import)\
         .where(db.birdlife_import.c.spno == taxon.spno)\
         .execute()
 
     for row in q:
-        print str(dict(row))
-        yield classification_for_bla_row(row), row['the_geom']
+        if row['the_geom'] is None:
+            _log.warning('Found row with no geometry: %s', str(dict(row)))
+            continue
+
+        poly = shapely.wkt.loads(row['the_geom'])
+
+        if not poly.is_valid:
+            poly = poly.buffer(0) # can turn invalid polygons into valid ones
+            if not poly.is_valid:
+                _log.warning('Found invalid polygon on row: %s', str(dict(row)))
+                continue
+
+        # db only accepts multipolygons, but shape can contain both
+        # polygons and multipolygons
+        if isinstance(poly, Polygon):
+            poly = MultiPolygon([poly])
+
+        yield classification_for_bla_row(row), poly
 
 
 def insert_vettings_for_taxon(taxon, user_id):
@@ -167,7 +190,7 @@ def insert_vettings_for_taxon(taxon, user_id):
                 species_id=taxon.db_id,
                 comment='Polygons imported from Birdlife Australia',
                 classification=classification,
-                area=poly
+                area=WKTSpatialElement(poly.wkt, 4326)
             ).execute()
 
         num_inserted += 1
