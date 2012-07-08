@@ -42,9 +42,6 @@
         <h1>other people's vettings</h1>
         <div class="toolcontent">
             <ul id="other_peoples_vettings_list" class="vetting_list theirs">
-                <li>test A</li>
-                <li>test B</li>
-                <li>test C</li>
             </ul>
         </div>
     </div>
@@ -52,7 +49,6 @@
         <h1>my vettings</h1>
         <div class="toolcontent">
             <ul id="my_vettings_list" class="vetting_list mine">
-                <li>test A</li>
             </ul>
         </div>
     </div>
