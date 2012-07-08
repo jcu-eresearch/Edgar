@@ -40,7 +40,7 @@
     }
 
     // Pull out every class in the map file.
-    mu_removeAllStyleClasses($layer);
+    //mu_removeAllStyleClasses($layer);
 
     // Add style classes to the layer
     mu_addStyleClasses($layer, $threshold);

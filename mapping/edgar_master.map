@@ -69,45 +69,45 @@ MAP
         #define the color table. color are define as RGB color from 0 to 255.
         #EXPRESSION are used to define the style apply to the right rang of data
         #COLORRANGE and DATARANGE are paired to generate gradient color
-        CLASSITEM "[pixel]"
-        CLASS
-            NAME "0.0  - 0.25"
-            KEYIMAGE "ramp_0_25.gif"
-            EXPRESSION ([pixel]>0 AND [pixel]<0.25)
-            STYLE
-                COLORRANGE  0 0 255 0 255 255
-                DATARANGE   0 0.25
-            END
-        END
-
-        CLASS
-            NAME "0.25 - 0.5"
-            KEYIMAGE "ramp_25_50.gif"
-            EXPRESSION ([pixel]>=0.25 AND [pixel]<0.5)
-            STYLE
-                COLORRANGE  0 255 255 0 255 0
-                DATARANGE   0.25 0.5
-            END
-        END
-
-        CLASS
-            NAME "0.5  - 0.75"
-            KEYIMAGE "ramp_50_75.gif"
-            EXPRESSION ([pixel]>=0.5 AND [pixel]<0.75)
-            STYLE
-                COLORRANGE  0 255 0 255 255 0
-                DATARANGE   0.5 0.75
-            END
-        END
-
-        CLASS
-            NAME "0.75 - 1.0"
-            KEYIMAGE "ramp_75_100.gif"
-            EXPRESSION ([pixel]>=0.75)
-            STYLE
-                COLORRANGE  255 255 0 255 0 0
-                DATARANGE   0.75 1
-            END
-        END
+        #CLASSITEM "[pixel]"
+        #CLASS
+        #    NAME "0.0  - 0.25"
+        #    KEYIMAGE "ramp_0_25.gif"
+        #    EXPRESSION ([pixel]>0 AND [pixel]<0.25)
+        #    STYLE
+        #        COLORRANGE  0 0 255 0 255 255
+        #        DATARANGE   0 0.25
+        #    END
+        #END
+        #
+        #CLASS
+        #    NAME "0.25 - 0.5"
+        #    KEYIMAGE "ramp_25_50.gif"
+        #    EXPRESSION ([pixel]>=0.25 AND [pixel]<0.5)
+        #    STYLE
+        #        COLORRANGE  0 255 255 0 255 0
+        #        DATARANGE   0.25 0.5
+        #    END
+        #END
+        #
+        #CLASS
+        #    NAME "0.5  - 0.75"
+        #    KEYIMAGE "ramp_50_75.gif"
+        #    EXPRESSION ([pixel]>=0.5 AND [pixel]<0.75)
+        #    STYLE
+        #        COLORRANGE  0 255 0 255 255 0
+        #        DATARANGE   0.5 0.75
+        #    END
+        #END
+        #
+        #CLASS
+        #    NAME "0.75 - 1.0"
+        #    KEYIMAGE "ramp_75_100.gif"
+        #    EXPRESSION ([pixel]>=0.75)
+        #    STYLE
+        #        COLORRANGE  255 255 0 255 0 0
+        #        DATARANGE   0.75 1
+        #    END
+        #END
     END
 END
