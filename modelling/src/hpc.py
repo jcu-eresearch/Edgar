@@ -18,6 +18,7 @@ import paramiko
 import ssh
 from hpc_config import HPCConfig
 import sqlalchemy
+from sqlalchemy import or_
 
 log = logging.getLogger()
 
@@ -41,7 +42,10 @@ class HPCJob:
     def getNextSpeciesId():
         log.debug("Determining the next species Id, %s", HPCConfig.nextSpeciesURL)
         try:
-            connection = urllib2.urlopen(HPCConfig.nextSpeciesURL)
+            values = {}
+            data = urllib.urlencode(values)
+            req = urllib2.Request(HPCConfig.nextSpeciesURL, data)
+            connection = urllib2.urlopen(req)
             responseCode = connection.getcode()
             log.debug("Response code: %s", responseCode)
 
@@ -145,7 +149,7 @@ class HPCJob:
                             'ST_Y(sensitive_location) as sensitive_latitude']).\
                             select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
                             where(db.occurrences.c.species_id == self.speciesId).\
-                            where(db.occurrences.c.classification >= 'non-breeding').\
+                            where(or_(db.occurrences.c.classification == 'unknown', db.occurrences.c.classification >= 'non-breeding')).\
                             execute()
 
                         # Iterate over the occurrences, and write them to the csv

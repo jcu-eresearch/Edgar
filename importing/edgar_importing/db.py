@@ -5,8 +5,10 @@ from sqlalchemy.types import (SmallInteger, String, Integer,
 from geoalchemy import (GeometryExtensionColumn, Point, GeometryDDL,
     MultiPolygon)
 
+
 engine = None
 metadata = MetaData()
+
 
 def connect(engine_config):
     '''Call this before trying to use anything else'''
@@ -14,9 +16,11 @@ def connect(engine_config):
     engine = engine_from_config(engine_config, prefix='db.')
     metadata.bind = engine
 
+
 classification_enum = Enum('unknown', 'invalid', 'historic', 'vagrant', 'irruptive',
     'non-breeding', 'introduced non-breeding', 'breeding',
     'introduced breeding');
+
 
 species = Table('species', metadata,
     Column('id', Integer(), primary_key=True),
@@ -25,11 +29,13 @@ species = Table('species', metadata,
     Column('num_dirty_occurrences', Integer(), nullable=False, default=0)
 )
 
+
 sources = Table('sources', metadata,
     Column('id', Integer(), primary_key=True),
     Column('name', String(256), nullable=False),
     Column('last_import_time', DateTime(), nullable=True)
 )
+
 
 occurrences = Table('occurrences', metadata,
     Column('id', Integer(), primary_key=True),
@@ -44,11 +50,13 @@ occurrences = Table('occurrences', metadata,
 )
 GeometryDDL(occurrences)
 
+
 sensitive_occurrences = Table('sensitive_occurrences', metadata,
     Column('occurrence_id', Integer(), ForeignKey('occurrences.id'), nullable=False),
     GeometryExtensionColumn('sensitive_location', Point(2, srid=4326), nullable=False)
 )
 GeometryDDL(sensitive_occurrences)
+
 
 vettings = Table('vettings', metadata,
     Column('id', Integer(), primary_key=True),
@@ -60,3 +68,13 @@ vettings = Table('vettings', metadata,
 )
 GeometryDDL(vettings)
 
+
+# table only available after using shp2pgsql on BLA shapefile:
+#     shp2pgsql TaxonPolys1.shp birdlife_import | sudo -u postgres psql edgar
+birdlife_import = Table('birdlife_import', metadata,
+    Column('spno', SmallInteger()),
+    Column('range_t', String(50)),
+    Column('br_rnge_t', String(50)),
+    GeometryExtensionColumn('the_geom', MultiPolygon(2, srid=-1))
+)
+GeometryDDL(birdlife_import)

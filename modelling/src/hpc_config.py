@@ -19,7 +19,7 @@ import paramiko
 class HPCConfig:
     cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
     #cakeAppBaseURL = "http://localhost/~robert/ap03"
-    nextSpeciesURL= cakeAppBaseURL + "/species/next_job"
+    nextSpeciesURL= cakeAppBaseURL + "/species/get_next_job_and_assume_queued"
     sshUser = "jc155857"
     sshHPCDestination = "login.hpc.jcu.edu.au"
 

@@ -10,7 +10,6 @@ import datetime
 import shapely.wkt
 import shapely.geometry
 from sqlalchemy import func, select, text
-from geoalchemy import WKTSpatialElement
 from cStringIO import StringIO
 
 
@@ -477,17 +476,15 @@ class Syncer:
 
 
 def classification_for_occurrence(occ):
-    '''Returns an occurrences.classification enum value for an ala.Occurrence.
-
-    Basically just determines whether the record is "suspect" or not, all
-    bad records should have been filtered out by this point.'''
+    '''Returns an occurrences.classification enum value for an
+    ala.Occurrence.'''
 
     if 'detectedOutlier' in occ.assertions:
-        return 'invalid' # suspect
+        return 'vagrant'
     elif 'habitatMismatch' in occ.assertions:
-        return 'invalid' # suspect
+        return 'invalid'
     else:
-        return 'irruptive' # not suspect
+        return 'unknown'
 
 
 def postgres_escape_bytea(b):
