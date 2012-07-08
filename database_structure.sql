@@ -129,7 +129,8 @@ CREATE TABLE users (
     fname VARCHAR(256) NOT NULL,
     lname VARCHAR(256) NOT NULL,
     can_vet BOOLEAN DEFAULT TRUE NOT NULL,
-    is_admin BOOLEAN DEFAULT FALSE NOT NULL
+    is_admin BOOLEAN DEFAULT FALSE NOT NULL,
+    authority INT DEFAULT 1000 NOT NULL
 );
 
 
@@ -210,6 +211,7 @@ DECLARE
     r RECORD;
 BEGIN
     -- Revert back to original vettings, as obtained from the source
+    RAISE NOTICE 'Reverting classification back to source_classification';
     UPDATE occurrences
         SET classification = source_classification
         WHERE species_id = speciesId;
@@ -218,12 +220,14 @@ BEGIN
     FOR r IN
         -- TODO: order this loop from least authoritative user to most authoritative.
         -- TODO: what if two vettings by the same user overlap? What takes precedence?
-        SELECT *
+        SELECT *, vettings.id as vetting_id
             FROM vettings
                 JOIN users on vettings.user_id = users.id
             WHERE vettings.species_id = speciesId
                 AND users.can_vet
+            ORDER BY users.authority ASC, vettings.updated_on ASC
     LOOP
+        RAISE NOTICE 'Applying vetting %, authority %, by user %', r.vetting_id, r.authority, r.email;
         UPDATE occurrences
             SET classification = r.classification
             WHERE occurrences.species_id = speciesId
