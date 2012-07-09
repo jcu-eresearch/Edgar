@@ -9,7 +9,8 @@ window.Edgar = window.Edgar || {};
 Edgar.map = Edgar.map || null;
 
 // mode: one of 'blank', 'current', 'future', 'vetting'
-// don't set this directly, use:    $(Edgar.map).trigger('changemode','future'); // to change into future mode, for example
+// don't set this directly, use:
+//    $(Edgar.map).trigger('changemode','future'); // to change into future mode, for example
 Edgar.mapmode = Edgar.mapmode || 'blank';
 
 // vars related to the species map

@@ -58,12 +58,4 @@ $(function() {
         Edgar.yearSlider.playAnimation();
     });
 
-    // test the mode changing stuff
-    $('#go').click( function() {
-        $(Edgar.map).trigger('changemode', 'current');
-        setTimeout(function() {
-            $(Edgar.map).trigger('changemode', 'vetting');
-        }, 3000);
-    });
-
 });

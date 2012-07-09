@@ -139,14 +139,21 @@
 
             <hr style="clear: both">
 
-            <button id="go">.go.</button>
-            <label><input id="done" type="checkbox" value="done" />done</label>
+            <button id="vet">.vet.</button>
+            <button id="novet">.devet.</button>
         </div>
     </div>
 
 </div>
 
 <div id="speciespanel" class="top panel speciespanel clearfix">
+
+    <div id="currentspecies">
+        <h1>Common Name</h1>
+        <h2>Scientific nameicus, often quite longdiae</h2>
+    </div>
+
+    <!-- old species panel below -->
 
     <p class="minor label" id="species_modelling_status"></p>
     <p class="minor label" id="species_showing_label"></p>
