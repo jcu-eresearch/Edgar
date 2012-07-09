@@ -36,8 +36,24 @@ function addMapModes(theMap) {
         var oldMode = Edgar.mapmode;
         var newMode = theMap.destinationMode;
 
+        function showhidetools(showlist, hidelist) { // - - - - - - - - 
+            $.each(hidelist, function(i, tool) {
+                $('#' + tool).hide('blind','slow');
+            });
+            $.each(showlist, function(i, tool) {
+                $('#' + tool).show('blind','slow');
+            });
+        } // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
         // do nothing if there was no adjustment of mode
         if (oldMode === newMode) {
+            if (oldMode == 'blank') {
+                // special handling for blank-to-blank, the startup mode switch
+                showhidetools(
+                    ['tool-layers', 'tool-example', 'tool-debug', 'tool-layers'],
+                    ['oldvets','myvets','newvet','tool-legend','tool-emissions']
+                );
+            }
             return;
         }
 
@@ -48,7 +64,7 @@ function addMapModes(theMap) {
         }
 
         // okay now we're okay to change to the proper mode.
-        consolelog("changing mode to " + newMode);
+        consolelog('changing mode, ' + oldMode + ' to ' + newMode);
 
         //
         // transitions between modes
@@ -70,6 +86,10 @@ function addMapModes(theMap) {
         }
 
         if (oldMode === 'current' && newMode === 'vetting') {
+            disengageCurrentMode();
+            // show & hide the appropriate tools
+            showhidetools(['oldvets','newvets','myvets'], ['tool-legend','tool-emissions']);
+            engageVettingMode();
         }
 
         if (oldMode === 'future'  && newMode === 'current') {
@@ -79,10 +99,16 @@ function addMapModes(theMap) {
         }
 
         if (oldMode === 'vetting' && newMode === 'current') {
+            disengageVettingMode();
+            showhidetools([], ['oldvets','newvets','myvets'],['tool-legend']);
+            engageCurrentMode();
         }
 
         if (oldMode === 'vetting' && newMode === 'future' ) {
         }
+
+        // yay, we're almost done.. now change the mode record
+        Edgar.mapmode = newMode;
 
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,3 +122,5 @@ function addMapModes(theMap) {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
+// trigger a mode change to blank, to get everything showing up right
+$(function() { $(Edgar.map).trigger('changemode', 'blank'); });

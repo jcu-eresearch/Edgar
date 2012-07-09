@@ -38,7 +38,7 @@
 
 <div id="toolspanel" class="side panel toolspanel">
 
-    <div id="oldvets" class="tool">
+    <div class="tool" id="oldvets">
         <h1>other people's vettings</h1>
         <div class="toolcontent">
             <ul id="other_peoples_vettings_list" class="vetting_list theirs">
@@ -48,7 +48,7 @@
             </ul>
         </div>
     </div>
-    <div id="myvets" class="tool">
+    <div class="tool" id="myvets">
         <h1>my vettings</h1>
         <div class="toolcontent">
             <ul id="my_vettings_list" class="vetting_list mine">
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div id="newvet" class="tool">
+    <div class="tool" id="newvet">
         <h1>new vetting</h1>
         <div class="toolcontent">
             <div id="newvet_control" class="newvet_control">
@@ -92,19 +92,19 @@
         </div>
     </div>
 
-    <div class="tool">
+    <div class="tool" id="tool-layers">
         <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
     </div>
 
-    <div class="tool">
+    <div class="tool" id="tool-example">
         <h1>some tool</h1>
         <div class="toolcontent">
             tool content goes here
         </div>
     </div>
 
-    <div class="tool legend startclosed">
+    <div class="tool legend startclosed" id="tool-legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
             <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
@@ -112,7 +112,7 @@
     </div>
 
 
-    <div class="tool">
+    <div class="tool" id="tool-emissions">
         <h1>emissions and time</h1>
         <div class="toolcontent">
             <!-- the check box will probably be removed when this is working properly -->
@@ -128,7 +128,7 @@
         </div>
     </div>
 
-    <div class="tool">
+    <div class="tool" id="tool-debug">
         <h1>debug</h1>
         <div class="toolcontent">
 

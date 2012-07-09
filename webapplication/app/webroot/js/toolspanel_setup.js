@@ -60,7 +60,10 @@ $(function() {
 
     // test the mode changing stuff
     $('#go').click( function() {
-        $(Edgar.map).trigger('changemode', 'future');
+        $(Edgar.map).trigger('changemode', 'current');
+        setTimeout(function() {
+            $(Edgar.map).trigger('changemode', 'vetting');
+        }, 3000);
     });
 
 });

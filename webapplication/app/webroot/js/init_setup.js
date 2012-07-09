@@ -21,3 +21,5 @@ Edgar.mapdata.year = null; //(integer) the year that the suitability map represe
 
 // logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
 Edgar.user = Edgar.user || null;
+
+

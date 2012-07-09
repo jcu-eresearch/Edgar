@@ -5,7 +5,11 @@
 //
 
 // convenient debug method
-function consolelog(arg1, arg2, arg3) { if (window.console){ console.log(arg1, arg2, arg3); } }
+function consolelog(arg1, arg2, arg3) { if (window.console) {
+    if (arg3) { console.log(arg1, arg2, arg3); }
+    if (arg2) { console.log(arg1, arg2);       }
+    if (arg1) { console.log(arg1);             }
+}}
 // ------------------------------------------------------------------
 var occurrences, distribution, occurrence_select_control;
 
@@ -38,6 +42,16 @@ zoom_bounds = australia_bounds;
 // (registered under Robert's name)
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 // ------------------------------------------------------------------
+// gets called by mapmodes.js, when the previous mode has been
+// disengeged, and the current mode tools have been shown
+function engageCurrentMode() {
+}
+// ------------------------------------------------------------------
+// gets called by mapmodes.js, when changing out of current 
+// mode, before hiding the current mode tools
+function disengageCurrentMode() {
+}
+// ------------------------------------------------------------------
 function speciesGeoJSONURL() {
     return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.mapdata.species.id + ".json");
 }
@@ -47,7 +61,6 @@ function legendURL() {
     var data = speciesId + '/1975.asc';
     return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php' +
         '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
-
 }
 // ------------------------------------------------------------------
 function updateLegend() {
