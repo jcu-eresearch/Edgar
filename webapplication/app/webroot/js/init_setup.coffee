@@ -31,14 +31,3 @@ Edgar.mapdata.year = null #(integer) the year that the suitability map represent
 logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
 ###
 Edgar.user = Edgar.user || null
-
-###
-Projections
-----------
-###
-Edgar.util =
-        projections:
-            # DecLat, DecLng 
-            geographic: new OpenLayers.Projection "EPSG:4326"
-            # Spherical Meters
-            mercator:   new OpenLayers.Projection "EPSG:900913"
