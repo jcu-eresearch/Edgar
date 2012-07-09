@@ -68,7 +68,6 @@
                 <legend>Classification
                     <select id="vetclassification" name="classification">
                         <option value="" selected=true>-- classify these areas --</option>
-                        <option value="unknown">unknown</option>
                         <option value="invalid">invalid</option>
                         <option value="historic">historic</option>
                         <option value="vagrant">vagrant</option>
