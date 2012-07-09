@@ -1,6 +1,9 @@
 <?php
     require("lib/map_utility_functions.php");
 
+    // Set content type.
+    header('Content-Type: image/png');
+
     // Determine request type.
     $request_type = $_GET['REQUEST'];
 
@@ -57,8 +60,6 @@
        throw new Exception('Unexpected request type. Request type was: "'.$request.'", expected GetMap or GetLegendGraphic');
     }
 
-    // Set content type.
-    header('Content-Type: image/png');
     // Output image to stdout
     $image_to_render->saveImage('');
     exit;
