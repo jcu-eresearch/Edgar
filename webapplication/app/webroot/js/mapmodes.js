@@ -128,7 +128,10 @@ $(function() {
 
     // test the mode changing stuff
     $('#vet').click( function() {
-        $(Edgar.map).trigger('changemode', 'vetting');
+        $(Edgar.map).trigger('changemode', 'current');
+        setTimeout( function() {
+            $(Edgar.map).trigger('changemode', 'vetting');
+        }, 1000);
     });
 
     $('#devet').click( function() {
