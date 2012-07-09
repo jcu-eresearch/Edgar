@@ -94,13 +94,6 @@
         <div id="layerstool" class="toolcontent"></div>
     </div>
 
-    <div class="tool" id="tool-example">
-        <h1>some tool</h1>
-        <div class="toolcontent">
-            tool content goes here
-        </div>
-    </div>
-
     <div class="tool legend startclosed" id="tool-legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
@@ -125,7 +118,7 @@
         </div>
     </div>
 
-    <div class="tool" id="tool-debug">
+    <div class="tool startclosed" id="tool-debug">
         <h1>debug</h1>
         <div class="toolcontent">
 
