@@ -96,13 +96,6 @@
         <div id="layerstool" class="toolcontent"></div>
     </div>
 
-    <div class="tool" id="tool-example">
-        <h1>some tool</h1>
-        <div class="toolcontent">
-            tool content goes here
-        </div>
-    </div>
-
     <div class="tool legend startclosed" id="tool-legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
@@ -127,19 +120,18 @@
         </div>
     </div>
 
-    <div class="tool" id="tool-debug">
+    <div class="tool startclosed" id="tool-debug">
         <h1>debug</h1>
         <div class="toolcontent">
 
+            <hr style="clear: both">
+
             <!-- clustering selector -->
-            <fieldset class="clusteroptions" style="float: right">
-                <legend>Clustering Display</legend>
-                <select id="cluster">
-                    <option value="dotradius" >Dot Radius (no clustering)</option>
-                    <option value="dotgrid" selected>Dot Grid</option>
-                    <option value="squaregrid">Square Grid</option>
-                </select>
-            </fieldset>
+            <select id="cluster">
+                <option value="dotradius" >Dot Radius (no clustering)</option>
+                <option value="dotgrid" selected>Dot Grid</option>
+                <option value="squaregrid">Square Grid</option>
+            </select>
 
             <hr style="clear: both">
 
@@ -153,16 +145,17 @@
 <div id="speciespanel" class="top panel speciespanel clearfix">
 
     <div id="currentspecies">
-        <h1>Common Name</h1>
+        <h1>Common Name </h1><button class="ui-state-default ui-corner-all">change species</button>
         <h2>Scientific nameicus, often quite longdiae</h2>
     </div>
 
     <!-- old species panel below -->
-
     <p class="minor label" id="species_modelling_status"></p>
     <p class="minor label" id="species_showing_label"></p>
 
     <!-- Species Selector -->
+<!--
+-->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
 
     <table>
