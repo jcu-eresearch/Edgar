@@ -16,23 +16,28 @@ def parse_args():
     return parser.parse_args()
 
 
-def coords_for_species_id(species_id):
+def rows_for_species_id(species_id):
     q = sqlalchemy.select([
         'ST_X(location) as longitude',
         'ST_Y(location) as latitude',
         'ST_X(sensitive_location) as sensitive_longitude',
         'ST_Y(sensitive_location) as sensitive_latitude',
-        'uncertainty']).\
+        'uncertainty',
+        'date']).\
         select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
         where(db.occurrences.c.species_id == species_id).\
-        where(db.occurrences.c.classification > 'irruptive').\
-        execute()
+        where(sqlalchemy.or_(
+            db.occurrences.c.classification >= 'irruptive',
+            db.occurrences.c.classification == 'unknown'
+        )).execute()
 
     for row in q:
-        if row['sensitive_longitude'] is None:
-            yield row['longitude'], row['latitude'], row['uncertainty']
-        else:
-            yield row['sensitive_longitude'], row['sensitive_latitude'], row['uncertainty']
+        row = dict(row)
+        row['date'] = '' if row['date'] is None else row['date'].isoformat()
+        if row['sensitive_longitude'] is not None:
+            row['longitude'] = row['sensitive_longitude']
+            row['latitude'] = row['sensitive_latitude']
+        yield row
 
 
 def write_csv_for_species(species):
@@ -40,20 +45,23 @@ def write_csv_for_species(species):
     f = None
     num_records = 0
 
-    for lon, lat, uncertainty in coords_for_species_id(species['id']):
+    for row in rows_for_species_id(species['id']):
         # lazy open file, incase this species has 0 records
         if writer is None:
             f = open(species['scientific_name'] + '.csv', 'wb')
             writer = csv.writer(f)
-            writer.writerow(["SPPCODE", "LATDEC", "LONGDEC", "UNCERTAINTY"])
+            writer.writerow(["SPPCODE", "LATDEC", "LONGDEC", "UNCERTAINTY", "DATE"])
 
-        writer.writerow([species['id'], lat, lon, uncertainty])
+        writer.writerow((species['id'],
+                         row['latitude'],
+                         row['longitude'],
+                         row['uncertainty'],
+                         row['date']))
         num_records += 1
 
     if f is not None:
         logging.info('Wrote %d records for species %s', num_records, species['scientific_name'])
         f.close()
-
 
 
 def main():
