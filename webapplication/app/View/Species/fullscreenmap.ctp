@@ -14,6 +14,9 @@
     // add the init JS to our scripts content block
     $this->Html->scriptBlock($species_init_js, array('inline'=>false));
 
+    // add more init stuff
+    $this->Html->script('late_init_setup', array('inline'=>false));
+
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
@@ -29,6 +32,7 @@
 
     // the init stuff needs to go early
     $this->Html->script('init_setup', array('inline'=>false, 'block'=>'earlyscript'));
+
 
 ?>
 
