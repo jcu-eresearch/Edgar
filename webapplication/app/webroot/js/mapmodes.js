@@ -122,5 +122,22 @@ function addMapModes(theMap) {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
-// trigger a mode change to blank, to get everything showing up right
-$(function() { $(Edgar.map).trigger('changemode', 'blank'); });
+$(function() {
+    // trigger a mode change to blank, to get everything showing up right
+    $(Edgar.map).trigger('changemode', 'blank');
+
+    // test the mode changing stuff
+    $('#vet').click( function() {
+        $(Edgar.map).trigger('changemode', 'vetting');
+    });
+
+    $('#devet').click( function() {
+        $(Edgar.map).trigger('changemode', 'current');
+    });
+
+});
+
+
+
+
+
