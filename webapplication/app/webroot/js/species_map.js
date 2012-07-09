@@ -450,7 +450,7 @@ function updateWindowHistory() {
 }
 
 function handleBlankTile() {
-    console.error("Failed to load tile.");
+    consolelog("Failed to load tile.");
     //    alert("We don't have the map for that species :(");
 
 
