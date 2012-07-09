@@ -25,10 +25,8 @@
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
     $this->Html->script('mapmodes', array('inline'=>false));
-    $this->Html->script('vetting/add_new_vetting', array('inline'=>false));
-    $this->Html->script('vetting/display_my_vettings', array('inline'=>false));
-    $this->Html->script('vetting/display_their_vettings', array('inline'=>false));
-    $this->Html->script('vetting/init_vetting', array('inline'=>false));
+    $this->Html->script('vetting/vetting', array('inline'=>false));
+    $this->Html->script('vetting/classify_habitat', array('inline'=>false));
 
     // the init stuff needs to go early
     $this->Html->script('init_setup', array('inline'=>false, 'block'=>'earlyscript'));
