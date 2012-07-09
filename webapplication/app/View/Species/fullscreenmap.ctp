@@ -144,7 +144,7 @@
             <hr style="clear: both">
 
             <button id="vet">.vet.</button>
-            <button id="novet">.devet.</button>
+            <button id="devet">.devet.</button>
         </div>
     </div>
 
