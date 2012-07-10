@@ -3,6 +3,12 @@
     position: relative;
 }
 
+caption {
+    caption-side: bottom;
+    font-style: italic;
+    font-size: 80%;
+}
+
 #logo {
     float: left;
     margin-bottom: 1ex;
@@ -10,16 +16,28 @@
 .cc-by {
     padding: 1em 0;
     text-align: left;
+    width: 80%;
+    margin: auto;
+    border-top: 1px silver solid;
 }
 
-.ands-acknowledge {
-    color: black;
+footer {
     background: white;
     --webkit-border-radius: 6px;
     border-radius: 6px;
     border: 1px solid silver;
     padding: 1ex;
     margin: 20px -20px;
+    text-align: center;
+}
+
+.ands-acknowledge {
+    color: black;
+}
+
+.credits {
+    padding-top: 10px;
+    text-align: center;
 }
 
 #cc-logo {
