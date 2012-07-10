@@ -9,6 +9,7 @@ Edgar.vetting = {
     ###
     init: () ->
         Edgar.vetting.classifyHabitat.init()
+
         null
 
     ###
@@ -17,6 +18,8 @@ Edgar.vetting = {
     ###
     engageVettingMode: () ->
         console.log "engageVettingMode"
+        Edgar.vetting.classifyHabitat.engage()
+
         null
 
     ###
@@ -25,6 +28,7 @@ Edgar.vetting = {
     ###
     disengageVettingMode: () ->
         console.log "disengageVettingMode"
+
         null
 }
 
