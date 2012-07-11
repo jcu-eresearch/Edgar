@@ -88,7 +88,7 @@ function addMapModes(theMap) {
         if (oldMode === 'current' && newMode === 'vetting') {
             disengageCurrentMode();
             // show & hide the appropriate tools
-            showhidetools(['oldvets','newvets','myvets'], ['tool-legend','tool-emissions']);
+            showhidetools(['oldvets','newvet','myvets'], ['tool-legend','tool-emissions']);
             Edgar.vetting.engageVettingMode();
         }
 
@@ -100,7 +100,7 @@ function addMapModes(theMap) {
 
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
-            showhidetools([], ['oldvets','newvets','myvets'],['tool-legend']);
+            showhidetools([], ['oldvets','newvet','myvets'],['tool-legend']);
             engageCurrentMode();
         }
 

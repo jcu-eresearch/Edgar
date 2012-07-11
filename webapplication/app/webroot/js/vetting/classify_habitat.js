@@ -121,9 +121,9 @@
     },
     engage: function() {
       consolelog("Starting engageClassifyHabitatInterface");
-      _addVectorLayer();
-      _addDrawControl();
-      _addModifyControl();
+      this._addVectorLayer();
+      this._addDrawControl();
+      this._addModifyControl();
       consolelog("Finished engageClassifyHabitatInterface");
       return null;
     },
