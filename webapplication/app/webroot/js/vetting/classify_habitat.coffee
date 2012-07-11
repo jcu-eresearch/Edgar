@@ -1,19 +1,20 @@
 ###
-Code to control the classify a habitat interface
+# Code to control the classify a habitat interface
 ###
 
 Edgar.vetting.classifyHabitat = {
 
     ###
-    Init the classify Habitat
-
-    This is run once
+    # Init the classify Habitat
+    #
+    # This is run once
     ###
     init: () ->
         consolelog "Starting to init the classify habitat interface"
+        classifyHabitat = Edgar.vetting.classifyHabitat
 
-        Edgar.vetting.classifyHabitat.wkt = new OpenLayers.Format.WKT {
-            'internalProjection': Edgar.map.baseLayer.projection,
+        classifyHabitat.wkt = new OpenLayers.Format.WKT {
+            'internalProjection': Edgar.map.baseLayer.projection
             'externalProjection': Edgar.util.projections.mercator
         }
 
@@ -21,32 +22,33 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
-        Edgar.vetting.classifyHabitat.vectorLayerOptions = {
+        classifyHabitat.vectorLayerOptions = {
             ###
-            NOTE: Due to OpenLayers Bug.. can't do this.
-              The modify feature control draws points onto the vector layer
-              to show vertice drag points.. these drag points fail the geometryType
-              test.
-            'geometryType': OpenLayers.Geometry.Polygon
+            # NOTE: Due to OpenLayers Bug.. can't do this.
+            #   The modify feature control draws points onto the vector layer
+            #   to show vertice drag points.. these drag points fail the geometryType
+            #   test.
+            # 'geometryType': OpenLayers.Geometry.Polygon
             ###
         }
 
         # Listen for button clicks
-        Edgar.vetting.classifyHabitat._addButtonHandlers()
+        classifyHabitat._addButtonHandlers()
 
-        consolelog("Finished init new vetting");
+        consolelog("Finished init new vetting")
 
         null
 
     ###
-        Code to add button click even handlers to DOM
+    # Code to add button click even handlers to DOM
     ###
     _addButtonHandlers: () ->
+
         ###
         handle draw polygon press
         ###
         $('#newvet_draw_polygon_button').click( (e) ->
-            handleDrawPolygonClick e
+            _handleDrawPolygonClick e
             null
         )
 
@@ -54,337 +56,376 @@ Edgar.vetting.classifyHabitat = {
         handle add polygon press
         ###
         $('#newvet_add_polygon_button').click( (e) ->
-            handleAddPolygonClick e
+            _handleAddPolygonClick e
             null
-        );
+        )
 
         ###
         handle modify polygon press
         ###
         $('#newvet_modify_polygon_button').click( (e) ->
-            handleModifyPolygonClick e
+            _handleModifyPolygonClick e
             null
-        );
+        )
 
         ###
         handle delete selected polygon press
         ###
         $('#newvet_delete_selected_polygon_button').click( (e) ->
-            handleDeleteSelectedPolygonClick e
+            _handleDeleteSelectedPolygonClick e
             null
-        );
+        )
 
         ###
         handle delete all polygon press
         ###
         $('#newvet_delete_all_polygons_button').click( (e) ->
-            handleDeleteAllPolygonClick e
+            _handleDeleteAllPolygonClick e
             null
-        );
+        )
 
         ###
         toggle the ui-state-hover class on hover events
         ###
         $('#newvet :button').hover(
             () ->
-                $(Edgar.vetting.classifyHabitat).addClass "ui-state-hover"
+                classifyHabitat = Edgar.vetting.classifyHabitat
+                $(classifyHabitat).addClass "ui-state-hover"
                 null
-            ,
             () ->
-                $(Edgar.vetting.classifyHabitat).removeClass "ui-state-hover"
+                classifyHabitat = Edgar.vetting.classifyHabitat
+                $(classifyHabitat).removeClass "ui-state-hover"
                 null
         )
 
         ###
         listen for newvet form submission
         ###
-        vetpanel = $('#newvet');
-        vetform = $('#vetform');
+        vetpanel = $('#newvet')
+        vetform = $('#vetform')
 
         # Add click handler to vet_submit form
         $('#vet_submit').click( (e) ->
             e.preventDefault()
 
             ###
-            validate the form
-            and, if valid, submit its contents
+            # validate the form
+            # and, if valid, submit its contents
             ###
             # if the form was valid...
-            if(validateNewVetForm())
+            if _validateNewVetForm()
                 # submit the vetting
-                createNewVetting()
-            # else do nothing
-
-            null
-        );
+                _createNewVetting()
+            else
+                false
+        )
 
     engage: () ->
         consolelog "Starting engageClassifyHabitatInterface"
-        ###
-        Define a vector layer to hold a user's area classification
-        ###
-        Edgar.vetting.classifyHabitat.vectorLayer = new OpenLayers.Layer.Vector "New Area Classification", Edgar.vetting.classifyHabitat.classifyHabitat.vectorLayerOptions
 
-        ###
-        Create a Draw control to let users draw an area (polygon)
-        ###
-        Edgar.vetting.classifyHabitat.drawControl = new OpenLayers.Control.DrawFeature(
-            Edgar.vetting.classifyHabitat.vectorLayer,
-            OpenLayers.Handler.Polygon
-        )
-
-        ###
-        Create a Modify Feature control
-        Allow users to:
-            - Reshape
-            - Drag
-        ###
-        Edgar.vetting.classifyHabitat.modifyControl = new OpenLayers.Control.ModifyFeature(Edgar.vetting.classifyHabitat.vectorLayer, {
-            mode: OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG,
-            beforeSelectFeature: (feature) -> 
-                $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled")
-                null
-            ,
-            unselectFeature: (feature) ->
-                $('#newvet_delete_selected_polygon_button').attr("disabled", true).addClass("ui-state-disabled")
-                null
-        });
-
-        Edgar.map.addLayers     [Edgar.vetting.classifyHabitat.vectorLayer]
-        Edgar.map.addControl    Edgar.vetting.classifyHabitat.drawControl
-        Edgar.map.addControl    Edgar.vetting.classifyHabitat.modifyControl
+        _addVectorLayer()
+        _addDrawControl()
+        _addModifyControl()
 
         consolelog "Finished engageClassifyHabitatInterface"
 
         null
 
-    clearNewVettingMode: (e) ->
+    _addVectorLayer: () ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
+
+        ###
+        # Define a vector layer to hold a user's area classification
+        ###
+        classifyHabitat.vectorLayer = new OpenLayers.Layer.Vector "New Area Classification", classifyHabitat.vectorLayerOptions
+        Edgar.map.addLayers  [classifyHabitat.vectorLayer]
+
+    _removeVectorLayer: () ->
+        # TODO
+        null
+
+    _addDrawControl: () ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
+        classifyHabitat.drawControl = new OpenLayers.Control.DrawFeature(
+            classifyHabitat.vectorLayer
+            OpenLayers.Handler.Polygon
+        )
+        Edgar.map.addControl classifyHabitat.drawControl
+
+        null
+
+    _removeDrawControl: () ->
+        # TODO
+        null
+
+    _addModifyControl: () ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
+
+        ###
+        # Create a Modify Feature control
+        # Allow users to:
+        #    - Reshape
+        #    - Drag
+        ###
+        classifyHabitat.modifyControl = new OpenLayers.Control.ModifyFeature(
+            classifyHabitat.vectorLayer
+            {
+                mode: ( OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG )
+                beforeSelectFeature: (feature) ->
+                    $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled")
+                    null
+                unselectFeature: (feature) ->
+                    $('#newvet_delete_selected_polygon_button').attr("disabled", true).addClass("ui-state-disabled")
+                    null
+            }
+        )
+
+        null
+
+    _removeModifyControl: () ->
+        # TODO
+        null
+
+
+    _clearNewVettingMode: (e) ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
         consolelog "Clearing classify habitat mode of operation"
 
         removeModifyFeatureHandlesAndVertices()
 
         # Deactivate draw polygon control
-        Edgar.vetting.classifyHabitat.drawControl.deactivate()
+        classifyHabitat.drawControl.deactivate()
         $('#newvet_draw_polygon_button').removeClass 'ui-state-active'
 
         # Deactivate modify polygon control
-        Edgar.vetting.classifyHabitat.modifyControl.deactivate()
+        classifyHabitat.modifyControl.deactivate()
         $('#newvet_modify_polygon_button').removeClass 'ui-state-active'
 
-        updateNewVetHint()
+        _updateNewVetHint()
 
-    activateDrawPolygonMode: () ->
-        clearNewVettingMode()
+        null
+
+    _activateDrawPolygonMode: () ->
+        _clearNewVettingMode()
         $('#newvet_draw_polygon_button').addClass 'ui-state-active'
         new_vet_draw_polygon_control.activate()
-        updateNewVetHint()
+        _updateNewVetHint()
 
-    activateModifyPolygonMode: () ->
-        clearNewVettingMode()
+        null
+
+    _activateModifyPolygonMode: () ->
+        _clearNewVettingMode()
         $('#newvet_modify_polygon_button').addClass 'ui-state-active'
 
         # Specify the modify mode as reshape and drag 
-        Edgar.vetting.classifyHabitat.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG
-        Edgar.vetting.classifyHabitat.modifyControl.activate()
-        updateNewVetHint()
+        classifyHabitat.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG
+        classifyHabitat.modifyControl.activate()
+        _updateNewVetHint()
 
-    function handleToggleButtonClick(e, onActivatingButton, onDeactivatingButton) {
-        e.preventDefault();
-        if ( $(e.srcElement).hasClass('ui-state-active') ) {
-            onDeactivatingButton();
-        } else {
-            onActivatingButton();
-        }
-    }
+    _handleToggleButtonClick: (e, onActivatingButton, onDeactivatingButton) ->
+        e.preventDefault()
+        if $(e.srcElement).hasClass 'ui-state-active'
+            onDeactivatingButton()
+        else
+            onActivatingButton()
 
-    function handleDrawPolygonClick(e) {
-        handleToggleButtonClick(e, activateDrawPolygonMode, clearNewVettingMode);
-    }
+        null
 
-    function handleModifyPolygonClick(e) {
-        handleToggleButtonClick(e, activateModifyPolygonMode, clearNewVettingMode);
-    }
+    _handleDrawPolygonClick: (e) ->
+        _handleToggleButtonClick(e, _activateDrawPolygonMode, _clearNewVettingMode)
 
-    function handleAddPolygonClick(e) {
-        e.preventDefault();
+        null
 
-        clearNewVettingMode();
+    _handleModifyPolygonClick: (e) ->
+        _handleToggleButtonClick(e, _activateModifyPolygonMode, _clearNewVettingMode)
 
-        // Determine position to add polygon..
-        // then add it.
-        // Get the center of the map.
-        var centerOfMap = Edgar.map.getCenter();
-        var mapBounds   = Edgar.map.getExtent();
-        var mapHeight   = mapBounds.top   - mapBounds.bottom;
-        var mapWidth    = mapBounds.right - mapBounds.left;
+        null
 
-        var calcDimension = null;
-        if (mapHeight > mapWidth) {
-            calcDimension = mapHeight;
-        } else {
-            calcDimension = mapWidth;
-        }
+    _handleAddPolygonClick: (e) ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
 
-        var largerFraction = calcDimension / 10;
-        var minorFraction = calcDimension / 14;
+        e.preventDefault()
 
-        var points = [
-            new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - largerFraction),
-            new OpenLayers.Geometry.Point(centerOfMap.lon - largerFraction, centerOfMap.lat),
-            new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction),
-            new OpenLayers.Geometry.Point(centerOfMap.lon + largerFraction, centerOfMap.lat),
-            new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - largerFraction)
-        ];
+        _clearNewVettingMode()
 
-        var ring = new OpenLayers.Geometry.LinearRing(points);
-        var polygon = new OpenLayers.Geometry.Polygon([ring]);
+        # Determine position to add polygon..
+        # then add it.
+        # Get the center of the map.
+        centerOfMap = Edgar.map.getCenter
+        mapBounds   = Edgar.map.getExtent
+        mapHeight   = ( mapBounds.top   - mapBounds.bottom )
+        mapWidth    = ( mapBounds.right - mapBounds.left )
 
-        // create some attributes for the feature
-        var attributes = {};
+        calcDimension = null
+        if (mapHeight > mapWidth)
+            calcDimension = mapHeight
+        else
+            calcDimension = mapWidth
 
-        var feature = new OpenLayers.Feature.Vector(polygon, attributes);
-        classify_habitat_vectors.addFeatures([feature]);
+        majorFraction = calcDimension / 10
+        minorFraction = calcDimension / 14
 
-        activateModifyPolygonMode();
-    }
+        points = [
+            new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - majorFraction)
+            new OpenLayers.Geometry.Point(centerOfMap.lon - majorFraction, centerOfMap.lat)
+            new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction)
+            new OpenLayers.Geometry.Point(centerOfMap.lon + majorFraction, centerOfMap.lat)
+            new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - majorFraction)
+        ]
 
-    function removeModifyFeatureHandlesAndVertices() {
-        // Delete any modify control vertices.
-        classify_habitat_vectors.removeFeatures(new_vet_modify_polygon_control.virtualVertices, { silent: true });
-        classify_habitat_vectors.removeFeatures(new_vet_modify_polygon_control.vertices, { silent: true });
-        // Delete the radius handle.
-        classify_habitat_vectors.removeFeatures(new_vet_modify_polygon_control.radiusHandle, { silent: true });
-        // Delete the drag handle.
-        classify_habitat_vectors.removeFeatures(new_vet_modify_polygon_control.dragHandle, { silent: true });
-    }
+        ring = new OpenLayers.Geometry.LinearRing points
+        polygon = new OpenLayers.Geometry.Polygon [ring]
 
-    function handleDeleteSelectedPolygonClick(e) {
-        e.preventDefault();
-        currentFeature = new_vet_modify_polygon_control.feature;
-        if(currentFeature) {
-            // Unselect the feature.
-            new_vet_modify_polygon_control.unselectFeature(currentFeature);
-            removeModifyFeatureHandlesAndVertices();
-            // Delete the selected feature
-            classify_habitat_vectors.removeFeatures(currentFeature);
+        # create some attributes for the feature
+        attributes = {}
 
-            // If all Features are now deleted,
-            // clear the vetting mode (get out of modify mode)
-            if (classify_habitat_vectors.features.length === 0) {
-                clearNewVettingMode();
-            }
-        }
+        feature = new OpenLayers.Feature.Vector polygon, attributes
+        classifyHabitat.vectorLayer.addFeatures [feature]
 
-    }
+        _activateModifyPolygonMode()
 
-    function handleDeleteAllPolygonClick(e) {
-        e.preventDefault();
+        null
 
-        clearNewVettingMode();
+    _removeModifyFeatureHandlesAndVertices: () ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
+        classifyHabitat.vectorLayer.addFeatures [feature]
 
-        classify_habitat_vectors.removeAllFeatures();
+        # Delete any modify control vertices.
+        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.virtualVertices, { silent: true }
+        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.vertices, { silent: true }
+        # Delete the radius handle.
+        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.radiusHandle, { silent: true }
+        # Delete the drag handle.
+        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.dragHandle, { silent: true }
 
-        updateNewVetHint();
-    }
+        null
+
+    _handleDeleteSelectedPolygonClick: (e) ->
+        e.preventDefault()
+        classifyHabitat = Edgar.vetting.classifyHabitat
+        currentFeature =  classifyHabitat.modifyControl.feature
+
+        if(currentFeature)
+            # Unselect the feature.
+            classifyHabitat.modifyControl.unselectFeature(currentFeature)
+            _removeModifyFeatureHandlesAndVertices()
+            # Delete the selected feature
+            classifyHabitat.vectorLayer.removeFeatures(currentFeature)
+
+            # If all Features are now deleted,
+            # clear the vetting mode (get out of modify mode)
+            if classifyHabitat.vectorLayer.features.length == 0
+                _clearNewVettingMode()
+
+        null
 
 
-    // Sets the vetting hint to a random hint
-    function updateNewVetHint() {
-        var drawPolygonHints = [
+    _handleDeleteAllPolygonClick: (e) ->
+        e.preventDefault()
+        classifyHabitat = Edgar.vetting.classifyHabitat
+
+        _clearNewVettingMode()
+
+        classifyHabitat.vectorLayer.removeAllFeatures()
+
+        _updateNewVetHint()
+
+        null
+
+
+    # Sets the vetting hint to a random hint
+    _updateNewVetHint: () ->
+        drawPolygonHints = [
             ''
-        ];
+        ]
 
-        var modifyPolygonHints = [
+        modifyPolygonHints = [
             '<p>Press <strong>Delete</strong> while over a corner to delete it</p>'
-        ];
+        ]
 
-        var movePolygonHints = [
+        movePolygonHints = [
             ''
-        ];
+        ]
 
-        // Modify feature is active
-        if (new_vet_modify_polygon_control.active) {
-            var hint = modifyPolygonHints[Math.floor(Math.random()*modifyPolygonHints.length)]
-            $('#vethint').html(hint);
-        } else if (new_vet_draw_polygon_control) {
-            var hint = drawPolygonHints[Math.floor(Math.random()*drawPolygonHints.length)]
-            $('#vethint').html(hint);
-        } else {
-            $('#vethint').html('');
-        }
-    }
+        # Modify feature is active
+        if new_vet_modify_polygon_control.active
+            hint = modifyPolygonHints[Math.floor(Math.random()*modifyPolygonHints.length)]
+            $('#vethint').html hint
+        else if new_vet_draw_polygon_control
+            hint = drawPolygonHints[Math.floor(Math.random()*drawPolygonHints.length)]
+            $('#vethint').html hint
+        else
+            $('#vethint').html ''
+
+        null
 
 
-    function createNewVetting() {
-        console.log("Processing create new vetting");
+    _createNewVetting: () ->
+        consolelog "Processing create new vetting"
 
-        // Get features from the vector layer (which are all known to be polygons)
-        var new_vet_polygon_features = classify_habitat_vectors.features;
-        // Now convert our array of features into an array of geometries.
-        var new_vet_polygon_geoms = [];
-        for (var i = 0; i < new_vet_polygon_features.length; i++) {
-            var i_feature = new_vet_polygon_features[i];
-            var i_geom = i_feature.geometry;
-            new_vet_polygon_geoms.push(i_geom);
-        }
+        classifyHabitat = Edgar.vetting.classifyHabitat
 
-        // Create a MultiPolygon from our polygons.
-        var new_vet_multipolygon = new OpenLayers.Geometry.MultiPolygon(new_vet_polygon_geoms);
-        console.log("WKT");
-        console.log(new_vet_multipolygon);
+        # Get features from the vector layer (which are all known to be polygons)
+        newVetPolygonFeatures = classifyHabitat.features
+        # Now convert our array of features into an array of geometries.
+        newVetPolygonGeoms = []
+        newVetPolygonGeoms.push(feature.geometry) for feature in newVetPolygonFeatures
 
-        // Get WKT (well known text) for the multipolygon
-        var layer_wkt_str = wkt.extractGeometry(new_vet_multipolygon);
-        // At this point, we have our WKT
-        console.log(layer_wkt_str);
+        # Create a MultiPolygon from our polygons.
+        newVetPolygon = new OpenLayers.Geometry.MultiPolygon newVetPolygonGeoms
+        consolelog "WKT logs:"
+        consolelog "polygon", newVetPolygon
 
-        var species_id = Edgar.mapdata.species.id;
-        var new_vet_data = {
-            area: layer_wkt_str,
-            species_id: species_id,
-            comment: $("#vetcomment").val(),
+        # Get WKT (well known text) for the multipolygon
+        layerWKTString = classifyHabitat.wkt.extractGeometry(newVetPolygon)
+        # At this point, we have our WKT
+        consolelog "layer string", layerWKTString
+
+        speciesId = Edgar.mapdata.species.id
+        newVetData = {
+            area:           layerWKTString
+            species_id:     speciesId
+            comment:        $("#vetcomment").val()
             classification: $("#vetclassification").val()
-        };
-
-        // At this point, we have filled out our submit form
-        console.log("Post Data:");
-        console.log(new_vet_data);
-        var vet_data_as_json_str = JSON.stringify(new_vet_data);
-        console.log(vet_data_as_json_str);
-        var url = Edgar.baseUrl + "species/insert_vetting/" + species_id + ".json";
-
-        // Send the new vet to the back-end
-        $.post(url, vet_data_as_json_str, function(data, text_status, jqXHR) {
-            console.log("New Vet Response", data, text_status, jqXHR);
-            alert("New Vet Response: " + data);
-        }, 'json');
-
-        return true;
-    }
-
-    // Returns true if valid
-    // Returns false else
-    function validateNewVetForm() {
-        // Get features from the vector layer (which are all known to be polygons)
-        var new_vet_polygon_features = classify_habitat_vectors.features;
-
-        if(Edgar.mapdata.species === null) {
-            alert("No species selected");
-            return false;
         }
 
-        if (new_vet_polygon_features.length === 0) {
-            alert("No polygons provided");
-            $('#newvet_add_polygon_button').effect("highlight", {}, 5000);
-            return false;
-        }
+        # At this point, we have filled out our submit form
+        consolelog "Post Data", newVetData
+        vetDataAsJSONString = JSON.stringify newVetData
+        consolelog "Post Data as JSON", vetDataAsJSONString
+        url = ( Edgar.baseUrl + "species/insert_vetting/" + species_id + ".json" )
 
-        if ($('#vetclassification').val() === '') {
-            alert("No classification provided");
-            $('#vetclassification').effect("highlight", {}, 5000);
-            return false;
-        }
+        # Send the new vet to the back-end
+        $.post(
+            url
+            vet_data_as_json_str
+            (data, text_status, jqXHR) ->
+                consolelog "New Vet Response", data, text_status, jqXHR
+                alert "New Vet Response: " + data
+            'json'
+        )
 
-        return true;
-    }
+        true
+
+    # Returns true if valid
+    # Returns false else
+    _validateNewVetForm: () ->
+        classifyHabitat = Edgar.vetting.classifyHabitat
+
+        # Get features from the vector layer (which are all known to be polygons)
+        newVetPolygonFeatures = classifyHabitat.features
+
+        if (Edgar.mapdata.species == null)
+            alert "No species selected"
+            false
+        else if (new_vet_polygon_features.length == 0)
+            alert "No polygons provided"
+            $('#newvet_add_polygon_button').effect("highlight", {}, 5000)
+            false
+        else if ($('#vetclassification').val() == '')
+            alert "No classification provided"
+            $('#vetclassification').effect("highlight", {}, 5000)
+            false
+        else
+            true
 }
