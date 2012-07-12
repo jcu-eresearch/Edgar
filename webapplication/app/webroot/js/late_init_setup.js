@@ -14,11 +14,11 @@ Projections
 
 (function() {
 
-  Edgar.util = {
-    projections: {
-      geographic: new OpenLayers.Projection("EPSG:4326"),
-      mercator: new OpenLayers.Projection("EPSG:900913")
-    }
+  Edgar.util = Edgar.util || {};
+
+  Edgar.util.projections = {
+    geographic: new OpenLayers.Projection("EPSG:4326"),
+    mercator: new OpenLayers.Projection("EPSG:900913")
   };
 
 }).call(this);

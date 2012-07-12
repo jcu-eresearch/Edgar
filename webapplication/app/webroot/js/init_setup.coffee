@@ -31,3 +31,18 @@ Edgar.mapdata.year = null #(integer) the year that the suitability map represent
 logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
 ###
 Edgar.user = Edgar.user || null
+
+###
+humanise where possible
+###
+Edgar.util = Edgar.util || {}
+
+Edgar.util.pluralise = (count, noun, plural) ->
+    if count == 1
+        count + " " + noun
+    else if plural
+        count + " " + plural
+    else
+        count + " " + noun + "s"
+
+        

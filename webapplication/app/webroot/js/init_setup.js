@@ -49,4 +49,21 @@ the global Edgar object
 
   Edgar.user = Edgar.user || null;
 
+  /*
+  humanise where possible
+  */
+
+
+  Edgar.util = Edgar.util || {};
+
+  Edgar.util.pluralise = function(count, noun, plural) {
+    if (count === 1) {
+      return count + " " + noun;
+    } else if (plural) {
+      return count + " " + plural;
+    } else {
+      return count + " " + noun + "s";
+    }
+  };
+
 }).call(this);
