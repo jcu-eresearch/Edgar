@@ -44,5 +44,3 @@ Edgar.util.pluralise = (count, noun, plural) ->
         count + " " + plural
     else
         count + " " + noun + "s"
-
-        
