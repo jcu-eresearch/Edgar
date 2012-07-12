@@ -793,3 +793,6 @@ div.hint .info {
 button.ui-state-active {
 }
 
+#dialogs {
+    display: none;
+}

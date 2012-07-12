@@ -38,6 +38,29 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
+    _confirmModeChangeOkayViaDialog: (newMode) ->
+        myDialog = $( "#discard-area-classifcation-confirm" ).dialog(
+            resizable: false
+            width:    400
+            modal:     true
+            buttons: {
+                "Discard area classification": () ->
+                    $( this ).dialog( "close" )
+                    Edgar.vetting.classifyHabitat._removeAllFeatures()
+                    $(Edgar.map).trigger 'changemode', $( this ).data('newMode')
+                Cancel: () ->
+                    $( this ).dialog( "close" )
+            }
+        )
+        myDialog.data 'newMode', newMode
+
+    isChangeModeOkay: (newMode) ->
+        if ( 'vectorLayer' of this ) and ( this.vectorLayer.features.length > 0 )
+            this._confirmModeChangeOkayViaDialog(newMode)
+            false
+        else
+            true
+
     ###
     # Code to add button click even handlers to DOM
     ###
@@ -150,6 +173,7 @@ Edgar.vetting.classifyHabitat = {
 
     _removeVectorLayer: () ->
         Edgar.map.removeLayer(this.vectorLayer)
+        delete this.vectorLayer
 
         null
 
@@ -168,6 +192,7 @@ Edgar.vetting.classifyHabitat = {
     ###
     _removeDrawControl: () ->
         this.drawControl.map.removeControl this.modifyControl
+        delete this.drawControl
 
         null
 
@@ -201,6 +226,7 @@ Edgar.vetting.classifyHabitat = {
     ###
     _removeModifyControl: () ->
         this.modifyControl.map.removeControl this.modifyControl
+        delete this.modifyControl
 
         null
 
@@ -301,6 +327,9 @@ Edgar.vetting.classifyHabitat = {
         this._activateModifyPolygonMode()
 
         null
+
+    _removeAllFeatures: () ->
+        this.vectorLayer.removeFeatures this.vectorLayer.features
 
     _removeModifyFeatureHandlesAndVertices: () ->
         # Delete any modify control vertices.
