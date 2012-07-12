@@ -140,6 +140,7 @@
     },
     _removeVectorLayer: function() {
       Edgar.map.removeLayer(this.vectorLayer);
+      delete this.vectorLayer;
       return null;
     },
     _addDrawControl: function() {
@@ -154,6 +155,7 @@
 
     _removeDrawControl: function() {
       this.drawControl.map.removeControl(this.modifyControl);
+      delete this.drawControl;
       return null;
     },
     _addModifyControl: function() {
@@ -184,6 +186,7 @@
 
     _removeModifyControl: function() {
       this.modifyControl.map.removeControl(this.modifyControl);
+      delete this.modifyControl;
       return null;
     },
     _clearNewVettingMode: function(e) {

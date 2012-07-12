@@ -150,6 +150,7 @@ Edgar.vetting.classifyHabitat = {
 
     _removeVectorLayer: () ->
         Edgar.map.removeLayer(this.vectorLayer)
+        delete this.vectorLayer
 
         null
 
@@ -168,6 +169,7 @@ Edgar.vetting.classifyHabitat = {
     ###
     _removeDrawControl: () ->
         this.drawControl.map.removeControl this.modifyControl
+        delete this.drawControl
 
         null
 
@@ -201,6 +203,7 @@ Edgar.vetting.classifyHabitat = {
     ###
     _removeModifyControl: () ->
         this.modifyControl.map.removeControl this.modifyControl
+        delete this.modifyControl
 
         null
 
