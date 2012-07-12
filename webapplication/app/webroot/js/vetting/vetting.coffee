@@ -28,6 +28,7 @@ Edgar.vetting = {
     ###
     disengageVettingMode: () ->
         console.log "disengageVettingMode"
+        Edgar.vetting.classifyHabitat.disengage()
 
         null
 }

@@ -33,6 +33,7 @@ File to control entering and exiting vetting modes.
 
     disengageVettingMode: function() {
       console.log("disengageVettingMode");
+      Edgar.vetting.classifyHabitat.disengage();
       return null;
     }
   };

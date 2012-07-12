@@ -123,6 +123,14 @@
       consolelog("Finished engageClassifyHabitatInterface");
       return null;
     },
+    disengage: function() {
+      consolelog("Starting disengageClassifyHabitatInterface");
+      this._clearNewVettingMode();
+      this._removeDrawControl();
+      this._removeModifyControl();
+      this._removeVectorLayer();
+      return consolelog("Finished disengageClassifyHabitatInterface");
+    },
     _addVectorLayer: function() {
       /*
               # Define a vector layer to hold a user's area classification
@@ -131,6 +139,7 @@
       return Edgar.map.addLayers([this.vectorLayer]);
     },
     _removeVectorLayer: function() {
+      Edgar.map.removeLayer(this.vectorLayer);
       return null;
     },
     _addDrawControl: function() {
@@ -138,7 +147,13 @@
       Edgar.map.addControl(this.drawControl);
       return null;
     },
+    /*
+        # Removes the draw control
+        # Note: Assumes _clearNewVettingMode was already run
+    */
+
     _removeDrawControl: function() {
+      this.drawControl.map.removeControl(this.modifyControl);
       return null;
     },
     _addModifyControl: function() {
@@ -162,7 +177,13 @@
       Edgar.map.addControl(this.modifyControl);
       return null;
     },
+    /*
+        # Removes the modify control
+        # Note: Assumes _clearNewVettingMode was already run
+    */
+
     _removeModifyControl: function() {
+      this.modifyControl.map.removeControl(this.modifyControl);
       return null;
     },
     _clearNewVettingMode: function(e) {

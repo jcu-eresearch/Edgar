@@ -130,6 +130,17 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
+    disengage: () ->
+        consolelog "Starting disengageClassifyHabitatInterface"
+
+        this._clearNewVettingMode()
+
+        this._removeDrawControl()
+        this._removeModifyControl()
+        this._removeVectorLayer()
+
+        consolelog "Finished disengageClassifyHabitatInterface"
+
     _addVectorLayer: () ->
         ###
         # Define a vector layer to hold a user's area classification
@@ -138,7 +149,8 @@ Edgar.vetting.classifyHabitat = {
         Edgar.map.addLayers  [this.vectorLayer]
 
     _removeVectorLayer: () ->
-        # TODO
+        Edgar.map.removeLayer(this.vectorLayer)
+
         null
 
     _addDrawControl: () ->
@@ -150,8 +162,13 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
+    ###
+    # Removes the draw control
+    # Note: Assumes _clearNewVettingMode was already run
+    ###
     _removeDrawControl: () ->
-        # TODO
+        this.drawControl.map.removeControl this.modifyControl
+
         null
 
     _addModifyControl: () ->
@@ -178,10 +195,14 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
+    ###
+    # Removes the modify control
+    # Note: Assumes _clearNewVettingMode was already run
+    ###
     _removeModifyControl: () ->
-        # TODO
-        null
+        this.modifyControl.map.removeControl this.modifyControl
 
+        null
 
     _clearNewVettingMode: (e) ->
         consolelog "Clearing classify habitat mode of operation"
