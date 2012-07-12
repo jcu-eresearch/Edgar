@@ -360,7 +360,7 @@ def _fetch_species_list(params):
                 s = Species()
                 s.lsid = result['guid']
                 s.scientific_name = result['nameComplete'].strip()
-                if result['commonNameSingle'] is not None:
+                if 'commonNameSingle' in result and result['commonNameSingle'] is not None:
                     s.common_name = result['commonNameSingle'].strip()
 
                 yield s
