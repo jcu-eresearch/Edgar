@@ -154,9 +154,9 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
 
             date = None
             if 'eventDate' in occ:
-                # unix timestamp, but in milliseconds instead of seconds
-                ts = occ['eventDate'] / 1000
-                date = datetime.date.fromtimestamp(ts)
+                # posix timestamp, but in milliseconds instead of seconds
+                offset = datetime.timedelta(milliseconds=occ['eventDate'])
+                date = datetime.date.fromtimestamp(0) + offset
 
             yield Occurrence(
                 uuid_in=uuid.UUID(occ['uuid']),
