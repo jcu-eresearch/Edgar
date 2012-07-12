@@ -23,6 +23,7 @@ File to control entering and exiting vetting modes.
 
     engageVettingMode: function() {
       console.log("engageVettingMode");
+      Edgar.vetting.classifyHabitat.engage();
       return null;
     },
     /*

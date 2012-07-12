@@ -168,7 +168,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
             )
 
 
-def species_for_lsid(species_lsid):
+def species_for_lsid(species_lsid, convert_subspecies=False):
     '''Fetches a Species object by its LSID
 
     Can return None if no species is found. A species' LSID tends to change
@@ -180,25 +180,35 @@ def species_for_lsid(species_lsid):
     '''
 
     escaped_lsid = urllib.quote(species_lsid.encode('utf-8'))
-    url = BIE + 'species/shortProfile/{0}.json'.format(escaped_lsid)
+    url = BIE + 'species/{0}.json'.format(escaped_lsid)
     info = _fetch_json(create_request(url), check_not_empty=False)
     if not info or len(info) == 0:
         return None
 
-    if info['rank'] == 'species':
+    if 'rankString' not in info['taxonConcept']:
+        _log.warning('Taxon LSID has no rank: %s', species_lsid)
+        return None
+
+    rank = info['taxonConcept']['rankString']
+
+    if rank == 'species':
         s = Species()
-        s.scientific_name = info['scientificName'].strip()
+        s.scientific_name = info['taxonConcept']['nameString'].strip()
         s.lsid = species_lsid
-        if 'commonName' in info:
-            s.common_name = info['commonName'].strip()
+        if len(info['commonNames']) > 0:
+            for cname in info['commonNames']:
+                if cname['isPreferred']:
+                    s.common_name = cname['nameString']
+                    break
         return s
+    elif convert_subspecies and (rank == 'subspecies' or rank == 'infraspecific'):
+        return species_for_lsid(info['taxonConcept']['parentGuid'])
     else:
-        _log.warning('lsid is for "%s", not "species": %s',
-                info['rank'], species_lsid)
+        _log.warning('lsid is for "%s", not "species": %s', rank, species_lsid)
         return None
 
 
-def species_for_scientific_name(scientific_name):
+def species_for_scientific_name(scientific_name, convert_subspecies=False):
     '''Fetches a Species object by its scientific name.
 
     scientific_name is in the format "genus (subgenus) species" where the
@@ -215,7 +225,7 @@ def species_for_scientific_name(scientific_name):
     if not info or len(info) == 0:
         return None
     else:
-        return species_for_lsid(info[0]['identifier'])
+        return species_for_lsid(info[0]['acceptedIdentifier'], convert_subspecies)
 
 
 def all_bird_species():

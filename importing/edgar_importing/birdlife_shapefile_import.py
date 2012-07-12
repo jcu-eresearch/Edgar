@@ -3,6 +3,7 @@ import argparse
 import json
 import logging
 from edgar_importing import db
+from edgar_importing import ala
 from geoalchemy import WKTSpatialElement
 import geoalchemy.functions
 import sqlalchemy
@@ -30,16 +31,14 @@ _log = logging.getLogger(__name__)
 
 class Taxon(object):
 
-    def __init__(self, spno=None, common=None, sci=None):
-        self.spno = spno
+    def __init__(self, common=None, sci=None):
         self.common_name = common
         self.sci_name = sci
         self.db_id = None
         self.polys_by_classification = {}
 
     def __repr__(self):
-        return '<Taxon spno="{spno}" db_id="{dbid}" sci="{sci}" common="{common}" />'.format(
-                spno=self.spno,
+        return '<Taxon db_id="{dbid}" sci="{sci}" common="{common}" />'.format(
                 dbid=self.db_id,
                 sci=self.sci_name,
                 common=self.common_name)
@@ -48,7 +47,7 @@ class Taxon(object):
         if self.sci_name is None:
             return None
         parts = self.sci_name.split()
-        if len(parts) != 2:
+        if len(parts) < 2 or len(parts) > 3:
             raise RuntimeError("Can't split sciname: " + repr(self))
         assert idx < len(parts)
         return parts[idx]
@@ -59,7 +58,7 @@ class Taxon(object):
 
     @property
     def species(self):
-        return self._get_sci_name_part(1)
+        return self._get_sci_name_part(-1)
 
 
 
@@ -92,13 +91,20 @@ def load_taxons_by_spno(csv_path):
                 len(row['PopCode']) == 0 and
                 len(row['SpSciName']) > 0)
 
-            if is_species:
-                taxon_spno = int(row['SpNo'])
-                if taxon_spno in taxons:
-                    raise RuntimeError('Duplicate SpNo: ' + str(taxon_spno))
-                taxons[taxon_spno] = Taxon(spno=taxon_spno,
-                                         common=row['SpName'],
-                                         sci=row['SpSciName'])
+            if not is_species:
+                continue
+
+            taxon_spno = int(row['SpNo'])
+            if taxon_spno in taxons:
+                raise RuntimeError('Duplicate SpNo: ' + str(taxon_spno))
+
+            species = ala.species_for_scientific_name(row['SpSciName'], convert_subspecies=True)
+            if species is None:
+                _log.warning("Can't find species '%s' at ALA", row['SpSciName'])
+                continue
+
+            taxons[taxon_spno] = Taxon(common=species.common_name,
+                                       sci=species.scientific_name)
 
     return taxons
 
@@ -128,15 +134,9 @@ def set_db_id_for_taxons(taxons):
     for t in taxons:
         genus = t.genus.upper()
         species = t.species.upper()
-        _log.debug('Finding %s %s...', genus, species)
         if genus in db_ids:
             if species in db_ids[genus]:
                 t.db_id = db_ids[genus][species]
-                _log.debug('\tfound %d', t.db_id)
-            else:
-                _log.debug('\tspecies missing')
-        else:
-            _log.debug('\tgenus missing')
 
 
 def classification_for_bla_row(row):
@@ -148,13 +148,13 @@ def classification_for_bla_row(row):
     return CLASSIFICATIONS_BY_BLA_CATEGORIES[category]
 
 
-def polys_for_taxon(taxon):
+def polys_for_spno(spno):
     q = sqlalchemy.select([
         'range_t',
         'br_rnge_t',
         'ST_AsText(the_geom) as the_geom'])\
         .select_from(db.birdlife_import)\
-        .where(db.birdlife_import.c.spno == taxon.spno)\
+        .where(db.birdlife_import.c.spno == spno)\
         .execute()
 
     for row in q:
@@ -178,13 +178,13 @@ def polys_for_taxon(taxon):
         yield classification_for_bla_row(row), poly
 
 
-def insert_vettings_for_taxon(taxon, user_id):
+def insert_vettings_for_taxon(taxon, spno, user_id):
     if taxon.db_id is None:
         _log.warning('Skipping species with no db_id: %s', taxon.sci_name)
         return
 
     num_inserted = 0
-    for classification, poly in polys_for_taxon(taxon):
+    for classification, poly in polys_for_spno(spno):
         q = db.vettings.insert().values(
                 user_id=user_id,
                 species_id=taxon.db_id,
@@ -215,5 +215,5 @@ def main():
     db.vettings.delete().where(db.vettings.c.user_id == args.user_id[0]).execute()
 
     # create new vettings
-    for t in taxons.itervalues():
-        insert_vettings_for_taxon(t, args.user_id[0])
+    for spno, taxon in taxons.iteritems():
+        insert_vettings_for_taxon(taxon, spno, args.user_id[0])
