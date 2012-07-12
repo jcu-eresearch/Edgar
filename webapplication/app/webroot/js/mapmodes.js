@@ -1,6 +1,47 @@
 // Edgar's species map is always in one of four mapmodes.
 // Read the value if Edgar.mapmode to determine which.
 // DON'T WRITE TO Edgar.mapmode.
+
+// Changing map mode
+// -----------------
+// call $(Edgar.map).trigger('changemode', 'modename') to attempt
+// to change modes.
+//
+// Overriding / cancelling a mode change
+// -------------------------------------
+// if you want to be able to override a mode change, bind a handler
+// to the changemode event like this:
+//
+//    $(Edgar.map).on('changemode', function(event, newMode) {
+//        console.log('attempt to change mode to ' + newMode);
+//    }
+//
+// you can prevent the mode change by calling event.preventDefault
+// in your handler:
+//
+//    $(Edgar.map).on('changemode', function(event, newMode) {
+//        console.log('attempt to change mode from ' +
+//                Edgar.mapmode + ' to ' + newMode);
+//        if (notReady) {
+//            console.log('cancelling mode change.');
+//            event.preventDefault();
+//        }
+//    }
+//
+// Being notified of a mode change
+// -------------------------------
+// Because the mode change is overrideable, you can't use the 
+// changemode event to react to a mode change.  For that you 
+// need to listen for the modechanged event.
+//
+//    $(Edgar.map).on('modechanged', function(event, oldMode) {
+//        console.log('mode has changed from ' + oldMode +
+//            ' to ' + Edgar.mapmode);
+//    }
+//
+// What modes are there?
+// ---------------------
+// The possible modes are:
 //
 // mapmode: 'blank'
 //   No species has been selected yet
@@ -18,6 +59,7 @@
 //   A species is selected, a user is logged in, and
 //   the user is viewing or editing vetting information.
 
+// -------------------------------------------------------------------------------
 // presume the init_setup.js has already run and Edgar.mode
 // exists and is initially set to 'blank'.
 // e.g.  Edgar.mode = Edgar.mode || 'blank';
@@ -71,15 +113,16 @@ function addMapModes(theMap) {
         //
 
         // illegal transitions
-        if ( (oldMode === 'blank' && newMode === 'future') ||  // can't skip current
-             (oldMode === 'blank' && newMode === 'vetting') || // can't skip current
+        if ( (oldMode === 'blank'   && newMode === 'future' ) || // can't skip current
+             (oldMode === 'blank'   && newMode === 'vetting') || // can't skip current
+             (oldMode === 'future'  && newMode === 'vetting') || // must go through current
+             (oldMode === 'vetting' && newMode === 'future' ) || // must go through current
              (newMode === 'blank')
         ) {                           // can't return to blank
             consolelog('illegal mode transition: cannot move from "' + oldMode + '" to "' + newMode + '".');
         }
 
         if (oldMode === 'blank'   && newMode === 'current') {
-            
         }
 
         if (oldMode === 'current' && newMode === 'future' ) {
@@ -88,35 +131,31 @@ function addMapModes(theMap) {
         if (oldMode === 'current' && newMode === 'vetting') {
             disengageCurrentMode();
             // show & hide the appropriate tools
-            showhidetools(['oldvets','newvets','myvets'], ['tool-legend','tool-emissions']);
+            showhidetools(['oldvets','newvet','myvets'], ['tool-legend','tool-emissions']);
             Edgar.vetting.engageVettingMode();
         }
 
         if (oldMode === 'future'  && newMode === 'current') {
         }
 
-        if (oldMode === 'future'  && newMode === 'vetting') {
-        }
-
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
-            showhidetools([], ['oldvets','newvets','myvets'],['tool-legend']);
+            showhidetools(['tool-legend'], ['oldvets','newvet','myvets']);
             engageCurrentMode();
-        }
-
-        if (oldMode === 'vetting' && newMode === 'future' ) {
         }
 
         // yay, we're almost done.. now change the mode record
         Edgar.mapmode = newMode;
 
+        // finally, trigger the event that tells everyone about the new mode
+        $map.trigger('modechanged', oldMode);
+
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // bind a handler that remembers the destination mode for later use
-    $map.bind('changemode', function(event, newMode) {
+    $map.on('changemode', function(event, newMode) {
         theMap.destinationMode = newMode;
     });
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
