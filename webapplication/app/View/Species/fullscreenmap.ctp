@@ -175,3 +175,8 @@
 
 <div id="spinner"></div>
 
+<div id="dialogs">
+    <div id="discard-area-classifcation-confirm" title="Discard your area classification?" class="edgar-dialog">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>The area classification you're working on will be permanently deleted and cannot be recovered. Are you sure?</p>
+    </div>
+</div>

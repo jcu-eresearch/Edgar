@@ -36,6 +36,33 @@
       consolelog("Finished init new vetting");
       return null;
     },
+    _confirmModeChangeOkayViaDialog: function(newMode) {
+      var myDialog;
+      myDialog = $("#discard-area-classifcation-confirm").dialog({
+        resizable: false,
+        width: 400,
+        modal: true,
+        buttons: {
+          "Discard area classification": function() {
+            $(this).dialog("close");
+            Edgar.vetting.classifyHabitat._removeAllFeatures();
+            return $(Edgar.map).trigger('changemode', $(this).data('newMode'));
+          },
+          Cancel: function() {
+            return $(this).dialog("close");
+          }
+        }
+      });
+      return myDialog.data('newMode', newMode);
+    },
+    isChangeModeOkay: function(newMode) {
+      if (('vectorLayer' in this) && (this.vectorLayer.features.length > 0)) {
+        this._confirmModeChangeOkayViaDialog(newMode);
+        return false;
+      } else {
+        return true;
+      }
+    },
     /*
         # Code to add button click even handlers to DOM
     */
@@ -255,6 +282,9 @@
       consolelog(this.vectorLayer.features);
       this._activateModifyPolygonMode();
       return null;
+    },
+    _removeAllFeatures: function() {
+      return this.vectorLayer.removeFeatures(this.vectorLayer.features);
     },
     _removeModifyFeatureHandlesAndVertices: function() {
       this.vectorLayer.removeFeatures(this.modifyControl.virtualVertices, {
