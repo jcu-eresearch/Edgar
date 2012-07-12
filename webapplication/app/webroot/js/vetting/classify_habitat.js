@@ -15,16 +15,14 @@
     */
 
     init: function() {
-      var classifyHabitat;
       consolelog("Starting to init the classify habitat interface");
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      classifyHabitat.wkt = new OpenLayers.Format.WKT({
+      this.wkt = new OpenLayers.Format.WKT({
         'internalProjection': Edgar.map.baseLayer.projection,
         'externalProjection': Edgar.util.projections.mercator
       });
       consolelog("Finished init-ing the classify habitat interface");
       null;
-      classifyHabitat.vectorLayerOptions = {
+      this.vectorLayerOptions = {
         /*
                     # NOTE: Due to OpenLayers Bug.. can't do this.
                     #   The modify feature control draws points onto the vector layer
@@ -34,7 +32,7 @@
         */
 
       };
-      classifyHabitat._addButtonHandlers();
+      this._addButtonHandlers();
       consolelog("Finished init new vetting");
       return null;
     },
@@ -49,7 +47,7 @@
 
       var vetform, vetpanel;
       $('#newvet_draw_polygon_button').click(function(e) {
-        _handleDrawPolygonClick(e);
+        Edgar.vetting.classifyHabitat._handleDrawPolygonClick(e);
         return null;
       });
       /*
@@ -57,7 +55,7 @@
       */
 
       $('#newvet_add_polygon_button').click(function(e) {
-        _handleAddPolygonClick(e);
+        Edgar.vetting.classifyHabitat._handleAddPolygonClick(e);
         return null;
       });
       /*
@@ -65,7 +63,7 @@
       */
 
       $('#newvet_modify_polygon_button').click(function(e) {
-        _handleModifyPolygonClick(e);
+        Edgar.vetting.classifyHabitat._handleModifyPolygonClick(e);
         return null;
       });
       /*
@@ -73,7 +71,7 @@
       */
 
       $('#newvet_delete_selected_polygon_button').click(function(e) {
-        _handleDeleteSelectedPolygonClick(e);
+        Edgar.vetting.classifyHabitat._handleDeleteSelectedPolygonClick(e);
         return null;
       });
       /*
@@ -81,7 +79,7 @@
       */
 
       $('#newvet_delete_all_polygons_button').click(function(e) {
-        _handleDeleteAllPolygonClick(e);
+        Edgar.vetting.classifyHabitat._handleDeleteAllPolygonClick(e);
         return null;
       });
       /*
@@ -89,14 +87,10 @@
       */
 
       $('#newvet :button').hover(function() {
-        var classifyHabitat;
-        classifyHabitat = Edgar.vetting.classifyHabitat;
-        $(classifyHabitat).addClass("ui-state-hover");
+        $(Edgar.vetting.classifyHabitat).addClass("ui-state-hover");
         return null;
       }, function() {
-        var classifyHabitat;
-        classifyHabitat = Edgar.vetting.classifyHabitat;
-        $(classifyHabitat).removeClass("ui-state-hover");
+        $(Edgar.vetting.classifyHabitat).removeClass("ui-state-hover");
         return null;
       });
       /*
@@ -106,14 +100,16 @@
       vetpanel = $('#newvet');
       vetform = $('#vetform');
       return $('#vet_submit').click(function(e) {
+        var classifyHabitat;
         e.preventDefault();
+        classifyHabitat = Edgar.vetting.classifyHabitat;
         /*
                     # validate the form
                     # and, if valid, submit its contents
         */
 
-        if (_validateNewVetForm()) {
-          return _createNewVetting();
+        if (classifyHabitat._validateNewVetForm()) {
+          return classifyHabitat._createNewVetting();
         } else {
           return false;
         }
@@ -128,39 +124,31 @@
       return null;
     },
     _addVectorLayer: function() {
-      var classifyHabitat;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
       /*
               # Define a vector layer to hold a user's area classification
       */
-
-      classifyHabitat.vectorLayer = new OpenLayers.Layer.Vector("New Area Classification", classifyHabitat.vectorLayerOptions);
-      return Edgar.map.addLayers([classifyHabitat.vectorLayer]);
+      this.vectorLayer = new OpenLayers.Layer.Vector("New Area Classification", this.vectorLayerOptions);
+      return Edgar.map.addLayers([this.vectorLayer]);
     },
     _removeVectorLayer: function() {
       return null;
     },
     _addDrawControl: function() {
-      var classifyHabitat;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      classifyHabitat.drawControl = new OpenLayers.Control.DrawFeature(classifyHabitat.vectorLayer, OpenLayers.Handler.Polygon);
-      Edgar.map.addControl(classifyHabitat.drawControl);
+      this.drawControl = new OpenLayers.Control.DrawFeature(this.vectorLayer, OpenLayers.Handler.Polygon);
+      Edgar.map.addControl(this.drawControl);
       return null;
     },
     _removeDrawControl: function() {
       return null;
     },
     _addModifyControl: function() {
-      var classifyHabitat;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
       /*
               # Create a Modify Feature control
               # Allow users to:
               #    - Reshape
               #    - Drag
       */
-
-      classifyHabitat.modifyControl = new OpenLayers.Control.ModifyFeature(classifyHabitat.vectorLayer, {
+      this.modifyControl = new OpenLayers.Control.ModifyFeature(this.vectorLayer, {
         mode: OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG,
         beforeSelectFeature: function(feature) {
           $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled");
@@ -171,61 +159,59 @@
           return null;
         }
       });
+      Edgar.map.addControl(this.modifyControl);
       return null;
     },
     _removeModifyControl: function() {
       return null;
     },
     _clearNewVettingMode: function(e) {
-      var classifyHabitat;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
       consolelog("Clearing classify habitat mode of operation");
-      removeModifyFeatureHandlesAndVertices();
-      classifyHabitat.drawControl.deactivate();
+      this._removeModifyFeatureHandlesAndVertices();
+      this.drawControl.deactivate();
       $('#newvet_draw_polygon_button').removeClass('ui-state-active');
-      classifyHabitat.modifyControl.deactivate();
+      this.modifyControl.deactivate();
       $('#newvet_modify_polygon_button').removeClass('ui-state-active');
-      _updateNewVetHint();
+      this._updateNewVetHint();
       return null;
     },
     _activateDrawPolygonMode: function() {
-      _clearNewVettingMode();
+      this._clearNewVettingMode();
       $('#newvet_draw_polygon_button').addClass('ui-state-active');
-      new_vet_draw_polygon_control.activate();
-      _updateNewVetHint();
+      this.drawControl.activate();
+      this._updateNewVetHint();
       return null;
     },
     _activateModifyPolygonMode: function() {
-      _clearNewVettingMode();
+      this._clearNewVettingMode();
       $('#newvet_modify_polygon_button').addClass('ui-state-active');
-      classifyHabitat.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
-      classifyHabitat.modifyControl.activate();
-      return _updateNewVetHint();
+      this.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
+      this.modifyControl.activate();
+      return this._updateNewVetHint();
     },
     _handleToggleButtonClick: function(e, onActivatingButton, onDeactivatingButton) {
       e.preventDefault();
       if ($(e.srcElement).hasClass('ui-state-active')) {
-        onDeactivatingButton();
+        onDeactivatingButton.apply(Edgar.vetting.classifyHabitat, []);
       } else {
-        onActivatingButton();
+        onActivatingButton.apply(Edgar.vetting.classifyHabitat, []);
       }
       return null;
     },
     _handleDrawPolygonClick: function(e) {
-      _handleToggleButtonClick(e, _activateDrawPolygonMode, _clearNewVettingMode);
+      this._handleToggleButtonClick(e, this._activateDrawPolygonMode, this._clearNewVettingMode);
       return null;
     },
     _handleModifyPolygonClick: function(e) {
-      _handleToggleButtonClick(e, _activateModifyPolygonMode, _clearNewVettingMode);
+      this._handleToggleButtonClick(e, this._activateModifyPolygonMode, this._clearNewVettingMode);
       return null;
     },
     _handleAddPolygonClick: function(e) {
-      var attributes, calcDimension, centerOfMap, classifyHabitat, feature, majorFraction, mapBounds, mapHeight, mapWidth, minorFraction, points, polygon, ring;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
+      var attributes, calcDimension, centerOfMap, feature, majorFraction, mapBounds, mapHeight, mapWidth, minorFraction, points, polygon, ring;
       e.preventDefault();
-      _clearNewVettingMode();
-      centerOfMap = Edgar.map.getCenter;
-      mapBounds = Edgar.map.getExtent;
+      this._clearNewVettingMode();
+      centerOfMap = Edgar.map.getCenter();
+      mapBounds = Edgar.map.getExtent();
       mapHeight = mapBounds.top - mapBounds.bottom;
       mapWidth = mapBounds.right - mapBounds.left;
       calcDimension = null;
@@ -241,50 +227,45 @@
       polygon = new OpenLayers.Geometry.Polygon([ring]);
       attributes = {};
       feature = new OpenLayers.Feature.Vector(polygon, attributes);
-      classifyHabitat.vectorLayer.addFeatures([feature]);
-      _activateModifyPolygonMode();
+      this.vectorLayer.addFeatures([feature]);
+      consolelog(this.vectorLayer.features);
+      this._activateModifyPolygonMode();
       return null;
     },
     _removeModifyFeatureHandlesAndVertices: function() {
-      var classifyHabitat;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      classifyHabitat.vectorLayer.addFeatures([feature]);
-      classifyHabitat.vectorLayer.removeFeatures(classifyHabitat.modifyControl.virtualVertices, {
+      this.vectorLayer.removeFeatures(this.modifyControl.virtualVertices, {
         silent: true
       });
-      classifyHabitat.vectorLayer.removeFeatures(classifyHabitat.modifyControl.vertices, {
+      this.vectorLayer.removeFeatures(this.modifyControl.vertices, {
         silent: true
       });
-      classifyHabitat.vectorLayer.removeFeatures(classifyHabitat.modifyControl.radiusHandle, {
+      this.vectorLayer.removeFeatures(this.modifyControl.radiusHandle, {
         silent: true
       });
-      classifyHabitat.vectorLayer.removeFeatures(classifyHabitat.modifyControl.dragHandle, {
+      this.vectorLayer.removeFeatures(this.modifyControl.dragHandle, {
         silent: true
       });
       return null;
     },
     _handleDeleteSelectedPolygonClick: function(e) {
-      var classifyHabitat, currentFeature;
+      var currentFeature;
       e.preventDefault();
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      currentFeature = classifyHabitat.modifyControl.feature;
+      currentFeature = this.modifyControl.feature;
       if (currentFeature) {
-        classifyHabitat.modifyControl.unselectFeature(currentFeature);
-        _removeModifyFeatureHandlesAndVertices();
-        classifyHabitat.vectorLayer.removeFeatures(currentFeature);
-        if (classifyHabitat.vectorLayer.features.length === 0) {
-          _clearNewVettingMode();
+        this.modifyControl.unselectFeature(currentFeature);
+        this._removeModifyFeatureHandlesAndVertices();
+        this.vectorLayer.removeFeatures(currentFeature);
+        if (this.vectorLayer.features.length === 0) {
+          this._clearNewVettingMode();
         }
       }
       return null;
     },
     _handleDeleteAllPolygonClick: function(e) {
-      var classifyHabitat;
       e.preventDefault();
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      _clearNewVettingMode();
-      classifyHabitat.vectorLayer.removeAllFeatures();
-      _updateNewVetHint();
+      this._clearNewVettingMode();
+      this.vectorLayer.removeAllFeatures();
+      this._updateNewVetHint();
       return null;
     },
     _updateNewVetHint: function() {
@@ -292,10 +273,10 @@
       drawPolygonHints = [''];
       modifyPolygonHints = ['<p>Press <strong>Delete</strong> while over a corner to delete it</p>'];
       movePolygonHints = [''];
-      if (new_vet_modify_polygon_control.active) {
+      if (this.modifyControl.active) {
         hint = modifyPolygonHints[Math.floor(Math.random() * modifyPolygonHints.length)];
         $('#vethint').html(hint);
-      } else if (new_vet_draw_polygon_control) {
+      } else if (this.drawControl.active) {
         hint = drawPolygonHints[Math.floor(Math.random() * drawPolygonHints.length)];
         $('#vethint').html(hint);
       } else {
@@ -304,10 +285,9 @@
       return null;
     },
     _createNewVetting: function() {
-      var classifyHabitat, feature, layerWKTString, newVetData, newVetPolygon, newVetPolygonFeatures, newVetPolygonGeoms, speciesId, url, vetDataAsJSONString, _i, _len;
+      var feature, layerWKTString, newVetData, newVetPolygon, newVetPolygonFeatures, newVetPolygonGeoms, speciesId, url, vetDataAsJSONString, _i, _len;
       consolelog("Processing create new vetting");
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      newVetPolygonFeatures = classifyHabitat.features;
+      newVetPolygonFeatures = this.features;
       newVetPolygonGeoms = [];
       for (_i = 0, _len = newVetPolygonFeatures.length; _i < _len; _i++) {
         feature = newVetPolygonFeatures[_i];
@@ -316,7 +296,7 @@
       newVetPolygon = new OpenLayers.Geometry.MultiPolygon(newVetPolygonGeoms);
       consolelog("WKT logs:");
       consolelog("polygon", newVetPolygon);
-      layerWKTString = classifyHabitat.wkt.extractGeometry(newVetPolygon);
+      layerWKTString = this.wkt.extractGeometry(newVetPolygon);
       consolelog("layer string", layerWKTString);
       speciesId = Edgar.mapdata.species.id;
       newVetData = {
@@ -336,9 +316,8 @@
       return true;
     },
     _validateNewVetForm: function() {
-      var classifyHabitat, newVetPolygonFeatures;
-      classifyHabitat = Edgar.vetting.classifyHabitat;
-      newVetPolygonFeatures = classifyHabitat.features;
+      var newVetPolygonFeatures;
+      newVetPolygonFeatures = this.features;
       if (Edgar.mapdata.species === null) {
         alert("No species selected");
         return false;

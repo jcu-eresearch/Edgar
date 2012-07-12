@@ -11,9 +11,8 @@ Edgar.vetting.classifyHabitat = {
     ###
     init: () ->
         consolelog "Starting to init the classify habitat interface"
-        classifyHabitat = Edgar.vetting.classifyHabitat
 
-        classifyHabitat.wkt = new OpenLayers.Format.WKT {
+        this.wkt = new OpenLayers.Format.WKT {
             'internalProjection': Edgar.map.baseLayer.projection
             'externalProjection': Edgar.util.projections.mercator
         }
@@ -22,7 +21,7 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
-        classifyHabitat.vectorLayerOptions = {
+        this.vectorLayerOptions = {
             ###
             # NOTE: Due to OpenLayers Bug.. can't do this.
             #   The modify feature control draws points onto the vector layer
@@ -33,7 +32,7 @@ Edgar.vetting.classifyHabitat = {
         }
 
         # Listen for button clicks
-        classifyHabitat._addButtonHandlers()
+        this._addButtonHandlers()
 
         consolelog("Finished init new vetting")
 
@@ -48,7 +47,7 @@ Edgar.vetting.classifyHabitat = {
         handle draw polygon press
         ###
         $('#newvet_draw_polygon_button').click( (e) ->
-            _handleDrawPolygonClick e
+            Edgar.vetting.classifyHabitat._handleDrawPolygonClick e
             null
         )
 
@@ -56,7 +55,7 @@ Edgar.vetting.classifyHabitat = {
         handle add polygon press
         ###
         $('#newvet_add_polygon_button').click( (e) ->
-            _handleAddPolygonClick e
+            Edgar.vetting.classifyHabitat._handleAddPolygonClick e
             null
         )
 
@@ -64,7 +63,7 @@ Edgar.vetting.classifyHabitat = {
         handle modify polygon press
         ###
         $('#newvet_modify_polygon_button').click( (e) ->
-            _handleModifyPolygonClick e
+            Edgar.vetting.classifyHabitat._handleModifyPolygonClick e
             null
         )
 
@@ -72,7 +71,7 @@ Edgar.vetting.classifyHabitat = {
         handle delete selected polygon press
         ###
         $('#newvet_delete_selected_polygon_button').click( (e) ->
-            _handleDeleteSelectedPolygonClick e
+            Edgar.vetting.classifyHabitat._handleDeleteSelectedPolygonClick e
             null
         )
 
@@ -80,7 +79,7 @@ Edgar.vetting.classifyHabitat = {
         handle delete all polygon press
         ###
         $('#newvet_delete_all_polygons_button').click( (e) ->
-            _handleDeleteAllPolygonClick e
+            Edgar.vetting.classifyHabitat._handleDeleteAllPolygonClick e
             null
         )
 
@@ -89,12 +88,10 @@ Edgar.vetting.classifyHabitat = {
         ###
         $('#newvet :button').hover(
             () ->
-                classifyHabitat = Edgar.vetting.classifyHabitat
-                $(classifyHabitat).addClass "ui-state-hover"
+                $(Edgar.vetting.classifyHabitat).addClass "ui-state-hover"
                 null
             () ->
-                classifyHabitat = Edgar.vetting.classifyHabitat
-                $(classifyHabitat).removeClass "ui-state-hover"
+                $(Edgar.vetting.classifyHabitat).removeClass "ui-state-hover"
                 null
         )
 
@@ -108,14 +105,16 @@ Edgar.vetting.classifyHabitat = {
         $('#vet_submit').click( (e) ->
             e.preventDefault()
 
+            classifyHabitat = Edgar.vetting.classifyHabitat;
+
             ###
             # validate the form
             # and, if valid, submit its contents
             ###
             # if the form was valid...
-            if _validateNewVetForm()
+            if classifyHabitat._validateNewVetForm()
                 # submit the vetting
-                _createNewVetting()
+                classifyHabitat._createNewVetting()
             else
                 false
         )
@@ -132,25 +131,22 @@ Edgar.vetting.classifyHabitat = {
         null
 
     _addVectorLayer: () ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
-
         ###
         # Define a vector layer to hold a user's area classification
         ###
-        classifyHabitat.vectorLayer = new OpenLayers.Layer.Vector "New Area Classification", classifyHabitat.vectorLayerOptions
-        Edgar.map.addLayers  [classifyHabitat.vectorLayer]
+        this.vectorLayer = new OpenLayers.Layer.Vector "New Area Classification", this.vectorLayerOptions
+        Edgar.map.addLayers  [this.vectorLayer]
 
     _removeVectorLayer: () ->
         # TODO
         null
 
     _addDrawControl: () ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
-        classifyHabitat.drawControl = new OpenLayers.Control.DrawFeature(
-            classifyHabitat.vectorLayer
+        this.drawControl = new OpenLayers.Control.DrawFeature(
+            this.vectorLayer
             OpenLayers.Handler.Polygon
         )
-        Edgar.map.addControl classifyHabitat.drawControl
+        Edgar.map.addControl this.drawControl
 
         null
 
@@ -159,7 +155,6 @@ Edgar.vetting.classifyHabitat = {
         null
 
     _addModifyControl: () ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
 
         ###
         # Create a Modify Feature control
@@ -167,8 +162,8 @@ Edgar.vetting.classifyHabitat = {
         #    - Reshape
         #    - Drag
         ###
-        classifyHabitat.modifyControl = new OpenLayers.Control.ModifyFeature(
-            classifyHabitat.vectorLayer
+        this.modifyControl = new OpenLayers.Control.ModifyFeature(
+            this.vectorLayer
             {
                 mode: ( OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG )
                 beforeSelectFeature: (feature) ->
@@ -179,6 +174,7 @@ Edgar.vetting.classifyHabitat = {
                     null
             }
         )
+        Edgar.map.addControl this.modifyControl
 
         null
 
@@ -188,71 +184,68 @@ Edgar.vetting.classifyHabitat = {
 
 
     _clearNewVettingMode: (e) ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
         consolelog "Clearing classify habitat mode of operation"
 
-        removeModifyFeatureHandlesAndVertices()
+        this._removeModifyFeatureHandlesAndVertices()
 
         # Deactivate draw polygon control
-        classifyHabitat.drawControl.deactivate()
+        this.drawControl.deactivate()
         $('#newvet_draw_polygon_button').removeClass 'ui-state-active'
 
         # Deactivate modify polygon control
-        classifyHabitat.modifyControl.deactivate()
+        this.modifyControl.deactivate()
         $('#newvet_modify_polygon_button').removeClass 'ui-state-active'
 
-        _updateNewVetHint()
+        this._updateNewVetHint()
 
         null
 
     _activateDrawPolygonMode: () ->
-        _clearNewVettingMode()
+        this._clearNewVettingMode()
         $('#newvet_draw_polygon_button').addClass 'ui-state-active'
-        new_vet_draw_polygon_control.activate()
-        _updateNewVetHint()
+        this.drawControl.activate()
+        this._updateNewVetHint()
 
         null
 
     _activateModifyPolygonMode: () ->
-        _clearNewVettingMode()
+        this._clearNewVettingMode()
         $('#newvet_modify_polygon_button').addClass 'ui-state-active'
 
         # Specify the modify mode as reshape and drag 
-        classifyHabitat.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG
-        classifyHabitat.modifyControl.activate()
-        _updateNewVetHint()
+        this.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG
+        this.modifyControl.activate()
+        this._updateNewVetHint()
 
     _handleToggleButtonClick: (e, onActivatingButton, onDeactivatingButton) ->
         e.preventDefault()
         if $(e.srcElement).hasClass 'ui-state-active'
-            onDeactivatingButton()
+            onDeactivatingButton.apply(Edgar.vetting.classifyHabitat, [])
         else
-            onActivatingButton()
+            onActivatingButton.apply(Edgar.vetting.classifyHabitat, [])
 
         null
 
     _handleDrawPolygonClick: (e) ->
-        _handleToggleButtonClick(e, _activateDrawPolygonMode, _clearNewVettingMode)
+        this._handleToggleButtonClick(e, this._activateDrawPolygonMode, this._clearNewVettingMode)
 
         null
 
     _handleModifyPolygonClick: (e) ->
-        _handleToggleButtonClick(e, _activateModifyPolygonMode, _clearNewVettingMode)
+        this._handleToggleButtonClick(e, this._activateModifyPolygonMode, this._clearNewVettingMode)
 
         null
 
     _handleAddPolygonClick: (e) ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
-
         e.preventDefault()
 
-        _clearNewVettingMode()
+        this._clearNewVettingMode()
 
         # Determine position to add polygon..
         # then add it.
         # Get the center of the map.
-        centerOfMap = Edgar.map.getCenter
-        mapBounds   = Edgar.map.getExtent
+        centerOfMap = Edgar.map.getCenter()
+        mapBounds   = Edgar.map.getExtent()
         mapHeight   = ( mapBounds.top   - mapBounds.bottom )
         mapWidth    = ( mapBounds.right - mapBounds.left )
 
@@ -280,55 +273,52 @@ Edgar.vetting.classifyHabitat = {
         attributes = {}
 
         feature = new OpenLayers.Feature.Vector polygon, attributes
-        classifyHabitat.vectorLayer.addFeatures [feature]
+        this.vectorLayer.addFeatures [feature]
 
-        _activateModifyPolygonMode()
+        consolelog(this.vectorLayer.features);
+
+        this._activateModifyPolygonMode()
 
         null
 
     _removeModifyFeatureHandlesAndVertices: () ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
-        classifyHabitat.vectorLayer.addFeatures [feature]
-
         # Delete any modify control vertices.
-        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.virtualVertices, { silent: true }
-        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.vertices, { silent: true }
+        this.vectorLayer.removeFeatures this.modifyControl.virtualVertices, { silent: true }
+        this.vectorLayer.removeFeatures this.modifyControl.vertices, { silent: true }
         # Delete the radius handle.
-        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.radiusHandle, { silent: true }
+        this.vectorLayer.removeFeatures this.modifyControl.radiusHandle, { silent: true }
         # Delete the drag handle.
-        classifyHabitat.vectorLayer.removeFeatures classifyHabitat.modifyControl.dragHandle, { silent: true }
+        this.vectorLayer.removeFeatures this.modifyControl.dragHandle, { silent: true }
 
         null
 
     _handleDeleteSelectedPolygonClick: (e) ->
         e.preventDefault()
-        classifyHabitat = Edgar.vetting.classifyHabitat
-        currentFeature =  classifyHabitat.modifyControl.feature
+        currentFeature =  this.modifyControl.feature
 
         if(currentFeature)
             # Unselect the feature.
-            classifyHabitat.modifyControl.unselectFeature(currentFeature)
-            _removeModifyFeatureHandlesAndVertices()
+            this.modifyControl.unselectFeature(currentFeature)
+            this._removeModifyFeatureHandlesAndVertices()
             # Delete the selected feature
-            classifyHabitat.vectorLayer.removeFeatures(currentFeature)
+            this.vectorLayer.removeFeatures(currentFeature)
 
             # If all Features are now deleted,
             # clear the vetting mode (get out of modify mode)
-            if classifyHabitat.vectorLayer.features.length == 0
-                _clearNewVettingMode()
+            if this.vectorLayer.features.length == 0
+                this._clearNewVettingMode()
 
         null
 
 
     _handleDeleteAllPolygonClick: (e) ->
         e.preventDefault()
-        classifyHabitat = Edgar.vetting.classifyHabitat
 
-        _clearNewVettingMode()
+        this._clearNewVettingMode()
 
-        classifyHabitat.vectorLayer.removeAllFeatures()
+        this.vectorLayer.removeAllFeatures()
 
-        _updateNewVetHint()
+        this._updateNewVetHint()
 
         null
 
@@ -348,10 +338,10 @@ Edgar.vetting.classifyHabitat = {
         ]
 
         # Modify feature is active
-        if new_vet_modify_polygon_control.active
+        if this.modifyControl.active
             hint = modifyPolygonHints[Math.floor(Math.random()*modifyPolygonHints.length)]
             $('#vethint').html hint
-        else if new_vet_draw_polygon_control
+        else if this.drawControl.active
             hint = drawPolygonHints[Math.floor(Math.random()*drawPolygonHints.length)]
             $('#vethint').html hint
         else
@@ -363,10 +353,8 @@ Edgar.vetting.classifyHabitat = {
     _createNewVetting: () ->
         consolelog "Processing create new vetting"
 
-        classifyHabitat = Edgar.vetting.classifyHabitat
-
         # Get features from the vector layer (which are all known to be polygons)
-        newVetPolygonFeatures = classifyHabitat.features
+        newVetPolygonFeatures = this.features
         # Now convert our array of features into an array of geometries.
         newVetPolygonGeoms = []
         newVetPolygonGeoms.push(feature.geometry) for feature in newVetPolygonFeatures
@@ -377,7 +365,7 @@ Edgar.vetting.classifyHabitat = {
         consolelog "polygon", newVetPolygon
 
         # Get WKT (well known text) for the multipolygon
-        layerWKTString = classifyHabitat.wkt.extractGeometry(newVetPolygon)
+        layerWKTString = this.wkt.extractGeometry(newVetPolygon)
         # At this point, we have our WKT
         consolelog "layer string", layerWKTString
 
@@ -410,10 +398,9 @@ Edgar.vetting.classifyHabitat = {
     # Returns true if valid
     # Returns false else
     _validateNewVetForm: () ->
-        classifyHabitat = Edgar.vetting.classifyHabitat
 
         # Get features from the vector layer (which are all known to be polygons)
-        newVetPolygonFeatures = classifyHabitat.features
+        newVetPolygonFeatures = this.features
 
         if (Edgar.mapdata.species == null)
             alert "No species selected"
