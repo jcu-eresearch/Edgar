@@ -210,8 +210,8 @@
       var attributes, calcDimension, centerOfMap, feature, majorFraction, mapBounds, mapHeight, mapWidth, minorFraction, points, polygon, ring;
       e.preventDefault();
       this._clearNewVettingMode();
-      centerOfMap = Edgar.map.getCenter;
-      mapBounds = Edgar.map.getExtent;
+      centerOfMap = Edgar.map.getCenter();
+      mapBounds = Edgar.map.getExtent();
       mapHeight = mapBounds.top - mapBounds.bottom;
       mapWidth = mapBounds.right - mapBounds.left;
       calcDimension = null;

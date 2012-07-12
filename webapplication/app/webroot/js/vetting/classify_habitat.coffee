@@ -244,8 +244,8 @@ Edgar.vetting.classifyHabitat = {
         # Determine position to add polygon..
         # then add it.
         # Get the center of the map.
-        centerOfMap = Edgar.map.getCenter
-        mapBounds   = Edgar.map.getExtent
+        centerOfMap = Edgar.map.getCenter()
+        mapBounds   = Edgar.map.getExtent()
         mapHeight   = ( mapBounds.top   - mapBounds.bottom )
         mapWidth    = ( mapBounds.right - mapBounds.left )
 
