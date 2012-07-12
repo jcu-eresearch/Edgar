@@ -409,7 +409,7 @@ def _fetch_json(request, check_not_empty=True):
             response_time - start_time,
             end_time - response_time)
 
-    return_value = json.loads(response_str, parse_int=long)
+    return_value = json.loads(response_str)
     if check_not_empty and len(return_value) == 0:
         raise RuntimeError('ALA returned empty response')
     else:
