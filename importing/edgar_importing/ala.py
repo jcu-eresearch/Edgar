@@ -47,7 +47,7 @@ class Coord(object):
     @classmethod
     def from_dict(cls, d, latKey, longKey):
         if latKey in d and longKey in d:
-            return Coord(float(d[latKey]), float(d[longKey]))
+            return Coord(d[latKey], d[longKey])
         else:
             return None
 
@@ -148,15 +148,14 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
 
             uncertainty = None
             if 'sensitiveCoordinateUncertaintyInMeters' in occ:
-                uncertainty = long(occ['sensitiveCoordinateUncertaintyInMeters'])
+                uncertainty = occ['sensitiveCoordinateUncertaintyInMeters']
             else:
-                uncertainty = long(occ['coordinateUncertaintyInMeters'])
+                uncertainty = occ['coordinateUncertaintyInMeters']
 
             date = None
             if 'eventDate' in occ:
                 # unix timestamp, but in milliseconds instead of seconds
-                # cuts off last 3 digits
-                ts = long(occ['eventDate'][:-3])
+                ts = occ['eventDate'] / 1000
                 date = datetime.date.fromtimestamp(ts)
 
             yield Occurrence(
@@ -164,7 +163,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
-                uncertainty=long(uncertainty),
+                uncertainty=int(uncertainty),
                 date=date
             )
 
@@ -261,7 +260,7 @@ def num_occurrences_for_lsid(lsid):
             'q': q_param(lsid),
             'facet': 'off',
             'pageSize': 0}))
-    return long(j['totalRecords'])
+    return j['totalRecords']
 
 
 def create_request(url, params=None, use_get=True, use_api_key=False):
@@ -357,7 +356,7 @@ def _fetch_species_list(params):
 
     for page in _json_pages(url, params, total_key_path, 'start'):
         for result in page['searchResults']['results']:
-            if long(result['occCount']) > 0:
+            if result['occCount'] > 0:
                 s = Species()
                 s.lsid = result['guid']
                 s.scientific_name = result['nameComplete'].strip()
@@ -410,7 +409,7 @@ def _fetch_json(request, check_not_empty=True):
             response_time - start_time,
             end_time - response_time)
 
-    return_value = json.loads(response_str, parse_int=str)
+    return_value = json.loads(response_str, parse_int=long)
     if check_not_empty and len(return_value) == 0:
         raise RuntimeError('ALA returned empty response')
     else:
