@@ -325,7 +325,7 @@
     _updateNewVetHint: function() {
       var drawPolygonHints, hint, modifyPolygonHints, movePolygonHints;
       drawPolygonHints = [''];
-      modifyPolygonHints = ['<p>Press <strong>Delete</strong> while over a corner to delete it</p>'];
+      modifyPolygonHints = ['<p>Press the <strong>Delete</strong> key while hovering your mouse cursor over a corner to delete it</p>'];
       movePolygonHints = [''];
       if (this.modifyControl.active) {
         hint = modifyPolygonHints[Math.floor(Math.random() * modifyPolygonHints.length)];

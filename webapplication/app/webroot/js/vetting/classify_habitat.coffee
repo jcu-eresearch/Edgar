@@ -380,7 +380,7 @@ Edgar.vetting.classifyHabitat = {
         ]
 
         modifyPolygonHints = [
-            '<p>Press <strong>Delete</strong> while over a corner to delete it</p>'
+            '<p>Press the <strong>Delete</strong> key while hovering your mouse cursor over a corner to delete it</p>'
         ]
 
         movePolygonHints = [
