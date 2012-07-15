@@ -10,12 +10,6 @@ import shapely.wkt
 import shapely.geometry
 from pprint import pprint
 
-# 3 digits means the size of each grid cell is 0.001
-GRID_DIGITS = 3
-GRID_SIZE = float(10.0 ** -GRID_DIGITS)
-FLOAT_FMT = '%0.' + str(GRID_DIGITS) + 'f'
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description='''Recalculates occurrence
         record classifications based on vettings''')
@@ -61,24 +55,24 @@ def vet_species(args):
     log_info('Loading all vettings')
     vettings = ordered_vettings_for_species_id(species['id'])
 
-    log_info('Vetting grid cells')
+    log_info('Vetting occurrences')
     num_coords = 0
-    for lon, lat in unique_gridded_coords_for_species_id(species['id']):
-        update_occurrences_in_grid_cell(lon, lat, species['id'], vettings)
+    for lon, lat, occid in occurrences_for_species_id(species['id']):
+        update_occurrence(lon, lat, occid, species['id'], vettings)
         num_coords += 1
 
     return len(vettings), num_coords
 
 
-def update_occurrences_in_grid_cell(lon, lat, species_id, ordered_vettings):
+def update_occurrence(lon, lat, occid, species_id, ordered_vettings):
     contention = False
     classification = None
-    cell_center = shapely.geometry.Point(lon + GRID_SIZE/2.0, lat + GRID_SIZE/2.0)
+    p = shapely.geometry.Point(lon, lat)
 
     # for each vetting, ordered most-authoritive first
     for vetting in ordered_vettings:
-        # check if the vetting applies to this grid cell
-        if vetting.area.intersects(cell_center):
+        # check if the vetting applies to this occurrences' location
+        if vetting.area.intersects(p):
             # first, look for classification (if not found previously)
             if classification is None:
                 classification = vetting.classification
@@ -87,6 +81,7 @@ def update_occurrences_in_grid_cell(lon, lat, species_id, ordered_vettings):
                 contention = True
                 # if both classification and contention are found, no need
                 # to check the rest of the polygons
+                log_info('Contention')
                 break
 
     # only update db if one of the vettings was applied
@@ -94,13 +89,11 @@ def update_occurrences_in_grid_cell(lon, lat, species_id, ordered_vettings):
         db.engine.execute('''
             UPDATE occurrences
             SET contentious = {cont}, classification = '{classi}'
-            WHERE species_id = {sid}
-                AND location && {box}
+            WHERE id = {occid}
             '''.format(
                 cont=('TRUE' if contention else 'FALSE'),
                 classi=classification,
-                sid=int(species_id),
-                box=make_box2d_for_grid_cell(lon, lat)
+                occid=occid
             ))
 
 
@@ -110,14 +103,11 @@ def ordered_vettings_for_species_id(species_id):
     query = db.engine.execute('''
         SELECT
             vettings.classification AS classi,
-            ST_AsText(ST_SimplifyPreserveTopology(vettings.area, {acc})) AS area
+            ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area
         FROM vettings INNER JOIN users ON vettings.user_id=users.id
         WHERE vettings.species_id = {sid} AND users.can_vet
         ORDER BY users.authority DESC, vettings.updated_on DESC
-        '''.format(
-            sid=int(species_id),
-            acc=GRID_SIZE
-        ))
+        '''.format(sid=int(species_id)))
 
     for row in query:
         vettings.append(Vetting(row['classi'], row['area']))
@@ -125,44 +115,15 @@ def ordered_vettings_for_species_id(species_id):
     return vettings
 
 
-def unique_gridded_coords_for_species_id(species_id):
+def occurrences_for_species_id(species_id):
     query = db.engine.execute('''
-        SELECT DISTINCT
-            TRUNC(ST_X(location)::numeric, {truncd}) AS lon,
-            TRUNC(ST_Y(location)::numeric, {truncd}) AS lat
+        SELECT id, ST_X(location) AS lon, ST_Y(location) AS lat
         FROM occurrences
         WHERE species_id = {sid}
-        '''.format(
-            truncd=GRID_DIGITS,
-            sid=species_id
-        ))
+        '''.format(sid=species_id))
 
     for row in query:
-        yield float(row['lon']), float(row['lat'])
-
-
-def get_grid_bounds_for_dimension(dimension):
-    '''Returns (min_bounds, max_bounds). Bounds are based on the truncation of
-    the dimension. Negative numbers become more negative, and the bounds around
-    0.0 are twice the size of the rest (can't tell if a positive or negative
-    number was truncated).'''
-    if dimension > 0:
-        return dimension, dimension + GRID_SIZE
-    elif dimension < 0:
-        return dimension - GRID_SIZE, dimension
-    else:
-        return -GRID_SIZE, GRID_SIZE
-
-
-def make_box2d_for_grid_cell(lon, lat):
-    lonmin, lonmax = get_grid_bounds_for_dimension(lon)
-    latmin, latmax = get_grid_bounds_for_dimension(lat)
-
-    return "ST_SetSRID('BOX({lonmin} {latmin},{lonmax} {latmax})'::box2d,4326)".format(
-        lonmin=(FLOAT_FMT % lonmin),
-        latmin=(FLOAT_FMT % latmin),
-        lonmax=(FLOAT_FMT % lonmax),
-        latmax=(FLOAT_FMT % latmax))
+        yield float(row['lon']), float(row['lat']), row['id']
 
 
 class Vetting(object):
