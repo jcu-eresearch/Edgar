@@ -9,11 +9,33 @@
 
   Edgar.vetting = {
     /*
+        # Define a style map for the vetting areas
+    */
+
+    _initAreaStyleMap: function() {
+      return this.areaStyleMap = new OpenLayers.StyleMap({
+        'default': {
+          'fillOpacity': 0.3,
+          'strokeOpacity': 0.9,
+          'fillColor': '${fill_color}',
+          'strokeColor': '${stroke_color}',
+          'fontColor': '${font_color}',
+          'label': '${classification}'
+        },
+        'select': {
+          'fillOpacity': 1.0,
+          'strokeOpacity': 1.0
+        }
+      });
+    },
+    /*
         # Initialise the classify habitat interface
     */
 
     init: function() {
       Edgar.vetting.classifyHabitat.init();
+      Edgar.vetting.myHabitatClassifications.init();
+      this._initAreaStyleMap();
       this._bindToChangeModeEvents();
       return null;
     },
@@ -30,7 +52,7 @@
     },
     isChangeModeOkay: function(newMode) {
       if (Edgar.mapmode === 'vetting') {
-        if (this.classifyHabitat.isChangeModeOkay(newMode)) {
+        if (this.classifyHabitat.isChangeModeOkay(newMode) && this.myHabitatClassifications.isChangeModeOkay(newMode)) {
           return true;
         } else {
           consolelog('cancelling mode change.');
@@ -47,6 +69,7 @@
 
     engageVettingMode: function() {
       console.log("engageVettingMode");
+      Edgar.vetting.myHabitatClassifications.engage();
       Edgar.vetting.classifyHabitat.engage();
       return null;
     },
@@ -57,6 +80,7 @@
 
     disengageVettingMode: function() {
       console.log("disengageVettingMode");
+      Edgar.vetting.myHabitatClassifications.disengage();
       Edgar.vetting.classifyHabitat.disengage();
       return null;
     }

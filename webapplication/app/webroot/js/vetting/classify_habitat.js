@@ -20,8 +20,6 @@
         'internalProjection': Edgar.map.baseLayer.projection,
         'externalProjection': Edgar.util.projections.mercator
       });
-      consolelog("Finished init-ing the classify habitat interface");
-      null;
       this.vectorLayerOptions = {
         /*
                     # NOTE: Due to OpenLayers Bug.. can't do this.
@@ -33,7 +31,7 @@
 
       };
       this._addButtonHandlers();
-      consolelog("Finished init new vetting");
+      consolelog("Finished init-ing the classify habitat interface");
       return null;
     },
     _confirmModeChangeOkayViaDialog: function(newMode) {

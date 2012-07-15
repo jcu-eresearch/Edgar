@@ -17,10 +17,6 @@ Edgar.vetting.classifyHabitat = {
             'externalProjection': Edgar.util.projections.mercator
         }
 
-        consolelog "Finished init-ing the classify habitat interface"
-
-        null
-
         this.vectorLayerOptions = {
             ###
             # NOTE: Due to OpenLayers Bug.. can't do this.
@@ -34,7 +30,7 @@ Edgar.vetting.classifyHabitat = {
         # Listen for button clicks
         this._addButtonHandlers()
 
-        consolelog("Finished init new vetting")
+        consolelog "Finished init-ing the classify habitat interface"
 
         null
 
