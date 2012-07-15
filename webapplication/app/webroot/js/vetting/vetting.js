@@ -35,6 +35,7 @@
     init: function() {
       Edgar.vetting.classifyHabitat.init();
       Edgar.vetting.myHabitatClassifications.init();
+      Edgar.vetting.theirHabitatClassifications.init();
       this._initAreaStyleMap();
       this._bindToChangeModeEvents();
       return null;
@@ -52,7 +53,7 @@
     },
     isChangeModeOkay: function(newMode) {
       if (Edgar.mapmode === 'vetting') {
-        if (this.classifyHabitat.isChangeModeOkay(newMode) && this.myHabitatClassifications.isChangeModeOkay(newMode)) {
+        if (this.classifyHabitat.isChangeModeOkay(newMode) && this.myHabitatClassifications.isChangeModeOkay(newMode) && this.theirHabitatClassifications.isChangeModeOkay(newMode)) {
           return true;
         } else {
           consolelog('cancelling mode change.');
@@ -70,6 +71,7 @@
     engageVettingMode: function() {
       console.log("engageVettingMode");
       Edgar.vetting.myHabitatClassifications.engage();
+      Edgar.vetting.theirHabitatClassifications.engage();
       Edgar.vetting.classifyHabitat.engage();
       return null;
     },
@@ -81,6 +83,7 @@
     disengageVettingMode: function() {
       console.log("disengageVettingMode");
       Edgar.vetting.myHabitatClassifications.disengage();
+      Edgar.vetting.theirHabitatClassifications.disengage();
       Edgar.vetting.classifyHabitat.disengage();
       return null;
     }

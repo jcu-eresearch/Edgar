@@ -29,6 +29,7 @@ Edgar.vetting = {
     init: () ->
         Edgar.vetting.classifyHabitat.init()
         Edgar.vetting.myHabitatClassifications.init()
+        Edgar.vetting.theirHabitatClassifications.init()
 
         this._initAreaStyleMap()
 
@@ -49,7 +50,7 @@ Edgar.vetting = {
 
     isChangeModeOkay: (newMode) ->
         if Edgar.mapmode == 'vetting'
-            if this.classifyHabitat.isChangeModeOkay(newMode) and this.myHabitatClassifications.isChangeModeOkay(newMode)
+            if this.classifyHabitat.isChangeModeOkay(newMode) and this.myHabitatClassifications.isChangeModeOkay(newMode) and this.theirHabitatClassifications.isChangeModeOkay(newMode)
                 true
             else
                 consolelog('cancelling mode change.')
@@ -64,6 +65,7 @@ Edgar.vetting = {
     engageVettingMode: () ->
         console.log "engageVettingMode"
         Edgar.vetting.myHabitatClassifications.engage()
+        Edgar.vetting.theirHabitatClassifications.engage()
         Edgar.vetting.classifyHabitat.engage()
 
         null
@@ -75,6 +77,7 @@ Edgar.vetting = {
     disengageVettingMode: () ->
         console.log "disengageVettingMode"
         Edgar.vetting.myHabitatClassifications.disengage()
+        Edgar.vetting.theirHabitatClassifications.disengage()
         Edgar.vetting.classifyHabitat.disengage()
 
         null
