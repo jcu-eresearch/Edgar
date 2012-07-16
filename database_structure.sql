@@ -90,6 +90,7 @@ CREATE TABLE occurrences (
     uncertainty INT NOT NULL, -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box. Bounding box makes sense, if the lat/lon are rounded.
     date DATE NULL, -- when the occurrence/sighting happened
     classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
+    contentious BOOL DEFAULT FALSE NOT NULL,
     source_classification classification NOT NULL, -- The vetting classification as obtained from the source (i.e. ALA assertions translated to our vettings system)
     source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
     species_id INT NOT NULL REFERENCES species(id)
@@ -167,11 +168,12 @@ ALTER TABLE vettings ADD CONSTRAINT vettings_area_valid_check CHECK (ST_IsValid(
 -- Also assumes this SQL is running with grant privileges
 
 -- edgar_backend
-GRANT SELECT, INSERT, UPDATE, DELETE ON species TO edgar_backend;
-GRANT SELECT, INSERT, UPDATE, DELETE ON sources TO edgar_backend;
-GRANT SELECT, INSERT, UPDATE, DELETE ON occurrences TO edgar_backend;
-GRANT SELECT, INSERT, UPDATE, DELETE ON sensitive_occurrences TO edgar_backend;
-GRANT SELECT, INSERT, UPDATE, DELETE ON vettings TO edgar_backend;
+GRANT ALL ON species TO edgar_backend;
+GRANT ALL ON sources TO edgar_backend;
+GRANT ALL ON occurrences TO edgar_backend;
+GRANT ALL ON sensitive_occurrences TO edgar_backend;
+GRANT ALL ON vettings TO edgar_backend;
+GRANT ALL ON users TO edgar_backend;
 GRANT USAGE, SELECT ON species_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON sources_id_seq TO edgar_backend;
 GRANT USAGE, SELECT ON occurrences_id_seq TO edgar_backend;
@@ -191,54 +193,6 @@ GRANT USAGE, SELECT ON users_id_seq TO edgar_frontend;
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 -- CUSTOM FUNCTIONS
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
--- Recalculates the "classification" (a.k.a vetting) on each occurrence
--- Uses a painters algorithm. Orders all vettings from least authoritative to
--- most authoritative, then applies the vettings to the area. This means the
--- most authoritative vettings gets applied last, and therefore has the final
--- say.
---
--- Calls ST_SimplifyPreserveTopology on the vetting polygons, because they
--- can be super high resolution which makes ST_CoveredBy run super slow.
---
--- Run this with: SELECT EdgarUpdateVettings(x);
--- Where `x` is a valid species.id
-
-
-CREATE FUNCTION EdgarUpdateVettings(speciesId INT) RETURNS VOID AS $$
-DECLARE
-    r RECORD;
-BEGIN
-    -- Revert back to original vettings, as obtained from the source
-    RAISE NOTICE 'Reverting classification back to source_classification';
-    UPDATE occurrences
-        SET classification = source_classification
-        WHERE species_id = speciesId;
-
-    -- Apply user vettings using painters algorithm
-    FOR r IN
-        -- TODO: order this loop from least authoritative user to most authoritative.
-        -- TODO: what if two vettings by the same user overlap? What takes precedence?
-        SELECT *, vettings.id as vetting_id
-            FROM vettings
-                JOIN users on vettings.user_id = users.id
-            WHERE vettings.species_id = speciesId
-                AND users.can_vet
-            ORDER BY users.authority ASC, vettings.updated_on ASC
-    LOOP
-        RAISE NOTICE 'Applying vetting %, authority %, by user %', r.vetting_id, r.authority, r.email;
-        UPDATE occurrences
-            SET classification = r.classification
-            WHERE occurrences.species_id = speciesId
-                AND ST_CoveredBy(occurrences.location, ST_SimplifyPreserveTopology(r.area, 0.01));
-    END LOOP;
-
-    RETURN;
-END;
-$$ LANGUAGE plpgsql;
-
-
 
 -- Inserts/updates (upserts) an occurrence, and its related
 -- sensitive_occurrence if necessary. This is a slow operation in python, and

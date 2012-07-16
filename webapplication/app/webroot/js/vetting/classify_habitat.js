@@ -18,10 +18,8 @@
       consolelog("Starting to init the classify habitat interface");
       this.wkt = new OpenLayers.Format.WKT({
         'internalProjection': Edgar.map.baseLayer.projection,
-        'externalProjection': Edgar.util.projections.mercator
+        'externalProjection': Edgar.util.projections.geographic
       });
-      consolelog("Finished init-ing the classify habitat interface");
-      null;
       this.vectorLayerOptions = {
         /*
                     # NOTE: Due to OpenLayers Bug.. can't do this.
@@ -33,7 +31,7 @@
 
       };
       this._addButtonHandlers();
-      consolelog("Finished init new vetting");
+      consolelog("Finished init-ing the classify habitat interface");
       return null;
     },
     _confirmModeChangeOkayViaDialog: function(newMode) {
@@ -258,7 +256,7 @@
       return null;
     },
     _handleAddPolygonClick: function(e) {
-      var attributes, calcDimension, centerOfMap, feature, majorFraction, mapBounds, mapHeight, mapWidth, minorFraction, points, polygon, ring;
+      var attributes, calcDimension, centerOfMap, centerPoint, feature, mapBounds, mapHeight, mapWidth, minorFraction, polygon, radius, rotation, sides;
       e.preventDefault();
       this._clearNewVettingMode();
       centerOfMap = Edgar.map.getCenter();
@@ -271,11 +269,12 @@
       } else {
         calcDimension = mapWidth;
       }
-      majorFraction = calcDimension / 10;
       minorFraction = calcDimension / 14;
-      points = [new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - majorFraction), new OpenLayers.Geometry.Point(centerOfMap.lon - majorFraction, centerOfMap.lat), new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction), new OpenLayers.Geometry.Point(centerOfMap.lon + majorFraction, centerOfMap.lat), new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - majorFraction)];
-      ring = new OpenLayers.Geometry.LinearRing(points);
-      polygon = new OpenLayers.Geometry.Polygon([ring]);
+      radius = minorFraction;
+      sides = 6;
+      rotation = Math.random() * 90;
+      centerPoint = new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat);
+      polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(centerPoint, radius, sides, rotation);
       attributes = {};
       feature = new OpenLayers.Feature.Vector(polygon, attributes);
       this.vectorLayer.addFeatures([feature]);
@@ -325,7 +324,7 @@
     _updateNewVetHint: function() {
       var drawPolygonHints, hint, modifyPolygonHints, movePolygonHints;
       drawPolygonHints = [''];
-      modifyPolygonHints = ['<p>Press <strong>Delete</strong> while over a corner to delete it</p>'];
+      modifyPolygonHints = ['<p>Press the <strong>Delete</strong> key while hovering your mouse cursor over a corner to delete it</p>'];
       movePolygonHints = [''];
       if (this.modifyControl.active) {
         hint = modifyPolygonHints[Math.floor(Math.random() * modifyPolygonHints.length)];
@@ -341,7 +340,7 @@
     _createNewVetting: function() {
       var feature, layerWKTString, newVetData, newVetPolygon, newVetPolygonFeatures, newVetPolygonGeoms, speciesId, url, vetDataAsJSONString, _i, _len;
       consolelog("Processing create new vetting");
-      newVetPolygonFeatures = this.features;
+      newVetPolygonFeatures = this.vectorLayer.features;
       newVetPolygonGeoms = [];
       for (_i = 0, _len = newVetPolygonFeatures.length; _i < _len; _i++) {
         feature = newVetPolygonFeatures[_i];
@@ -362,20 +361,28 @@
       consolelog("Post Data", newVetData);
       vetDataAsJSONString = JSON.stringify(newVetData);
       consolelog("Post Data as JSON", vetDataAsJSONString);
-      url = Edgar.baseUrl + "species/insert_vetting/" + species_id + ".json";
-      $.post(url, vet_data_as_json_str, function(data, text_status, jqXHR) {
-        consolelog("New Vet Response", data, text_status, jqXHR);
-        return alert("New Vet Response: " + data);
-      }, 'json');
+      url = Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json";
+      $.ajax(url, {
+        type: "POST",
+        data: vetDataAsJSONString,
+        success: function(data, textStatus, jqXHR) {
+          return alert("Successfully created your vetting. Please reload this page in your browser...(Note.. this is a temporary work-around)");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          return alert("Failed to create vetting: " + errorThrown + ". Please ensure your classified area is a simple polygon (i.e. its boundaries don't cross each other)");
+        },
+        complete: function(jqXHR, textStatus) {},
+        dataType: 'json'
+      });
       return true;
     },
     _validateNewVetForm: function() {
       var newVetPolygonFeatures;
-      newVetPolygonFeatures = this.features;
+      newVetPolygonFeatures = this.vectorLayer.features;
       if (Edgar.mapdata.species === null) {
         alert("No species selected");
         return false;
-      } else if (new_vet_polygon_features.length === 0) {
+      } else if (newVetPolygonFeatures.length === 0) {
         alert("No polygons provided");
         $('#newvet_add_polygon_button').effect("highlight", {}, 5000);
         return false;

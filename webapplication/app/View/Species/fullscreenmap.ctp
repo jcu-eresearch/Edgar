@@ -27,6 +27,8 @@
     $this->Html->script('mapmodes', array('inline'=>false));
     $this->Html->script('vetting/vetting', array('inline'=>false));
     $this->Html->script('vetting/classify_habitat', array('inline'=>false));
+    $this->Html->script('vetting/display_my_vettings', array('inline'=>false));
+    $this->Html->script('vetting/display_their_vettings', array('inline'=>false));
 
     // the init stuff needs to go early
     $this->Html->script('init_setup', array('inline'=>false, 'block'=>'earlyscript'));
@@ -41,7 +43,7 @@
     <div class="tool" id="oldvets">
         <h1>other people's vettings</h1>
         <div class="toolcontent">
-            <ul id="other_peoples_vettings_list" class="vetting_list theirs">
+            <ul id="their_vettings_list" class="vetting_list theirs">
             </ul>
         </div>
     </div>

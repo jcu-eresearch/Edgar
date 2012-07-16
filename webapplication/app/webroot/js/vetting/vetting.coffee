@@ -5,10 +5,33 @@
 Edgar.vetting = {
 
     ###
+    # Define a style map for the vetting areas
+    ###
+    _initAreaStyleMap: () ->
+        this.areaStyleMap = new OpenLayers.StyleMap({
+            'default': {
+                'fillOpacity':    0.3
+                'strokeOpacity':  0.9
+                'fillColor':     '${fill_color}'
+                'strokeColor':   '${stroke_color}'
+                'fontColor':     '${font_color}'
+                'label':         '${classification}'
+            }
+            'select': {
+                'fillOpacity':   1.0
+                'strokeOpacity': 1.0
+            }
+        })
+
+    ###
     # Initialise the classify habitat interface
     ###
     init: () ->
         Edgar.vetting.classifyHabitat.init()
+        Edgar.vetting.myHabitatClassifications.init()
+        Edgar.vetting.theirHabitatClassifications.init()
+
+        this._initAreaStyleMap()
 
         this._bindToChangeModeEvents()
 
@@ -26,8 +49,14 @@ Edgar.vetting = {
         )
 
     isChangeModeOkay: (newMode) ->
-        if Edgar.mapmode == 'vetting'
-            if this.classifyHabitat.isChangeModeOkay(newMode)
+        if newMode == 'vetting'
+            if Edgar.user == null or Edgar.mapdata.species == null
+                alert "can't change to vetting mode. You need to have selected a species, and you need to be logged in to engage the vetting mode"
+                false
+            else
+                true
+        else if Edgar.mapmode == 'vetting'
+            if this.classifyHabitat.isChangeModeOkay(newMode) and this.myHabitatClassifications.isChangeModeOkay(newMode) and this.theirHabitatClassifications.isChangeModeOkay(newMode)
                 true
             else
                 consolelog('cancelling mode change.')
@@ -41,6 +70,8 @@ Edgar.vetting = {
     ###
     engageVettingMode: () ->
         console.log "engageVettingMode"
+        Edgar.vetting.myHabitatClassifications.engage()
+        Edgar.vetting.theirHabitatClassifications.engage()
         Edgar.vetting.classifyHabitat.engage()
 
         null
@@ -51,6 +82,8 @@ Edgar.vetting = {
     ###
     disengageVettingMode: () ->
         console.log "disengageVettingMode"
+        Edgar.vetting.myHabitatClassifications.disengage()
+        Edgar.vetting.theirHabitatClassifications.disengage()
         Edgar.vetting.classifyHabitat.disengage()
 
         null

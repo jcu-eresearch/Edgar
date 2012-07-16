@@ -14,12 +14,8 @@ Edgar.vetting.classifyHabitat = {
 
         this.wkt = new OpenLayers.Format.WKT {
             'internalProjection': Edgar.map.baseLayer.projection
-            'externalProjection': Edgar.util.projections.mercator
+            'externalProjection': Edgar.util.projections.geographic
         }
-
-        consolelog "Finished init-ing the classify habitat interface"
-
-        null
 
         this.vectorLayerOptions = {
             ###
@@ -34,7 +30,7 @@ Edgar.vetting.classifyHabitat = {
         # Listen for button clicks
         this._addButtonHandlers()
 
-        consolelog("Finished init new vetting")
+        consolelog "Finished init-ing the classify habitat interface"
 
         null
 
@@ -302,19 +298,19 @@ Edgar.vetting.classifyHabitat = {
         else
             calcDimension = mapWidth
 
-        majorFraction = calcDimension / 10
         minorFraction = calcDimension / 14
 
-        points = [
-            new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - majorFraction)
-            new OpenLayers.Geometry.Point(centerOfMap.lon - majorFraction, centerOfMap.lat)
-            new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction)
-            new OpenLayers.Geometry.Point(centerOfMap.lon + majorFraction, centerOfMap.lat)
-            new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - majorFraction)
-        ]
-
-        ring = new OpenLayers.Geometry.LinearRing points
-        polygon = new OpenLayers.Geometry.Polygon [ring]
+        radius = minorFraction # in map units (mercator - i.e. meters)
+        sides = 6
+        rotation = Math.random() * 90 # (in degrees)
+        centerPoint = new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat)
+        # create a polygon
+        polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(
+            centerPoint
+            radius
+            sides
+            rotation
+        )
 
         # create some attributes for the feature
         attributes = {}
@@ -380,7 +376,7 @@ Edgar.vetting.classifyHabitat = {
         ]
 
         modifyPolygonHints = [
-            '<p>Press <strong>Delete</strong> while over a corner to delete it</p>'
+            '<p>Press the <strong>Delete</strong> key while hovering your mouse cursor over a corner to delete it</p>'
         ]
 
         movePolygonHints = [
@@ -404,7 +400,7 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Processing create new vetting"
 
         # Get features from the vector layer (which are all known to be polygons)
-        newVetPolygonFeatures = this.features
+        newVetPolygonFeatures = this.vectorLayer.features
         # Now convert our array of features into an array of geometries.
         newVetPolygonGeoms = []
         newVetPolygonGeoms.push(feature.geometry) for feature in newVetPolygonFeatures
@@ -431,16 +427,27 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Post Data", newVetData
         vetDataAsJSONString = JSON.stringify newVetData
         consolelog "Post Data as JSON", vetDataAsJSONString
-        url = ( Edgar.baseUrl + "species/insert_vetting/" + species_id + ".json" )
+        url = ( Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json" )
+
+        # TODO
+        # disable save button
 
         # Send the new vet to the back-end
-        $.post(
+        # TODO -> Handle create vetting response better.
+        $.ajax(
             url
-            vet_data_as_json_str
-            (data, text_status, jqXHR) ->
-                consolelog "New Vet Response", data, text_status, jqXHR
-                alert "New Vet Response: " + data
-            'json'
+            {
+                type: "POST",
+                data: vetDataAsJSONString,
+                success: (data, textStatus, jqXHR) ->
+                    alert "Successfully created your vetting. Please reload this page in your browser...(Note.. this is a temporary work-around)"
+                error: (jqXHR, textStatus, errorThrown) ->
+                    alert "Failed to create vetting: " + errorThrown + ". Please ensure your classified area is a simple polygon (i.e. its boundaries don't cross each other)"
+                complete: (jqXHR, textStatus) ->
+                    # TODO
+                    # re-enable save button
+                dataType: 'json'
+            }
         )
 
         true
@@ -450,12 +457,12 @@ Edgar.vetting.classifyHabitat = {
     _validateNewVetForm: () ->
 
         # Get features from the vector layer (which are all known to be polygons)
-        newVetPolygonFeatures = this.features
+        newVetPolygonFeatures = this.vectorLayer.features
 
         if (Edgar.mapdata.species == null)
             alert "No species selected"
             false
-        else if (new_vet_polygon_features.length == 0)
+        else if (newVetPolygonFeatures.length == 0)
             alert "No polygons provided"
             $('#newvet_add_polygon_button').effect("highlight", {}, 5000)
             false
