@@ -52,7 +52,14 @@
       });
     },
     isChangeModeOkay: function(newMode) {
-      if (Edgar.mapmode === 'vetting') {
+      if (newMode === 'vetting') {
+        if (Edgar.user === null || Edgar.mapdata.species === null) {
+          alert("can't change to vetting mode. You need to have selected a species, and you need to be logged in to engage the vetting mode");
+          return false;
+        } else {
+          return true;
+        }
+      } else if (Edgar.mapmode === 'vetting') {
         if (this.classifyHabitat.isChangeModeOkay(newMode) && this.myHabitatClassifications.isChangeModeOkay(newMode) && this.theirHabitatClassifications.isChangeModeOkay(newMode)) {
           return true;
         } else {

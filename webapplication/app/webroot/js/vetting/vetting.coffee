@@ -49,7 +49,13 @@ Edgar.vetting = {
         )
 
     isChangeModeOkay: (newMode) ->
-        if Edgar.mapmode == 'vetting'
+        if newMode == 'vetting'
+            if Edgar.user == null or Edgar.mapdata.species == null
+                alert "can't change to vetting mode. You need to have selected a species, and you need to be logged in to engage the vetting mode"
+                false
+            else
+                true
+        else if Edgar.mapmode == 'vetting'
             if this.classifyHabitat.isChangeModeOkay(newMode) and this.myHabitatClassifications.isChangeModeOkay(newMode) and this.theirHabitatClassifications.isChangeModeOkay(newMode)
                 true
             else
