@@ -67,7 +67,7 @@
         featureData = feature.data;
         classification = featureData['classification'];
         comment = featureData['comment'];
-        $liVetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span></li>');
+        $liVetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span>' + '<button class="ui-state-default ui-corner-all toggle delete_polygon"' + 'title="modify areas"><span class="ui-icon ui-icon-trash">' + '</span></button>' + '</li>');
         $liVetting.data('feature', feature);
         $liVetting.hover(function() {
           var thisFeature;
@@ -104,6 +104,16 @@
     },
     isChangeModeOkay: function(newMode) {
       return true;
+    },
+    refresh: function() {
+      if ('vectorLayer' in this) {
+        this.vectorLayer.refresh({
+          force: true
+        });
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 
