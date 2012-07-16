@@ -44,14 +44,61 @@
       delete this.vectorLayer;
       return null;
     },
+    _addSelectControl: function() {
+      this.selectControl = new OpenLayers.Control.SelectFeature(this.vectorLayer);
+      return Edgar.map.addControl(this.selectControl);
+    },
+    _removeSelectControl: function() {
+      return Edgar.map.removeControl(this.selectControl);
+    },
+    _addLoadEndListener: function() {
+      return this.vectorLayer.events.register('loadend', this, this._vectorLayerUpdated);
+    },
+    _removeLoadEndListener: function() {
+      return this.vectorLayer.events.unregister('loadend', this, this._vectorLayerUpdated);
+    },
+    _vectorLayerUpdated: function() {
+      var $myVettingsList, addVettingToVettingsList, feature, features, _i, _len;
+      $myVettingsList = $('#my_vettings_list');
+      $myVettingsList.empty();
+      features = this.vectorLayer.features;
+      addVettingToVettingsList = function(feature, $ul) {
+        var $liVetting, classification, comment, featureData;
+        featureData = feature.data;
+        classification = featureData['classification'];
+        comment = featureData['comment'];
+        $liVetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span></li>');
+        $liVetting.data('feature', feature);
+        $liVetting.hover(function() {
+          var thisFeature;
+          thisFeature = $(this).data('feature');
+          Edgar.vetting.myHabitatClassifications.selectControl.select(thisFeature);
+          return $(this).addClass("ui-state-hover");
+        }, function() {
+          Edgar.vetting.myHabitatClassifications.selectControl.unselectAll();
+          return $(this).removeClass("ui-state-hover");
+        });
+        return $ul.append($liVetting);
+      };
+      for (_i = 0, _len = features.length; _i < _len; _i++) {
+        feature = features[_i];
+        addVettingToVettingsList(feature, $myVettingsList);
+      }
+      return null;
+    },
     engage: function() {
       consolelog("Starting engageMyHabitatClassifications");
       this._addVectorLayer();
+      this._addSelectControl();
+      this._addLoadEndListener();
+      this._vectorLayerUpdated();
       consolelog("Finished engageMyHabitatClassifications");
       return null;
     },
     disengage: function() {
       consolelog("Starting disengageMyHabitatClassifications");
+      this._removeLoadEndListener();
+      this._removeSelectControl();
       this._removeVectorLayer();
       return consolelog("Finished disengageMyHabitatClassifications");
     },

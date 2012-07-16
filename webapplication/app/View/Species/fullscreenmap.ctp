@@ -45,7 +45,7 @@
     <div class="tool" id="oldvets">
         <h1>other people's vettings</h1>
         <div class="toolcontent">
-            <ul id="other_peoples_vettings_list" class="vetting_list theirs">
+            <ul id="their_vettings_list" class="vetting_list theirs">
             </ul>
         </div>
     </div>
