@@ -433,7 +433,6 @@ Edgar.vetting.classifyHabitat = {
         # disable save button
 
         # Send the new vet to the back-end
-        # TODO -> Handle create vetting response better.
         $.ajax(
             url
             {
