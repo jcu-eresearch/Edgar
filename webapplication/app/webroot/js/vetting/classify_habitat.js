@@ -373,7 +373,7 @@
       if (Edgar.mapdata.species === null) {
         alert("No species selected");
         return false;
-      } else if (new_vet_polygon_features.length === 0) {
+      } else if (newVetPolygonFeatures.length === 0) {
         alert("No polygons provided");
         $('#newvet_add_polygon_button').effect("highlight", {}, 5000);
         return false;
