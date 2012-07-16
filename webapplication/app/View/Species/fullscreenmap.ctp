@@ -32,8 +32,6 @@
 
     // the init stuff needs to go early
     $this->Html->script('init_setup', array('inline'=>false, 'block'=>'earlyscript'));
-
-
 ?>
 
 
@@ -145,17 +143,30 @@
 <div id="speciespanel" class="top panel speciespanel clearfix">
 
     <div id="currentspecies">
-        <h1>Common Name </h1><button class="ui-state-default ui-corner-all">change species</button>
-        <h2>Scientific nameicus, often quite longdiae</h2>
+        <div class="speciesname">
+            <h1><span style="opacity: 0.2">(No Common Name)</span></h1>
+            <h2><span style="opacity: 0.2">Scientific species name</span></h2>
+            <button id="button_changespecies" class="changebtn ui-state-default ui-corner-all">change<br>species</button>
+        </div>
+        <div class="speciesinfo">
+            <p class="status"></p>
+            <button id="button-remodel" class="button-remodel">request modelling</button>
+        </div>
     </div>
 
-    <!-- old species panel below -->
+    <div id="speciesselector">
+        <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+    </div>
+
+
+<!-- old species panel below -->
+
+<!--
     <p class="minor label" id="species_modelling_status"></p>
     <p class="minor label" id="species_showing_label"></p>
-
+-->
     <!-- Species Selector -->
 <!--
--->
     <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
 
     <table>
@@ -170,6 +181,7 @@
             </td>
         </tr>
     </table>
+-->
 </div>
 
 <div id="map">
