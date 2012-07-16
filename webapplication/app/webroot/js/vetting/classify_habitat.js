@@ -339,7 +339,7 @@
     _createNewVetting: function() {
       var feature, layerWKTString, newVetData, newVetPolygon, newVetPolygonFeatures, newVetPolygonGeoms, speciesId, url, vetDataAsJSONString, _i, _len;
       consolelog("Processing create new vetting");
-      newVetPolygonFeatures = this.features;
+      newVetPolygonFeatures = this.vectorLayer.features;
       newVetPolygonGeoms = [];
       for (_i = 0, _len = newVetPolygonFeatures.length; _i < _len; _i++) {
         feature = newVetPolygonFeatures[_i];
@@ -360,16 +360,16 @@
       consolelog("Post Data", newVetData);
       vetDataAsJSONString = JSON.stringify(newVetData);
       consolelog("Post Data as JSON", vetDataAsJSONString);
-      url = Edgar.baseUrl + "species/insert_vetting/" + species_id + ".json";
-      $.post(url, vet_data_as_json_str, function(data, text_status, jqXHR) {
-        consolelog("New Vet Response", data, text_status, jqXHR);
+      url = Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json";
+      $.post(url, vetDataAsJSONString, function(data, textStatus, jqXHR) {
+        consolelog("New Vet Response", data, textStatus, jqXHR);
         return alert("New Vet Response: " + data);
       }, 'json');
       return true;
     },
     _validateNewVetForm: function() {
       var newVetPolygonFeatures;
-      newVetPolygonFeatures = this.features;
+      newVetPolygonFeatures = this.vectorLayer.features;
       if (Edgar.mapdata.species === null) {
         alert("No species selected");
         return false;

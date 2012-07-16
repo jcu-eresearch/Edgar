@@ -400,7 +400,7 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Processing create new vetting"
 
         # Get features from the vector layer (which are all known to be polygons)
-        newVetPolygonFeatures = this.features
+        newVetPolygonFeatures = this.vectorLayer.features
         # Now convert our array of features into an array of geometries.
         newVetPolygonGeoms = []
         newVetPolygonGeoms.push(feature.geometry) for feature in newVetPolygonFeatures
@@ -427,14 +427,14 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Post Data", newVetData
         vetDataAsJSONString = JSON.stringify newVetData
         consolelog "Post Data as JSON", vetDataAsJSONString
-        url = ( Edgar.baseUrl + "species/insert_vetting/" + species_id + ".json" )
+        url = ( Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json" )
 
         # Send the new vet to the back-end
         $.post(
             url
-            vet_data_as_json_str
-            (data, text_status, jqXHR) ->
-                consolelog "New Vet Response", data, text_status, jqXHR
+            vetDataAsJSONString
+            (data, textStatus, jqXHR) ->
+                consolelog "New Vet Response", data, textStatus, jqXHR
                 alert "New Vet Response: " + data
             'json'
         )
@@ -446,7 +446,7 @@ Edgar.vetting.classifyHabitat = {
     _validateNewVetForm: () ->
 
         # Get features from the vector layer (which are all known to be polygons)
-        newVetPolygonFeatures = this.features
+        newVetPolygonFeatures = this.vectorLayer.features
 
         if (Edgar.mapdata.species == null)
             alert "No species selected"
