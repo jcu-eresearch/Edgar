@@ -322,13 +322,13 @@ html, body {
 .panel {
     position: absolute;
     z-index: 10000;
-    opacity: 0.75;
-    background-color: white;
+    opacity: 0.66;
+    background-color: transparent;
     color: black;
 }
 
 .panel:hover {
-    opacity: 1.0;
+    opacity: 0.9;
 }
 
 .top.panel {
@@ -336,7 +336,6 @@ html, body {
     left: 0;
     right: 0;
     height: 5em;
-    xpadding: 0 0.6em 0 0.4em;
 }
 
 .side.panel {
@@ -344,7 +343,6 @@ html, body {
     top: 0;
     width: 13em;
     overflow: auto;
-    background-color: transparent;
 
     top: 5em; /* height of top panel */
     max-height: ~"-moz-calc(100% - 5em)";
@@ -354,11 +352,44 @@ html, body {
 
 /* species panel content ------------------------------------------------ */
 
-#currentspecies {
-    height: 4.5em;
-    padding: 0.5em 0 0 1em;
+.speciespanel {
     text-align: left;
-    display: none;
+    background: transparent;
+    overflow: hidden;
+}
+
+#currentspecies, #speciesselector {
+    position: absolute;
+    top: 1px;
+    bottom: 0;
+    left: 1px;
+    right: 1px;
+    .allrounded(2px);
+    background-color: white;
+    xborder: 1px solid red;
+    overflow: hidden;
+}
+
+#speciesselector {
+    z-index: 1;
+}
+
+#species_autocomplete {
+    font-size: 2em;
+    position: absolute;
+    padding: 0.5em;
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+}
+
+#currentspecies .speciesname {
+    position: relative;
+    height: 4.5em;
+    padding: 0.5em 6em 0 1em; /* room at right for change sp btn */
+    text-align: left;
+    display: inline-block;
 }
 
 #currentspecies h1, #currentspecies h2 {
@@ -377,22 +408,41 @@ html, body {
 #currentspecies h2 { /* the scientific name for a species */
     margin-top: -0.33em;
 }
-#currentspecies button {
+
+#currentspecies .changebtn {
+    position: absolute;
+    right: 0.5em;
+    top: 1em;
+    height: 4em;
     font-size: 80%;
     font-weight: bold;
-    margin-left: 0.25em;
-    padding: 0.1em 0.5em;
+    padding: 0.1em 1em;
     opacity: 0.33;
-    vertical-align: text-bottom;
 }
 
-#currentspecies:hover button {
-    opacity: 0.66;
+#currentspecies:hover .changebtn { opacity: 0.66; }
+#currentspecies .changebtn:hover { opacity: 1;    }
+
+#currentspecies .speciesinfo {
+    float: right;
+    text-align: right;
+    width: 13em; /* same as .side.panel */
+    height: 5em;
+    xborder: 1px solid blue;
 }
 
-#currentspecies button:hover {
-    opacity: 1;
+#currentspecies .status {
+    padding: 1em;
+    font-size: 70%;
+    font-weight: normal;
+    color: #999;
 }
+#currentspecies .status em {
+    font-weight: bold;
+    font-style: normal;
+    white-space: nowrap;
+}
+
 
 /* old vvv ||| new ^^^ */
 
@@ -406,11 +456,13 @@ html, body {
 
 #species_showing_label {
     text-align: left;
+    display: none;
 }
 
 #species_modelling_status {
     float: right;
     text-align: right;
+    display: none;
 }
 
 /* tools panel content ------------------------------------------------ */
@@ -420,9 +472,9 @@ html, body {
     background-color: white;
     color: black;
     text-align: left;
-    margin: 0.15em;
+    margin: 1px;
     padding: 0.2em;
-    .allrounded(0.25em);   
+    .allrounded(2px);
 }
 
 #toolspanel .tool h1, #toolspanel .tool h2 {

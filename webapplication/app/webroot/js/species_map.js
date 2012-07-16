@@ -42,6 +42,10 @@ zoom_bounds = australia_bounds;
 // (registered under Robert's name)
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 // ------------------------------------------------------------------
+// gets called by mapmodes.js, when changing out of blank mode
+function disengageBlankMode() {
+}
+// ------------------------------------------------------------------
 // gets called by mapmodes.js, when the previous mode has been
 // disengeged, and the current mode tools have been shown
 function engageCurrentMode() {
@@ -510,7 +514,6 @@ $(function() {
         // do stuff when the layer has started loading
         event.layer.events.register('loadstart', null, function(evt) {
             // find the layerswitcher
-consolelog('start loading layer ' + evt.object.name + '...');
             var label = layerLabelDom(evt.object);
             if (label) {
                 label.addClass('loading');
@@ -523,7 +526,6 @@ consolelog('! no matching label for ' + evt.object.name + '!');
 
         // do stuff when the layer has finished loading
         event.layer.events.register('loadend', null, function(evt) {
-consolelog('... done loading layer ' + evt.object.name);
             // find the layerswitcher
             var label = layerLabelDom(evt.object);
             if (label) {

@@ -307,6 +307,7 @@ label {
     font-size: 110%;
     margin-bottom:3px;
 }
+/*
 input, textarea {
     clear: both;
     font-size: 140%;
@@ -314,6 +315,7 @@ input, textarea {
     padding: 1%;
     width:98%;
 }
+*/
 select {
     clear: both;
     font-size: 120%;
