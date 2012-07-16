@@ -11,12 +11,8 @@ Edgar.vetting.myHabitatClassifications = {
     ###
     init: () ->
         consolelog "Starting to init the my habitat classifications interface"
-
-        # TODO
-        #
-        # Attach button handlers here....
-        # ----------------------------
-
+        # Place holder
+        # put any future init code here
         consolelog "Finished init-ing the classify habitat interface"
 
         null
@@ -68,10 +64,14 @@ Edgar.vetting.myHabitatClassifications = {
             featureData    = feature.data
             classification = featureData['classification']
             comment        = featureData['comment']
-            $liVetting     = $('<li class="ui-state-default"><span class="classification">' +
+            $liVetting     = $('<li class="ui-state-default vetting_listing"><span class="classification">' +
                              classification + '</span><span class="comment">' + 
                              comment +
-                             '</span></li>')
+                             '</span>' +
+                             '<button class="ui-state-default ui-corner-all delete_polygon"' +
+                             'title="modify areas"><span class="ui-icon ui-icon-trash">' +
+                             '</span></button>' +
+                             '</li>')
 
             $liVetting.data('feature', feature)
             $liVetting.hover(
