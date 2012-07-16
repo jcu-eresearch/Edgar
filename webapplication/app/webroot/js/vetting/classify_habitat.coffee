@@ -40,11 +40,11 @@ Edgar.vetting.classifyHabitat = {
             width:    400
             modal:     true
             buttons: {
-                "Discard area classification": () ->
+                "Discard area classification": () =>
                     $( this ).dialog( "close" )
-                    Edgar.vetting.classifyHabitat._removeAllFeatures()
+                    this._removeAllFeatures()
                     $(Edgar.map).trigger 'changemode', $( this ).data('newMode')
-                Cancel: () ->
+                Cancel: () =>
                     $( this ).dialog( "close" )
             }
         )
@@ -65,52 +65,52 @@ Edgar.vetting.classifyHabitat = {
         ###
         handle draw polygon press
         ###
-        $('#newvet_draw_polygon_button').click( (e) ->
-            Edgar.vetting.classifyHabitat._handleDrawPolygonClick e
+        $('#newvet_draw_polygon_button').click( (e) =>
+            this._handleDrawPolygonClick e
             null
         )
 
         ###
         handle add polygon press
         ###
-        $('#newvet_add_polygon_button').click( (e) ->
-            Edgar.vetting.classifyHabitat._handleAddPolygonClick e
+        $('#newvet_add_polygon_button').click( (e) =>
+            this._handleAddPolygonClick e
             null
         )
 
         ###
         handle modify polygon press
         ###
-        $('#newvet_modify_polygon_button').click( (e) ->
-            Edgar.vetting.classifyHabitat._handleModifyPolygonClick e
+        $('#newvet_modify_polygon_button').click( (e) =>
+            this._handleModifyPolygonClick e
             null
         )
 
         ###
         handle delete selected polygon press
         ###
-        $('#newvet_delete_selected_polygon_button').click( (e) ->
-            Edgar.vetting.classifyHabitat._handleDeleteSelectedPolygonClick e
+        $('#newvet_delete_selected_polygon_button').click( (e) =>
+            this._handleDeleteSelectedPolygonClick e
             null
         )
 
         ###
         handle delete all polygon press
         ###
-        $('#newvet_delete_all_polygons_button').click( (e) ->
-            Edgar.vetting.classifyHabitat._handleDeleteAllPolygonClick e
+        $('#newvet_delete_all_polygons_button').click( (e) =>
+            this._handleDeleteAllPolygonClick e
             null
         )
 
         ###
-        toggle the ui-state-hover class on hover events
+        # toggle the ui-state-hover class on hover events
         ###
         $('#newvet :button').hover(
             () ->
-                $(Edgar.vetting.classifyHabitat).addClass "ui-state-hover"
+                $(this).addClass "ui-state-hover"
                 null
             () ->
-                $(Edgar.vetting.classifyHabitat).removeClass "ui-state-hover"
+                $(this).removeClass "ui-state-hover"
                 null
         )
 
@@ -121,19 +121,17 @@ Edgar.vetting.classifyHabitat = {
         vetform = $('#vetform')
 
         # Add click handler to vet_submit form
-        $('#vet_submit').click( (e) ->
+        $('#vet_submit').click( (e) =>
             e.preventDefault()
-
-            classifyHabitat = Edgar.vetting.classifyHabitat;
 
             ###
             # validate the form
             # and, if valid, submit its contents
             ###
             # if the form was valid...
-            if classifyHabitat._validateNewVetForm()
+            if this._validateNewVetForm()
                 # submit the vetting
-                classifyHabitat._createNewVetting()
+                this._createNewVetting()
             else
                 false
         )
@@ -263,9 +261,11 @@ Edgar.vetting.classifyHabitat = {
     _handleToggleButtonClick: (e, onActivatingButton, onDeactivatingButton) ->
         e.preventDefault()
         if $(e.srcElement).hasClass 'ui-state-active'
-            onDeactivatingButton.apply(Edgar.vetting.classifyHabitat, [])
+            # Run in the scope of this
+            onDeactivatingButton.call(this)
         else
-            onActivatingButton.apply(Edgar.vetting.classifyHabitat, [])
+            # Run in the scope of this
+            onActivatingButton.call(this)
 
         null
 
@@ -439,20 +439,20 @@ Edgar.vetting.classifyHabitat = {
             {
                 type: "POST",
                 data: vetDataAsJSONString,
-                success: (data, textStatus, jqXHR) ->
+                success: (data, textStatus, jqXHR) =>
                     alert "Successfully created your vetting"
                     # okay.. we did it..
                     # remove all the features from the new vetting interface
                     # clear the new vetting mode
                     # clear the new vetting form
                     # refresh the my features vetting interface
-                    Edgar.vetting.classifyHabitat._removeAllFeatures()
-                    Edgar.vetting.classifyHabitat._clearNewVettingMode()
-                    Edgar.vetting.classifyHabitat._clearVettingFormFields()
+                    this._removeAllFeatures()
+                    this._clearNewVettingMode()
+                    this._clearVettingFormFields()
                     Edgar.vetting.myHabitatClassifications.refresh()
-                error: (jqXHR, textStatus, errorThrown) ->
+                error: (jqXHR, textStatus, errorThrown) =>
                     alert "Failed to create vetting: " + errorThrown + ". Please ensure your classified area is a simple polygon (i.e. its boundaries don't cross each other)"
-                complete: (jqXHR, textStatus) ->
+                complete: (jqXHR, textStatus) =>
                     # TODO
                     # re-enable save button
                 dataType: 'json'

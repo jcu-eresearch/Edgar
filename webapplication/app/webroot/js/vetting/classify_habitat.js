@@ -35,19 +35,20 @@
       return null;
     },
     _confirmModeChangeOkayViaDialog: function(newMode) {
-      var myDialog;
+      var myDialog,
+        _this = this;
       myDialog = $("#discard-area-classifcation-confirm").dialog({
         resizable: false,
         width: 400,
         modal: true,
         buttons: {
           "Discard area classification": function() {
-            $(this).dialog("close");
-            Edgar.vetting.classifyHabitat._removeAllFeatures();
-            return $(Edgar.map).trigger('changemode', $(this).data('newMode'));
+            $(_this).dialog("close");
+            _this._removeAllFeatures();
+            return $(Edgar.map).trigger('changemode', $(_this).data('newMode'));
           },
           Cancel: function() {
-            return $(this).dialog("close");
+            return $(_this).dialog("close");
           }
         }
       });
@@ -70,9 +71,10 @@
               handle draw polygon press
       */
 
-      var vetform, vetpanel;
+      var vetform, vetpanel,
+        _this = this;
       $('#newvet_draw_polygon_button').click(function(e) {
-        Edgar.vetting.classifyHabitat._handleDrawPolygonClick(e);
+        _this._handleDrawPolygonClick(e);
         return null;
       });
       /*
@@ -80,7 +82,7 @@
       */
 
       $('#newvet_add_polygon_button').click(function(e) {
-        Edgar.vetting.classifyHabitat._handleAddPolygonClick(e);
+        _this._handleAddPolygonClick(e);
         return null;
       });
       /*
@@ -88,7 +90,7 @@
       */
 
       $('#newvet_modify_polygon_button').click(function(e) {
-        Edgar.vetting.classifyHabitat._handleModifyPolygonClick(e);
+        _this._handleModifyPolygonClick(e);
         return null;
       });
       /*
@@ -96,7 +98,7 @@
       */
 
       $('#newvet_delete_selected_polygon_button').click(function(e) {
-        Edgar.vetting.classifyHabitat._handleDeleteSelectedPolygonClick(e);
+        _this._handleDeleteSelectedPolygonClick(e);
         return null;
       });
       /*
@@ -104,18 +106,18 @@
       */
 
       $('#newvet_delete_all_polygons_button').click(function(e) {
-        Edgar.vetting.classifyHabitat._handleDeleteAllPolygonClick(e);
+        _this._handleDeleteAllPolygonClick(e);
         return null;
       });
       /*
-              toggle the ui-state-hover class on hover events
+              # toggle the ui-state-hover class on hover events
       */
 
       $('#newvet :button').hover(function() {
-        $(Edgar.vetting.classifyHabitat).addClass("ui-state-hover");
+        $(this).addClass("ui-state-hover");
         return null;
       }, function() {
-        $(Edgar.vetting.classifyHabitat).removeClass("ui-state-hover");
+        $(this).removeClass("ui-state-hover");
         return null;
       });
       /*
@@ -125,16 +127,14 @@
       vetpanel = $('#newvet');
       vetform = $('#vetform');
       return $('#vet_submit').click(function(e) {
-        var classifyHabitat;
         e.preventDefault();
-        classifyHabitat = Edgar.vetting.classifyHabitat;
         /*
                     # validate the form
                     # and, if valid, submit its contents
         */
 
-        if (classifyHabitat._validateNewVetForm()) {
-          return classifyHabitat._createNewVetting();
+        if (_this._validateNewVetForm()) {
+          return _this._createNewVetting();
         } else {
           return false;
         }
@@ -241,9 +241,9 @@
     _handleToggleButtonClick: function(e, onActivatingButton, onDeactivatingButton) {
       e.preventDefault();
       if ($(e.srcElement).hasClass('ui-state-active')) {
-        onDeactivatingButton.apply(Edgar.vetting.classifyHabitat, []);
+        onDeactivatingButton.call(this);
       } else {
-        onActivatingButton.apply(Edgar.vetting.classifyHabitat, []);
+        onActivatingButton.call(this);
       }
       return null;
     },
@@ -338,7 +338,8 @@
       return null;
     },
     _createNewVetting: function() {
-      var feature, layerWKTString, newVetData, newVetPolygon, newVetPolygonFeatures, newVetPolygonGeoms, speciesId, url, vetDataAsJSONString, _i, _len;
+      var feature, layerWKTString, newVetData, newVetPolygon, newVetPolygonFeatures, newVetPolygonGeoms, speciesId, url, vetDataAsJSONString, _i, _len,
+        _this = this;
       consolelog("Processing create new vetting");
       newVetPolygonFeatures = this.vectorLayer.features;
       newVetPolygonGeoms = [];
@@ -367,9 +368,9 @@
         data: vetDataAsJSONString,
         success: function(data, textStatus, jqXHR) {
           alert("Successfully created your vetting");
-          Edgar.vetting.classifyHabitat._removeAllFeatures();
-          Edgar.vetting.classifyHabitat._clearNewVettingMode();
-          Edgar.vetting.classifyHabitat._clearVettingFormFields();
+          _this._removeAllFeatures();
+          _this._clearNewVettingMode();
+          _this._clearVettingFormFields();
           return Edgar.vetting.myHabitatClassifications.refresh();
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -380,6 +381,10 @@
       });
       return true;
     },
+    /*
+        # Clear the new vetting form fields
+    */
+
     _clearVettingFormFields: function() {
       $("#vetcomment").val('');
       $("#vetclassification").val('');
