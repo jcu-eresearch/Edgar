@@ -298,19 +298,19 @@ Edgar.vetting.classifyHabitat = {
         else
             calcDimension = mapWidth
 
-        majorFraction = calcDimension / 10
         minorFraction = calcDimension / 14
 
-        points = [
-            new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - majorFraction)
-            new OpenLayers.Geometry.Point(centerOfMap.lon - majorFraction, centerOfMap.lat)
-            new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction)
-            new OpenLayers.Geometry.Point(centerOfMap.lon + majorFraction, centerOfMap.lat)
-            new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - majorFraction)
-        ]
-
-        ring = new OpenLayers.Geometry.LinearRing points
-        polygon = new OpenLayers.Geometry.Polygon [ring]
+        radius = minorFraction # in map units (mercator - i.e. meters)
+        sides = 6
+        rotation = Math.random() * 90 # (in degrees)
+        centerPoint = new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat)
+        # create a polygon
+        polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(
+            centerPoint
+            radius
+            sides
+            rotation
+        )
 
         # create some attributes for the feature
         attributes = {}
@@ -429,14 +429,25 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Post Data as JSON", vetDataAsJSONString
         url = ( Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json" )
 
+        # TODO
+        # disable save button
+
         # Send the new vet to the back-end
-        $.post(
+        # TODO -> Handle create vetting response better.
+        $.ajax(
             url
-            vetDataAsJSONString
-            (data, textStatus, jqXHR) ->
-                consolelog "New Vet Response", data, textStatus, jqXHR
-                alert "New Vet Response: " + data
-            'json'
+            {
+                type: "POST",
+                data: vetDataAsJSONString,
+                success: (data, textStatus, jqXHR) ->
+                    alert "Successfully created your vetting. Please reload this page in your browser...(Note.. this is a temporary work-around)"
+                error: (jqXHR, textStatus, errorThrown) ->
+                    alert "Failed to create vetting: " + errorThrown + ". Please ensure your classified area is a simple polygon (i.e. its boundaries don't cross each other)"
+                complete: (jqXHR, textStatus) ->
+                    # TODO
+                    # re-enable save button
+                dataType: 'json'
+            }
         )
 
         true

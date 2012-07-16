@@ -256,7 +256,7 @@
       return null;
     },
     _handleAddPolygonClick: function(e) {
-      var attributes, calcDimension, centerOfMap, feature, majorFraction, mapBounds, mapHeight, mapWidth, minorFraction, points, polygon, ring;
+      var attributes, calcDimension, centerOfMap, centerPoint, feature, mapBounds, mapHeight, mapWidth, minorFraction, polygon, radius, rotation, sides;
       e.preventDefault();
       this._clearNewVettingMode();
       centerOfMap = Edgar.map.getCenter();
@@ -269,11 +269,12 @@
       } else {
         calcDimension = mapWidth;
       }
-      majorFraction = calcDimension / 10;
       minorFraction = calcDimension / 14;
-      points = [new OpenLayers.Geometry.Point(centerOfMap.lon - minorFraction, centerOfMap.lat - majorFraction), new OpenLayers.Geometry.Point(centerOfMap.lon - majorFraction, centerOfMap.lat), new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat + minorFraction), new OpenLayers.Geometry.Point(centerOfMap.lon + majorFraction, centerOfMap.lat), new OpenLayers.Geometry.Point(centerOfMap.lon + minorFraction, centerOfMap.lat - majorFraction)];
-      ring = new OpenLayers.Geometry.LinearRing(points);
-      polygon = new OpenLayers.Geometry.Polygon([ring]);
+      radius = minorFraction;
+      sides = 6;
+      rotation = Math.random() * 90;
+      centerPoint = new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat);
+      polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(centerPoint, radius, sides, rotation);
       attributes = {};
       feature = new OpenLayers.Feature.Vector(polygon, attributes);
       this.vectorLayer.addFeatures([feature]);
@@ -361,10 +362,18 @@
       vetDataAsJSONString = JSON.stringify(newVetData);
       consolelog("Post Data as JSON", vetDataAsJSONString);
       url = Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json";
-      $.post(url, vetDataAsJSONString, function(data, textStatus, jqXHR) {
-        consolelog("New Vet Response", data, textStatus, jqXHR);
-        return alert("New Vet Response: " + data);
-      }, 'json');
+      $.ajax(url, {
+        type: "POST",
+        data: vetDataAsJSONString,
+        success: function(data, textStatus, jqXHR) {
+          return alert("Successfully created your vetting. Please reload this page in your browser...(Note.. this is a temporary work-around)");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          return alert("Failed to create vetting: " + errorThrown + ". Please ensure your classified area is a simple polygon (i.e. its boundaries don't cross each other)");
+        },
+        complete: function(jqXHR, textStatus) {},
+        dataType: 'json'
+      });
       return true;
     },
     _validateNewVetForm: function() {
