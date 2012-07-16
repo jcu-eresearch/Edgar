@@ -104,6 +104,16 @@
     },
     isChangeModeOkay: function(newMode) {
       return true;
+    },
+    refresh: function() {
+      if ('vectorLayer' in this) {
+        this.vectorLayer.refresh({
+          force: true
+        });
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 

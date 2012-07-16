@@ -8,7 +8,7 @@ Edgar.vetting = {
     # Define a style map for the vetting areas
     ###
     _initAreaStyleMap: () ->
-        this.areaStyleMap = new OpenLayers.StyleMap({
+        @areaStyleMap = new OpenLayers.StyleMap({
             'default': {
                 'fillOpacity':    0.3
                 'strokeOpacity':  0.9
@@ -56,7 +56,7 @@ Edgar.vetting = {
             else
                 true
         else if Edgar.mapmode == 'vetting'
-            if this.classifyHabitat.isChangeModeOkay(newMode) and this.myHabitatClassifications.isChangeModeOkay(newMode) and this.theirHabitatClassifications.isChangeModeOkay(newMode)
+            if @classifyHabitat.isChangeModeOkay(newMode) and @myHabitatClassifications.isChangeModeOkay(newMode) and @theirHabitatClassifications.isChangeModeOkay(newMode)
                 true
             else
                 consolelog('cancelling mode change.')

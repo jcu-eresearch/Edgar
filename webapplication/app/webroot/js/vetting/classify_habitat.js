@@ -272,7 +272,7 @@
       minorFraction = calcDimension / 14;
       radius = minorFraction;
       sides = 6;
-      rotation = Math.random() * 90;
+      rotation = Math.random() * 360;
       centerPoint = new OpenLayers.Geometry.Point(centerOfMap.lon, centerOfMap.lat);
       polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(centerPoint, radius, sides, rotation);
       attributes = {};
@@ -366,7 +366,11 @@
         type: "POST",
         data: vetDataAsJSONString,
         success: function(data, textStatus, jqXHR) {
-          return alert("Successfully created your vetting. Please reload this page in your browser...(Note.. this is a temporary work-around)");
+          alert("Successfully created your vetting");
+          Edgar.vetting.classifyHabitat._removeAllFeatures();
+          Edgar.vetting.classifyHabitat._clearNewVettingMode();
+          Edgar.vetting.classifyHabitat._clearVettingFormFields();
+          return Edgar.vetting.myHabitatClassifications.refresh();
         },
         error: function(jqXHR, textStatus, errorThrown) {
           return alert("Failed to create vetting: " + errorThrown + ". Please ensure your classified area is a simple polygon (i.e. its boundaries don't cross each other)");
@@ -375,6 +379,11 @@
         dataType: 'json'
       });
       return true;
+    },
+    _clearVettingFormFields: function() {
+      $("#vetcomment").val('');
+      $("#vetclassification").val('');
+      return this;
     },
     _validateNewVetForm: function() {
       var newVetPolygonFeatures;

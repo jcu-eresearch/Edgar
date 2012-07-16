@@ -22,7 +22,7 @@ Edgar.vetting.theirHabitatClassifications = {
         null
 
     _addVectorLayer: () ->
-        this.vectorLayer = new OpenLayers.Layer.Vector('Their Habitat Classifications', {
+        @vectorLayer = new OpenLayers.Layer.Vector('Their Habitat Classifications', {
             isBaseLayer: false
             projection: Edgar.util.projections.geographic
             strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})]
@@ -36,26 +36,26 @@ Edgar.vetting.theirHabitatClassifications = {
             })
             styleMap: Edgar.vetting.areaStyleMap
         });
-        Edgar.map.addLayer(this.vectorLayer)
+        Edgar.map.addLayer(@vectorLayer)
 
     _removeVectorLayer: () ->
-        Edgar.map.removeLayer(this.vectorLayer)
-        delete this.vectorLayer
+        Edgar.map.removeLayer(@vectorLayer)
+        delete @vectorLayer
 
         null
 
     _addSelectControl: () ->
-        this.selectControl = new OpenLayers.Control.SelectFeature this.vectorLayer
-        Edgar.map.addControl(this.selectControl)
+        @selectControl = new OpenLayers.Control.SelectFeature @vectorLayer
+        Edgar.map.addControl(@selectControl)
 
     _removeSelectControl: () ->
-        Edgar.map.removeControl(this.selectControl)
+        Edgar.map.removeControl(@selectControl)
 
     _addLoadEndListener: () ->
-        this.vectorLayer.events.register('loadend', this, this._vectorLayerUpdated)
+        @vectorLayer.events.register('loadend', this, this._vectorLayerUpdated)
 
     _removeLoadEndListener: () ->
-        this.vectorLayer.events.unregister('loadend', this, this._vectorLayerUpdated)
+        @vectorLayer.events.unregister('loadend', this, this._vectorLayerUpdated)
 
     _vectorLayerUpdated: () ->
         # Clear the list of existing features
@@ -63,7 +63,7 @@ Edgar.vetting.theirHabitatClassifications = {
         $myVettingsList.empty();
 
         # Process Vetting Layer Features.
-        features = this.vectorLayer.features
+        features = @vectorLayer.features
 
         addVettingToVettingsList = (feature, $ul) ->
             featureData    = feature.data
