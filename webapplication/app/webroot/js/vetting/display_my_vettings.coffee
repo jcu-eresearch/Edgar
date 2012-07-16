@@ -52,6 +52,44 @@ Edgar.vetting.myHabitatClassifications = {
     _removeLoadEndListener: () ->
         @vectorLayer.events.unregister('loadend', this, this._vectorLayerUpdated)
 
+    _addVettingToVettingsList: (feature, $ul) ->
+        featureData    = feature.data
+        classification = featureData['classification']
+        comment        = featureData['comment']
+        # Create the delete button
+        $deleteButton = $('<button class="ui-state-default ui-corner-all delete_polygon"' +
+                         'title="modify areas"><span class="ui-icon ui-icon-trash">' +
+                          '</span></button>')
+
+        # Click handler for the delete button
+        $deleteButton.click( (e) =>
+            alert "You clicked the button..."
+            null
+        )
+
+        # Create a list item for the vetting
+        $liVetting     = $('<li class="ui-state-default vetting_listing"><span class="classification">' +
+                         classification + '</span><span class="comment">' + 
+                         comment +
+                         '</span>' +
+                         '</li>')
+        # Append the button to the list item vetting
+        $liVetting.append($deleteButton)
+
+        # Add a hover handler to highlight the associated feature
+        $liVetting.data('feature', feature)
+        $liVetting.hover(
+            () ->
+                thisFeature = $(this).data('feature')
+                Edgar.vetting.myHabitatClassifications.selectControl.select(thisFeature)
+                $(this).addClass("ui-state-hover")
+            () ->
+                Edgar.vetting.myHabitatClassifications.selectControl.unselectAll();
+                $(this).removeClass("ui-state-hover")
+        )
+
+        $ul.append($liVetting)
+
     _vectorLayerUpdated: () ->
         # Clear the list of existing features
         $myVettingsList = $('#my_vettings_list');
@@ -60,33 +98,7 @@ Edgar.vetting.myHabitatClassifications = {
         # Process Vetting Layer Features.
         features = @vectorLayer.features
 
-        addVettingToVettingsList = (feature, $ul) ->
-            featureData    = feature.data
-            classification = featureData['classification']
-            comment        = featureData['comment']
-            $liVetting     = $('<li class="ui-state-default vetting_listing"><span class="classification">' +
-                             classification + '</span><span class="comment">' + 
-                             comment +
-                             '</span>' +
-                             '<button class="ui-state-default ui-corner-all delete_polygon"' +
-                             'title="modify areas"><span class="ui-icon ui-icon-trash">' +
-                             '</span></button>' +
-                             '</li>')
-
-            $liVetting.data('feature', feature)
-            $liVetting.hover(
-                () ->
-                    thisFeature = $(this).data('feature')
-                    Edgar.vetting.myHabitatClassifications.selectControl.select(thisFeature)
-                    $(this).addClass("ui-state-hover")
-                () ->
-                    Edgar.vetting.myHabitatClassifications.selectControl.unselectAll();
-                    $(this).removeClass("ui-state-hover")
-            )
-
-            $ul.append($liVetting)
-
-        addVettingToVettingsList(feature, $myVettingsList) for feature in features
+        this._addVettingToVettingsList(feature, $myVettingsList) for feature in features
 
         null
 

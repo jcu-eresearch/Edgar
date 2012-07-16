@@ -57,32 +57,39 @@
     _removeLoadEndListener: function() {
       return this.vectorLayer.events.unregister('loadend', this, this._vectorLayerUpdated);
     },
+    _addVettingToVettingsList: function(feature, $ul) {
+      var $deleteButton, $liVetting, classification, comment, featureData,
+        _this = this;
+      featureData = feature.data;
+      classification = featureData['classification'];
+      comment = featureData['comment'];
+      $deleteButton = $('<button class="ui-state-default ui-corner-all delete_polygon"' + 'title="modify areas"><span class="ui-icon ui-icon-trash">' + '</span></button>');
+      $deleteButton.click(function(e) {
+        alert("You clicked the button...");
+        return null;
+      });
+      $liVetting = $('<li class="ui-state-default vetting_listing"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span>' + '</li>');
+      $liVetting.append($deleteButton);
+      $liVetting.data('feature', feature);
+      $liVetting.hover(function() {
+        var thisFeature;
+        thisFeature = $(this).data('feature');
+        Edgar.vetting.myHabitatClassifications.selectControl.select(thisFeature);
+        return $(this).addClass("ui-state-hover");
+      }, function() {
+        Edgar.vetting.myHabitatClassifications.selectControl.unselectAll();
+        return $(this).removeClass("ui-state-hover");
+      });
+      return $ul.append($liVetting);
+    },
     _vectorLayerUpdated: function() {
-      var $myVettingsList, addVettingToVettingsList, feature, features, _i, _len;
+      var $myVettingsList, feature, features, _i, _len;
       $myVettingsList = $('#my_vettings_list');
       $myVettingsList.empty();
       features = this.vectorLayer.features;
-      addVettingToVettingsList = function(feature, $ul) {
-        var $liVetting, classification, comment, featureData;
-        featureData = feature.data;
-        classification = featureData['classification'];
-        comment = featureData['comment'];
-        $liVetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span>' + '<button class="ui-state-default ui-corner-all toggle delete_polygon"' + 'title="modify areas"><span class="ui-icon ui-icon-trash">' + '</span></button>' + '</li>');
-        $liVetting.data('feature', feature);
-        $liVetting.hover(function() {
-          var thisFeature;
-          thisFeature = $(this).data('feature');
-          Edgar.vetting.myHabitatClassifications.selectControl.select(thisFeature);
-          return $(this).addClass("ui-state-hover");
-        }, function() {
-          Edgar.vetting.myHabitatClassifications.selectControl.unselectAll();
-          return $(this).removeClass("ui-state-hover");
-        });
-        return $ul.append($liVetting);
-      };
       for (_i = 0, _len = features.length; _i < _len; _i++) {
         feature = features[_i];
-        addVettingToVettingsList(feature, $myVettingsList);
+        this._addVettingToVettingsList(feature, $myVettingsList);
       }
       return null;
     },
