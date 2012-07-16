@@ -14,7 +14,7 @@ Edgar.vetting.classifyHabitat = {
 
         this.wkt = new OpenLayers.Format.WKT {
             'internalProjection': Edgar.map.baseLayer.projection
-            'externalProjection': Edgar.util.projections.mercator
+            'externalProjection': Edgar.util.projections.geographic
         }
 
         this.vectorLayerOptions = {
