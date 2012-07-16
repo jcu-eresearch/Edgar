@@ -15,7 +15,7 @@ class SpeciesController extends AppController {
     // Don't allow a user to insert a vetting unless they are logged in.
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->deny(array('insert_vetting', 'delete_vetting'));
+        $this->Auth->deny(array('add_vetting'));
     }
 
 
@@ -230,7 +230,7 @@ class SpeciesController extends AppController {
     /*
         Insert vetting geojson for the given species.
     */
-    public function insert_vetting($species_id = null) {
+    public function add_vetting($species_id = null) {
 
         // Get the auth'd user.
         // NOTE: Prefilter means the user can't be here unless they are logged in.
@@ -272,54 +272,6 @@ class SpeciesController extends AppController {
             }
         }
     }
-
-
-    /*
-        Delete vetting geojson for the given species.
-    */
-    public function delete_vetting($species_id = null) {
-
-        // Get the auth'd user.
-        // NOTE: Prefilter means the user can't be here unless they are logged in.
-        $user_id = $this->Auth->user('id');
-
-        if ($this->request->is('post')) {
-            $this->Species->recursive = 0;
-            $this->Species->id = $species_id;
-            if (!$this->Species->exists()) {
-                throw new NotFoundException(__('Invalid species'));
-            }
-            $this->set('species', $this->Species->read(null, $species_id));
-
-            // Specify the output for the json view.
-            $this->set('_serialize', 'species');
-
-            $jsonData = json_decode(utf8_encode(trim(file_get_contents('php://input'))), true);
-
-            if ($jsonData !== null) {
-                // At this point, we have the json data.
-                // Do the work on it.
-                $this->set('jsonData', $jsonData);
-                $area = $jsonData['area'];
-                $this->set('_serialize', 'jsonData');
-                $comment = $jsonData['comment'];
-                $classification = $jsonData['classification'];
-
-                $dbo = $this->Species->Vetting->getDataSource();
-                $escaped_area = $dbo->value($area);
-                $dbo->execute(
-                    "INSERT INTO vettings (user_id, species_id, comment, classification, area) VALUES ( ? , ? , ? , ? , ( ST_GeomFromText(".$escaped_area.", 4326) ) )",
-                    array(),
-                    array($user_id, $species_id, $comment, $classification)
-                );
-
-                $this->dieWithStatus(200, '{ "result": "success" }');
-            } else {
-                $this->dieWithStatus(400, "Bad JSON Input");
-            }
-        }
-    }
-
 
     /**
      * single_upload_json method
