@@ -200,13 +200,75 @@ Edgar.vetting.classifyHabitat = {
                 }
             }
         )
+
         @drawBoundingBoxControl.featureAdded = (feature) =>
-            alert feature
-            consolelog feature
             geom = feature.geometry
             geomBounds = geom.getBounds()
-            alert geomBounds.toString()
             @vectorLayer.removeFeatures([feature])
+
+            occurrencesLayer = window.Edgar.occurrences.vectorLayer
+            occurrenceClusterFeatures = occurrencesLayer.features
+
+            featuresWithinBounds = []
+            addPolygonIfWithinBounds = (clusterFeature, bounds, arrayToAppendTo) =>
+                featureCentroid = clusterFeature.geometry.getCentroid()
+                isFeatureWithinBounds = bounds.contains(featureCentroid.x, featureCentroid.y)
+                if isFeatureWithinBounds
+                    arrayToAppendTo.push(feature)
+
+            addPolygonIfWithinBounds(feature, geomBounds, featuresWithinBounds) for feature in occurrenceClusterFeatures
+
+            centerOfMap = Edgar.map.getCenter()
+            mapBounds   = Edgar.map.getExtent()
+            mapHeight   = ( mapBounds.top   - mapBounds.bottom )
+            mapWidth    = ( mapBounds.right - mapBounds.left )
+
+            calcDimension = null
+            if (mapHeight > mapWidth)
+                calcDimension = mapHeight
+            else
+                calcDimension = mapWidth
+
+            minorFraction = calcDimension / 16
+            consolelog(["-", minorFraction])
+
+            for featureOccurrence in featuresWithinBounds
+                featureCentroid = featureOccurrence.geometry.getCentroid()
+
+                for otherFeatureOccurrence in featuresWithinBounds
+                        otherFeatureCentroid = otherFeatureOccurrence.geometry.getCentroid()
+                    if featureOccurrence != otherFeatureOccurrence
+                        xDist = Math.abs(featureCentroid.x - otherFeatureCentroid.x)
+                        yDist = Math.abs(featureCentroid.y - otherFeatureCentroid.y)
+
+                        if xDist < minorFraction and xDist != 0
+                            minorFraction = xDist/2
+                        if yDist < minorFraction and yDist != 0
+                            minorFraction = yDist/2
+
+            for featureOccurrence in featuresWithinBounds
+                consolelog featureOccurrence
+                featureCentroid = featureOccurrence.geometry.getCentroid()
+
+                radius = minorFraction # in map units (mercator - i.e. meters)
+                sides = 20
+                rotation = 0
+                centerPoint = featureCentroid
+
+                # create a polygon
+                polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(
+                    centerPoint
+                    radius
+                    sides
+                    rotation
+                )
+
+                # create some attributes for the feature
+                attributes = {}
+
+                featureOccurrence = new OpenLayers.Feature.Vector polygon, attributes
+                @vectorLayer.addFeatures [featureOccurrence]
+            this._activateModifyPolygonMode()
 
         Edgar.map.addControl @drawBoundingBoxControl
 

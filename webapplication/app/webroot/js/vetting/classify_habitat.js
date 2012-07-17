@@ -191,13 +191,69 @@
         }
       });
       this.drawBoundingBoxControl.featureAdded = function(feature) {
-        var geom, geomBounds;
-        alert(feature);
-        consolelog(feature);
+        var addPolygonIfWithinBounds, attributes, calcDimension, centerOfMap, centerPoint, featureCentroid, featureOccurrence, featuresWithinBounds, geom, geomBounds, mapBounds, mapHeight, mapWidth, minorFraction, occurrenceClusterFeatures, occurrencesLayer, otherFeatureCentroid, otherFeatureOccurrence, polygon, radius, rotation, sides, xDist, yDist, _i, _j, _k, _l, _len, _len1, _len2, _len3;
         geom = feature.geometry;
         geomBounds = geom.getBounds();
-        alert(geomBounds.toString());
-        return _this.vectorLayer.removeFeatures([feature]);
+        _this.vectorLayer.removeFeatures([feature]);
+        occurrencesLayer = window.Edgar.occurrences.vectorLayer;
+        occurrenceClusterFeatures = occurrencesLayer.features;
+        featuresWithinBounds = [];
+        addPolygonIfWithinBounds = function(clusterFeature, bounds, arrayToAppendTo) {
+          var featureCentroid, isFeatureWithinBounds;
+          featureCentroid = clusterFeature.geometry.getCentroid();
+          isFeatureWithinBounds = bounds.contains(featureCentroid.x, featureCentroid.y);
+          if (isFeatureWithinBounds) {
+            return arrayToAppendTo.push(feature);
+          }
+        };
+        for (_i = 0, _len = occurrenceClusterFeatures.length; _i < _len; _i++) {
+          feature = occurrenceClusterFeatures[_i];
+          addPolygonIfWithinBounds(feature, geomBounds, featuresWithinBounds);
+        }
+        centerOfMap = Edgar.map.getCenter();
+        mapBounds = Edgar.map.getExtent();
+        mapHeight = mapBounds.top - mapBounds.bottom;
+        mapWidth = mapBounds.right - mapBounds.left;
+        calcDimension = null;
+        if (mapHeight > mapWidth) {
+          calcDimension = mapHeight;
+        } else {
+          calcDimension = mapWidth;
+        }
+        minorFraction = calcDimension / 16;
+        consolelog(["-", minorFraction]);
+        for (_j = 0, _len1 = featuresWithinBounds.length; _j < _len1; _j++) {
+          featureOccurrence = featuresWithinBounds[_j];
+          featureCentroid = featureOccurrence.geometry.getCentroid();
+          for (_k = 0, _len2 = featuresWithinBounds.length; _k < _len2; _k++) {
+            otherFeatureOccurrence = featuresWithinBounds[_k];
+            otherFeatureCentroid = otherFeatureOccurrence.geometry.getCentroid();
+          }
+          if (featureOccurrence !== otherFeatureOccurrence) {
+            xDist = Math.abs(featureCentroid.x - otherFeatureCentroid.x);
+            yDist = Math.abs(featureCentroid.y - otherFeatureCentroid.y);
+            if (xDist < minorFraction && xDist !== 0) {
+              minorFraction = xDist / 2;
+            }
+            if (yDist < minorFraction && yDist !== 0) {
+              minorFraction = yDist / 2;
+            }
+          }
+        }
+        for (_l = 0, _len3 = featuresWithinBounds.length; _l < _len3; _l++) {
+          featureOccurrence = featuresWithinBounds[_l];
+          consolelog(featureOccurrence);
+          featureCentroid = featureOccurrence.geometry.getCentroid();
+          radius = minorFraction;
+          sides = 20;
+          rotation = 0;
+          centerPoint = featureCentroid;
+          polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(centerPoint, radius, sides, rotation);
+          attributes = {};
+          featureOccurrence = new OpenLayers.Feature.Vector(polygon, attributes);
+          _this.vectorLayer.addFeatures([featureOccurrence]);
+        }
+        return _this._activateModifyPolygonMode();
       };
       return Edgar.map.addControl(this.drawBoundingBoxControl);
     },
