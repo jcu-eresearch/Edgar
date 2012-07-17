@@ -358,6 +358,12 @@ html, body {
     overflow: hidden;
 }
 
+.speciespanel button {
+    font-size: 80%;
+    font-weight: bold;
+    padding: 0.25em 0.5em;
+}
+
 #currentspecies, #speciesselector {
     position: absolute;
     top: 1px;
@@ -366,12 +372,17 @@ html, body {
     right: 1px;
     .allrounded(2px);
     background-color: white;
-    xborder: 1px solid red;
     overflow: hidden;
 }
 
-#speciesselector {
-    z-index: 1;
+#speciesselector .button-cancelselect {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    width: 6em;
+    font-weight: bold;
+    padding: inherit 0;
 }
 
 #species_autocomplete {
@@ -414,9 +425,6 @@ html, body {
     right: 0.5em;
     top: 1em;
     height: 4em;
-    font-size: 80%;
-    font-weight: bold;
-    padding: 0.1em 1em;
     opacity: 0.33;
 }
 
@@ -432,7 +440,8 @@ html, body {
 }
 
 #currentspecies .status {
-    padding: 1em;
+    padding: 10px 10px 0 0;
+    margin: 0;
     font-size: 70%;
     font-weight: normal;
     color: #999;
@@ -443,6 +452,9 @@ html, body {
     white-space: nowrap;
 }
 
+#button_remodel {
+    margin: 5px 10px 0 0;
+}
 
 /* old vvv ||| new ^^^ */
 
@@ -548,6 +560,18 @@ html, body {
 #toolspanel .dataLayersDiv .labelSpan.loading:before {
     float: right;
     content: url(../img/loading-bar.gif);
+}
+
+/* mode switching panel content --------------------------------------- */
+
+#tool_modechanger .tip {
+    margin: 0;
+    padding: 0.5em 0 0 0;
+}
+
+#tool_modechanger button {
+    width: 100%;
+    padding: 0.5em 0.5em;
 }
 
 /* legend panel content ----------------------------------------------- */

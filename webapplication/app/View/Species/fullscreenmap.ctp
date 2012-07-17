@@ -40,6 +40,17 @@
 
 <div id="toolspanel" class="side panel toolspanel">
 
+    <div class="tool" id="tool_modechanger">
+        <h1>things to do</h1>
+        <div class="toolcontent">
+            <p id="tip_no_species" class="tip">Choose a species to:</p>
+            <button id="button_current" class="">See current information</button>
+            <button id="button_future" class="">See future projections</button>
+            <p id="tip_no_user" class="tip">Log in to:</p>
+            <button id="button_vetting" class="">Vet this species</button>
+        </div>
+    </div>
+
     <div class="tool" id="oldvets">
         <h1>other people's vettings</h1>
         <div class="toolcontent">
@@ -47,6 +58,7 @@
             </ul>
         </div>
     </div>
+
     <div class="tool" id="myvets">
         <h1>my vettings</h1>
         <div class="toolcontent">
@@ -90,12 +102,12 @@
         </div>
     </div>
 
-    <div class="tool" id="tool-layers">
+    <div class="tool" id="tool_layers">
         <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
     </div>
 
-    <div class="tool legend startclosed" id="tool-legend">
+    <div class="tool legend startclosed" id="tool_legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
             <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
@@ -103,7 +115,7 @@
     </div>
 
 
-    <div class="tool" id="tool-emissions">
+    <div class="tool" id="tool_emissions">
         <h1>emissions and time</h1>
         <div class="toolcontent">
             <!-- the check box will probably be removed when this is working properly -->
@@ -119,7 +131,7 @@
         </div>
     </div>
 
-    <div class="tool startclosed" id="tool-debug">
+    <div class="tool startclosed" id="tool_debug">
         <h1>debug</h1>
         <div class="toolcontent">
 
@@ -151,12 +163,13 @@
         </div>
         <div class="speciesinfo">
             <p class="status"></p>
-            <button id="button-remodel" class="button-remodel">request modelling</button>
+            <button id="button_remodel" class="button-remodel ui-state-default ui-corner-all">request modelling</button>
         </div>
     </div>
 
     <div id="speciesselector">
         <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+        <button id="button_cancelselect" class="button-cancelselect ui-state-default ui-corner-all">cancel</button>
     </div>
 
 
