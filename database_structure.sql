@@ -69,6 +69,8 @@ CREATE TABLE species (
     last_successfully_completed_model_queued_time TIMESTAMP DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
     last_successfully_completed_model_finish_time TIMESTAMP DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
     last_successfully_completed_model_importance SMALLINT DEFAULT NULL NULL -- The importance the species had when the last successfully completed model was queued
+
+    
 );
 
 
@@ -183,7 +185,7 @@ GRANT USAGE, SELECT ON vettings_id_seq TO edgar_backend;
 GRANT SELECT, UPDATE ON species TO edgar_frontend;
 GRANT SELECT, INSERT ON users TO edgar_frontend;
 GRANT SELECT ON occurrences TO edgar_frontend;
-GRANT SELECT, INSERT, UPDATE, DELETE ON vettings TO edgar_frontend;
+GRANT SELECT, INSERT, UPDATE ON vettings TO edgar_frontend;
 GRANT USAGE, SELECT ON vettings_id_seq TO edgar_frontend;
 GRANT USAGE, SELECT ON users_id_seq TO edgar_frontend;
 
