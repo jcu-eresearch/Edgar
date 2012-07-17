@@ -58,14 +58,30 @@
       return this.vectorLayer.events.unregister('loadend', this, this._vectorLayerUpdated);
     },
     _addVettingToVettingsList: function(feature, $ul) {
-      var $deleteButton, $liVetting, classification, comment, featureData,
+      var $deleteButton, $liVetting, classification, comment, featureData, vettingId,
         _this = this;
       featureData = feature.data;
       classification = featureData['classification'];
       comment = featureData['comment'];
+      vettingId = featureData['vetting_id'];
       $deleteButton = $('<button class="ui-state-default ui-corner-all delete_polygon"' + 'title="modify areas"><span class="ui-icon ui-icon-trash">' + '</span></button>');
       $deleteButton.click(function(e) {
-        alert("You clicked the button...");
+        var url;
+        url = Edgar.baseUrl + "vettings/delete/" + vettingId + ".json";
+        $.ajax(url, {
+          type: "POST",
+          data: {},
+          success: function(data, textStatus, jqXHR) {
+            alert("Successfully deleted your vetting (" + vettingId + ")");
+            return _this.refresh();
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            consolelog("Failed to del vetting", jqXHR, textStatus, errorThrown);
+            return alert("Failed to delete your vetting: " + errorThrown + "(" + vettingId + ")");
+          },
+          complete: function(jqXHR, textStatus) {},
+          dataType: 'json'
+        });
         return null;
       });
       $liVetting = $('<li class="ui-state-default vetting_listing"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span>' + '</li>');

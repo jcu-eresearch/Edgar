@@ -178,7 +178,7 @@ class SpeciesController extends AppController {
 
         if ($by_user_id and $inverse_user_id_filter) {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
                 'WHERE species_id = ? AND user_id <> ? '.
                 'LIMIT 1000',
                 array(),
@@ -186,7 +186,7 @@ class SpeciesController extends AppController {
             );
         } elseif ($by_user_id) {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
                 'WHERE species_id = ? AND user_id = ? '.
                 'LIMIT 1000',
                 array(),
@@ -194,7 +194,7 @@ class SpeciesController extends AppController {
             );
         } else {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
                 'WHERE species_id = ? '.
                 'LIMIT 1000',
                 array(),
@@ -208,11 +208,12 @@ class SpeciesController extends AppController {
 
         if($results) {
             while ($row = $results->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-                $area_json = $row[0];
-                $classification = $row[1];
-                $comment = $row[2];
+                $vetting_id = $row[0];
+                $area_json  = $row[1];
+                $classification = $row[2];
+                $comment = $row[3];
 
-                $properties_json_array = Vetting::getPropertiesJSONObject($classification, $comment);
+                $properties_json_array = Vetting::getPropertiesJSONObject($vetting_id, $classification, $comment);
                 // decode the json
                 array_push($geo_json_features_array, array('type' => 'Fetaure', 'geometry' => json_decode($area_json), 'properties' => $properties_json_array));
             }

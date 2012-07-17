@@ -56,6 +56,8 @@ Edgar.vetting.myHabitatClassifications = {
         featureData    = feature.data
         classification = featureData['classification']
         comment        = featureData['comment']
+        vettingId      = featureData['vetting_id']
+
         # Create the delete button
         $deleteButton = $('<button class="ui-state-default ui-corner-all delete_polygon"' +
                          'title="modify areas"><span class="ui-icon ui-icon-trash">' +
@@ -63,7 +65,23 @@ Edgar.vetting.myHabitatClassifications = {
 
         # Click handler for the delete button
         $deleteButton.click( (e) =>
-            alert "You clicked the button..."
+            url = ( Edgar.baseUrl + "vettings/delete/" + vettingId + ".json" )
+            $.ajax(
+                url
+                {
+                    type: "POST",
+                    data: {},
+                    success: (data, textStatus, jqXHR) =>
+                        alert "Successfully deleted your vetting (" + vettingId + ")"
+                        # refresh the my features vetting interface
+                        this.refresh()
+                    error: (jqXHR, textStatus, errorThrown) =>
+                        consolelog("Failed to del vetting", jqXHR, textStatus, errorThrown);
+                        alert "Failed to delete your vetting: " + errorThrown + "(" + vettingId + ")"
+                    complete: (jqXHR, textStatus) =>
+                    dataType: 'json'
+                }
+            )
             null
         )
 
