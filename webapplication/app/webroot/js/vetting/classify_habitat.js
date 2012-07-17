@@ -183,12 +183,22 @@
       return null;
     },
     _addDrawBoundingBoxControl: function() {
+      var _this = this;
       this.drawBoundingBoxControl = new OpenLayers.Control.DrawFeature(this.vectorLayer, OpenLayers.Handler.RegularPolygon, {
         handlerOptions: {
           sides: 4,
           irregular: true
         }
       });
+      this.drawBoundingBoxControl.featureAdded = function(feature) {
+        var geom, geomBounds;
+        alert(feature);
+        consolelog(feature);
+        geom = feature.geometry;
+        geomBounds = geom.getBounds();
+        alert(geomBounds.toString());
+        return _this.vectorLayer.removeFeatures([feature]);
+      };
       return Edgar.map.addControl(this.drawBoundingBoxControl);
     },
     /*

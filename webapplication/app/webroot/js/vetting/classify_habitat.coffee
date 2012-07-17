@@ -200,6 +200,14 @@ Edgar.vetting.classifyHabitat = {
                 }
             }
         )
+        @drawBoundingBoxControl.featureAdded = (feature) =>
+            alert feature
+            consolelog feature
+            geom = feature.geometry
+            geomBounds = geom.getBounds()
+            alert geomBounds.toString()
+            @vectorLayer.removeFeatures([feature])
+
         Edgar.map.addControl @drawBoundingBoxControl
 
     ###
