@@ -79,6 +79,14 @@ Edgar.vetting.classifyHabitat = {
         )
 
         ###
+        handle add polygon by occurrences press
+        ###
+        $('#newvet_add_polygon_by_occurrences_button').click( (e) =>
+            this._handleAddPolygonByOccurrencesClick e
+            null
+        )
+
+        ###
         handle modify polygon press
         ###
         $('#newvet_modify_polygon_button').click( (e) =>
@@ -141,6 +149,7 @@ Edgar.vetting.classifyHabitat = {
 
         this._addVectorLayer()
         this._addDrawControl()
+        this._addDrawBoundingBoxControl()
         this._addModifyControl()
 
         consolelog "Finished engageClassifyHabitatInterface"
@@ -152,6 +161,7 @@ Edgar.vetting.classifyHabitat = {
 
         this._clearNewVettingMode()
 
+        this._removeDrawBoundingBoxControl()
         this._removeDrawControl()
         this._removeModifyControl()
         this._removeVectorLayer()
@@ -180,13 +190,35 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
+    _addDrawBoundingBoxControl: () ->
+        @drawBoundingBoxControl = new OpenLayers.Control.DrawFeature(
+            @vectorLayer
+            OpenLayers.Handler.RegularPolygon, {
+                handlerOptions: {
+                    sides: 4
+                    irregular: true
+                }
+            }
+        )
+        Edgar.map.addControl @drawBoundingBoxControl
+
     ###
     # Removes the draw control
     # Note: Assumes _clearNewVettingMode was already run
     ###
     _removeDrawControl: () ->
-        @drawControl.map.removeControl @modifyControl
+        @drawControl.map.removeControl @drawControl
         delete @drawControl
+
+        null
+
+    ###
+    # Removes the draw bounding box control
+    # Note: Assumes _clearNewVettingMode was already run
+    ###
+    _removeDrawBoundingBoxControl: () ->
+        @drawBoundingBoxControl.map.removeControl @drawBoundingBoxControl
+        delete @drawBoundingBoxControl
 
         null
 
@@ -232,6 +264,10 @@ Edgar.vetting.classifyHabitat = {
         # Deactivate draw polygon control
         @drawControl.deactivate()
         $('#newvet_draw_polygon_button').removeClass 'ui-state-active'
+
+        # Deactivate draw bounding box control
+        @drawBoundingBoxControl.deactivate()
+        $('#newvet_add_polygon_by_occurrences_button').removeClass 'ui-state-active'
 
         # Deactivate modify polygon control
         @modifyControl.deactivate()
@@ -321,6 +357,20 @@ Edgar.vetting.classifyHabitat = {
         consolelog(@vectorLayer.features);
 
         this._activateModifyPolygonMode()
+
+        null
+
+    _handleAddPolygonByOccurrencesClick: (e) ->
+        e.preventDefault()
+        this._handleToggleButtonClick(e, this._activateAddPolygonByOccurrenceMode, this._clearNewVettingMode)
+
+        null
+
+    _activateAddPolygonByOccurrenceMode: () ->
+        this._clearNewVettingMode()
+        $('#newvet_add_polygon_by_occurrences_button').addClass 'ui-state-active'
+        @drawBoundingBoxControl.activate()
+        this._updateNewVetHint()
 
         null
 
