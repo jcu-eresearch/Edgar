@@ -108,8 +108,8 @@ function addMapModes(theMap) {
             if (newMode == 'blank') {
                 // special handling for blank-to-blank, the startup mode switch
                 showhide(
-                    ['tool-layers', 'tool-debug', 'tool-layers'],
-                    ['oldvets','myvets','newvet','tool-legend','tool-emissions']
+                    ['tool_layers', 'tool_debug', 'tool_layers'],
+                    ['oldvets','myvets','newvet','tool_legend','tool_emissions']
                 );
 
             } else if (newMode == 'current') {
@@ -159,7 +159,7 @@ function addMapModes(theMap) {
         if (oldMode === 'current' && newMode === 'vetting') {
             disengageCurrentMode();
             // show & hide the appropriate tools
-            showhide(['oldvets','newvet','myvets'], ['tool-legend','tool-emissions']);
+            showhide(['oldvets','newvet','myvets'], ['tool_legend','tool_emissions']);
             Edgar.vetting.engageVettingMode();
         }
 
@@ -168,7 +168,7 @@ function addMapModes(theMap) {
 
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
-            showhide(['tool-legend'], ['oldvets','newvet','myvets']);
+            showhide(['tool_legend'], ['oldvets','newvet','myvets']);
             engageCurrentMode();
         }
 

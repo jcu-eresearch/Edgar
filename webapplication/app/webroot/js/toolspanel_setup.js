@@ -32,6 +32,21 @@ $(function() {
     jQuery.fx.off = fx;
 
     //
+    // set up the mode switching stuff
+    //
+    $('#button_current').click( function(e) {
+        $(Edgar.map).trigger('changemode', 'current');
+    });
+
+    $('#button_future').click( function(e) {
+        $(Edgar.map).trigger('changemode', 'future');
+    });
+
+    $('#button_vetting').click( function(e) {
+        $(Edgar.map).trigger('changemode', 'vetting');
+    });
+
+    //
     // set up the emission selecting stuff
     //
     Edgar.yearSlider = new Edgar.YearSlider({
