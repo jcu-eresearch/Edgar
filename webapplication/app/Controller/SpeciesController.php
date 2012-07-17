@@ -224,7 +224,8 @@ class SpeciesController extends AppController {
         );
 
         $geo_json = json_encode($geo_json_object);
-        $this->set('json_output', $geo_json);
+        $this->set('geo_json', $geo_json_object);
+        $this->set('_serialize', 'geo_json');
     }
 
     /*
