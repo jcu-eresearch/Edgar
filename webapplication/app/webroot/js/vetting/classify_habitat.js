@@ -35,20 +35,19 @@
       return null;
     },
     _confirmModeChangeOkayViaDialog: function(newMode) {
-      var myDialog,
-        _this = this;
+      var myDialog;
       myDialog = $("#discard-area-classifcation-confirm").dialog({
         resizable: false,
         width: 400,
         modal: true,
         buttons: {
           "Discard area classification": function() {
-            $(_this).dialog("close");
-            _this._removeAllFeatures();
-            return $(Edgar.map).trigger('changemode', $(_this).data('newMode'));
+            $(this).dialog("close");
+            Edgar.vetting.classifyHabitat._removeAllFeatures();
+            return $(Edgar.map).trigger('changemode', $(this).data('newMode'));
           },
           Cancel: function() {
-            return $(_this).dialog("close");
+            return $(this).dialog("close");
           }
         }
       });
@@ -83,6 +82,14 @@
 
       $('#newvet_add_polygon_button').click(function(e) {
         _this._handleAddPolygonClick(e);
+        return null;
+      });
+      /*
+              handle add polygon by occurrences press
+      */
+
+      $('#newvet_add_polygon_by_occurrences_button').click(function(e) {
+        _this._handleAddPolygonByOccurrencesClick(e);
         return null;
       });
       /*
@@ -144,6 +151,7 @@
       consolelog("Starting engageClassifyHabitatInterface");
       this._addVectorLayer();
       this._addDrawControl();
+      this._addDrawBoundingBoxControl();
       this._addModifyControl();
       consolelog("Finished engageClassifyHabitatInterface");
       return null;
@@ -151,6 +159,7 @@
     disengage: function() {
       consolelog("Starting disengageClassifyHabitatInterface");
       this._clearNewVettingMode();
+      this._removeDrawBoundingBoxControl();
       this._removeDrawControl();
       this._removeModifyControl();
       this._removeVectorLayer();
@@ -173,14 +182,43 @@
       Edgar.map.addControl(this.drawControl);
       return null;
     },
+    _addDrawBoundingBoxControl: function() {
+      var _this = this;
+      this.drawBoundingBoxControl = new OpenLayers.Control.DrawFeature(this.vectorLayer, OpenLayers.Handler.RegularPolygon, {
+        handlerOptions: {
+          sides: 4,
+          irregular: true
+        }
+      });
+      this.drawBoundingBoxControl.featureAdded = function(feature) {
+        var geom, geomBounds;
+        alert(feature);
+        consolelog(feature);
+        geom = feature.geometry;
+        geomBounds = geom.getBounds();
+        alert(geomBounds.toString());
+        return _this.vectorLayer.removeFeatures([feature]);
+      };
+      return Edgar.map.addControl(this.drawBoundingBoxControl);
+    },
     /*
         # Removes the draw control
         # Note: Assumes _clearNewVettingMode was already run
     */
 
     _removeDrawControl: function() {
-      this.drawControl.map.removeControl(this.modifyControl);
+      this.drawControl.map.removeControl(this.drawControl);
       delete this.drawControl;
+      return null;
+    },
+    /*
+        # Removes the draw bounding box control
+        # Note: Assumes _clearNewVettingMode was already run
+    */
+
+    _removeDrawBoundingBoxControl: function() {
+      this.drawBoundingBoxControl.map.removeControl(this.drawBoundingBoxControl);
+      delete this.drawBoundingBoxControl;
       return null;
     },
     _addModifyControl: function() {
@@ -219,6 +257,8 @@
       this._removeModifyFeatureHandlesAndVertices();
       this.drawControl.deactivate();
       $('#newvet_draw_polygon_button').removeClass('ui-state-active');
+      this.drawBoundingBoxControl.deactivate();
+      $('#newvet_add_polygon_by_occurrences_button').removeClass('ui-state-active');
       this.modifyControl.deactivate();
       $('#newvet_modify_polygon_button').removeClass('ui-state-active');
       this._updateNewVetHint();
@@ -280,6 +320,18 @@
       this.vectorLayer.addFeatures([feature]);
       consolelog(this.vectorLayer.features);
       this._activateModifyPolygonMode();
+      return null;
+    },
+    _handleAddPolygonByOccurrencesClick: function(e) {
+      e.preventDefault();
+      this._handleToggleButtonClick(e, this._activateAddPolygonByOccurrenceMode, this._clearNewVettingMode);
+      return null;
+    },
+    _activateAddPolygonByOccurrenceMode: function() {
+      this._clearNewVettingMode();
+      $('#newvet_add_polygon_by_occurrences_button').addClass('ui-state-active');
+      this.drawBoundingBoxControl.activate();
+      this._updateNewVetHint();
       return null;
     },
     _removeAllFeatures: function() {
@@ -362,7 +414,7 @@
       consolelog("Post Data", newVetData);
       vetDataAsJSONString = JSON.stringify(newVetData);
       consolelog("Post Data as JSON", vetDataAsJSONString);
-      url = Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json";
+      url = Edgar.baseUrl + "species/add_vetting/" + speciesId + ".json";
       $.ajax(url, {
         type: "POST",
         data: vetDataAsJSONString,

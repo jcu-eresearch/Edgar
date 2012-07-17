@@ -40,11 +40,11 @@ Edgar.vetting.classifyHabitat = {
             width:    400
             modal:     true
             buttons: {
-                "Discard area classification": () =>
+                "Discard area classification": () ->
                     $( this ).dialog( "close" )
-                    this._removeAllFeatures()
+                    Edgar.vetting.classifyHabitat._removeAllFeatures()
                     $(Edgar.map).trigger 'changemode', $( this ).data('newMode')
-                Cancel: () =>
+                Cancel: () ->
                     $( this ).dialog( "close" )
             }
         )
@@ -75,6 +75,14 @@ Edgar.vetting.classifyHabitat = {
         ###
         $('#newvet_add_polygon_button').click( (e) =>
             this._handleAddPolygonClick e
+            null
+        )
+
+        ###
+        handle add polygon by occurrences press
+        ###
+        $('#newvet_add_polygon_by_occurrences_button').click( (e) =>
+            this._handleAddPolygonByOccurrencesClick e
             null
         )
 
@@ -141,6 +149,7 @@ Edgar.vetting.classifyHabitat = {
 
         this._addVectorLayer()
         this._addDrawControl()
+        this._addDrawBoundingBoxControl()
         this._addModifyControl()
 
         consolelog "Finished engageClassifyHabitatInterface"
@@ -152,6 +161,7 @@ Edgar.vetting.classifyHabitat = {
 
         this._clearNewVettingMode()
 
+        this._removeDrawBoundingBoxControl()
         this._removeDrawControl()
         this._removeModifyControl()
         this._removeVectorLayer()
@@ -180,13 +190,43 @@ Edgar.vetting.classifyHabitat = {
 
         null
 
+    _addDrawBoundingBoxControl: () ->
+        @drawBoundingBoxControl = new OpenLayers.Control.DrawFeature(
+            @vectorLayer
+            OpenLayers.Handler.RegularPolygon, {
+                handlerOptions: {
+                    sides: 4
+                    irregular: true
+                }
+            }
+        )
+        @drawBoundingBoxControl.featureAdded = (feature) =>
+            alert feature
+            consolelog feature
+            geom = feature.geometry
+            geomBounds = geom.getBounds()
+            alert geomBounds.toString()
+            @vectorLayer.removeFeatures([feature])
+
+        Edgar.map.addControl @drawBoundingBoxControl
+
     ###
     # Removes the draw control
     # Note: Assumes _clearNewVettingMode was already run
     ###
     _removeDrawControl: () ->
-        @drawControl.map.removeControl @modifyControl
+        @drawControl.map.removeControl @drawControl
         delete @drawControl
+
+        null
+
+    ###
+    # Removes the draw bounding box control
+    # Note: Assumes _clearNewVettingMode was already run
+    ###
+    _removeDrawBoundingBoxControl: () ->
+        @drawBoundingBoxControl.map.removeControl @drawBoundingBoxControl
+        delete @drawBoundingBoxControl
 
         null
 
@@ -232,6 +272,10 @@ Edgar.vetting.classifyHabitat = {
         # Deactivate draw polygon control
         @drawControl.deactivate()
         $('#newvet_draw_polygon_button').removeClass 'ui-state-active'
+
+        # Deactivate draw bounding box control
+        @drawBoundingBoxControl.deactivate()
+        $('#newvet_add_polygon_by_occurrences_button').removeClass 'ui-state-active'
 
         # Deactivate modify polygon control
         @modifyControl.deactivate()
@@ -321,6 +365,20 @@ Edgar.vetting.classifyHabitat = {
         consolelog(@vectorLayer.features);
 
         this._activateModifyPolygonMode()
+
+        null
+
+    _handleAddPolygonByOccurrencesClick: (e) ->
+        e.preventDefault()
+        this._handleToggleButtonClick(e, this._activateAddPolygonByOccurrenceMode, this._clearNewVettingMode)
+
+        null
+
+    _activateAddPolygonByOccurrenceMode: () ->
+        this._clearNewVettingMode()
+        $('#newvet_add_polygon_by_occurrences_button').addClass 'ui-state-active'
+        @drawBoundingBoxControl.activate()
+        this._updateNewVetHint()
 
         null
 
@@ -427,13 +485,12 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Post Data", newVetData
         vetDataAsJSONString = JSON.stringify newVetData
         consolelog "Post Data as JSON", vetDataAsJSONString
-        url = ( Edgar.baseUrl + "species/insert_vetting/" + speciesId + ".json" )
+        url = ( Edgar.baseUrl + "species/add_vetting/" + speciesId + ".json" )
 
         # TODO
         # disable save button
 
         # Send the new vet to the back-end
-        # TODO -> Handle create vetting response better.
         $.ajax(
             url
             {

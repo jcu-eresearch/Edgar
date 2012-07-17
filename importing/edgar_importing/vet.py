@@ -32,47 +32,50 @@ def main():
         db.connect(json.load(f))
 
     log_info('Starting');
-    num_vettings, num_coords = None, None
+    connection = db.engine.connect()
+    transaction = connection.begin()
     try:
-        num_vettings, num_coords = vet_species(args)
+        vet_species(args, connection)
+        log_info('Committing transaction')
+        transaction.commit()
+    except:
+        logging.warning('Performing rollback due to exception',)
+        transaction.rollback()
+        raise
     finally:
-        log_info('Finished running %s coords through %s vettings', num_coords,
-            num_vettings);
+        connection.close()
+        log_info('Finished')
 
 
-def vet_species(args):
-    species = db.species.select()\
+def vet_species(args, connection):
+    species = connection.execute(db.species.select()\
         .where(db.species.c.id == args.species_id)\
-        .execute()\
-        .fetchone()
-
-    log_info('Resetting classifications to source classifications')
-    # TODO: uncomment this when done
-    #db.occurrences.update()\
-        #.values(classification=db.occurrences.c.source_classification)\
-        #.execute()
+        ).fetchone()
 
     log_info('Loading all vettings')
-    vettings = ordered_vettings_for_species_id(species['id'])
+    vettings = ordered_vettings_for_species_id(species['id'], connection)
 
-    log_info('Vetting occurrences')
-    num_coords = 0
-    for lon, lat, occid in occurrences_for_species_id(species['id']):
-        update_occurrence(lon, lat, occid, species['id'], vettings)
-        num_coords += 1
+    query = occurrences_for_species_id(species['id'], connection)
+    log_info('Vetting %d occurrences through %d vettings', query.rowcount,
+            len(vettings))
 
-    return len(vettings), num_coords
+    rows_remaining = query.rowcount
+    for occrow in query:
+        update_occurrence(occrow, vettings, connection)
+        rows_remaining -= 1
+        if rows_remaining % 10000 == 0:
+            log_info('%d rows remaining', rows_remaining)
 
 
-def update_occurrence(lon, lat, occid, species_id, ordered_vettings):
+def update_occurrence(occrow, ordered_vettings, connection):
     contention = False
     classification = None
-    p = shapely.geometry.Point(lon, lat)
+    location = shapely.wkt.loads(occrow['location'])
 
     # for each vetting, ordered most-authoritive first
     for vetting in ordered_vettings:
         # check if the vetting applies to this occurrences' location
-        if vetting.area.intersects(p):
+        if vetting.area.intersects(location):
             # first, look for classification (if not found previously)
             if classification is None:
                 classification = vetting.classification
@@ -81,26 +84,29 @@ def update_occurrence(lon, lat, occid, species_id, ordered_vettings):
                 contention = True
                 # if both classification and contention are found, no need
                 # to check the rest of the polygons
-                log_info('Contention')
                 break
 
-    # only update db if one of the vettings was applied
-    if classification is not None:
-        db.engine.execute('''
+    # if no vettings affect this occurrence, use source_classification
+    if classification is None:
+        classification = occrow['source_classification']
+
+    # only update db if something changed
+    if classification != occrow['classification'] or contention != occrow['contentious']:
+        connection.execute('''
             UPDATE occurrences
             SET contentious = {cont}, classification = '{classi}'
             WHERE id = {occid}
             '''.format(
                 cont=('TRUE' if contention else 'FALSE'),
                 classi=classification,
-                occid=occid
+                occid=occrow['id']
             ))
 
 
-def ordered_vettings_for_species_id(species_id):
+def ordered_vettings_for_species_id(species_id, connection):
     vettings = []
 
-    query = db.engine.execute('''
+    query = connection.execute('''
         SELECT
             vettings.classification AS classi,
             ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area
@@ -115,15 +121,17 @@ def ordered_vettings_for_species_id(species_id):
     return vettings
 
 
-def occurrences_for_species_id(species_id):
-    query = db.engine.execute('''
-        SELECT id, ST_X(location) AS lon, ST_Y(location) AS lat
+def occurrences_for_species_id(species_id, connection):
+    return connection.execute('''
+        SELECT
+            id,
+            classification,
+            source_classification,
+            contentious,
+            ST_AsText(location) AS location
         FROM occurrences
         WHERE species_id = {sid}
         '''.format(sid=species_id))
-
-    for row in query:
-        yield float(row['lon']), float(row['lat']), row['id']
 
 
 class Vetting(object):

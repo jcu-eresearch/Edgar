@@ -15,7 +15,7 @@ class SpeciesController extends AppController {
     // Don't allow a user to insert a vetting unless they are logged in.
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->deny('insert_vetting');
+        $this->Auth->deny(array('add_vetting'));
     }
 
 
@@ -178,7 +178,7 @@ class SpeciesController extends AppController {
 
         if ($by_user_id and $inverse_user_id_filter) {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
                 'WHERE species_id = ? AND user_id <> ? '.
                 'LIMIT 1000',
                 array(),
@@ -186,7 +186,7 @@ class SpeciesController extends AppController {
             );
         } elseif ($by_user_id) {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
                 'WHERE species_id = ? AND user_id = ? '.
                 'LIMIT 1000',
                 array(),
@@ -194,7 +194,7 @@ class SpeciesController extends AppController {
             );
         } else {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
                 'WHERE species_id = ? '.
                 'LIMIT 1000',
                 array(),
@@ -204,37 +204,35 @@ class SpeciesController extends AppController {
 
 
         // Convert the received vettings into a geometry collection.
-        $geo_json = '{ "type": "FeatureCollection", "features": [';
+        $geo_json_features_array = array();
 
         if($results) {
-            $first = true;
             while ($row = $results->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-                $area_json = $row[0];
-                $classification = $row[1];
-                $comment = $row[2];
-                if( $first ) {
-                    $first = false;
-                } else {
-                    $geo_json = $geo_json.',';
-                }
+                $vetting_id = $row[0];
+                $area_json  = $row[1];
+                $classification = $row[2];
+                $comment = $row[3];
 
-                $properties_json = Vetting::getPropertiesJSONString($classification, $comment);
-                $geo_json = $geo_json.
-                '{ '.
-                    '"type": "Feature",'.
-                    '"geometry": '.$area_json.','.
-                    $properties_json.
-                '}';
+                $properties_json_array = Vetting::getPropertiesJSONObject($vetting_id, $classification, $comment);
+                // decode the json
+                array_push($geo_json_features_array, array('type' => 'Fetaure', 'geometry' => json_decode($area_json), 'properties' => $properties_json_array));
             }
         }
-        $geo_json = $geo_json." ] }";
-        $this->set('json_output', $geo_json);
+
+        $geo_json_object = array( 
+                    'type' => 'FeatureCollection',
+                    'features' => $geo_json_features_array
+        );
+
+        $geo_json = json_encode($geo_json_object);
+        $this->set('geo_json', $geo_json_object);
+        $this->set('_serialize', 'geo_json');
     }
 
     /*
         Insert vetting geojson for the given species.
     */
-    public function insert_vetting($species_id = null) {
+    public function add_vetting($species_id = null) {
 
         // Get the auth'd user.
         // NOTE: Prefilter means the user can't be here unless they are logged in.
@@ -276,7 +274,6 @@ class SpeciesController extends AppController {
             }
         }
     }
-
 
     /**
      * single_upload_json method
