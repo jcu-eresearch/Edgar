@@ -26,7 +26,66 @@ $(function() {
         $('#species_autocomplete').focus().select();
         $('#species_autocomplete').val('');
     });
+
+    // set up the remodel button
+    $('#button_remodel').click(function() {
+        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.mapdata.species.id });
+        $(this).fadeOut('fast', function() {
+            Edgar.mapdata.species.remodelStatus = "Remodelling running";
+            updateSpeciesStatus(Edgar.mapdata.species);
+        });
+    });
+
+    // set up the autocomplete bar
+    $('#species_autocomplete').focus( function() {
+        // when the _text_box_ is focussed
+        setTimeout(function() {
+            $('#species_autocomplete').select();
+        }, 0);
+    });
+
+    $('#species_autocomplete').autocomplete({
+        minLength: 2,
+        source: Edgar.baseUrl + 'species/autocomplete.json',
+        select: function(event, ui) {
+            changeSpecies(ui.item);
+        }
+    });
+
 });
+// ------------------------------------------------------------------
+// update the status information for a species.
+function updateSpeciesStatus(species) {
+
+        var status = species.remodelStatus;
+        var dirty = species.numDirtyOccurrences;
+        var statusText = "";
+
+        // TODO: incorporate dirty-vettings into this status info
+
+        if (status.indexOf("Remodelling running") != -1) {
+            statusText = "Modelling is <em>now running</em> to incorporate ";
+            statusText += Edgar.util.pluralise(dirty, "changed observation");
+            statusText += " into the climate suitability for this species."
+            $('#button_remodel').hide();
+        } else if (status.indexOf("Priority queued") != -1) {
+            statusText = "Modelling is <em>queued</em> to incorporate ";
+            statusText += Edgar.util.pluralise(dirty, "changed observation");
+            statusText += " into the climate suitability for this species."
+            $('#button_remodel').hide();
+        } else if (dirty > 0) {
+            statusText = "There are ";
+            statusText += Edgar.util.pluralise(dirty, "changed observation");
+            statusText += " <em>not yet incorporated</em> into the climate";
+            statusText += " suitability for this species.";
+            $('#button_remodel').show();
+        } else {
+            statusText = 'Climate suitability modelling for this species is <em>up to date</em>.';
+            $('#button_remodel').hide();
+        }
+
+        $('#currentspecies .status').html(statusText);
+}
 // ------------------------------------------------------------------
 // actually set up for a new species.  Don't call this yourself, use
 // changeSpecies(species) which does the mode change checking.
@@ -53,32 +112,7 @@ function _setupNewSpecies() {
         $('#currentspecies h1').text(newSpecies.commonName || '(no common name)');  // set the static panel names
         $('#currentspecies h2').text(newSpecies.scientificName);  // set the static panel names
 
-        var status = newSpecies.remodelStatus;
-        var dirty = newSpecies.numDirtyOccurrences;
-        var statusText = "";
-
-        if (status.indexOf("Remodelling running") != -1) {
-            statusText = "Modelling is <em>now running</em> to incorporate ";
-            statusText += Edgar.util.pluralise(dirty, "changed observation");
-            statusText += " into the climate suitability for this species."
-            // TODO hide queue-now button
-        } else if (status.indexOf("Priority queued") != -1) {
-            statusText = "Modelling is <em>queued</em> to incorporate ";
-            statusText += Edgar.util.pluralise(dirty, "changed observation");
-            statusText += " into the climate suitability for this species."
-            // TODO hide queue-now button
-        } else if (dirty > 0) {
-            statusText = "There are ";
-            statusText += Edgar.util.pluralise(dirty, "changed observation");
-            statusText += " <em>not yet incorporated</em> into the climate";
-            statusText += " suitability for this species.";
-            // TODO show queue-now button
-        } else {
-            statusText = 'Climate suitability modelling for this species is <em>up to date</em>.';
-            // TODO hide queue-now button
-        }
-
-        $('#currentspecies .status').html(statusText);
+        updateSpeciesStatus(newSpecies);
 
         updateWindowHistory();
 
@@ -97,84 +131,3 @@ function changeSpecies(species) {
     }
 }
 // ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-
-
-
-
-
-
-
-
-// OLD ////////////////////////
-
-
-
-function oldChangeSpecies(species) {
-    // The work to do if the user changes the selected species..
-    // We need to then update the species details.
-
-    clearExistingSpeciesOccurrencesAndDistributionLayers();
-
-    Edgar.mapdata.species = species;
-
-//consolelog(species);
-
-    if (species !== null) {
-
-        addSpeciesOccurrencesAndDistributionLayers();
-
-        $('#species_autocomplete').val(species.label);
-
-        if(Edgar.user && Edgar.user.canRequestRemodel && species.canRequestRemodel){
-            $('#model_rerun_button').show();
-            $('#model_rerun_requested').hide();
-            $('#model_rerun').show();
-        } else {
-            $('#model_rerun').hide();
-        }
-
-    } else {
-
-        $('#species_autocomplete').val('');
-        $('#species_freshness').text('');
-        $('#model_status').text('');
-        $('#model_rerun').hide();
-
-    }
-    updateWindowHistory();
-}
-
-// ------------------------------------------------------------------
-$(function() {
-
-    $('#species_autocomplete').focus( function() {
-        // when the _text_box_ is focussed
-        setTimeout(function() {
-            $('#species_autocomplete').select();
-        }, 0);
-    });
-
-    $('#species_autocomplete').autocomplete({
-        minLength: 2,
-        source: Edgar.baseUrl + 'species/autocomplete.json',
-        select: function(event, ui) {
-//            oldChangeSpecies(ui.item);
-            changeSpecies(ui.item);
-        }
-    });
-/*
-    $('#model_rerun_button').click(function() {
-        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.mapdata.species.id });
-        $(this).fadeOut('fast', function(){
-            $('#model_rerun_requested').fadeIn();
-        });
-    });
-*/
-    //load species if specified
-
-});
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-
