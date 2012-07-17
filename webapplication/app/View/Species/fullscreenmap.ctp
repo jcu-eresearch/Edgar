@@ -150,12 +150,13 @@
         </div>
         <div class="speciesinfo">
             <p class="status"></p>
-            <button id="button-remodel" class="button-remodel">request modelling</button>
+            <button id="button_remodel" class="button-remodel ui-state-default ui-corner-all">request modelling</button>
         </div>
     </div>
 
     <div id="speciesselector">
         <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
+        <button id="button_cancelselect" class="button-cancelselect ui-state-default ui-corner-all">cancel</button>
     </div>
 
 
