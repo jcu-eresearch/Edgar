@@ -40,11 +40,11 @@ Edgar.vetting.classifyHabitat = {
             width:    400
             modal:     true
             buttons: {
-                "Discard area classification": () =>
+                "Discard area classification": () ->
                     $( this ).dialog( "close" )
-                    this._removeAllFeatures()
+                    Edgar.vetting.classifyHabitat._removeAllFeatures()
                     $(Edgar.map).trigger 'changemode', $( this ).data('newMode')
-                Cancel: () =>
+                Cancel: () ->
                     $( this ).dialog( "close" )
             }
         )

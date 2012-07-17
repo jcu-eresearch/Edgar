@@ -69,7 +69,7 @@
         return null;
       });
       $liVetting = $('<li class="ui-state-default vetting_listing"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span>' + '</li>');
-      $liVetting.append($deleteButton);
+      $liVetting.prepend($deleteButton);
       $liVetting.data('feature', feature);
       $liVetting.hover(function() {
         var thisFeature;

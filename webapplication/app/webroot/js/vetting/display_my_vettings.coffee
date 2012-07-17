@@ -73,8 +73,8 @@ Edgar.vetting.myHabitatClassifications = {
                          comment +
                          '</span>' +
                          '</li>')
-        # Append the button to the list item vetting
-        $liVetting.append($deleteButton)
+        # Prepend the button to the list item vetting
+        $liVetting.prepend($deleteButton)
 
         # Add a hover handler to highlight the associated feature
         $liVetting.data('feature', feature)

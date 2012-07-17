@@ -35,20 +35,19 @@
       return null;
     },
     _confirmModeChangeOkayViaDialog: function(newMode) {
-      var myDialog,
-        _this = this;
+      var myDialog;
       myDialog = $("#discard-area-classifcation-confirm").dialog({
         resizable: false,
         width: 400,
         modal: true,
         buttons: {
           "Discard area classification": function() {
-            $(_this).dialog("close");
-            _this._removeAllFeatures();
-            return $(Edgar.map).trigger('changemode', $(_this).data('newMode'));
+            $(this).dialog("close");
+            Edgar.vetting.classifyHabitat._removeAllFeatures();
+            return $(Edgar.map).trigger('changemode', $(this).data('newMode'));
           },
           Cancel: function() {
-            return $(_this).dialog("close");
+            return $(this).dialog("close");
           }
         }
       });
