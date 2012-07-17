@@ -68,9 +68,8 @@ CREATE TABLE species (
     -- Modelling most recently successfully completed
     last_successfully_completed_model_queued_time TIMESTAMP DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
     last_successfully_completed_model_finish_time TIMESTAMP DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
-    last_successfully_completed_model_importance SMALLINT DEFAULT NULL NULL -- The importance the species had when the last successfully completed model was queued
-
-    
+    last_successfully_completed_model_importance SMALLINT DEFAULT NULL NULL, -- The importance the species had when the last successfully completed model was queued
+    last_applied_vettings TIMESTAMP DEFAULT NULL NULL    -- When were the classifications of occurrences for this species last calc'd based on vettings
 );
 
 
@@ -153,8 +152,10 @@ CREATE TABLE vettings (
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
     classification classification NOT NULL,
 
-    created_on TIMESTAMP NOT NULL DEFAULT now(), -- The time the vetting was created
-    updated_on TIMESTAMP NOT NULL DEFAULT now()  -- The time the vetting was updated
+    created_on       TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was created
+    updated_on       TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was updated
+    deleted_on       TIMESTAMP DEFAULT NULL NULL,          -- The time the vetting was deleted (NULL if not deleted)
+    last_ala_sync_on TIMESTAMP DEFAULT NULL NULL           -- The time the vetting was last synced with ALA (NULL if never sync'd)
 );
 SELECT AddGeometryColumn('vettings', 'area', 4326, 'MULTIPOLYGON', 2);
 ALTER TABLE vettings ALTER COLUMN area SET NOT NULL;
