@@ -13,6 +13,9 @@ function consolelog(arg1, arg2, arg3) { if (window.console) {
 // ------------------------------------------------------------------
 var occurrences, distribution, occurrence_select_control;
 
+window.Edgar = window.Edgar || {};
+window.Edgar.occurrences = window.Edgar.occurrences || {};
+
 // Projections
 // ----------
 
@@ -363,6 +366,9 @@ function addOccurrencesLayer() {
             }
 
         );
+
+        window.Edgar.occurrences = window.Edgar.occurrences || {};
+        window.Edgar.occurrences.vectorLayer = occurrences;
 
         // Set the opacity of the layer using setOpacity 
         //
