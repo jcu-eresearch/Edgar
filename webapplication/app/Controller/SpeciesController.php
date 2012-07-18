@@ -263,7 +263,7 @@ class SpeciesController extends AppController {
                 $dbo = $this->Species->Vetting->getDataSource();
                 $escaped_area = $dbo->value($area);
                 $dbo->execute(
-                    "INSERT INTO vettings (user_id, species_id, comment, classification, area) VALUES ( ? , ? , ? , ? , ( ST_GeomFromText(".$escaped_area.", 4326) ) )",
+                    "INSERT INTO vettings (user_id, species_id, comment, classification, area) VALUES ( ? , ? , ? , ? , ST_Buffer( ( ST_GeomFromText(".$escaped_area.", 4326) ), 0 ) )",
                     array(),
                     array($user_id, $species_id, $comment, $classification)
                 );
