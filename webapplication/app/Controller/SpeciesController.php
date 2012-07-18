@@ -179,7 +179,7 @@ class SpeciesController extends AppController {
         if ($by_user_id and $inverse_user_id_filter) {
             $results = $this->Species->getDataSource()->execute(
                 'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
-                'WHERE species_id = ? AND user_id <> ? '.
+                'WHERE species_id = ? AND user_id <> ? AND deleted is NULL '.
                 'LIMIT 1000',
                 array(),
                 array($species_id, $by_user_id)
@@ -187,7 +187,7 @@ class SpeciesController extends AppController {
         } elseif ($by_user_id) {
             $results = $this->Species->getDataSource()->execute(
                 'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
-                'WHERE species_id = ? AND user_id = ? '.
+                'WHERE species_id = ? AND user_id = ? AND deleted is NULL '.
                 'LIMIT 1000',
                 array(),
                 array($species_id, $by_user_id)
@@ -195,7 +195,7 @@ class SpeciesController extends AppController {
         } else {
             $results = $this->Species->getDataSource()->execute(
                 'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
-                'WHERE species_id = ? '.
+                'WHERE species_id = ? AND deleted is NULL '.
                 'LIMIT 1000',
                 array(),
                 array($species_id)
