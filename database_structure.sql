@@ -153,7 +153,7 @@ CREATE TABLE vettings (
     classification classification NOT NULL,
 
     created          TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was created
-    updated          TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was updated
+    modified         TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was modified
     deleted          TIMESTAMP DEFAULT NULL NULL,          -- The time the vetting was deleted (NULL if not deleted)
     last_ala_sync    TIMESTAMP DEFAULT NULL NULL           -- The time the vetting was last synced with ALA (NULL if never sync'd)
 );
