@@ -42,8 +42,8 @@ def main():
 def next_species_row_to_vet():
     return db.engine.execute('''
         SELECT * FROM species
-        WHERE needs_vetting
-        ORDER BY RANDOM()
+        WHERE needs_vetting_since IS NOT NULL
+        ORDER BY needs_vetting_since ASC
         LIMIT 1
         ''').fetchone()
 
@@ -83,9 +83,9 @@ def vet_species_inner(species, connection):
 
         rows_remaining -= 1
         if rows_remaining % 10000 == 0:
-            log_info('%d rows remaining', rows_remaining)
+            log_info('%d occurrences remaining', rows_remaining)
 
-    log_info('Dirtied %d rows in total', rows_changed)
+    log_info('Dirtied %d occurrences in total', rows_changed)
     if rows_changed > 0:
         connection.execute('''
             UPDATE species
@@ -97,7 +97,8 @@ def vet_species_inner(species, connection):
             ))
 
     connection.execute('''
-        UPDATE species SET needs_vetting = FALSE
+        UPDATE species
+        SET needs_vetting_since = NULL
         WHERE id = {sid};
         '''.format(sid=species['id']))
 

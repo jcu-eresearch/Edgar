@@ -457,9 +457,8 @@ class Syncer:
 
     def update_num_dirty_occurrences(self):
         '''Updates the species.num_dirty_occurrences column with the number of
-        occurrences that have been changed by self.
-        '''
-        dirty_col = db.species.c.num_dirty_occurrences
+        occurrences that have been changed by self. Also updates
+        needs_vetting_since column if dirty occurrences > 0.'''
 
         for row in self.local_species():
             if row['id'] not in self.num_dirty_records_by_species_id:
@@ -469,10 +468,13 @@ class Syncer:
             if newly_dirty <= 0:
                 continue
 
-            db.species.update().\
-                values(num_dirty_occurrences=(dirty_col + newly_dirty)).\
-                where(db.species.c.id == row['id']).\
-                execute()
+            dirty_col = db.species.c.num_dirty_occurrences
+            db.species.update()\
+                .values(
+                    num_dirty_occurrences=(dirty_col + newly_dirty),
+                    needs_vetting_since=func.now()
+                ).where(db.species.c.id == row['id'])\
+                .execute()
 
 
 def classification_for_occurrence(occ):

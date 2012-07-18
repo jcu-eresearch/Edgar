@@ -26,7 +26,8 @@ species = Table('species', metadata,
     Column('id', Integer(), primary_key=True),
     Column('scientific_name', String(256), nullable=False),
     Column('common_name', String(256), nullable=True),
-    Column('num_dirty_occurrences', Integer(), nullable=False, default=0)
+    Column('num_dirty_occurrences', Integer(), nullable=False, default=0),
+    Column('needs_vetting_since', DateTime(), nullable=True, default=None)
 )
 
 
