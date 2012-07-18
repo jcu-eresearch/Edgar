@@ -129,7 +129,7 @@ def ordered_vettings_for_species_id(species_id, connection):
             ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area
         FROM vettings INNER JOIN users ON vettings.user_id=users.id
         WHERE vettings.species_id = {sid} AND users.can_vet
-        ORDER BY users.authority DESC, vettings.updated_on DESC
+        ORDER BY users.authority DESC, vettings.modified DESC
         '''.format(sid=int(species_id)))
 
     for row in query:
