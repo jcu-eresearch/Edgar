@@ -25,19 +25,20 @@ function get_features_dotgrid(Model $Model, $bounds ) {
     /*
         The following is a thought dump..
         It describes the clustering algorithm used.
-        (assumes GRID_RANGE_LONGITUDE .nd GRID_RANGE_LATITUDE are 50)
+        (assumes GRID_RANGE_LONGITUDE and GRID_RANGE_LATITUDE are 50)
             if min_lat 30 and max_lat 90
             max_lat - min_lat = 60
             60 is lat range.
             grid is 50
             60/50 is 1.2.
             Each grid point is 1.2 up/down
-            A occurrence at 30 should be in array location 0    => ( 30 - 30 ) / 1.2
+            An occurrence at 30 should be in array location 0   => ( 30 - 30 ) / 1.2
             An occurrence at 40 should be in array location 8   => ( 40 - 30 ) / 1.2
             An occurrence at 90 should be in array location 50  => ( 90 - 30 ) / 1.2
             transform is: ( occur_lat - min_lat ) / transform_lat
             transform_lat = ( max_lat - min_lat ) / range ( 1.2 in our example )
     */
+
     $transform_longitude = ( $max_longitude - $min_longitude ) / $GRID_RANGE_LONGITUDE;
     $transform_latitude = $transform_longitude; // actually, make them "square"
 
@@ -75,10 +76,17 @@ function get_features_dotgrid(Model $Model, $bounds ) {
         // i is the longitude indicator
         // using i, estimate the center of this grid coordinate (along the longitude axis)
         $original_longitude_approximation = ( ( $i * $transform_longitude) + $min_longitude + ( $transform_longitude / 2) );
+        $current_min_longitude_range = ( $i * $transform_longitude ) + $min_longitude;
+        $current_max_longitude_range = ( $i * $transform_longitude ) + $transform_longitude + $min_longitude;
+
         for ($j = 0; $j < sizeOf($transformed_array[$i]); $j++) {
             // j is the longitude indicator
             $locations_approximately_here       = $transformed_array[$i][$j];
             $locations_approximately_here_size  = sizeOf($locations_approximately_here);
+
+            $current_min_latitude_range  = ( $j * $transform_latitude ) + $min_latitude;
+            $current_max_latitude_range  = ( $j * $transform_latitude ) + $transform_latitude + $min_latitude;
+
             if ($locations_approximately_here_size > 0) {
                 // using j, estimate the center of this grid coordinate (along the latitude axis)
                 $original_latitude_approximation  = ( ( $j * $transform_latitude) + $min_latitude + ( $transform_latitude / 2 ));
@@ -92,6 +100,8 @@ function get_features_dotgrid(Model $Model, $bounds ) {
 
                 // Create a well-formatted GeoJSON array for this cluster, and append it to our location_features array
                 $point_radius = ( floor(log($locations_approximately_here_size, 2) ) + $MIN_FEATURE_RADIUS );
+
+
                 $location_features[] = array(
                     "type" => "Feature",
                     'properties' => array(
@@ -99,12 +109,44 @@ function get_features_dotgrid(Model $Model, $bounds ) {
                         'occurrence_type' => 'dotgrid',
                         'title' => "".$locations_approximately_here_size." occurrences",
                         'description' => "",
+                        'min_latitude_range'  => $current_min_latitude_range,
+                        'max_latitude_range'  => $current_max_latitude_range,
+                        'min_longitude_range' => $current_min_longitude_range,
+                        'max_longitude_range' => $current_max_longitude_range,
                     ),
                     'geometry' => array(
                         'type' => 'Point',
                         'coordinates' => array($original_longitude_approximation, $original_latitude_approximation),
                     ),
                 );
+
+/*
+                $location_features[] = array(
+                    "type" => "Feature",
+                    'properties' => array(
+                        'point_radius' => $point_radius,
+                        'occurrence_type' => 'dotgrid',
+                        'title' => "".$locations_approximately_here_size." occurrences",
+                        'description' => "",
+                        'min_latitude_range'  => $current_min_latitude_range,
+                        'max_latitude_range'  => $current_max_latitude_range,
+                        'min_longitude_range' => $current_min_longitude_range,
+                        'max_longitude_range' => $current_max_longitude_range,
+                    ),
+                    'geometry' => array(
+                        'type' => 'Polygon',
+                        'coordinates' => array(
+                            array(
+                                array($current_min_longitude_range, $current_min_latitude_range),
+                                array($current_min_longitude_range, $current_max_latitude_range),
+                                array($current_max_longitude_range, $current_max_latitude_range),
+                                array($current_max_longitude_range, $current_min_latitude_range),
+                                array($current_min_longitude_range, $current_min_latitude_range),
+                            ),
+                        ),
+                    ),
+                );
+*/
             }
         }
     }
