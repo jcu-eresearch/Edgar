@@ -44,6 +44,11 @@ class VettingsController extends AppController {
             throw new NotFoundException(__('Invalid vetting'));
         }
 
+        $logged_in_user = AuthComponent::user();
+        if ( $vetting['Vetting']['user_id'] !== $logged_in_user['id'] ) {
+            throw new ForbiddenException("You aren't the owner of the vetting");
+        }
+
         if ( $vetting['Vetting']['deleted'] === null ) {
             $vetting['Vetting']['deleted'] = date(DATE_ISO8601);
             unset($vetting['Vetting']['modified']);
