@@ -214,63 +214,85 @@ Edgar.vetting.classifyHabitat = {
                 featureCentroid = clusterFeature.geometry.getCentroid()
                 isFeatureWithinBounds = bounds.contains(featureCentroid.x, featureCentroid.y)
                 if isFeatureWithinBounds
-                    arrayToAppendTo.push(feature)
+                    arrayToAppendTo.push(clusterFeature)
 
             addPolygonIfWithinBounds(feature, geomBounds, featuresWithinBounds) for feature in occurrenceClusterFeatures
 
-            centerOfMap = Edgar.map.getCenter()
-            mapBounds   = Edgar.map.getExtent()
-            mapHeight   = ( mapBounds.top   - mapBounds.bottom )
-            mapWidth    = ( mapBounds.right - mapBounds.left )
-
-            calcDimension = null
-            if (mapHeight > mapWidth)
-                calcDimension = mapHeight
-            else
-                calcDimension = mapWidth
-
-            minorFraction = calcDimension / 16
-            consolelog(["-", minorFraction])
-
-            for featureOccurrence in featuresWithinBounds
-                featureCentroid = featureOccurrence.geometry.getCentroid()
-
-                for otherFeatureOccurrence in featuresWithinBounds
-                        otherFeatureCentroid = otherFeatureOccurrence.geometry.getCentroid()
-                    if featureOccurrence != otherFeatureOccurrence
-                        xDist = Math.abs(featureCentroid.x - otherFeatureCentroid.x)
-                        yDist = Math.abs(featureCentroid.y - otherFeatureCentroid.y)
-
-                        if xDist < minorFraction and xDist != 0
-                            minorFraction = xDist/2
-                        if yDist < minorFraction and yDist != 0
-                            minorFraction = yDist/2
-
-            for featureOccurrence in featuresWithinBounds
+            polygonsToAdd = []
+            for feature in featuresWithinBounds
                 consolelog featureOccurrence
-                featureCentroid = featureOccurrence.geometry.getCentroid()
 
-                radius = minorFraction # in map units (mercator - i.e. meters)
-                sides = 20
-                rotation = 0
-                centerPoint = featureCentroid
+                min_latitude_range  = feature.attributes['min_latitude_range']
+                max_latitude_range  = feature.attributes['max_latitude_range']
+                min_longitude_range = feature.attributes['min_longitude_range']
+                max_longitude_range = feature.attributes['max_longitude_range']
+
+
+                points = [
+                    (new OpenLayers.Geometry.Point(min_longitude_range, min_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
+                    (new OpenLayers.Geometry.Point(min_longitude_range, max_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
+                    (new OpenLayers.Geometry.Point(max_longitude_range, max_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
+                    (new OpenLayers.Geometry.Point(max_longitude_range, min_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
+                ]
+
+                consolelog("POINTS")
+                consolelog(points)
+
+                edgeLine = new OpenLayers.Geometry.LinearRing(points)
 
                 # create a polygon
-                polygon = OpenLayers.Geometry.Polygon.createRegularPolygon(
-                    centerPoint
-                    radius
-                    sides
-                    rotation
-                )
+                polygon = new OpenLayers.Geometry.Polygon(edgeLine)
 
                 # create some attributes for the feature
                 attributes = {}
 
                 featureOccurrence = new OpenLayers.Feature.Vector polygon, attributes
                 @vectorLayer.addFeatures [featureOccurrence]
+
             this._activateModifyPolygonMode()
 
         Edgar.map.addControl @drawBoundingBoxControl
+
+    _shareAnEdge: (polygonA, polygonB) ->
+        # check for shared edge
+        false
+
+    _simplifyPolygons: (polygonsInput) ->
+        resultPolygons = []
+
+        buckets = []
+
+        for polygon in polygonsInput
+            foundBucket = null
+            for bucket in buckets
+                # first, look for ourselves
+                featureIndex = bucket.indexOf(polygon)
+                if featureIndex != -1
+                    foundBucket = bucket
+                    break
+
+            for otherPolygon in polygonsInput
+                if polygon != otherPolygon
+                    # if this polygon and otherPolygon share a common edge, put them in the same bucket
+                    # if neither polygon is already in a bucket, create a bucket, and stick them in the bucket.
+                    if _shareAnEdge(polygon, otherPolygon)
+                        if foundBucket == null
+                            for bucket in buckets
+                                # first, look for ourselves
+                                featureIndex = bucket.indexOf(otherPolygon)
+                                if featureIndex != -1
+                                    foundBucket = bucket
+                                    break
+
+                        if foundBucket == null
+                            newBucket = []
+                            buckets.push(newBucket)
+                            foundBucket = newBucket
+                            foundBucket.push(otherPolygon)
+
+                        foundBucket.push(polygon)
+
+        resultPolygons
 
     ###
     # Removes the draw control
