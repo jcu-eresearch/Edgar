@@ -268,6 +268,8 @@ class SpeciesController extends AppController {
                     array($user_id, $species_id, $comment, $classification)
                 );
 
+                $this->Species->markAsNeedingVetting($species_id);
+
                 $this->dieWithStatus(200, '{ "result": "success" }');
             } else {
                 $this->dieWithStatus(400, "Bad JSON Input");
@@ -511,7 +513,6 @@ class SpeciesController extends AppController {
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
             'remodelStatus' => $this->_speciesRemodelStatusMessage($species),
             'label' => $species['common_name'].' - '.$species['scientific_name']
-            #'distributionThreshold' => $species['distribution_threshold']
         );
     }
 

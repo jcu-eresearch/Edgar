@@ -48,4 +48,13 @@ class Species extends AppModel {
             array($this->data['Species']['id'])
         );
     }
+
+    public function markAsNeedingVetting($species_id){
+        $this->getDataSource()->execute(
+            'UPDATE species SET needs_vetting_since = NOW() '.
+            'WHERE id = ? AND needs_vetting_since IS NULL',
+            array(),
+            array($species_id)
+        );
+    }
 }

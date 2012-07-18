@@ -53,6 +53,7 @@ class VettingsController extends AppController {
             $vetting['Vetting']['deleted'] = date(DATE_ISO8601);
             unset($vetting['Vetting']['modified']);
             $this->Vetting->save($vetting);
+            $this->Vetting->Species->markAsNeedingVetting($vetting['Vetting']['species_id']);
         }
 
         $json_object = $vetting['Vetting'];
