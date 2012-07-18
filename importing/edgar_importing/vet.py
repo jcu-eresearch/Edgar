@@ -60,11 +60,25 @@ def vet_species(args, connection):
             len(vettings))
 
     rows_remaining = query.rowcount
+    rows_changed = 0
     for occrow in query:
-        update_occurrence(occrow, vettings, connection)
+        if update_occurrence(occrow, vettings, connection):
+            rows_changed += 1
+
         rows_remaining -= 1
         if rows_remaining % 10000 == 0:
             log_info('%d rows remaining', rows_remaining)
+
+    log_info('Dirtied %d rows in total', rows_changed)
+    if rows_changed > 0:
+        connection.execute('''
+            UPDATE species
+            SET num_dirty_occurrences = num_dirty_occurrences + {n}
+            WHERE id = {sid};
+            '''.format(
+                n=rows_changed,
+                sid=species['id']
+            ))
 
 
 def update_occurrence(occrow, ordered_vettings, connection):
@@ -101,6 +115,9 @@ def update_occurrence(occrow, ordered_vettings, connection):
                 classi=classification,
                 occid=occrow['id']
             ))
+        return True
+    else:
+        return False
 
 
 def ordered_vettings_for_species_id(species_id, connection):
@@ -112,7 +129,7 @@ def ordered_vettings_for_species_id(species_id, connection):
             ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area
         FROM vettings INNER JOIN users ON vettings.user_id=users.id
         WHERE vettings.species_id = {sid} AND users.can_vet
-        ORDER BY users.authority DESC, vettings.updated_on DESC
+        ORDER BY users.authority DESC, vettings.modified DESC
         '''.format(sid=int(species_id)))
 
     for row in query:
