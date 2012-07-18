@@ -3,6 +3,7 @@ import sqlalchemy
 import argparse
 import logging
 import json
+import time
 import datetime
 import shapely
 import shapely.prepared
@@ -16,9 +17,6 @@ def parse_args():
 
     parser.add_argument('config', type=str, help='''The JSON config file''')
 
-    parser.add_argument('species_id', type=int, help='''The id of the species
-        to recalculate vettings for''')
-
     return parser.parse_args()
 
 
@@ -31,11 +29,33 @@ def main():
     with open(args.config, 'rb') as f:
         db.connect(json.load(f))
 
-    log_info('Starting');
+    while True:
+        next_species = next_species_row_to_vet()
+        if next_species is None:
+            log_info('=========== No species need vetting. Sleeping for a while.')
+            time.sleep(5 * 60)
+        else:
+            vet_species(next_species)
+            db.engine.dispose()
+
+
+def next_species_row_to_vet():
+    return db.engine.execute('''
+        SELECT * FROM species
+        WHERE needs_vetting
+        ORDER BY RANDOM()
+        LIMIT 1
+        ''').fetchone()
+
+
+def vet_species(species):
+    log_info('>>>>>>>>>>> Started vetting species %d: %s',
+            species['id'], species['scientific_name'])
+
     connection = db.engine.connect()
     transaction = connection.begin()
     try:
-        vet_species(args, connection)
+        vet_species_inner(species, connection)
         log_info('Committing transaction')
         transaction.commit()
     except:
@@ -44,15 +64,11 @@ def main():
         raise
     finally:
         connection.close()
-        log_info('Finished')
+        log_info('<<<<<<<<<<< Finished')
 
 
-def vet_species(args, connection):
-    species = connection.execute(db.species.select()\
-        .where(db.species.c.id == args.species_id)\
-        ).fetchone()
+def vet_species_inner(species, connection):
 
-    log_info('Loading all vettings')
     vettings = ordered_vettings_for_species_id(species['id'], connection)
 
     query = occurrences_for_species_id(species['id'], connection)
@@ -79,6 +95,11 @@ def vet_species(args, connection):
                 n=rows_changed,
                 sid=species['id']
             ))
+
+    connection.execute('''
+        UPDATE species SET needs_vetting = FALSE
+        WHERE id = {sid};
+        '''.format(sid=species['id']))
 
 
 def update_occurrence(occrow, ordered_vettings, connection):

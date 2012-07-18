@@ -1,6 +1,5 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
-DROP FUNCTION IF EXISTS EdgarUpdateVettings(INT);
 DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, DATE, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, INT, bytea);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
@@ -53,6 +52,7 @@ CREATE TABLE species (
     scientific_name VARCHAR(256) NOT NULL, -- Format: "Genus (subgenus) species" where "(subgenus)" is optional
     common_name VARCHAR(256) NULL, -- Some species don't have a common name (can be null)
     num_dirty_occurrences INT DEFAULT 0 NOT NULL, -- This is the number of occurrences that have changed since the last modelling run happened
+    needs_vetting BOOL DEFAULT FALSE NOT NULL,
     -- Modelling status (current)
     first_requested_remodel TIMESTAMP DEFAULT NULL NULL, -- The first time, since last modelling run, that a user requested a remodel for this species
     -- Modelling current
@@ -109,7 +109,7 @@ CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
 -- Reduces disk access for queries with `where species_id = ?` (which is like 100% of queries)
 -- Do this manually, can take hours and a double the disk space of the table:
 -- CLUSTER occurrences USING occurrences_species_id_idx;
-VACUUM ANALYSE occurrences;
+-- VACUUM ANALYSE occurrences;
 
 
 -- SHOULD NOT BE ACCESSABLE TO THE PUBLIC.

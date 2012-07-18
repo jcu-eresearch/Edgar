@@ -10,6 +10,6 @@ setup(
         db_wipe = edgar_importing.db_wipe:main
         birdlife_shapefile_import = edgar_importing.birdlife_shapefile_import:main
         csvs_from_db = edgar_importing.csvs_from_db:main
-        vet = edgar_importing.vet:main
+        vettingd = edgar_importing.vettingd:main
         ''')
 )
