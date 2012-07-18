@@ -152,10 +152,10 @@ CREATE TABLE vettings (
     comment TEXT NOT NULL, -- additional free-form comment supplied by the user
     classification classification NOT NULL,
 
-    created_on       TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was created
-    updated_on       TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was updated
-    deleted_on       TIMESTAMP DEFAULT NULL NULL,          -- The time the vetting was deleted (NULL if not deleted)
-    last_ala_sync_on TIMESTAMP DEFAULT NULL NULL           -- The time the vetting was last synced with ALA (NULL if never sync'd)
+    created          TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was created
+    updated          TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was updated
+    deleted          TIMESTAMP DEFAULT NULL NULL,          -- The time the vetting was deleted (NULL if not deleted)
+    last_ala_sync    TIMESTAMP DEFAULT NULL NULL           -- The time the vetting was last synced with ALA (NULL if never sync'd)
 );
 SELECT AddGeometryColumn('vettings', 'area', 4326, 'MULTIPOLYGON', 2);
 ALTER TABLE vettings ALTER COLUMN area SET NOT NULL;
