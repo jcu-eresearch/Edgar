@@ -15,9 +15,11 @@ function get_features_dotradius(Model $Model, $bounds = null) {
     foreach($Model->occurrencesInBounds($bounds) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
-        $contentious = $location['contentious'];
+        $contentious = $location['contentious'] ? "true" : "false";
         $source_classification = $location['source_classification'];
+        $source_classification = (!isset($source_classification) || is_null($source_classification)) ? "N/A" : $source_classification;
         $classification = $location['classification'];
+        $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
 
         $location_features[] = array(
             "type" => "Feature",
