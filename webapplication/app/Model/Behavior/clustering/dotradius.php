@@ -15,12 +15,24 @@ function get_features_dotradius(Model $Model, $bounds = null) {
     foreach($Model->occurrencesInBounds($bounds) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
+        $contentious = $location['contentious'];
+        $source_classification = $location['source_classification'];
+        $classification = $location['classification'];
+
         $location_features[] = array(
             "type" => "Feature",
             'properties' => array(
                 'title' => "Occurrence",
                 'occurrence_type' => 'dotradius',
-                'description' => "<dl><dt>Latitude</dt><dd>$latitude</dd><dt>Longitude</dt><dd>$longitude</dd>",
+                'description' => 
+                    "<dl>".
+                    "<dt>Latitude</dt><dd>$latitude</dd>".
+                    "<dt>Longitude</dt><dd>$longitude</dd>".
+                    "<dt>Our Classification</dt><dd>$classification</dd>".
+                    "<dt>Contentious</dt><dd>$contentious</dd>".
+                    "<dt>Source</dt><dd><a href='http://www.ala.org.au/'>Atlas of Living Australia</a></dd>".
+                    "<dt>Source Classification</dt><dd>$source_classification</dd>".
+                    "</dl>",
                 'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS,
             ),
             'geometry' => array(
