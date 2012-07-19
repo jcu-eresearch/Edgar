@@ -274,8 +274,8 @@ function addOccurrencesLayer() {
             'default': {
                 'fillColor': "#993344",
                 'strokeColor': "#993344",
-                'fillOpacity': 0.8,
-                'strokeOpacity': 0.8,
+                'fillOpacity': 0.3,
+                'strokeOpacity': 0.3,
                 'fontFamily': 'sans-serif',
                 'fontSize': '13px'
             },
