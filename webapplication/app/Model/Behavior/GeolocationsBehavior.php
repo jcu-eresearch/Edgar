@@ -7,7 +7,7 @@
  */
 class GeolocationsBehavior extends ModelBehavior {
 
-    const NON_CLUSTERED_FEATURE_RADIUS   = 8;     // pixels
+    const NON_CLUSTERED_FEATURE_RADIUS   = 4;     // pixels
 
     /**
      * Store the settings for this model.
