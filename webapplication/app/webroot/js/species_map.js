@@ -274,22 +274,24 @@ function addOccurrencesLayer() {
             'default': {
                 'fillColor': "#993344",
                 'strokeColor': "#993344",
-                'fillOpacity': 0.3,
-                'strokeOpacity': 0.3,
+                'fillOpacity': 0.1,
+                'strokeOpacity': 0.1,
                 'fontFamily': 'sans-serif',
-                'fontSize': '13px'
+                'fontSize': '13px',
+                'pointRadius': 2
             },
             'select': {
                 'fillColor': "#83aeef",
                 'strokeColor': "#000000",
-                'fillOpacity': 0.9,
-                'strokeOpacity': 0.9
+                'fillOpacity': 1.0,
+                'strokeOpacity': 1.0,
+                'pointRadius': 8
             }
         });
 
         var occurrence_render_styles = {
             'dotradius': {
-                'pointRadius': "${point_radius}"
+//                'pointRadius': "${point_radius}"
             },
             'dotgrid': {
                 'pointRadius': "${point_radius}"
