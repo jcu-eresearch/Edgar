@@ -24,7 +24,7 @@ function get_features_dotradius(Model $Model, $bounds = null) {
         $location_features[] = array(
             "type" => "Feature",
             'properties' => array(
-                'title' => "Occurrence",
+                'title' => '',
                 'occurrence_type' => 'dotradius',
                 'description' => 
                     "<dl>".
