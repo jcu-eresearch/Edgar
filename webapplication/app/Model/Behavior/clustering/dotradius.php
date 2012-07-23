@@ -21,10 +21,6 @@ function get_features_dotradius(Model $Model, $bounds = null) {
         $classification = $location['classification'];
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
 
-        if ($source_classification == "unknown") {
-            $source_classification = "unclassified";
-        }
-
         $location_features[] = array(
             "type" => "Feature",
             'properties' => array(
