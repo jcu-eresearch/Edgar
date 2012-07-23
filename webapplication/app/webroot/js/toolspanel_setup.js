@@ -34,6 +34,8 @@ $(function() {
     //
     // set up the mode switching stuff
     //
+
+
     $('#button_current').click( function(e) {
         $(Edgar.map).trigger('changemode', 'current');
     });

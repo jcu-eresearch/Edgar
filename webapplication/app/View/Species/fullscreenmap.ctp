@@ -43,11 +43,22 @@
     <div class="tool" id="tool_modechanger">
         <h1>things to do</h1>
         <div class="toolcontent">
-            <p id="tip_no_species" class="tip">Choose a species to:</p>
-            <button id="button_current" class="">See current information</button>
-            <button id="button_future" class="">See future projections</button>
-            <p id="tip_no_user" class="tip">Log in to:</p>
-            <button id="button_vetting" class="">Vet this species</button>
+
+            <div id="modeswitches_nospecies">
+                <p id="tip_no_species" class="tip">Please choose a species.</p>
+            </div>
+
+            <div id="modeswitches_species">
+                <button id="button_current" class="">See current information</button>
+                <button id="button_future" class="">See future projections</button>
+
+                <div id="modeswitches_loggedin">
+                    <button id="button_vetting" class="">Vet this species</button>
+                </div>
+
+            </div>
+
+
         </div>
     </div>
 
