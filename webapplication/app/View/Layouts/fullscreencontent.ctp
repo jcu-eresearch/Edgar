@@ -89,6 +89,7 @@ $user = AuthComponent::user();
 <body>
 
     <div id="header">
+
         <div id="user">
             <?php
                 $user = AuthComponent::user();

@@ -41,7 +41,7 @@
 <div id="toolspanel" class="side panel toolspanel">
 
     <div class="tool" id="tool_modechanger">
-        <h1>things to do</h1>
+<!--        <h1>things to do</h1> -->
         <div class="toolcontent">
 
             <div id="modeswitches_nospecies">
@@ -57,9 +57,8 @@
                 </div>
 
             </div>
-
-
         </div>
+
     </div>
 
     <div class="tool" id="oldvets">

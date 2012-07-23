@@ -120,33 +120,6 @@ function get_features_dotgrid(Model $Model, $bounds ) {
                     ),
                 );
 
-/*
-                $location_features[] = array(
-                    "type" => "Feature",
-                    'properties' => array(
-                        'point_radius' => $point_radius,
-                        'occurrence_type' => 'dotgrid',
-                        'title' => "".$locations_approximately_here_size." occurrences",
-                        'description' => "",
-                        'min_latitude_range'  => $current_min_latitude_range,
-                        'max_latitude_range'  => $current_max_latitude_range,
-                        'min_longitude_range' => $current_min_longitude_range,
-                        'max_longitude_range' => $current_max_longitude_range,
-                    ),
-                    'geometry' => array(
-                        'type' => 'Polygon',
-                        'coordinates' => array(
-                            array(
-                                array($current_min_longitude_range, $current_min_latitude_range),
-                                array($current_min_longitude_range, $current_max_latitude_range),
-                                array($current_max_longitude_range, $current_max_latitude_range),
-                                array($current_max_longitude_range, $current_min_latitude_range),
-                                array($current_min_longitude_range, $current_min_latitude_range),
-                            ),
-                        ),
-                    ),
-                );
-*/
             }
         }
     }

@@ -88,7 +88,9 @@ CREATE TABLE sources (
 -- so it should have as few columns as possible.
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
-    uncertainty INT NOT NULL, -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box. Bounding box makes sense, if the lat/lon are rounded.
+    -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box.
+    -- Bounding box makes sense, if the lat/lon are rounded. NULL means that the uncertainty is unknown.
+    uncertainty INT NULL,
     date DATE NULL, -- when the occurrence/sighting happened
     classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
     contentious BOOL DEFAULT FALSE NOT NULL,
@@ -127,7 +129,7 @@ CREATE UNIQUE INDEX sensitive_occurrences_occurrence_id_idx ON sensitive_occurre
 -- No passwords for users because ALA handles the auth
 CREATE TABLE users (
     id SERIAL NOT NULL PRIMARY KEY,
-    email VARCHAR(256) NOT NULL,
+    email VARCHAR(256) NULL, -- NULL indicates that this user doesn't come from ALA (e.g. birdlife australia vettings)
     fname VARCHAR(256) NOT NULL,
     lname VARCHAR(256) NOT NULL,
     can_vet BOOLEAN DEFAULT TRUE NOT NULL,

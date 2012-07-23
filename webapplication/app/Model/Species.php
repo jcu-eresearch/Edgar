@@ -29,7 +29,7 @@ class Species extends AppModel {
 
     // Returns a PDOStatement of occurrence rows within the bounding box for this species
     public function occurrencesInBounds($bounds=null) {
-        $sql = 'SELECT ST_X(location) as longitude, ST_Y(location) as latitude '.
+        $sql = 'SELECT source_classification, classification, contentious, ST_X(location) as longitude, ST_Y(location) as latitude '.
                'FROM occurrences '.
                'WHERE species_id = ? ';
 

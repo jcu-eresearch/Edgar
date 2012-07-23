@@ -322,13 +322,13 @@ html, body {
 .panel {
     position: absolute;
     z-index: 10000;
-    opacity: 0.66;
+    opacity: 0.95;
     background-color: transparent;
     color: black;
 }
 
 .panel:hover {
-    opacity: 0.9;
+    opacity: 1.0;
 }
 
 .top.panel {
@@ -479,6 +479,10 @@ html, body {
 }
 
 /* tools panel content ------------------------------------------------ */
+
+#toolspanel {
+    overflow: hidden;
+}
 
 #toolspanel .tool {
     font-size: 80%;
@@ -659,4 +663,28 @@ ul.vetting_list li .classification {
     margin-right: 1em;
     display: inline-block;
     width: 50%;
+}
+
+
+olFramedCloudPopupContent {
+}
+
+.olFramedCloudPopupContent dl {
+    font-size: small;
+    overflow:hidden;
+    margin: 0;
+    padding: 0;
+    max-width: 25em;
+}
+.olFramedCloudPopupContent dt {
+     float:left;
+     width:50%; /* adjust the width; make sure the total of both is 100% */
+     margin: 0;
+     padding: 0;
+}
+.olFramedCloudPopupContent dd {
+     float:left;
+     width:50%; /* adjust the width; make sure the total of both is 100% */
+     margin: 0;
+     padding: 0;
 }
