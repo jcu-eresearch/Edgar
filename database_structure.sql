@@ -88,7 +88,9 @@ CREATE TABLE sources (
 -- so it should have as few columns as possible.
 CREATE TABLE occurrences (
     id SERIAL NOT NULL PRIMARY KEY,
-    uncertainty INT NOT NULL, -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box. Bounding box makes sense, if the lat/lon are rounded.
+    -- uncertainty of location in meters. Not sure if this is a radius, or width of a square bounding box.
+    -- Bounding box makes sense, if the lat/lon are rounded. NULL means that the uncertainty is unknown.
+    uncertainty INT NULL,
     date DATE NULL, -- when the occurrence/sighting happened
     classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
     contentious BOOL DEFAULT FALSE NOT NULL,
