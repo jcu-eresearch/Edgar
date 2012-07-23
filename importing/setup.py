@@ -11,5 +11,6 @@ setup(
         birdlife_shapefile_import = edgar_importing.birdlife_shapefile_import:main
         csvs_from_db = edgar_importing.csvs_from_db:main
         vettingd = edgar_importing.vettingd:main
+        vetting_syncd = edgar_importing.vetting_syncd:main
         ''')
 )
