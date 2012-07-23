@@ -127,7 +127,7 @@ CREATE UNIQUE INDEX sensitive_occurrences_occurrence_id_idx ON sensitive_occurre
 -- No passwords for users because ALA handles the auth
 CREATE TABLE users (
     id SERIAL NOT NULL PRIMARY KEY,
-    email VARCHAR(256) NOT NULL,
+    email VARCHAR(256) NULL, -- NULL indicates that this user doesn't come from ALA (e.g. birdlife australia vettings)
     fname VARCHAR(256) NOT NULL,
     lname VARCHAR(256) NOT NULL,
     can_vet BOOLEAN DEFAULT TRUE NOT NULL,
