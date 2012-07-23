@@ -148,9 +148,9 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
 
             uncertainty = None
             if 'sensitiveCoordinateUncertaintyInMeters' in occ:
-                uncertainty = occ['sensitiveCoordinateUncertaintyInMeters']
-            else:
-                uncertainty = occ['coordinateUncertaintyInMeters']
+                uncertainty = int(occ['sensitiveCoordinateUncertaintyInMeters'])
+            elif 'coordinateUncertaintyInMeters' in occ:
+                uncertainty = int(occ['coordinateUncertaintyInMeters'])
 
             date = None
             if 'eventDate' in occ:
@@ -163,7 +163,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
-                uncertainty=int(uncertainty),
+                uncertainty=uncertainty,
                 date=date
             )
 
@@ -328,18 +328,25 @@ def q_param(species_lsid=None, changed_since=None):
         latitude:[-43.734590478689 TO -9.9190742304658] AND
         ''',
 
-        # filters (assertions, uncertainty, etc)
+        # filter on uncertainty (must be unspecified, or < 25km)
         '''
-        coordinate_uncertainty:[* TO 25000] AND
+        (assertions:uncertaintyNotSpecified OR coordinate_uncertainty:[* TO 25000]) AND
+        ''',
+
+        # filter out occs with certain assertions
+        '''
         NOT assertions:zeroCoordinates AND
         NOT assertions:coordinatesCentreOfStateProvince AND
-        NOT assertions:uncertaintyNotSpecified AND
         NOT assertions:coordinatesCentreOfCountry AND
         NOT assertions:invalidGeodeticDatum AND
         NOT assertions:invalidScientificName AND
         NOT assertions:unknownKingdom AND
         NOT assertions:ambiguousName AND
         NOT assertions:inferredDuplicateRecord AND
+        ''',
+
+        # only records based on human observation, machine observation, or unknown basis
+        '''
         (
             basis_of_record:HumanObservation OR
             basis_of_record:MachineObservation OR
