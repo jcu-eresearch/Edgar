@@ -21,10 +21,10 @@ def main():
         db.connect(json.load(f))
 
     # wipe
+    db.sensitive_occurrences.delete().execute()
+    db.occurrences.delete().execute()
     db.species.delete().execute()
     db.sources.delete().execute()
-    db.occurrences.delete().execute()
-    db.sensitive_occurrences.delete().execute()
 
     # insert ALA source
     db.sources.insert().execute(
