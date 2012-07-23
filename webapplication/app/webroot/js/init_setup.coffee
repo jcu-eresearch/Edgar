@@ -44,3 +44,14 @@ Edgar.util.pluralise = (count, noun, plural) ->
         count + " " + plural
     else
         count + " " + noun + "s"
+
+Edgar.util.showhide = (showlist, hidelist) ->
+	$.each(hidelist,
+		(i, itemid) ->
+			$('#' + itemid).hide('blind','fast')
+	)
+
+	$.each(showlist,
+		(i, itemid) ->
+			$('#' + itemid).show('blind','fast')
+	)

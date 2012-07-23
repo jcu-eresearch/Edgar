@@ -66,4 +66,13 @@ the global Edgar object
     }
   };
 
+  Edgar.util.showhide = function(showlist, hidelist) {
+    $.each(hidelist, function(i, itemid) {
+      return $('#' + itemid).hide('blind', 'fast');
+    });
+    return $.each(showlist, function(i, itemid) {
+      return $('#' + itemid).show('blind', 'fast');
+    });
+  };
+
 }).call(this);
