@@ -115,6 +115,11 @@ def update_occurrence(occrow, ordered_vettings, connection):
             # first, look for classification (if not found previously)
             if classification is None:
                 classification = vetting.classification
+                # if this is an admin vetting, don't check the other vettings.
+                # this will keep `contention=False` for all occurrences within
+                # vettings by admins
+                if vetting.is_by_admin:
+                    break
             # second, look for contention (if not found previously)
             elif classification != vetting.classification:
                 contention = True
@@ -148,14 +153,15 @@ def ordered_vettings_for_species_id(species_id, connection):
     query = connection.execute('''
         SELECT
             vettings.classification AS classi,
-            ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area
+            ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area,
+            users.is_admin as is_admin
         FROM vettings INNER JOIN users ON vettings.user_id=users.id
         WHERE vettings.species_id = {sid} AND users.can_vet
         ORDER BY users.authority DESC, vettings.modified DESC
         '''.format(sid=int(species_id)))
 
     for row in query:
-        vettings.append(Vetting(row['classi'], row['area']))
+        vettings.append(Vetting(row['classi'], row['area'], row['is_admin']))
 
     return vettings
 
@@ -174,9 +180,10 @@ def occurrences_for_species_id(species_id, connection):
 
 
 class Vetting(object):
-    def __init__(self, classi, wkt_area):
+    def __init__(self, classi, wkt_area, is_by_admin):
         self.classification = classi
         self.area = shapely.prepared.prep(shapely.wkt.loads(wkt_area))
+        self.is_by_admin = is_by_admin
 
 
 def log_info(msg, *args, **kwargs):
