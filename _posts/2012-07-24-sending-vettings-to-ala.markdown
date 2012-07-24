@@ -30,11 +30,10 @@ vettings are identified by having `deleted != NULL`.
 
 ## Sending The Data
 
-A [daemon process](http://en.wikipedia.org/wiki/Daemon_(computing))
-watches the database for vettings to synchronise. This daemon
-is written in Python, and is named `vetting_syncd`. The daemon wakes up
-every five minutes to check for vettings that have been created,
-modified, or deleted since they were last synchronised.
+A [daemon process][1] watches the database for vettings to synchronise.
+This daemon is written in Python, and is named `vetting_syncd`. The
+daemon wakes up every five minutes to check for vettings that have been
+created, modified, or deleted since they were last synchronised.
 
 The vetting information is sent to ALA by making a HTTP request to an
 ALA web service. The body of the request contains JSON formatted
@@ -62,3 +61,5 @@ The `vetting_syncd` program is finished as described above. Once ALA
 has finished developing the web service at the receiving end, a URL will
 be set in the `config.json` file and `vetting_syncd` will start
 running.
+
+[1]: http://en.wikipedia.org/wiki/Daemon_(computing)
