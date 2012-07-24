@@ -1,9 +1,27 @@
 <?php
 
-function get_features_dotgrid_detail(Model $Model, $bounds ) {
+function get_features_dotgrid_detail(Model $Model, $bounds) {
     $location_features = array();
 
-    foreach($Model->detailedClusteredOccurrencesInBounds($bounds) as $location) {
+    $lat_range = $bounds['max_latitude']  - $bounds['min_latitude'];
+    $lng_range = $bounds['max_longitude'] - $bounds['min_longitude'];
+
+    $lat_lng_range_avg = ( array_sum( array($lat_range, $lng_range) ) / 2 );
+
+    // Range to decimal place conversions
+
+    // 100 = 0,
+    // 50 = 1,
+    // 25 = 1,
+    // 12.5  = 3,
+    // 7.5  = 4
+    // 2  = 16
+    // 1  = 33
+    // 0.1  = 332
+    // 0  = div by zero err
+    $round_to_x_dec = (int) ( 10 / log(pow(2, $lat_lng_range_avg), 10) );
+
+    foreach($Model->detailedClusteredOccurrencesInBounds($bounds, $round_to_x_dec) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
         $contentious = $location['contentious'] ? "yes" : "no";
