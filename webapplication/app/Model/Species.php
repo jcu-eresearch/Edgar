@@ -60,6 +60,12 @@ class Species extends AppModel {
 
     // Returns a PDOStatement of clustered occurrence rows within the bounding box for this species
     public function detailedClusteredOccurrencesInBounds($bounds) {
+        $bounds = sprintf("SetSRID('BOX(%.12F %.12F,%.12F %.12F)'::box2d,4326)",
+                          $bounds['min_longitude'],
+                          $bounds['min_latitude'],
+                          $bounds['max_longitude'],
+                          $bounds['max_latitude']);
+
         $sql = "".
             "SELECT ".
               "round(CAST (ST_X(location) as numeric), 0) as longitude, ".
@@ -77,16 +83,13 @@ class Species extends AppModel {
             'FROM occurrences '.
             'WHERE '.
               'species_id = ? '.
-              'AND ST_X(location) >= ? '.
-              'AND ST_X(location) <= ? '.
-              'AND ST_Y(location) >= ? '.
-              'AND ST_Y(location) <= ? '.
+              'AND location && ' . $bounds .' '.
             'GROUP BY longitude, latitude';
 
         return $this->getDataSource()->execute(
             $sql,
             array(),
-            array($this->data['Species']['id'], $bounds['min_longitude'], $bounds['max_longitude'], $bounds['min_latitude'], $bounds['max_latitude'])
+            array($this->data['Species']['id'])
         );
     }
 }
