@@ -31,6 +31,7 @@ class GeolocationsBehavior extends ModelBehavior {
 
         include 'clustering/dotradius.php';
         include 'clustering/dotgrid.php';
+        include 'clustering/dotgriddetail.php';
         include 'clustering/squaregrid.php';
 
         $location_features = array();
@@ -42,6 +43,10 @@ class GeolocationsBehavior extends ModelBehavior {
         } elseif ( $cluster_type == "dotgrid" ) {
             // use dotgrid clustering
             $location_features = get_features_dotgrid($Model, $bounds);
+
+        } elseif ( $cluster_type == "dotgriddetail" ) {
+            // use dotgrid clustering
+            $location_features = get_features_dotgrid_detail($Model, $bounds);
 
         } elseif ( $cluster_type == "squaregrid" ) {
             // use dotgrid clustering

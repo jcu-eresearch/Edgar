@@ -57,4 +57,36 @@ class Species extends AppModel {
             array($species_id)
         );
     }
+
+    // Returns a PDOStatement of clustered occurrence rows within the bounding box for this species
+    public function detailedClusteredOccurrencesInBounds($bounds) {
+        $sql = "".
+            "SELECT ".
+              "round(CAST (ST_X(location) as numeric), 0) as longitude, ".
+              "round(CAST (ST_Y(location) as numeric), 0) as latitude, ".
+              "sum(case when classification = 'unknown' then 1 else 0 end) as unknown_count, ".
+              "sum(case when classification = 'invalid' then 1 else 0 end) as invalid_count, ".
+              "sum(case when classification = 'historic' then 1 else 0 end) as historic_count, ".
+              "sum(case when classification = 'vagrant' then 1 else 0 end) as vagrant_count, ".
+              "sum(case when classification = 'irruptive' then 1 else 0 end) as irruptive_count, ".
+              "sum(case when classification = 'non-breeding' then 1 else 0 end) as non_breeding_count, ".
+              "sum(case when classification = 'introduced non-breeding' then 1 else 0 end) as introduced_non_breeding_count, ".
+              "sum(case when classification = 'breeding' then 1 else 0 end) as breeding_count, ".
+              "sum(case when classification = 'introduced breeding' then 1 else 0 end) as introduced_breeding_count, ".
+              "COUNT(*) as total_classification_count ".
+            'FROM occurrences '.
+            'WHERE '.
+              'species_id = ? '.
+              'AND ST_X(location) >= ? '.
+              'AND ST_X(location) <= ? '.
+              'AND ST_Y(location) >= ? '.
+              'AND ST_Y(location) <= ? '.
+            'GROUP BY longitude, latitude';
+
+        return $this->getDataSource()->execute(
+            $sql,
+            array(),
+            array($this->data['Species']['id'], $bounds['min_longitude'], $bounds['max_longitude'], $bounds['min_latitude'], $bounds['max_latitude'])
+        );
+    }
 }
