@@ -32,7 +32,7 @@ vettings are identified by having `deleted != NULL`.
 
 A [daemon process](http://en.wikipedia.org/wiki/Daemon_(computing))
 watches the database for vettings to synchronise. This daemon
-is written in Python, and is named `vetting\_syncd`. The daemon wakes up
+is written in Python, and is named `vetting_syncd`. The daemon wakes up
 every five minutes to check for vettings that have been created,
 modified, or deleted since they were last synchronised.
 
@@ -47,7 +47,7 @@ information about the vetting, including:
    level.
 
 If the HTTP response code is anything except 200, it is interpreted as
-failure and `vetting\_syncd` will keep retrying the request at five
+failure and `vetting_syncd` will keep retrying the request at five
 second intervals until the request is successful.
 
 If the sending of a _new_ or _modified_ vetting is successful,
@@ -58,7 +58,7 @@ then that row is simply deleted from the database.
 
 ## Development Status
 
-The `vetting\_syncd` program is finished as described above. Once ALA
+The `vetting_syncd` program is finished as described above. Once ALA
 has finished developing the web service at the receiving end, a URL will
-be set in the `config.json` file and `vetting\_syncd` will start
+be set in the `config.json` file and `vetting_syncd` will start
 running.
