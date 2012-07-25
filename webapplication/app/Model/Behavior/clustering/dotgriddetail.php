@@ -26,8 +26,6 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $round_to_nearest_nth_fraction = 16;
     } elseif ($lat_lng_range_avg > 2) {
         $round_to_nearest_nth_fraction = 32;
-    } elseif ($lat_lng_range_avg > 1) {
-        $round_to_nearest_nth_fraction = 64;
     } else {
         $round_to_nearest_nth_fraction = null;
     }
