@@ -57,4 +57,59 @@ class Species extends AppModel {
             array($species_id)
         );
     }
+
+    // Returns a PDOStatement of clustered occurrence rows within the bounding box for this species
+
+    // if $lat_lng_round_to_nearest_nth_fraction is null, don't round (simply group by).
+    public function detailedClusteredOccurrencesInBounds($bounds, $lat_lng_round_to_nearest_nth_fraction = null) {
+        $bounds = sprintf("SetSRID('BOX(%.12F %.12F,%.12F %.12F)'::box2d,4326)",
+                          $bounds['min_longitude'],
+                          $bounds['min_latitude'],
+                          $bounds['max_longitude'],
+                          $bounds['max_latitude']);
+
+        $query_args = array();
+        $sql = "";
+
+        if ( is_null($lat_lng_round_to_nearest_nth_fraction) ) {
+            $sql = $sql .
+            "SELECT ".
+              "CAST (ST_X(location) as numeric) as longitude, ".
+              "CAST (ST_Y(location) as numeric) as latitude, ";
+        } else {
+            $sql = $sql .
+            "SELECT ".
+              "round(CAST (ST_X(location) as numeric) * ?, 0) / ? as longitude, ".
+              "round(CAST (ST_Y(location) as numeric) * ?, 0) / ? as latitude, ";
+
+            $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
+            $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
+            $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
+            $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
+        }
+        $sql = $sql .
+              "sum(case when classification = 'unknown' then 1 else 0 end) as unknown_count, ".
+              "sum(case when classification = 'invalid' then 1 else 0 end) as invalid_count, ".
+              "sum(case when classification = 'historic' then 1 else 0 end) as historic_count, ".
+              "sum(case when classification = 'vagrant' then 1 else 0 end) as vagrant_count, ".
+              "sum(case when classification = 'irruptive' then 1 else 0 end) as irruptive_count, ".
+              "sum(case when classification = 'non-breeding' then 1 else 0 end) as non_breeding_count, ".
+              "sum(case when classification = 'introduced non-breeding' then 1 else 0 end) as introduced_non_breeding_count, ".
+              "sum(case when classification = 'breeding' then 1 else 0 end) as breeding_count, ".
+              "sum(case when classification = 'introduced breeding' then 1 else 0 end) as introduced_breeding_count, ".
+              "COUNT(*) as total_classification_count ".
+            'FROM occurrences '.
+            'WHERE '.
+              'species_id = ? '.
+              'AND location && ' . $bounds .' '.
+            'GROUP BY longitude, latitude';
+
+        $query_args[] = $this->data['Species']['id'];
+
+        return $this->getDataSource()->execute(
+            $sql,
+            array(),
+            $query_args
+        );
+    }
 }

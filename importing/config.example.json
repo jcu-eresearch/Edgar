@@ -17,5 +17,8 @@
     "maxRetrySeconds": 300,
 
     "doco_alaApiKey": ">>>THIS IS SECRET. DO NOT MAKE THIS PUBLIC<<<. API key used to access sensitive occurrence coordinates in web requests to ALA",
-    "alaApiKey": null
+    "alaApiKey": null,
+
+    "doco_alaVettingSyncUrl": "The url to post vettings to. Used to sync local vettings with ALA.",
+    "alaVettingSyncUrl": "http://biocache.ala.org.au/dunnoyet"
 }

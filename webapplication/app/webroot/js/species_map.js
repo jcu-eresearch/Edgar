@@ -335,14 +335,18 @@ function addOccurrencesLayer() {
                 // See: http://dev.openlayers.org/docs/files/OpenLayers/Strategy/BBOX-js.html#OpenLayers.Strategy.BBOX.resFactor
                 // A setting of <= 1 will mean the map is updated every time its zoom/bounds change.
 //                strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
-                strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
+                strategies: [
+                    new OpenLayers.Strategy.BBOX({
+                        resFactor: 1.1,
+                    })
+                ],
                 protocol: new OpenLayers.Protocol.HTTP({
                     // Path to the geo_json_occurrences for this species.
                     url: speciesGeoJSONURL(),
                     params: {
                         // Place addition custom request params here..
-                        bound: true,                 // do bound the request
-                        clustered: cluster_strategy  // use whatever clustering
+                        bound:      true,                    // do bound the request
+                        clustered:  cluster_strategy         // use whatever clustering
                     },
 
                     // The data format
