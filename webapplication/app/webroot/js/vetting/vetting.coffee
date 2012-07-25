@@ -70,6 +70,7 @@ Edgar.vetting = {
     ###
     engageVettingMode: () ->
         console.log "engageVettingMode"
+        Edgar.util.showhide(['button_current'],[])
         Edgar.vetting.myHabitatClassifications.engage()
         Edgar.vetting.theirHabitatClassifications.engage()
         Edgar.vetting.classifyHabitat.engage()
@@ -82,9 +83,9 @@ Edgar.vetting = {
     ###
     disengageVettingMode: () ->
         console.log "disengageVettingMode"
+        Edgar.util.showhide([],['button_current'])
         Edgar.vetting.myHabitatClassifications.disengage()
         Edgar.vetting.theirHabitatClassifications.disengage()
-        Edgar.vetting.classifyHabitat.disengage()
 
         null
 
