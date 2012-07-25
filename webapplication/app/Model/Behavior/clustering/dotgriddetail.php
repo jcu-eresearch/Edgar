@@ -10,22 +10,20 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
 
     // Range to decimal place conversions
     $round_to_nearest_nth_fraction = 1;
-    if ($lat_lng_range_avg > 400) {
+    if ($lat_lng_range_avg > 200) {
         $round_to_nearest_nth_fraction = 0.25;
-    } elseif ($lat_lng_range_avg > 200) {
-        $round_to_nearest_nth_fraction = 0.5;
     } elseif ($lat_lng_range_avg > 100) {
-        $round_to_nearest_nth_fraction = 1;
+        $round_to_nearest_nth_fraction = 0.5;
     } elseif ($lat_lng_range_avg > 50) {
-        $round_to_nearest_nth_fraction = 2;
+        $round_to_nearest_nth_fraction = 1;
     } elseif ($lat_lng_range_avg > 25) {
-        $round_to_nearest_nth_fraction = 4;
+        $round_to_nearest_nth_fraction = 2;
     } elseif ($lat_lng_range_avg > 10) {
-        $round_to_nearest_nth_fraction = 8;
+        $round_to_nearest_nth_fraction = 4;
     } elseif ($lat_lng_range_avg > 5) {
-        $round_to_nearest_nth_fraction = 16;
+        $round_to_nearest_nth_fraction = 8;
     } elseif ($lat_lng_range_avg > 2) {
-        $round_to_nearest_nth_fraction = 32;
+        $round_to_nearest_nth_fraction = 16;
     } else {
         $round_to_nearest_nth_fraction = null;
     }
@@ -39,6 +37,9 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $source_classification = (!isset($source_classification) || is_null($source_classification)) ? "N/A" : $source_classification;
         $classification = $location['classification'];
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
+        $count = $location['total_classification_count'];
+
+        $point_radius = ( floor(log($count, 2) ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
         $location_features[] = array(
             "type" => "Feature",
@@ -54,7 +55,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
                     "<dt>Source Classification</dt><dd>$source_classification</dd>".
                     "<dt>Cluster Rounded to nth of a degree</dt><dd>$round_to_nearest_nth_fraction</dd>".
                     "</dl>",
-                'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS,
+                'point_radius' => is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : $point_radius
             ),
             'geometry' => array(
                 'type' => 'Point',
