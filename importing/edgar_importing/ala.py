@@ -363,14 +363,13 @@ def _fetch_species_list(params):
 
     for page in _json_pages(url, params, total_key_path, 'start'):
         for result in page['searchResults']['results']:
-            if result['occCount'] > 0:
-                s = Species()
-                s.lsid = result['guid']
-                s.scientific_name = result['nameComplete'].strip()
-                if 'commonNameSingle' in result and result['commonNameSingle'] is not None:
-                    s.common_name = result['commonNameSingle'].strip()
+            s = Species()
+            s.lsid = result['guid']
+            s.scientific_name = result['nameComplete'].strip()
+            if 'commonNameSingle' in result and result['commonNameSingle'] is not None:
+                s.common_name = result['commonNameSingle'].strip()
 
-                yield s
+            yield s
 
 
 def _retry(delay=5.0):
