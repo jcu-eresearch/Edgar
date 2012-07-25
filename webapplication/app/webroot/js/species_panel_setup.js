@@ -6,7 +6,9 @@ $(function() {
 
     // maybe the species is already set on the URL
     if (mapSpecies !== null) {
-        setTimeout(function() {changeSpecies(mapSpecies);}, 1);
+        setTimeout(function() {
+            changeSpecies(mapSpecies);
+        }, 1);
     }
 
     // set up the cancel button
@@ -91,7 +93,7 @@ function updateSpeciesStatus(species) {
 // changeSpecies(species) which does the mode change checking.
 function _setupNewSpecies() {
 
-    if (Edgar.mapmode === 'current' && Edgar.newSpecies != Edgar.mapdata.species) {
+    if (Edgar.newSpecies && Edgar.newSpecies != Edgar.mapdata.species) {
 
         consolelog('new species!');
 

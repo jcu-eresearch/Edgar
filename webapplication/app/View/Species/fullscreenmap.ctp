@@ -41,21 +41,17 @@
 <div id="toolspanel" class="side panel toolspanel">
 
     <div class="tool" id="tool_modechanger">
-<!--        <h1>things to do</h1> -->
-        <div class="toolcontent">
+        <h1>things to do</h1>
+        <div class="toolcontent clearfix">
 
             <div id="modeswitches_nospecies">
-                <p id="tip_no_species" class="tip">Please choose a species.</p>
+                <p id="tip_no_species" class="tip">Start by entering a species.</p>
             </div>
 
-            <div id="modeswitches_species">
-                <button id="button_current" class="">See current information</button>
-                <button id="button_future" class="">See future projections</button>
-
-                <div id="modeswitches_loggedin">
-                    <button id="button_vetting" class="">Vet this species</button>
-                </div>
-
+            <div id="modeswitches">
+                <button id="button_current" class="ui-state-default ui-corner-all">See current information</button>
+                <button id="button_future" class="ui-state-default ui-corner-all">See future projections</button>
+                <button id="button_vetting" class="ui-state-default ui-corner-all">Vet this species</button>
             </div>
         </div>
 
@@ -125,7 +121,7 @@
     </div>
 
 
-    <div class="tool" id="tool_emissions">
+    <div class="tool" id="tool_future">
         <h1>emissions and time</h1>
         <div class="toolcontent">
             <!-- the check box will probably be removed when this is working properly -->

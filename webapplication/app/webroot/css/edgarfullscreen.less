@@ -582,8 +582,9 @@ html, body {
     background: #ffc;
 }
 
-#tool_modechanger {
+#tool_modechanger.tool {
     font-weight: bold;
+    text-align: center;
 }
 
 #tool_modechanger .tip {
@@ -592,21 +593,12 @@ html, body {
 }
 
 #tool_modechanger button {
+    display: inline-block;
     font-weight: bold;
-    padding: 0.5em 0;
+    padding: 0.5em;
+    margin: 0.2em 0;
     overflow: hidden;
-}
-
-#button_current, #button_future {
     width: 49%;
-}
-
-#button_current { float: left; }
-#button_future { float: right; }
-
-#button_vetting {
-    width: 100%;
-    margin-top: 0.5em;
 }
 
 /* legend panel content ----------------------------------------------- */

@@ -85,15 +85,6 @@ function addMapModes(theMap) {
         var oldMode = Edgar.mapmode;
         var newMode = theMap.destinationMode;
 
-        function showhide(showlist, hidelist) { // - - - - - - - - 
-            $.each(hidelist, function(i, tool) {
-                $('#' + tool).hide('blind','slow');
-            });
-            $.each(showlist, function(i, tool) {
-                $('#' + tool).show('blind','slow');
-            });
-        } // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
         consolelog('changing mode, ' + oldMode + ' to ' + newMode);
 
         if ( $.inArray(newMode, validModes) == -1 ) {
@@ -107,9 +98,9 @@ function addMapModes(theMap) {
 
             if (newMode == 'blank') {
                 // special handling for blank-to-blank, the startup mode switch
-                showhide(
-                    ['tool_layers', 'tool_debug', 'tool_layers'],
-                    ['oldvets','myvets','newvet','tool_legend','tool_emissions']
+                Edgar.util.showhide(
+                    ['tool_layers', 'tool_debug', 'tool_layers','tip_no_species'],
+                    ['oldvets','myvets','newvet','tool_legend','tool_future','button_current','button_future','button_vetting']
                 );
 
             } else if (newMode == 'current') {
@@ -120,7 +111,7 @@ function addMapModes(theMap) {
                 // so here we can call _setupNewSpecies to actually switch to the
                 // newly selected species.
                 _setupNewSpecies();
-                showhide(['currentspecies'],['speciesselector']);
+                Edgar.util.showhide(['currentspecies'],['speciesselector']);
                 engageCurrentMode();
             }
 
@@ -149,17 +140,21 @@ function addMapModes(theMap) {
             // so here we can call _setupNewSpecies to actually switch to the
             // newly selected species.
             _setupNewSpecies();
-            showhide(['currentspecies'],['speciesselector']);
+            Edgar.util.showhide(['currentspecies'],['speciesselector']);
             engageCurrentMode();
         }
 
         if (oldMode === 'current' && newMode === 'future' ) {
+            disengageCurrentMode();
+            // show & hide the appropriate tools
+            Edgar.util.showhide(['tool_legend','tool_future'], []);
+            engageFutureMode();
         }
 
         if (oldMode === 'current' && newMode === 'vetting') {
             disengageCurrentMode();
             // show & hide the appropriate tools
-            showhide(['oldvets','newvet','myvets'], ['tool_legend','tool_emissions']);
+            Edgar.util.showhide(['oldvets','newvet','myvets'], ['tool_legend','tool_future']);
             Edgar.vetting.engageVettingMode();
         }
 
@@ -168,7 +163,7 @@ function addMapModes(theMap) {
 
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
-            showhide(['tool_legend'], ['oldvets','newvet','myvets']);
+            Edgar.util.showhide(['tool_legend'], ['oldvets','newvet','myvets']);
             engageCurrentMode();
         }
 
@@ -185,7 +180,7 @@ function addMapModes(theMap) {
         theMap.destinationMode = newMode;
     });
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // now that the map has mode changing, trigger a change to
+    // now that the map has mode changing, trigger a change tob
     // blank mode to get everything set up nicely
     $map.trigger('changemode', 'blank');
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -203,6 +198,33 @@ $(function() {
     });
 
 });
+
+//
+// mode engagements.  maybe should be in files of their own..
+//
+
+// ------------------------------------------------------------------
+// gets called by mapmodes.js, when changing out of blank mode
+function disengageBlankMode() {
+    Edgar.util.showhide([],['tip_no_species']);
+}
+// ------------------------------------------------------------------
+// gets called by mapmodes.js, when the previous mode has been
+// disengeged, and the current mode tools have been shown
+function engageCurrentMode() {
+    Edgar.util.showhide(['button_future'],[]);
+    if (Edgar.user != null) {
+        Edgar.util.showhide(['button_vetting'],[]);
+    }
+    // clear the "destination" species
+    Edgar.newSpecies = null;
+}
+// ------------------------------------------------------------------
+// gets called by mapmodes.js, when changing out of current 
+// mode, before hiding the current mode tools
+function disengageCurrentMode() {
+    Edgar.util.showhide([],['button_vetting','button_future']);
+}
 
 
 

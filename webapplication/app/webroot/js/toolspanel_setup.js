@@ -35,17 +35,22 @@ $(function() {
     // set up the mode switching stuff
     //
 
-
     $('#button_current').click( function(e) {
-        $(Edgar.map).trigger('changemode', 'current');
+        if (Edgar.mapmode !== 'current') {
+            $(Edgar.map).trigger('changemode', 'current');
+        }
     });
 
     $('#button_future').click( function(e) {
-        $(Edgar.map).trigger('changemode', 'future');
+        if (Edgar.mapmode !== 'future') {
+            $(Edgar.map).trigger('changemode', 'future');
+        }
     });
 
     $('#button_vetting').click( function(e) {
-        $(Edgar.map).trigger('changemode', 'vetting');
+        if (Edgar.mapmode !== 'vetting') {
+            $(Edgar.map).trigger('changemode', 'vetting');
+        }
     });
 
     //
