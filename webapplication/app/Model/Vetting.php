@@ -15,7 +15,7 @@ class Vetting extends AppModel {
         )
     );
 
-    public function getPropertiesJSONObject($vetting_id, $classification, $comment) {
+    public function getPropertiesJSONObject($classification) {
         $fill_color  = null;
         $stroke_color= null;
         $font_color  = null;
@@ -77,9 +77,8 @@ class Vetting extends AppModel {
             'stroke_color'   => $stroke_color,
             'font_color'     => $font_color,
             'classification' => $classification,
-            'comment'        => $comment,
-            'vetting_id'     => $vetting_id
         );
         return $json_array;
     }
+
 }

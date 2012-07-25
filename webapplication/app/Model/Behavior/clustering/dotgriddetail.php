@@ -39,13 +39,13 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
         $count = $location['total_classification_count'];
 
-        $point_radius = ( floor(log($count, 2) ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
+        $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
         $location_features[] = array(
             "type" => "Feature",
             'properties' => array(
                 'title' => '',
-                'occurrence_type' => 'dotradius',
+                'occurrence_type' => 'dotgriddetail',
                 'description' => 
                     "<dl>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
@@ -55,7 +55,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
                     "<dt>Source Classification</dt><dd>$source_classification</dd>".
                     "<dt>Cluster Rounded to nth of a degree</dt><dd>$round_to_nearest_nth_fraction</dd>".
                     "</dl>",
-                'point_radius' => is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : $point_radius
+                'point_radius' => $point_radius,
+                'stroke_width' => $point_radius,
             ),
             'geometry' => array(
                 'type' => 'Point',
