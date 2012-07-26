@@ -36,7 +36,9 @@ class HPCJobStatus:
 class HPCJob:
 
     # How long until a job should be considered failed
-    expireJobAfterXSeconds = ( 3 * 60 * 60 ) # 3 hours
+    # Note: Needs to take into consideration HPC may be full
+    # and I may have to wait in the queue.
+    expireJobAfterXSeconds = ( 24 * 60 * 60 ) # 24 hours
 
     @staticmethod
     def getNextSpeciesId():
