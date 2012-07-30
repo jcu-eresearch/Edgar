@@ -78,6 +78,8 @@ while True:
         except Exception:
             # swallow any exceptions
             log.error("Error while trying to queue a new job: %s", traceback.format_exc())
+            # clear the current job var
+            currentJob = None
 
     else:
         try:
