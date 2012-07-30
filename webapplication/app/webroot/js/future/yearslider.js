@@ -4,12 +4,11 @@
     Edgar.YearSlider = function(options) {
         //options
         options = $.extend({
-            sliderElem: null,   // REQUIRED: empty div that will be converted into a slider
-            scenarioElem: null, // REQUIRED: <select> element containing emission scenario names
-            map: null,          // REQUIRED: the open layers map object
-            yearLabelElem: null,// Will change the inner text of this elem when the year changes
+            sliderElem: null,       // REQUIRED: empty div that will be converted into a slider
+            scenarioElemName: null, // REQUIRED: name of <radio> elements for selecting an emission scenario
+            map: null,              // REQUIRED: the open layers map object
+            yearLabelElem: null,    // Will change the inner text of this elem when the year changes
             defaultYear: 2010,
-            defaultScenario: 'sresa1b'
         }, options);
 
         this.MIN_YEAR = 1990;
@@ -20,9 +19,8 @@
         this._layersByYear = {};
         this._map = options.map;
         this._speciesId = null;
-        this._scenario = options.defaultScenario
         this._$slider = $(options.sliderElem);
-        this._$scenarios = $(options.scenarioElem);
+        this._$scenarios = $('input[name=' + options.scenarioElemName + ']');
         this._$yearLabel = (options.yearLabelElem === null ? null : $(options.yearLabelElem));
         var self = this;
 
@@ -33,7 +31,11 @@
                 min: self.MIN_YEAR,
                 max: self.MAX_YEAR,
                 value: self._year,
+                step: 10,
                 change: function(event, ui){
+                    self.setYear(ui.value);
+                },
+                slide: function(event, ui){
                     self.setYear(ui.value);
                 }
             });
@@ -42,11 +44,12 @@
             if(self._$yearLabel) self._$yearLabel.text(''+self._year);
 
             //init scenarios
-            self._$scenarios.val(self._scenario);
             self._$scenarios.change(function(){
-                self.setScenario($(this).val());
+                setTimeout(function(){
+                    self.setScenario();
+                }, 1);
             });
-        });
+       });
 
         this.setYear = function(year){
             year = parseInt(year);
@@ -76,8 +79,8 @@
             this._reloadLayers();
         }
 
-        this.setScenario = function(scenario){
-            scenario = ''+scenario;
+        this.setScenario = function(){
+            scenario = '' + self._$scenarios.filter(':checked').val();
             if(this._scenario == scenario) return;
 
             this._scenario = scenario;
@@ -86,12 +89,19 @@
 
         this.playAnimation = function(){
             var self = this;
+
+            // switch the step to 1 to get smooth transitions between years
+            self._$slider.slider('option', 'step', 1);
+
             var dummyElem = $('<div></div>').css('height', this.MIN_YEAR);
             dummyElem.animate({height: this.MAX_YEAR}, {
                 duration: 5000,
                 easing: 'linear',
                 step: function(year){
                     self.setYear(year);
+                },
+                complete: function() {
+                    self._$slider.slider('option', 'step', 10);
                 }
             });
         }
@@ -147,6 +157,7 @@
         }
 
         this._setLayerOpacities = function(){
+
             if(!this._speciesId) return;
 
             var currentYear = this._year;
@@ -183,6 +194,11 @@
                     layer.setOpacity(opacity);
                 });
             }
+            // finally, update the year indicator
+            var $thumb = this._$slider.slider("widget").find('a');
+            
+            var left = $thumb.position().left + this._$slider.position().left - ($thumb.width() / 2) - this._$yearLabel.width();
+            this._$yearLabel.css('left', left + "px");
         }
     };
 

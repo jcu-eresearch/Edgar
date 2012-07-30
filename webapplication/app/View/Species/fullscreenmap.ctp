@@ -20,11 +20,12 @@
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
-    $this->Html->script('yearslider', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
     $this->Html->script('mapmodes', array('inline'=>false));
+    $this->Html->script('future/yearslider', array('inline'=>false));
+    $this->Html->script('future/future', array('inline'=>false));
     $this->Html->script('vetting/vetting', array('inline'=>false));
     $this->Html->script('vetting/classify_habitat', array('inline'=>false));
     $this->Html->script('vetting/display_my_vettings', array('inline'=>false));
@@ -41,21 +42,17 @@
 <div id="toolspanel" class="side panel toolspanel">
 
     <div class="tool" id="tool_modechanger">
-<!--        <h1>things to do</h1> -->
-        <div class="toolcontent">
+        <h1>things to do</h1>
+        <div class="toolcontent clearfix">
 
             <div id="modeswitches_nospecies">
-                <p id="tip_no_species" class="tip">Please choose a species.</p>
+                <p id="tip_no_species" class="tip">Start by entering a species.</p>
             </div>
 
-            <div id="modeswitches_species">
-                <button id="button_current" class="">See current information</button>
-                <button id="button_future" class="">See future projections</button>
-
-                <div id="modeswitches_loggedin">
-                    <button id="button_vetting" class="">Vet this species</button>
-                </div>
-
+            <div id="modeswitches">
+                <button id="button_current" class="ui-state-default ui-corner-all">See current information</button>
+                <button id="button_future" class="ui-state-default ui-corner-all">See future projections</button>
+                <button id="button_vetting" class="ui-state-default ui-corner-all">Vet this species</button>
             </div>
         </div>
 
@@ -112,9 +109,28 @@
         </div>
     </div>
 
-    <div class="tool" id="tool_layers">
-        <h1>showing on the map</h1>
-        <div id="layerstool" class="toolcontent"></div>
+    <div class="tool" id="tool_future">
+        <h1>suitability projections</h1>
+        <div class="toolcontent">
+            <h3>Emission Scenario</h3>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP2.6">
+                <p>The reductions agreed to at the UNFCCC in 2010 are all achieved, resulting in strong reductions in carbon emissions, keeping warming below 2&deg;C and making teddy bears come alive and give everyone big warm cuddles.</p>
+            </label>
+            <label class="scenario ui-state-default ui-corner-all">
+<!--
+                <input type="radio" name="scenario" value="RCP8.5" checked="checked">
+-->
+                <input type="radio" name="scenario" value="sresb1" checked="checked">
+                <p>Situation continues more-or-less as normal.</p>
+            </label>
+
+            <div class="sliderbox">
+                <span id="year_label"></span>
+                <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
+                <div id="year_slider"></div>
+            </div>
+        </div>
     </div>
 
     <div class="tool legend startclosed" id="tool_legend">
@@ -124,21 +140,9 @@
         </div>
     </div>
 
-
-    <div class="tool" id="tool_emissions">
-        <h1>emissions and time</h1>
-        <div class="toolcontent">
-            <!-- the check box will probably be removed when this is working properly -->
-            <input id="use_emission_and_year" type="checkbox" />
-            <select id="emission_scenarios">
-                <option value="sresa1b" selected="selected">sresa1b</option>
-                <option value="sresb1">sresb1</option>
-                <option value="sresa2">sresa2</option>
-            </select>
-            <span id="year_label"></span>
-            <button id="play_slider_button">Play</button>
-            <div id="year_slider"></div>
-        </div>
+    <div class="tool" id="tool_layers">
+        <h1>showing on the map</h1>
+        <div id="layerstool" class="toolcontent"></div>
     </div>
 
     <div class="tool startclosed" id="tool_debug">

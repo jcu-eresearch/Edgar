@@ -25,7 +25,6 @@
 a {
     color: #003d4c;
     text-decoration: underline;
-    Xfont-weight: bold;
 }
 a:hover {
     color: #367889;
@@ -42,12 +41,10 @@ h1 {
 h2 {
     background:#fff;
     color: #e32;
-    font-family:'Gill Sans','lucida grande', helvetica, arial, sans-serif;
     font-size: 190%;
 }
 h3 {
     color: #2c6877;
-    font-family:'Gill Sans','lucida grande', helvetica, arial, sans-serif;
     font-size: 165%;
 }
 h4 {

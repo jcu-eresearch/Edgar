@@ -35,44 +35,22 @@ $(function() {
     // set up the mode switching stuff
     //
 
-
     $('#button_current').click( function(e) {
-        $(Edgar.map).trigger('changemode', 'current');
+        if (Edgar.mapmode !== 'current') {
+            $(Edgar.map).trigger('changemode', 'current');
+        }
     });
 
     $('#button_future').click( function(e) {
-        $(Edgar.map).trigger('changemode', 'future');
+        if (Edgar.mapmode !== 'future') {
+            $(Edgar.map).trigger('changemode', 'future');
+        }
     });
 
     $('#button_vetting').click( function(e) {
-        $(Edgar.map).trigger('changemode', 'vetting');
-    });
-
-    //
-    // set up the emission selecting stuff
-    //
-    Edgar.yearSlider = new Edgar.YearSlider({
-        sliderElem: '#year_slider',
-        scenarioElem: '#emission_scenarios',
-        map: Edgar.map,
-        yearLabelElem: '#year_label'
-    });
-
-    $('#use_emission_and_year').change(function(){
-        var sid = null;
-        if($(this).is(':checked'))
-            sid = Edgar.mapdata.species.id;
-        Edgar.yearSlider.setSpeciesId(sid);
-    });
-
-    $('#use_emission_and_year').change(reloadDistributionLayers);
-
-    Edgar.mapdata.emissionScenario = $('#emission_scenarios').val();
-    Edgar.mapdata.year = parseInt($('#year_selector').val());
-    reloadDistributionLayers();
-
-    $('#play_slider_button').click(function(){
-        Edgar.yearSlider.playAnimation();
+        if (Edgar.mapmode !== 'vetting') {
+            $(Edgar.map).trigger('changemode', 'vetting');
+        }
     });
 
 });

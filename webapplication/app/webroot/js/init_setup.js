@@ -42,6 +42,14 @@ the global Edgar object
 
   Edgar.mapdata.year = null;
 
+  Edgar.mapdata.layers = {};
+
+  Edgar.mapdata.layers.currentsuitability = null;
+
+  Edgar.mapdata.layers.occurrences = null;
+
+  Edgar.mapdata.layers.selectoccurrencecontrol = null;
+
   /*
   logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
   */
@@ -73,6 +81,19 @@ the global Edgar object
     return $.each(showlist, function(i, itemid) {
       return $('#' + itemid).show('blind', 'fast');
     });
+  };
+
+  Edgar.util.mappath = function(species, year, scenario) {
+    var speciesid;
+    speciesid = species;
+    if (typeof species === 'object') {
+      speciesid = species.id;
+    }
+    if (typeof year === 'string' && year.toLowerCase() === 'current') {
+      return "" + speciesid + "/1975.asc";
+    } else {
+      return "" + speciesid + "/" + scenario + ".csiro_mk3_5.run1.run1." + year + ".asc";
+    }
   };
 
 }).call(this);

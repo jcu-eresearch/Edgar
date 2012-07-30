@@ -77,6 +77,7 @@
 
     engageVettingMode: function() {
       console.log("engageVettingMode");
+      Edgar.util.showhide(['button_current'], []);
       Edgar.vetting.myHabitatClassifications.engage();
       Edgar.vetting.theirHabitatClassifications.engage();
       Edgar.vetting.classifyHabitat.engage();
@@ -89,9 +90,9 @@
 
     disengageVettingMode: function() {
       console.log("disengageVettingMode");
+      Edgar.util.showhide([], ['button_current']);
       Edgar.vetting.myHabitatClassifications.disengage();
       Edgar.vetting.theirHabitatClassifications.disengage();
-      Edgar.vetting.classifyHabitat.disengage();
       return null;
     }
   };
