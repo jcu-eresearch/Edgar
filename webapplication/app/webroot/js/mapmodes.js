@@ -148,6 +148,8 @@ function addMapModes(theMap) {
             disengageCurrentMode();
             // show & hide the appropriate tools
             Edgar.util.showhide(['tool_legend','tool_future'], []);
+            // switch off the current layers
+            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             engageFutureMode();
         }
 
@@ -159,6 +161,10 @@ function addMapModes(theMap) {
         }
 
         if (oldMode === 'future'  && newMode === 'current') {
+            disengageFutureMode();
+            Edgar.util.showhide([], ['tool_future']);
+            addSpeciesOccurrencesAndSuitabilityLayers();
+            engageCurrentMode();
         }
 
         if (oldMode === 'vetting' && newMode === 'current') {

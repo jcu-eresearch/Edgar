@@ -11,10 +11,7 @@ function consolelog(arg1, arg2, arg3) { if (window.console) {
     if (arg1) { console.log(arg1);             }
 }}
 // ------------------------------------------------------------------
-var occurrences, distribution, occurrence_select_control;
-
-window.Edgar = window.Edgar || {};
-window.Edgar.occurrences = window.Edgar.occurrences || {};
+var occurrence_select_control;
 
 // Projections
 // ----------
@@ -72,53 +69,41 @@ function hideLegend() {
 // Adds the new fresh layers.
 // Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
 // the fly, so we have to replace our old layers.
-function clearExistingSpeciesOccurrencesAndDistributionLayers() {
+function clearExistingSpeciesOccurrencesAndSuitabilityLayers() {
 
     clearExistingSpeciesOccurrencesLayer();
 
-    if (distribution !== undefined) {
-        Edgar.map.removeLayer(distribution);
-        distribution = undefined;
+    if (Edgar.mapdata.layers["Climate Suitability"]) {
+        Edgar.map.removeLayer(Edgar.mapdata.layers["Climate Suitability"]);
+        Edgar.mapdata.layers["Climate Suitability"] = null;
     }
 
-    // Get rid of any popups the user may of had on screen.
+    // Get rid of any popups the user may have had on screen.
     clearMapPopups();
     hideLegend();
 }
 // ------------------------------------------------------------------
 function clearExistingSpeciesOccurrencesLayer() {
-    // Remove old layers.
-    if (occurrences !== undefined) {
-        Edgar.map.removeLayer(occurrences);
-        occurrences = undefined;
+    // Remove old occurrence layer.
+    if (Edgar.mapdata.layers.occurrences !== null) {
+        Edgar.map.removeLayer(Edgar.mapdata.layers.occurrences);
+        Edgar.mapdata.layers.occurrences = null;
     }
 
     // Remove the old occurrence select control.
-    if (occurrence_select_control !== undefined) {
-        occurrence_select_control.unselectAll();
-        occurrence_select_control.deactivate();
-        Edgar.map.removeControl(occurrence_select_control);
-        occurrence_select_control = undefined;
+    if (Edgar.mapdata.layers.selectoccurrencecontrol !== null) {
+        Edgar.mapdata.layers.selectoccurrencecontrol.unselectAll();
+        Edgar.mapdata.layers.selectoccurrencecontrol.deactivate();
+        Edgar.map.removeControl(Edgar.mapdata.layers.selectoccurrencecontrol);
+        Edgar.mapdata.layers.selectoccurrencecontrol = null;
     }
 
-/*
-    if(vettingLayer !== undefined) {
-        console.log('Removing vetting layer');
-        Edgar.map.removeLayer(vettingLayer);
-        vettingLayerControl.unselectAll();
-        vettingLayerControl.deactivate();
-        Edgar.map.removeControl(vettingLayerControl);
-        vettingLayer = undefined;
-        vettingLayerControl = undefined;
-    }
-*/
 }
 // ------------------------------------------------------------------
 // Add our species specific layers.
-function addSpeciesOccurrencesAndDistributionLayers() {
-//    addVettingLayer();
+function addSpeciesOccurrencesAndSuitabilityLayers() {
     addOccurrencesLayer();
-    addDistributionLayer();
+    addSuitabilityLayer("Climate Suitability", Edgar.util.mappath(Edgar.mapdata.species.id, "current"));
     updateLegend();
     showLegend();
 }
@@ -129,74 +114,36 @@ function clearMapPopups() {
     });
 }
 // ------------------------------------------------------------------
-function reloadDistributionLayers() {
-    if (distribution !== undefined) {
-        Edgar.map.removeLayer(distribution);
-        distribution = undefined;
-    }
-    addDistributionLayer();
-}
-// ------------------------------------------------------------------
-function addDistributionLayer() {
-    var mapPath;
+function addSuitabilityLayer(layerName, mapPath) {
 
-    if (Edgar.mapdata.species) {
+    var thisLayer = new OpenLayers.Layer.WMS(
+        layerName,
+        mapToolBaseUrl + 'wms_with_auto_determined_threshold.php', // path to our map script handler.
 
-        var speciesId = Edgar.mapdata.species.id;
-        var scenario = Edgar.mapdata.emissionScenario;
-        var year = Edgar.mapdata.year;
-        var bioData = 'csiro_mk3_5'; //what is this meant to be set to?
-        var runs = 'run1.run1'; //what is this meant to be set to?
-
-        //check box will be removed when it is working
-        if($('#use_emission_and_year').is(':checked')){
-            mapPath = speciesId+'/'+scenario+'.'+bioData+'.'+runs+'.'+year+'.asc';
-        } else {
-            mapPath = speciesId+'/1975.asc';
+        // Params to send as part of request (note: keys will be auto-upcased)
+        // I'm typing them in caps so I don't get confused.
+        {
+            MODE: 'map',
+            MAP: 'edgar_master.map',
+            DATA: mapPath,
+            SPECIESID: Edgar.mapdata.species.id,
+            REASPECT: "true",
+            TRANSPARENT: 'true'
+        },
+        {
+            // It's an overlay
+            isBaseLayer: false,
+            transitionEffect: 'resize',
+            singleTile: true,
+            ratio: 1.5,
         }
+    );
 
-        // Species Distribution
-        // ----------------------
+    registerLayerProgress(thisLayer, layerName.toLowerCase());
 
-        // Our distribution map layer.
-        //
-        // NOTE:
-        // -----
-        //
-        // This code may need to be updated now that we are using mercator.
-        // I believe that OpenLayers will send the correct projection request
-        // to Map Server. I also believe that map script will correctly process the
-        // projection request.
-        // I could be wrong though...
+    Edgar.mapdata.layers[layerName] = thisLayer;
 
-        //    var sciNameCased = flattenScientificName(Edgar.mapdata.species.scientificName);
-
-        distribution = new OpenLayers.Layer.WMS(
-            "Climate Suitability",
-            mapToolBaseUrl + 'wms_with_auto_determined_threshold.php', // path to our map script handler.
-
-            // Params to send as part of request (note: keys will be auto-upcased)
-            // I'm typing them in caps so I don't get confused.
-            {
-                MODE: 'map',
-                MAP: 'edgar_master.map',
-                DATA: mapPath,
-                SPECIESID: Edgar.mapdata.species.id,
-                REASPECT: "true",
-                TRANSPARENT: 'true'
-            },
-            {
-                // It's an overlay
-                isBaseLayer: false,
-                transitionEffect: 'resize',
-                singleTile: true,
-                ratio: 1.5,
-            }
-        );
-
-        registerLayerProgress(distribution, "climate suitability");
-        Edgar.map.addLayer(distribution);
-    }
+    Edgar.map.addLayer(thisLayer);
 }
 // ------------------------------------------------------------------
 /*
@@ -322,7 +269,7 @@ function addOccurrencesLayer() {
 
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
-        occurrences = new OpenLayers.Layer.Vector(
+        Edgar.mapdata.layers.occurrences = new OpenLayers.Layer.Vector(
             "Occurrences",
             {
                 // It's an overlay
@@ -359,9 +306,6 @@ function addOccurrencesLayer() {
 
         );
 
-        window.Edgar.occurrences = window.Edgar.occurrences || {};
-        window.Edgar.occurrences.vectorLayer = occurrences;
-
         // Set the opacity of the layer using setOpacity 
         //
         // NOTE: Opacity is not supported as an option on layer..
@@ -373,7 +317,7 @@ function addOccurrencesLayer() {
         // tries to be smart, it will check if layer.opacity is different
         // to your setOpacity arg, and will determine that they haven't changed
         // and so will do nothing..
-        occurrences.setOpacity(1.0);
+        Edgar.mapdata.layers.occurrences.setOpacity(1.0);
 
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------
@@ -411,7 +355,7 @@ function addOccurrencesLayer() {
         }
 
         // Associate the above functions with the appropriate callbacks
-        occurrences.events.on({
+        Edgar.mapdata.layers.occurrences.events.on({
             'featureselected': onFeatureSelect,
             'featureunselected': onFeatureUnselect
         });
@@ -427,11 +371,11 @@ function addOccurrencesLayer() {
         // Note: change hover to true to make it a on hover interaction (instead
         // of an on-click interaction)
         occurrence_select_control = new OpenLayers.Control.SelectFeature(
-            occurrences, {hover: false}
+            Edgar.mapdata.layers.occurrences, {hover: false}
         );
 
-        registerLayerProgress(occurrences, "species occurrences");
-        Edgar.map.addLayer(occurrences);
+        registerLayerProgress(Edgar.mapdata.layers.occurrences, "species occurrences");
+        Edgar.map.addLayer(Edgar.mapdata.layers.occurrences);
 
         Edgar.map.addControl(occurrence_select_control);
         occurrence_select_control.activate();

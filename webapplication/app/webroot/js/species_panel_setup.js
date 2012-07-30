@@ -101,9 +101,9 @@ function _setupNewSpecies() {
         var oldSpecies = Edgar.mapdata.species;
         var newSpecies = Edgar.newSpecies;
 
-        clearExistingSpeciesOccurrencesAndDistributionLayers();
+        clearExistingSpeciesOccurrencesAndSuitabilityLayers();
         Edgar.mapdata.species = newSpecies;
-        addSpeciesOccurrencesAndDistributionLayers();
+        addSpeciesOccurrencesAndSuitabilityLayers();
 
         // just handle the panel update stuff here.
         // the map updates will be handled in event listeners that

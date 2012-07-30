@@ -53,31 +53,4 @@ $(function() {
         }
     });
 
-    //
-    // set up the emission selecting stuff
-    //
-    Edgar.yearSlider = new Edgar.YearSlider({
-        sliderElem: '#year_slider',
-        scenarioElem: '#emission_scenarios',
-        map: Edgar.map,
-        yearLabelElem: '#year_label'
-    });
-
-    $('#use_emission_and_year').change(function(){
-        var sid = null;
-        if($(this).is(':checked'))
-            sid = Edgar.mapdata.species.id;
-        Edgar.yearSlider.setSpeciesId(sid);
-    });
-
-    $('#use_emission_and_year').change(reloadDistributionLayers);
-
-    Edgar.mapdata.emissionScenario = $('#emission_scenarios').val();
-    Edgar.mapdata.year = parseInt($('#year_selector').val());
-    reloadDistributionLayers();
-
-    $('#play_slider_button').click(function(){
-        Edgar.yearSlider.playAnimation();
-    });
-
 });

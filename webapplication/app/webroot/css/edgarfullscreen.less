@@ -22,19 +22,28 @@
     border-bottom-left-radius: @bottomleft;
 }
 
+.shiny() {
+    /* one day, maybe */
+    xbackground: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(45px,rgba(0,0,0,0)));
+    background: -webkit-linear-gradient(top, rgba(192,192,192,0.5) 0%, rgba(192,192,192,0.5) 49.9%, rgba(128,128,128,0.5) 50%, rgba(255,255,255,0.5) 100%);
+    xbackground: -moz-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45px);
+    xbackground: -o-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45px);
+    xbackground: -ms-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45px);
+    xbackground: linear-gradient(top, rgba(1,1,1,0.8) 0%, rgba(1,1,1,0.8) 49%, rgba(1,1,1,0.3) 50%, rgba(1,1,1,1) 100%);
+}
+
 .borderbox() {
     -moz-box-sizing:border-box;
     -webkit-box-sizing:border-box;
     box-sizing:border-box;
 }
 
+
 /* openlayers fixups -------------------------------------------------- */
 
 /* hide error tiles (don't show pink tiles with image error icons) */
 .olImageLoadError {
     background-color: transparent !important;
-    xopacity: 0 !important;
-    xfilter: alpha(opacity=0) !important;
 }
 
 /* overall layout ----------------------------------------------------- */
@@ -566,6 +575,61 @@ html, body {
 #toolspanel .dataLayersDiv .labelSpan.loading:before {
     float: right;
     content: url(../img/loading-bar.gif);
+}
+
+/* future projections tool panel -------------------------------------- */
+
+#tool_future {
+}
+
+#tool_future h3 {
+    font-size: inherit;
+    font-weight: bold;
+}
+
+#tool_future .scenario {
+    display: block;
+    position: relative;
+    padding: 0.1em 0.1em 0.1em 2em;
+    margin: 0.2em 0;
+    font-size: 90%;
+    line-height: 1.1;
+}
+
+#tool_future .scenario input {
+    position: absolute;
+    height: 100%;
+    padding: 0;
+    left: 0.3em;
+}
+
+#tool_future .sliderbox {
+    position: relative;
+    height: 6em;
+}
+
+#year_label {
+    position: absolute;
+    padding: 0.2em 0.5em 0.3em;
+    top: 1em;
+    background: white;
+    border: 1px solid gray;
+    .rounded(0.75em, 0.75em, 0, 0.75em);
+}
+
+#play_slider_button {
+    position: absolute;
+    top: 3.5em;
+    left: 0;
+    width: 1.75em;
+    height: 1.75em;
+}
+
+#year_slider {
+    position: absolute;
+    top: 3.5em;
+    left: 2.5em;
+    right: 0.5em;
 }
 
 /* mode switching panel content --------------------------------------- */
