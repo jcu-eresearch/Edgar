@@ -20,11 +20,11 @@
     // add the actual JS that makes the map work
     $this->Html->script('species_map', array('inline'=>false));
     $this->Html->script('species_panel_setup', array('inline'=>false));
-    $this->Html->script('yearslider', array('inline'=>false));
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
     $this->Html->script('mapmodes', array('inline'=>false));
+    $this->Html->script('future/yearslider', array('inline'=>false));
     $this->Html->script('future/future', array('inline'=>false));
     $this->Html->script('vetting/vetting', array('inline'=>false));
     $this->Html->script('vetting/classify_habitat', array('inline'=>false));

@@ -469,7 +469,7 @@ $(function() {
             if (label) {
                 label.addClass('loading');
             } else {
-consolelog('! no matching label for ' + evt.object.name + '!');
+                consolelog('no Layer Switcher label for "' + evt.object.name + '", hidden layer?');
             }
             layersLoading.push(evt.object.name);
             loadingChanged();
