@@ -82,7 +82,7 @@ mkdir -p "$OUTPUTS_DIR"
 java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z redoifexists autorun
 
 # Cycle through the projections and project the maps
-for PROJ in `find "$PROJECTCLIMATE" -type d`; do
+for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_FULL_PROJECTION_PATH_BY_EMACS_REGEX"`; do
     java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 done
 

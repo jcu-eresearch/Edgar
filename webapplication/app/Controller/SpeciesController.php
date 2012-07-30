@@ -213,7 +213,10 @@ class SpeciesController extends AppController {
                 $classification = $row[2];
                 $comment = $row[3];
 
-                $properties_json_array = Vetting::getPropertiesJSONObject($vetting_id, $classification, $comment);
+                $properties_json_array = Vetting::getPropertiesJSONObject($classification);
+                $properties_json_array['classification'] = $classification;
+                $properties_json_array['vetting_id'] = $vetting_id;
+
                 // decode the json
                 array_push($geo_json_features_array, array('type' => 'Fetaure', 'geometry' => json_decode($area_json), 'properties' => $properties_json_array));
             }

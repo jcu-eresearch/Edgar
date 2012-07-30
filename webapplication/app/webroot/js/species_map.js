@@ -229,6 +229,15 @@ function addOccurrencesLayer() {
             'dotgrid': {
                 'pointRadius': "${point_radius}"
             },
+            'dotgriddetail': {
+                'pointRadius': "${point_radius}",
+                'fillColor':   "${fill_color}",
+                'strokeColor': "${stroke_color}",
+                'borderColor': "${border_color}",
+                'strokeWidth': "${stroke_width}",
+                'strokeOpacity': 1,
+                'fillOpacity': 1
+            },
             'squaregrid': {
                 'label': "${label}",
                 'fontOpacity': 1.0,
@@ -317,7 +326,7 @@ function addOccurrencesLayer() {
         // tries to be smart, it will check if layer.opacity is different
         // to your setOpacity arg, and will determine that they haven't changed
         // and so will do nothing..
-        Edgar.mapdata.layers.occurrences.setOpacity(1.0);
+        Edgar.mapdata.layers.occurrences.setOpacity(0.7);
 
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------

@@ -39,24 +39,68 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
         $count = $location['total_classification_count'];
 
-        $point_radius = ( floor(log($count, 2) ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
+        $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.5 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
-        $location_features[] = array(
-            "type" => "Feature",
-            'properties' => array(
-                'title' => '',
-                'occurrence_type' => 'dotradius',
-                'description' => 
+        $classification_count_array = array(
+            "unknown" => $location["unknown_count"],
+            "invalid" => $location["invalid_count"],
+            "historic" => $location["historic_count"],
+            "vagrant" => $location["vagrant_count"],
+            "irruptive" => $location["irruptive_count"],
+            "non breeding" => $location["non_breeding_count"],
+            "introduced non breeding" => $location["introduced_non_breeding_count"],
+            "breeding" => $location["breeding_count"],
+            "introduced breeding" => $location["introduced_breeding_count"]
+        );
+        arsort($classification_count_array);
+
+        $major_classification = null;
+        $minor_classification = null;
+
+        $major_classification_count = null;
+        $minor_classification_count = null;
+
+        $class_keys = array_keys($classification_count_array);
+        $class_counts = array_values($classification_count_array);
+
+        $major_classification = $class_keys[0];
+        $major_classification_count = $class_counts[0];
+        if ($class_counts[1] > 0) {
+            $minor_classification = $class_keys[1];
+            $minor_classification_count = $class_counts[1];
+        } else {
+            $minor_classification = $major_classification;
+        }
+
+        $major_classification_properties = Vetting::getPropertiesJSONObject($major_classification);
+        $minor_classification_properties = Vetting::getPropertiesJSONObject($minor_classification);
+
+        $properties_array = array();
+
+        // Use the vetting classification's fill color to represent the classification
+        $properties_array['stroke_color'] = $major_classification_properties['fill_color'];
+        $properties_array['fill_color']   = $minor_classification_properties['fill_color'];
+        $properties_array['title'] = '';
+        $properties_array['occurrence_type'] = 'dotgriddetail';
+        $properties_array['description'] = "".
                     "<dl>".
+                    "<dt>Major Class</dt><dd>$major_classification</dd>".
+                    "<dt>Major Class Count</dt><dd>$major_classification_count</dd>".
+                    "<dt>Minor Class</dt><dd>$minor_classification</dd>".
+                    "<dt>Minor Class Count</dt><dd>$minor_classification_count</dd>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
                     "<dt>Longitude</dt><dd>$longitude</dd>".
                     "<dt>Our Classification</dt><dd>$classification</dd>".
                     "<dt>Contentious</dt><dd>$contentious</dd>".
                     "<dt>Source Classification</dt><dd>$source_classification</dd>".
                     "<dt>Cluster Rounded to nth of a degree</dt><dd>$round_to_nearest_nth_fraction</dd>".
-                    "</dl>",
-                'point_radius' => is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : $point_radius
-            ),
+                    "</dl>";
+        $properties_array['point_radius'] = $point_radius;
+        $properties_array['stroke_width'] = $point_radius;
+
+        $location_features[] = array(
+            "type" => "Feature",
+            'properties' => $properties_array,
             'geometry' => array(
                 'type' => 'Point',
                 'coordinates' => array($longitude, $latitude),

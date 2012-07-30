@@ -350,6 +350,7 @@ def q_param(species_lsid=None, changed_since=None):
         (
             basis_of_record:HumanObservation OR
             basis_of_record:MachineObservation OR
+            basis_of_record:PreservedSpecimen OR
             assertions:missingBasisOfRecord
         )
         ''')))

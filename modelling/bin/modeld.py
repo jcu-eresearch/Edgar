@@ -79,6 +79,11 @@ while True:
             # swallow any exceptions
             log.error("Error while trying to queue a new job: %s", traceback.format_exc())
 
+            # clear the current job var
+            if currentJob:
+                currentJob.cleanup()
+                currentJob = None
+
     else:
         try:
             # If we have a current job...
