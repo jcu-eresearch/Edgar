@@ -4,7 +4,7 @@
 #
 # Script to queue a HPC Job for a species.
 #
-# Takes 2 Args
+# Takes 3 Args
 #
 # 1. The species to model.
 # 2. The working directory.
