@@ -77,9 +77,9 @@ function updateSpeciesStatus(species) {
             statusText += " for this species."
             $('#button_remodel').hide();
         } else if (dirty > 0) {
-            statusText = "There are ";
+            statusText = "This species has ";
             statusText += Edgar.util.pluralise(dirty, "changed observation");
-            statusText += " for this species <em>not yet incorporated</em>.";
+            statusText += " <em>not yet incorporated</em>.";
             $('#button_remodel').show();
         } else {
             statusText = 'Climate suitability modelling for this species is <em>up to date</em>.';
