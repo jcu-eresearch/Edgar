@@ -9,74 +9,71 @@ function mu_removeAllStyleClasses($layer)
 
 // Given a specific threshold, add the appropriate classes and associated
 // styles to the layer.
-function mu_addStyleClasses($layer, $threshold = "0")
+function mu_addStyleClasses($layer, $threshold = "0", $colors = null)
 {
 
-    $layer->updateFromString(''.
-        'CLASSITEM "[pixel]" '.
-            'CLASS '.
-                'NAME "0.0  - 0.25" '.
-                'KEYIMAGE "ramp_0_25.gif" '.
-                'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]<0.25) '.
-                'STYLE '.
-                    'COLORRANGE  0 0 255 0 255 255 '.
-                    'DATARANGE   0 0.25 '.
-                'END '.
-            'END '.
-        'END');
+    if ($colors === null) {
+        $colors = array(
+            array( 0x99, 0x77, 0x00 ),     // tan
+            array( 0xbb, 0xaa, 0x00 ),
+            array( 0xff, 0xcc, 0x00 ),     // yellow
+            array( 0x66, 0x99, 0x00 ),
+            array( 0x00, 0x77, 0x00 )      // darkish green
+        );
+        $colors = array(
+            array( 0xff, 0xcc, 0x00 ),     // yellow
+            array( 0xdd, 0x99, 0x44 ),
+            array( 0xcc, 0x66, 0x88 ),
+            array( 0xbb, 0x33, 0xcc ),
+            array( 0xaa, 0x00, 0xff )      // purple
+        );
+        $colors = array(
+            array( 0xff, 0xff, 0x00 ),     // lemon yellow
+            array( 0x99, 0xdd, 0x00 ),
+            array( 0x66, 0xbb, 0x00 ),
+            array( 0x33, 0x99, 0x00 ),
+            array( 0x00, 0x77, 0x00 )      // purple
+        );
+    }
 
-    $layer->updateFromString(''.
-        'CLASSITEM "[pixel]" '.
-            'CLASS '.
-                'NAME "0.25 - 0.5" '.
-                'KEYIMAGE "ramp_25_50.gif" '.
-                'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]<0.5) '.
-                'STYLE '.
-                    'COLORRANGE  0 255 255 0 255 0 '.
-                    'DATARANGE   0.25 0.5 '.
-                'END '.
-            'END '.
-        'END');
+    $numcolors = count($colors);
+    $start = (float)$threshold;
+    $range = 1.0 - $start;
+    $step = (1.0 * $range) / (1.0 * $numcolors);
+    $ranges = array();
+    for ($i = 0; $i < $numcolors; $i++) {
+        $section = array();
+        $section['min'] = $start + ($i * $step);
+        $section['max'] = $start + ($i * $step) + $step;
+        $section['color'] = $colors[$i];
+        $section['name'] = "";
+        if ($i == 0) $section['name'] = 'Least Suitable';
+        if ($i == $numcolors - 1) $section['name'] = 'Most Suitable';
+        $ranges[] = $section;
+    }
 
-    $layer->updateFromString(''.
-        'CLASSITEM "[pixel]" '.
-            'CLASS '.
-                'NAME "0.5  - 0.75" '.
-                'KEYIMAGE "ramp_50_75.gif" '.
-                'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]<0.75) '.
-                'STYLE '.
-                    'COLORRANGE  0 255 0 255 255 0 '.
-                    'DATARANGE   0.5 0.75 '.
-                'END '.
-            'END '.
-        'END');
-
-    $layer->updateFromString(''.
-        'CLASSITEM "[pixel]" '.
-            'CLASS '.
-                'NAME "0.75 - 1.0" '.
-                'KEYIMAGE "ramp_75_100.gif" '.
-                'EXPRESSION ([pixel]>'.$threshold.' AND [pixel]<=1) '.
-                'STYLE '.
-                    'COLORRANGE  255 255 0 255 0 0 '.
-                    'DATARANGE   0.75 1 '.
-                'END '.
-            'END '.
-        'END');
-
-   // NOTE: Needs to go at the end, else "blanks"
-   // all other style effects out.
-   // I'm confident there is a much better way of injecting information
-   // into the legend.
     $layer->updateFromString(''.
         'CLASSITEM "THRESHOLD" '.
             'CLASS '.
-                'NAME "Threshold: '.$threshold.'" '.
-                'STYLE '.
-                'END '.
+                'NAME "Threshold '.$threshold.'" '.
+                'EXPRESSION (1<0) ' .
             'END '.
-        'END');
+        'END'
+    );
 
+    foreach ($ranges as $section) {
+        $layer->updateFromString(''.
+            'CLASSITEM "[pixel]" '.
+                'CLASS '.
+                    'NAME "' . $section['name'] . '" '.
+                    'EXPRESSION ([pixel]>' . $section['min'] . ' AND [pixel]<=' . $section['max'] . ') '.
+                    'STYLE '.
+                        'COLOR ' . implode(' ', $section['color']) . ' ' .
+                    'END '.
+                'END '.
+            'END'
+        );
+    }
 }
 
 // Return the threshold, or NULL

@@ -140,6 +140,8 @@ function addMapModes(theMap) {
             // so here we can call _setupNewSpecies to actually switch to the
             // newly selected species.
             _setupNewSpecies();
+            Edgar.util.showhide(['tool_legend','currentspecies'],['speciesselector']);
+            // sometimes the current species / selector flip back
             Edgar.util.showhide(['currentspecies'],['speciesselector']);
             engageCurrentMode();
         }
@@ -162,7 +164,7 @@ function addMapModes(theMap) {
 
         if (oldMode === 'future'  && newMode === 'current') {
             disengageFutureMode();
-            Edgar.util.showhide([], ['tool_future']);
+            Edgar.util.showhide(['tool_legend'], ['tool_future']);
             addSpeciesOccurrencesAndSuitabilityLayers();
             engageCurrentMode();
         }

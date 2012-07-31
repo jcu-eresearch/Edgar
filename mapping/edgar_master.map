@@ -39,9 +39,12 @@ MAP
     LEGEND
         STATUS ON
         LABEL
-            COLOR 0 0 255
+            COLOR 64 64 64
+            ANTIALIAS true
+            OFFSET 0 -1
         END
-        KEYSIZE 32 16
+        KEYSIZE 32 14
+        KEYSPACING 5 -1
     END
 
     #define the folder that used for generate image
@@ -64,7 +67,7 @@ MAP
 
         #define the transparent of image. 100 is not transpartent.
         #0 is totally transparent.
-        TRANSPARENCY 60
+        TRANSPARENCY 70
 
         #define the color table. color are define as RGB color from 0 to 255.
         #EXPRESSION are used to define the style apply to the right rang of data
