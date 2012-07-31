@@ -97,7 +97,8 @@ class Species extends AppModel {
               "sum(case when classification = 'introduced non-breeding' then 1 else 0 end) as introduced_non_breeding_count, ".
               "sum(case when classification = 'breeding' then 1 else 0 end) as breeding_count, ".
               "sum(case when classification = 'introduced breeding' then 1 else 0 end) as introduced_breeding_count, ".
-              "COUNT(*) as total_classification_count ".
+              "sum(case when contentious = true then 1 else 0 end) as contentious_count, ".
+              "COUNT(*) as total_occurrences ".
             'FROM occurrences '.
             'WHERE '.
               'species_id = ? '.

@@ -507,6 +507,23 @@ class SpeciesController extends AppController {
         $this->dieWithStatus(200, 'Request processed');
     }
 
+    public function contentious() {
+        if(!AuthComponent::user('is_admin'))
+            $this->dieWithStatus(403);
+
+        $dbo = $this->Species->getDataSource();
+        $contentious = $this->Species->getDataSource()->execute(
+                'SELECT * FROM species '.
+                'WHERE (SELECT COUNT(*) FROM OCCURRENCES '.
+                '       WHERE species_id = species.id AND contentious '.
+                '       LIMIT 1) > 0 '.
+                'LIMIT 10'
+            );
+
+        $this->set('title_for_layout', 'Contentious Species');
+        $this->set('contentious_species', $contentious->fetchAll(PDO::FETCH_ASSOC));
+    }
+
     private function _speciesToJson($species) {
         return array(
             'id' => $species['id'],
