@@ -8,11 +8,11 @@
             scenarioElemName: null, // REQUIRED: name of <radio> elements for selecting an emission scenario
             map: null,              // REQUIRED: the open layers map object
             yearLabelElem: null,    // Will change the inner text of this elem when the year changes
-            defaultYear: 2010,
+            defaultYear: 2015,
         }, options);
 
-        this.MIN_YEAR = 1990;
-        this.MAX_YEAR = 2080;
+        this.MIN_YEAR = 2015;
+        this.MAX_YEAR = 2085;
 
         //member vars (private)
         this._year = parseInt(options.defaultYear);
@@ -116,22 +116,19 @@
 
             //readd layers if enabled
             if(this._speciesId){
-                this._addLayerForYear(1990);
-                this._addLayerForYear(2000);
-                this._addLayerForYear(2010);
-                this._addLayerForYear(2020);
-                this._addLayerForYear(2030);
-                this._addLayerForYear(2040);
-                this._addLayerForYear(2050);
-                this._addLayerForYear(2060);
-                this._addLayerForYear(2070);
-                this._addLayerForYear(2080);
+                this._addLayerForYear(2015);
+                this._addLayerForYear(2025);
+                this._addLayerForYear(2035);
+                this._addLayerForYear(2045);
+                this._addLayerForYear(2055);
+                this._addLayerForYear(2065);
+                this._addLayerForYear(2075);
                 this._setLayerOpacities();
             }
         }
 
         this._addLayerForYear = function(year){
-            var mapPath = '' + this._speciesId + '/' + this._scenario + '.csiro_mk3_5.run1.run1.' + year + '.asc';
+            var mapPath = Edgar.util.mappath(this._speciesId, year, this._scenario);
 
             var layer = new OpenLayers.Layer.WMS(
                 "Climate Suitability in " + year,

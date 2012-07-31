@@ -114,14 +114,14 @@
         <div class="toolcontent">
             <h3>Emission Scenario</h3>
             <label class="scenario ui-state-default ui-corner-all">
-                <input type="radio" name="scenario" value="RCP2.6">
+                <input type="radio" name="scenario" value="RCP3PD">
                 <p>The reductions agreed to at the UNFCCC in 2010 are all achieved, resulting in strong reductions in carbon emissions, keeping warming below 2&deg;C and making teddy bears come alive and give everyone big warm cuddles.</p>
             </label>
             <label class="scenario ui-state-default ui-corner-all">
 <!--
                 <input type="radio" name="scenario" value="RCP8.5" checked="checked">
 -->
-                <input type="radio" name="scenario" value="sresb1" checked="checked">
+                <input type="radio" name="scenario" value="RCP85" checked="checked">
                 <p>Situation continues more-or-less as normal.</p>
             </label>
 

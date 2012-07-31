@@ -30,8 +30,9 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
 
     # if round_to_nearest_nth_fraction null, don't round
     foreach($Model->detailedClusteredOccurrencesInBounds($bounds, $round_to_nearest_nth_fraction) as $location) {
-        $longitude = $location['longitude'];
-        $latitude = $location['latitude'];
+        $longitude = (float)(string) $location['longitude'];
+        $latitude = (float)(string) $location['latitude'];
+
         $contentious = $location['contentious'] ? "yes" : "no";
         $source_classification = $location['source_classification'];
         $source_classification = (!isset($source_classification) || is_null($source_classification)) ? "N/A" : $source_classification;
@@ -84,16 +85,11 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $properties_array['occurrence_type'] = 'dotgriddetail';
         $properties_array['description'] = "".
                     "<dl>".
-                    "<dt>Major Class</dt><dd>$major_classification</dd>".
-                    "<dt>Major Class Count</dt><dd>$major_classification_count</dd>".
-                    "<dt>Minor Class</dt><dd>$minor_classification</dd>".
-                    "<dt>Minor Class Count</dt><dd>$minor_classification_count</dd>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
                     "<dt>Longitude</dt><dd>$longitude</dd>".
                     "<dt>Our Classification</dt><dd>$classification</dd>".
                     "<dt>Contentious</dt><dd>$contentious</dd>".
                     "<dt>Source Classification</dt><dd>$source_classification</dd>".
-                    "<dt>Cluster Rounded to nth of a degree</dt><dd>$round_to_nearest_nth_fraction</dd>".
                     "</dl>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
