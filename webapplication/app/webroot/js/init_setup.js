@@ -90,9 +90,9 @@ the global Edgar object
       speciesid = species.id;
     }
     if (typeof year === 'string' && year.toLowerCase() === 'current') {
-      return "" + speciesid + "/1975.asc";
+      return "" + speciesid + "/1990.asc";
     } else {
-      return "" + speciesid + "/" + scenario + ".csiro_mk3_5.run1.run1." + year + ".asc";
+      return "" + speciesid + "/" + scenario + "_csiro-mk30_" + year + ".asc";
     }
   };
 
