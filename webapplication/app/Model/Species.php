@@ -76,6 +76,9 @@ class Species extends AppModel {
             "SELECT ".
               "CAST (ST_X(location) as numeric) as longitude, ".
               "CAST (ST_Y(location) as numeric) as latitude, ";
+              "contentious, ";
+              "classification, ";
+              "source_classification, ";
         } else {
             $sql = $sql .
             "SELECT ".
