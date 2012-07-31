@@ -33,12 +33,12 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $longitude = (float)(string) $location['longitude'];
         $latitude = (float)(string) $location['latitude'];
 
-        $contentious = $location['contentious'] ? "yes" : "no";
+        $contentious_count = $location['contentious_count'];
         $source_classification = $location['source_classification'];
         $source_classification = (!isset($source_classification) || is_null($source_classification)) ? "N/A" : $source_classification;
         $classification = $location['classification'];
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
-        $count = $location['total_classification_count'];
+        $count = $location['total_occurrences'];
 
         $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.5 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
@@ -87,9 +87,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
                     "<dl>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
                     "<dt>Longitude</dt><dd>$longitude</dd>".
-                    "<dt>Our Classification</dt><dd>$classification</dd>".
-                    "<dt>Contentious</dt><dd>$contentious</dd>".
-                    "<dt>Source Classification</dt><dd>$source_classification</dd>".
+                    "<dt>Cluster Size</dt><dd>$count</dd>".
+                    "<dt>Contentious</dt><dd>$contentious_count</dd>".
                     "</dl>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
