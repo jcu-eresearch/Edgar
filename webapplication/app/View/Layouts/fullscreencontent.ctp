@@ -118,8 +118,7 @@ $user = AuthComponent::user();
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="downloads" class="triggeredtab"><div class="inner">
         <p class="significant">
-            When completed in July 2012, Edgar will make occurrence and modelling data
-            available for researchers to download.
+            When completed in August 2012, Edgar will make occurrence and modelling data available for researchers to download.
         </p>
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
