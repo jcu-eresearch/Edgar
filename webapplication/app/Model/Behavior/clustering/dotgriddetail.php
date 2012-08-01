@@ -106,15 +106,16 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
 
         foreach ($unsorted_classification_count_array as $key => $value) {
             $this_contentious_count = $unsorted_contentious_classification_count_array[$key];
+
             $properties_array['description'] .=
                     "<tr class='".($value == 0 ? 'none' : 'some' )."'>".
                     "<td>".$key."</td>".
-                    "<td>".($value == 0 ? '-' : $value).($this_contentious_count == 0 ? '' : "<br>($this_contentious_count in contention)")."</td>".
-                    "</tr>";
+                    "<td>".($value == 0 ? '-' : $value)."</td></tr>".
+                    ($this_contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($this_contentious_count in contention)</td></tr>");
         };
 
         $properties_array['description'] .=
-                    "<tr><td>TOTAL</td><td>".$count.($contentious_count == 0 ? '' : "<br>($contentious_count in contention)")."</td></tr>".
+                    "<tr><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>").
                     "</tbody></table></div>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
