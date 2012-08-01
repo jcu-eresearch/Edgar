@@ -23,7 +23,7 @@
           'label': '${classification}'
         },
         'select': {
-          'fillOpacity': 1.0,
+          'fillOpacity': 0.6,
           'strokeOpacity': 1.0
         }
       });
