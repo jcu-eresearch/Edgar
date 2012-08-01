@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <div class="tool legend startclosed" id="tool_legend">
+    <div class="tool legend" id="tool_legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
             <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
@@ -152,17 +152,15 @@
             <hr style="clear: both">
 
             <!-- clustering selector -->
-            <select id="cluster">
+            <select id="cluster" style="width: 80%">
                 <option value="dotradius" >Dot Radius (no clustering)</option>
-                <option value="dotgrid" selected="selected">Dot Grid</option>
-                <option value="dotgriddetail">Dot Grid Detail</option>
+                <option value="dotgrid">Dot Grid</option>
+                <option value="dotgriddetail" selected="selected">Dot Grid Detail</option>
                 <option value="squaregrid">Square Grid</option>
             </select>
 
             <hr style="clear: both">
 
-            <button id="vet">.vet.</button>
-            <button id="devet">.devet.</button>
         </div>
     </div>
 
@@ -187,30 +185,6 @@
         <button id="button_cancelselect" class="button-cancelselect ui-state-default ui-corner-all">cancel</button>
     </div>
 
-
-<!-- old species panel below -->
-
-<!--
-    <p class="minor label" id="species_modelling_status"></p>
-    <p class="minor label" id="species_showing_label"></p>
--->
-    <!-- Species Selector -->
-<!--
-    <input id="species_autocomplete" placeholder="Type species common/scientific name here" />
-
-    <table>
-        <tr>
-            <th>Modeling Status</th>
-            <td>
-                <span id="model_status"></span>
-                <span id="model_rerun" style="display:none">
-                    <a id="model_rerun_button" href="#">Boost</a>
-                    <span id="model_rerun_requested">Boost successfull</span>
-                </span>
-            </td>
-        </tr>
-    </table>
--->
 </div>
 
 <div id="map">

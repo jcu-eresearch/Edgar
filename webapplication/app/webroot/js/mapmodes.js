@@ -141,8 +141,6 @@ function addMapModes(theMap) {
             // newly selected species.
             _setupNewSpecies();
             Edgar.util.showhide(['tool_legend','currentspecies'],['speciesselector']);
-            // sometimes the current species / selector flip back
-            Edgar.util.showhide(['currentspecies'],['speciesselector']);
             engageCurrentMode();
         }
 
@@ -193,19 +191,6 @@ function addMapModes(theMap) {
     $map.trigger('changemode', 'blank');
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
-
-$(function() {
-
-    // test the mode changing stuff
-    $('#vet').click( function() {
-        $(Edgar.map).trigger('changemode', 'vetting');
-    });
-
-    $('#devet').click( function() {
-        $(Edgar.map).trigger('changemode', 'current');
-    });
-
-});
 
 //
 // mode engagements.  maybe should be in files of their own..

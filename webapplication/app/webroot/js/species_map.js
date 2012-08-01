@@ -207,8 +207,8 @@ function addOccurrencesLayer() {
             'default': {
                 'fillColor': "#993344",
                 'strokeColor': "#993344",
-                'fillOpacity': 0.4,
-                'strokeOpacity': 0.4,
+                'fillOpacity': 1.0,
+                'strokeOpacity': 0,
                 'fontFamily': 'sans-serif',
                 'fontSize': '13px',
                 'pointRadius': 4
@@ -253,15 +253,18 @@ function addOccurrencesLayer() {
 //                'fontWeight': 'medium',
 //                'fontSize': '12px',
                 'fontWeight': 'bold',
+                'fillOpacity': 0.5,
                 'fontSize': '13px'
             },
             'medium': {
                 'fontWeight': 'medium',
-                'fontSize': '12px'
+                'fillOpacity': 0.3,
+                'fontSize': '11px'
             },
             'small': {
                 'fontWeight': 'medium',
-                'fontSize': '11px'
+                'fillOpacity': 0.1,
+                'fontSize': '9px'
             }
         }
         occurrence_StyleMap.addUniqueValueRules("default", "cluster_size", cluster_size_render_styles);
