@@ -67,19 +67,19 @@ function updateSpeciesStatus(species) {
         // TODO: incorporate dirty-vettings into this status info
 
         if (status.indexOf("Remodelling running") != -1) {
-            statusText = "Model is <em>now running</em> to incorporate ";
+            statusText = "Modelling is <em>now running</em> to incorporate ";
             statusText += Edgar.util.pluralise(dirty, "changed observation");
             statusText += " for this species."
             $('#button_remodel').hide();
         } else if (status.indexOf("Priority queued") != -1) {
-            statusText = "Model is <em>queued</em> to incorporate ";
+            statusText = "Modelling is <em>queued</em> to incorporate ";
             statusText += Edgar.util.pluralise(dirty, "changed observation");
             statusText += " for this species."
             $('#button_remodel').hide();
         } else if (dirty > 0) {
             statusText = "This species has ";
             statusText += Edgar.util.pluralise(dirty, "changed observation");
-            statusText += " <em>not yet incorporated</em>.";
+            statusText += " <em>not yet modelled</em>.";
             $('#button_remodel').show();
         } else {
             statusText = 'Climate suitability modelling for this species is <em>up to date</em>.';
