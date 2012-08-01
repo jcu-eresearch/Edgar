@@ -53,6 +53,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
             "breeding" => $location["breeding_count"],
             "introduced breeding" => $location["introduced_breeding_count"]
         );
+        $unsorted_classification_count_array  = $classification_count_array;
         arsort($classification_count_array);
 
         $major_classification = null;
@@ -87,8 +88,19 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
                     "<dl>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
                     "<dt>Longitude</dt><dd>$longitude</dd>".
-                    "<dt>Cluster Size</dt><dd>$count</dd>".
                     "<dt>Contentious</dt><dd>$contentious_count</dd>".
+                    "<dt>Classifications</dt><dd><table class='classifications'>".
+                    "<tr><th>classification</th><th>count</th></tr>";
+
+        foreach ($unsorted_classification_count_array as $key => $value) {
+            $properties_array['description'] .=
+                    "<tr class='".($value == 0 ? 'none' : 'some' )."'><td>".$key."</td><td>".($value == 0 ? '-' : $value)."</td></tr>";
+        };
+
+        $properties_array['description'] .=
+                    "<tr><td>TOTAL</td><td>".$count."</td></tr>".
+
+                    "</table></dd>".
                     "</dl>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
