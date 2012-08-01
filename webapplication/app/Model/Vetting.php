@@ -22,53 +22,53 @@ class Vetting extends AppModel {
 
         switch($classification) {
             case "unknown":
-                $fill_color   = "#00FFFF";
-                $stroke_color = "#FF0000";
+                $fill_color   = "#cc0000";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "invalid":
-                $fill_color   = "#AACCFF";
-                $stroke_color = "#339900";
+                $fill_color   = "#666666";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "historic":
-                $fill_color   = "#FF9999";
-                $stroke_color = "#AA0000";
+                $fill_color   = "#997722";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "vagrant":
-                $fill_color   = "#FFC0FF";
-                $stroke_color = "#0000AA";
+                $fill_color   = "#ff7700";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "irruptive":
-                $fill_color   = "#99CAFF";
-                $stroke_color = "#AA2200";
+                $fill_color   = "#ff3355";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "non-breeding":
-                $fill_color   = "#FFFF33";
-                $stroke_color = "#003300";
+                $fill_color   = "#7700ff";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "introduced non-breeding":
-                $fill_color   = "#AA3399";
-                $stroke_color = "#AAAAAA";
+                $fill_color   = "#bb33ff";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "breeding":
-                $fill_color   = "#FFCC00";
-                $stroke_color = "#CC0000";
+                $fill_color   = "#0022ff";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "introduced breeding":
-                $fill_color   = "#FF3399";
-                $stroke_color = "#990000";
+                $fill_color   = "#2266ff";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             default:
-                $fill_color   = "#FFFFFF";
-                $stroke_color = "#000000";
+                $fill_color   = "#ffffff";
+                $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
         }

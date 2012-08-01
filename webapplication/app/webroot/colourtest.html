@@ -7,23 +7,26 @@ body {
     background-image: url(googlephystile.png);
     background-repeat: repeat-y;
     background-attachment: fixed;
+	font-weight: bold;
+	color: #000;
+	text-align: center; 
 }
 
-* { font-size: 1em; font-weight: bold; color: #000; text-align: center; text-shadow: white 0 0 1px; }
+* { font-size: 1em; text-shadow: white 0 0 1px; }
 
-table {
+.suits table {
     border-collapse: collapse;
-    margin: 5em 5em 5em auto;;
+    margin: 5em 5em 5em auto;
     opacity: 0.75;
 }
 
-td {
+.suits td {
     width: 1em;
     padding: 0.5em;
     height: 5em;
 }
 
-td.new:after {
+.suits td.new:after {
     display: inline-block;
     content: 'new!';
     color: red;
@@ -38,10 +41,24 @@ td.new:after {
     -ms-transform: rotate(-30deg);
 }
 
-tr:nth-child(2) td:nth-child(1):before { content: 'least suitable'; }
-tr:nth-child(2) td:nth-child(2) { border: 1px solid #ccc; border-right: none; }
+.suits tr:nth-child(2) td:nth-child(1):before { content: 'least suitable'; }
+.suits tr:nth-child(2) td:nth-child(2) { border: 1px solid #ccc; border-right: none; }
 
-td:nth-child(8):before { content: 'most suitable'; }
+.suits td:nth-child(8):before { content: 'most suitable'; }
+
+
+
+.class table {
+	text-align: left;
+    margin: 5em 5em 5em auto;
+    xopacity: 0.75;
+}
+
+.class .dot {
+	width: 1em;
+	height: 1em;
+	border-radius: 0.5em;
+}
 
 </style>
 
@@ -49,9 +66,77 @@ td:nth-child(8):before { content: 'most suitable'; }
 
 <script>
 
-newsets = ['tanyellowdarkgreen', 'yellowpurple'];
+/*
+            case "unknown":
+                $fill_color   = "#00FFFF";
+                $stroke_color = "#FF0000";
+                $font_color   = $stroke_color;
+                break;
+            case "invalid":
+                $fill_color   = "#AACCFF";
+                $stroke_color = "#339900";
+                $font_color   = $stroke_color;
+                break;
+            case "historic":
+                $fill_color   = "#FF9999";
+                $stroke_color = "#AA0000";
+                $font_color   = $stroke_color;
+                break;
+            case "vagrant":
+                $fill_color   = "#FFC0FF";
+                $stroke_color = "#0000AA";
+                $font_color   = $stroke_color;
+                break;
+            case "irruptive":
+                $fill_color   = "#99CAFF";
+                $stroke_color = "#AA2200";
+                $font_color   = $stroke_color;
+                break;
+            case "non-breeding":
+                $fill_color   = "#FFFF33";
+                $stroke_color = "#003300";
+                $font_color   = $stroke_color;
+                break;
+            case "introduced non-breeding":
+                $fill_color   = "#AA3399";
+                $stroke_color = "#AAAAAA";
+                $font_color   = $stroke_color;
+                break;
+            case "breeding":
+                $fill_color   = "#FFCC00";
+                $stroke_color = "#CC0000";
+                $font_color   = $stroke_color;
+                break;
+            case "introduced breeding":
+                $fill_color   = "#FF3399";
+                $stroke_color = "#990000";
+                $font_color   = $stroke_color;
+                break;
+            default:
+*/
 
-sets = { 
+newclasssets = ['firsttry'];
+
+classsets = {
+	'firsttry': {
+		'unknown':                 'c00',
+		'invalid':                 '666',
+		'historic':                '972',
+		'vagrant':                 'f70',
+		'irruptive':               'f35',
+		'introduced non-breeding': 'b3f',
+		'non-breeding':            '70f',
+		'breeding/core':           '02f',
+		'introduced breeding':     '26f',
+		'default':                 'fff',
+	}
+}
+
+
+
+newsuitabilitysets = ['tanyellowdarkgreen', 'yellowpurple', 'tanredderyellowdarkgreen'];
+
+suitabilitysets = { 
 	'bluegreen': ['03c',
 	              '06a',
 	              '088',
@@ -126,11 +211,36 @@ sets = {
 };
 
 $(function() {
-    $.each(sets, function(setname, setcolors) {
-        var table = "<table class='" + setname;
-	table = table + "'><tr><td colspan='8'";
 
-        if ($.inArray(setname, newsets) > -1) {
+    $.each(classsets, function(setname, setcolors) {
+        var table = "<table class='" + setname;
+		table = table + "'><tr><th colspan='2'";
+
+        if ($.inArray(setname, newsuitabilitysets) > -1) {
+            table = table + " class='new'";
+        }
+        table = table + ">" + setname +
+            "</th></tr>";
+        
+        $.each(setcolors, function(tag, color) {
+            table = table + "<tr><td>";
+            table = table + "<div class='dot'";
+            table = table + " style='background: #" + color + "'>";
+            table = table + "</div></td>";
+            table = table + "<td style='line-height: 1.5em'>" + tag + "</td>";
+
+        });
+
+        $('body').append("<div class='class'>\n" + table + "</tr></table>\n</div>\n");
+    });
+
+    // ------------------------------------------------------
+
+    $.each(suitabilitysets, function(setname, setcolors) {
+        var table = "<table class='" + setname;
+		table = table + "'><tr><td colspan='8'";
+
+        if ($.inArray(setname, newsuitabilitysets) > -1) {
             table = table + " class='new'";
         }
         table = table + ">" + setname +
@@ -145,8 +255,9 @@ $(function() {
         });
 
         $('body').append("<style>" + css + "</style>");
-        $('body').append(table + "<td></td></tr></table>\n");
+        $('body').append("<div class='suits'>\n" + table + "<td></td></tr></table>\n</div>\n");
     });
+
 });
 
 </script>
