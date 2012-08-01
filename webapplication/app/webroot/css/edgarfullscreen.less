@@ -756,11 +756,26 @@ ul.vetting_list li .classification {
      padding: 0;
 }
 
-tr.contentious td {
+table.classifications tr td {
+    padding: 0.5em;
+    border-top: 1px solid #ddd;
+}
+
+table.classifications tr td:nth-child(2) {
+    text-align: right;
+}
+
+tr.count td {
+}
+
+table.classifications tr.contentious td {
+    border: none;
     font-size: x-small;
     text-align: right;
-    background-color: #ccc;
-    opacity: 0.8;
+
+    position: relative;
+    top: -0.5em;
+    padding-top: 0;
 }
 
 .classifications tr.none {
