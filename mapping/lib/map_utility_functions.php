@@ -47,8 +47,8 @@ function mu_addStyleClasses($layer, $threshold = "0", $colors = null)
         $section['max'] = $start + ($i * $step) + $step;
         $section['color'] = $colors[$i];
         $section['name'] = "";
-        if ($i == 0) $section['name'] = 'Least Suitable';
-        if ($i == $numcolors - 1) $section['name'] = 'Most Suitable';
+        if ($i == 0) $section['name'] = '    Least Suitable';
+        if ($i == $numcolors - 1) $section['name'] = '    Most Suitable';
         $ranges[] = $section;
     }
 
