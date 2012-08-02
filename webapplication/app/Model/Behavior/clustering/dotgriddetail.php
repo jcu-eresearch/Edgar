@@ -42,6 +42,18 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
 
         $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.5 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
+        $unsorted_contentious_classification_count_array = array(
+            "unknown" => $location["contentious_unknown_count"],
+            "invalid" => $location["contentious_invalid_count"],
+            "historic" => $location["contentious_historic_count"],
+            "vagrant" => $location["contentious_vagrant_count"],
+            "irruptive" => $location["contentious_irruptive_count"],
+            "non breeding" => $location["contentious_non_breeding_count"],
+            "introduced non breeding" => $location["contentious_introduced_non_breeding_count"],
+            "breeding" => $location["contentious_breeding_count"],
+            "introduced breeding" => $location["contentious_introduced_breeding_count"]
+        );
+
         $classification_count_array = array(
             "unknown" => $location["unknown_count"],
             "invalid" => $location["invalid_count"],
@@ -53,6 +65,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
             "breeding" => $location["breeding_count"],
             "introduced breeding" => $location["introduced_breeding_count"]
         );
+        $unsorted_classification_count_array  = $classification_count_array;
         arsort($classification_count_array);
 
         $major_classification = null;
@@ -87,9 +100,23 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
                     "<dl>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
                     "<dt>Longitude</dt><dd>$longitude</dd>".
-                    "<dt>Cluster Size</dt><dd>$count</dd>".
-                    "<dt>Contentious</dt><dd>$contentious_count</dd>".
-                    "</dl>";
+                    "</dl>".
+                    "<div class='table_wrapper'><table class='classifications'>".
+                    "<thead><tr><th>Classification</th><th>Observations</th></tr></thead><tbody>";
+
+        foreach ($unsorted_classification_count_array as $key => $value) {
+            $this_contentious_count = $unsorted_contentious_classification_count_array[$key];
+
+            $properties_array['description'] .=
+                    "<tr class='count ".($value == 0 ? 'none' : 'some' )."'>".
+                    "<td>".$key."</td>".
+                    "<td>".($value == 0 ? '-' : $value)."</td></tr>".
+                    ($this_contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($this_contentious_count in contention)</td></tr>");
+        };
+
+        $properties_array['description'] .=
+                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>").
+                    "</tbody></table></div>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
 

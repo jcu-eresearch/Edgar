@@ -792,25 +792,62 @@ ul.vetting_list li .classification {
 }
 
 
-olFramedCloudPopupContent {
+
+.olFramedCloudPopupContent {
+    overflow:auto;
+    font-size: small;
+    overflow: auto;
 }
 
-.olFramedCloudPopupContent dl {
-    font-size: small;
-    overflow:hidden;
-    margin: 0;
-    padding: 0;
-    max-width: 25em;
+.olFramedCloudPopupContent thead tr, .olFramedCloudPopupContent tbody {
+    display: block;
 }
+
+.olFramedCloudPopupContent thead tr {
+    background-color: #ccf;
+}
+
 .olFramedCloudPopupContent dt {
      float:left;
-     width:50%; /* adjust the width; make sure the total of both is 100% */
+     width:40%; /* adjust the width; make sure the total of both is 100% */
      margin: 0;
      padding: 0;
 }
+
+.olFramedCloudPopupContent tbody {
+    overflow: auto;
+    height: 12em;
+}
+
 .olFramedCloudPopupContent dd {
      float:left;
-     width:50%; /* adjust the width; make sure the total of both is 100% */
+     width:60%; /* adjust the width; make sure the total of both is 100% */
      margin: 0;
      padding: 0;
+}
+
+table.classifications tr td {
+    padding: 0.5em;
+    border-top: 1px solid #ddd;
+}
+
+table.classifications tr td:nth-child(2) {
+    text-align: right;
+}
+
+tr.count td {
+}
+
+table.classifications tr.contentious td {
+    border: none;
+    font-size: x-small;
+    text-align: right;
+
+    position: relative;
+    top: -0.5em;
+    padding-top: 0;
+}
+
+.classifications tr.none {
+    color: #999;
 }

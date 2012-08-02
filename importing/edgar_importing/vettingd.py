@@ -77,34 +77,33 @@ def vet_species_inner(species, connection):
 
     rows_remaining = query.rowcount
     rows_changed = 0
+    rows_contentious = 0
     for occrow in query:
-        if update_occurrence(occrow, vettings, connection):
-            rows_changed += 1
+        changed, contentious = update_occurrence(occrow, vettings, connection)
+        if changed: rows_changed += 1
+        if contentious: rows_contentious += 1
 
         rows_remaining -= 1
-        if rows_remaining % 10000 == 0:
+        if rows_remaining % 10000 == 0 and rows_remaining > 0:
             log_info('%d occurrences remaining', rows_remaining)
 
     log_info('Dirtied %d occurrences in total', rows_changed)
-    if rows_changed > 0:
-        connection.execute('''
-            UPDATE species
-            SET num_dirty_occurrences = num_dirty_occurrences + {n}
-            WHERE id = {sid};
-            '''.format(
-                n=rows_changed,
-                sid=species['id']
-            ))
 
     connection.execute('''
         UPDATE species
-        SET needs_vetting_since = NULL
+        SET num_dirty_occurrences = num_dirty_occurrences + {changed},
+            needs_vetting_since = NULL,
+            num_contentious_occurrences = {cont}
         WHERE id = {sid};
-        '''.format(sid=species['id']))
+        '''.format(
+            changed=rows_changed,
+            cont=rows_contentious,
+            sid=species['id']
+        ))
 
 
 def update_occurrence(occrow, ordered_vettings, connection):
-    contention = False
+    contentious = False
     classification = None
     location = shapely.wkt.loads(occrow['location'])
 
@@ -122,7 +121,7 @@ def update_occurrence(occrow, ordered_vettings, connection):
                     break
             # second, look for contention (if not found previously)
             elif classification != vetting.classification:
-                contention = True
+                contentious = True
                 # if both classification and contention are found, no need
                 # to check the rest of the polygons
                 break
@@ -132,19 +131,20 @@ def update_occurrence(occrow, ordered_vettings, connection):
         classification = occrow['source_classification']
 
     # only update db if something changed
-    if classification != occrow['classification'] or contention != occrow['contentious']:
+    if classification != occrow['classification'] or contentious != occrow['contentious']:
         connection.execute('''
             UPDATE occurrences
-            SET contentious = {cont}, classification = '{classi}'
+            SET contentious = {cont},
+                classification = '{classi}'
             WHERE id = {occid}
             '''.format(
-                cont=('TRUE' if contention else 'FALSE'),
+                cont=('TRUE' if contentious else 'FALSE'),
                 classi=classification,
                 occid=occrow['id']
             ))
-        return True
+        return True, contentious
     else:
-        return False
+        return False, contentious
 
 
 def ordered_vettings_for_species_id(species_id, connection):
