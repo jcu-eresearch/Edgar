@@ -155,9 +155,16 @@ def ordered_vettings_for_species_id(species_id, connection):
             vettings.classification AS classi,
             ST_AsText(ST_SimplifyPreserveTopology(vettings.area, 0.001)) AS area,
             users.is_admin as is_admin
-        FROM vettings INNER JOIN users ON vettings.user_id=users.id
-        WHERE vettings.species_id = {sid} AND users.can_vet
-        ORDER BY users.authority DESC, vettings.modified DESC
+        FROM
+            vettings INNER JOIN users ON vettings.user_id = users.id
+        WHERE
+            vettings.species_id = {sid}
+            AND vettings.ignored IS NULL
+            AND users.can_vet
+        ORDER BY
+            users.is_admin DESC,
+            users.authority DESC,
+            vettings.modified DESC
         '''.format(sid=int(species_id)))
 
     for row in query:

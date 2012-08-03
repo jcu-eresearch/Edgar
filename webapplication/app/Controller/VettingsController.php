@@ -62,4 +62,27 @@ class VettingsController extends AppController {
         $this->set('_serialize', 'output');
     }
 
+    public function ignore($vetting_id) {
+        if(!AuthComponent::user('is_admin'))
+            $this->dieWithStatus(403);
+
+        $vetting = $this->Vetting->find('first', array(
+            'conditions' => array('Vetting.id' => $vetting_id)
+        ));
+
+        if($vetting === false)
+            $this->dieWithStatus(404);
+
+        if(!$vetting['Vetting']['ignored']){
+            $vetting['Vetting']['ignored'] = date(DATE_ISO8601);
+            $vetting['Vetting']['modified'] = $vetting['Vetting']['ignored'];
+            $this->Vetting->save($vetting);
+            $this->Vetting->Species->markAsNeedingVetting($vetting['Vetting']['species_id']);
+        }
+
+        $json_object = $vetting['Vetting'];
+        $this->set('output', $json_object);
+        $this->set('_serialize', 'output');
+    }
+
 }
