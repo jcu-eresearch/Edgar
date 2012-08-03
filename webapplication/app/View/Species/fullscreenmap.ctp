@@ -130,10 +130,16 @@
                 <p>RCP2.6: emissions reduce substantially.</p>
             </label>
 
-            <div class="sliderbox">
-                <span id="year_label"></span>
-                <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
-                <div id="year_slider"></div>
+            <div class="loading_container" style="display: none;">
+                Loading projection maps...
+                <div class="loading_bar"></div>
+            </div>
+            <div class="options_container">
+                <div class="sliderbox">
+                    <span id="year_label"></span>
+                    <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
+                    <div id="year_slider"></div>
+                </div>
             </div>
         </div>
     </div>

@@ -20,9 +20,12 @@ $(function() {
     // set up the emission selecting stuff
     //
     Edgar.yearSlider = new Edgar.YearSlider({
+        containerElem: '#tool_future .options_container',
+        loadingContainerElem: '#tool_future .loading_container',
         sliderElem: '#year_slider',
         scenarioElemName: 'scenario',
         map: Edgar.map,
+        loadingBar: '#tool_future .loading_bar',
         yearLabelElem: '#year_label'
     });
 

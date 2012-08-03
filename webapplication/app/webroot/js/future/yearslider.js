@@ -4,12 +4,16 @@
     Edgar.YearSlider = function(options) {
         //options
         options = $.extend({
-            sliderElem: null,       // REQUIRED: empty div that will be converted into a slider
-            scenarioElemName: null, // REQUIRED: name of <radio> elements for selecting an emission scenario
-            map: null,              // REQUIRED: the open layers map object
-            yearLabelElem: null,    // Will change the inner text of this elem when the year changes
+            containerElem: null,        // REQUIRED: the element that contains all the options
+            loadingContainerElem: null, // REQUIRED: a sibling element to containerElem that contains a loading screen
+            sliderElem: null,           // REQUIRED: empty div that will be converted into a slider
+            scenarioElemName: null,     // REQUIRED: name of <radio> elements for selecting an emission scenario
+            map: null,                  // REQUIRED: the open layers map object
+            loadingBar: null,           // Will turn this empty div into a progress bar for loading
+            yearLabelElem: null,        // Will change the inner text of this elem when the year changes
             defaultYear: 2015,
         }, options);
+
 
         this.MIN_YEAR = 2015;
         this.MAX_YEAR = 2085;
@@ -19,8 +23,11 @@
         this._layersByYear = {};
         this._map = options.map;
         this._speciesId = null;
+        this._$container = $(options.containerElem);
+        this._$loadingContainer = $(options.loadingContainerElem);
         this._$slider = $(options.sliderElem);
         this._$scenarios = $('input[name=' + options.scenarioElemName + ']');
+        this._$loadingBar = (options.loadingBar === null ? null : $(options.loadingBar));
         this._$yearLabel = (options.yearLabelElem === null ? null : $(options.yearLabelElem));
         var self = this;
 
@@ -39,6 +46,9 @@
                     self.setYear(ui.value);
                 }
             });
+
+            //init loading bar
+            if(self._$loadingBar) self._$loadingBar.progressbar({value:0});
 
             //init year label
             if(self._$yearLabel) self._$yearLabel.text(''+self._year);
@@ -107,15 +117,10 @@
         }
 
         this._reloadLayers = function(){
-            //remove all layers
-            var self = this;
-            $.each(this._layersByYear, function(year, layer){
-                self._map.removeLayer(layer);
-            });
-            this._layersByYear = {};
+            this._removeAllLayers();
 
-            //readd layers if enabled
             if(this._speciesId){
+                this._beginLoading();
                 this._addLayerForYear(2015);
                 this._addLayerForYear(2025);
                 this._addLayerForYear(2035);
@@ -123,7 +128,6 @@
                 this._addLayerForYear(2055);
                 this._addLayerForYear(2065);
                 this._addLayerForYear(2075);
-                this._setLayerOpacities();
             }
         }
 
@@ -146,15 +150,63 @@
                     transitionEffect: 'resize',
                     displayInLayerSwitcher: false,
                     singleTile: true,
-                    ratio: 1.5
+                    ratio: 1.5,
                 }
             );
+
+            layer.events.register('loadend', this, this._layerDidLoad);
+            layer.setOpacity(0);
+
             this._layersByYear[year] = layer;
             this._map.addLayer(layer);
         }
 
-        this._setLayerOpacities = function(){
+        this._removeAllLayers = function(){
+            var self = this;
+            $.each(this._layersByYear, function(year, layer){
+                layer.events.unregister('loadend', self, self._layerDidLoad);
+                self._map.removeLayer(layer);
+            });
+            this._layersByYear = {};
+        }
 
+        this._layerDidLoad = function(event){
+            var numLoaded = 0;
+            var numTotal = 0;
+            $.each(this._layersByYear, function(year, layer){
+                numTotal += 1;
+                if(layer.numLoadingTiles == 0) numLoaded += 1;
+            });
+
+            this._updateLoading(numLoaded/numTotal);
+
+            if(numLoaded == numTotal)
+                this._endLoading();
+        }
+
+        this._beginLoading = function(){
+            this._updateLoading(0.05);
+
+            var self = this;
+            this._$container.stop().slideUp('fast', function(){
+                self._$loadingContainer.stop().slideDown('fast');
+            });
+        }
+
+        this._updateLoading = function(percentDone){
+            this._$loadingBar.progressbar('value', percentDone*100);
+        }
+
+        this._endLoading = function(){
+            this._setLayerOpacities();
+
+            var self = this;
+            this._$loadingContainer.stop().slideUp('fast', function(){
+                self._$container.stop().slideDown('fast');
+            });
+        }
+
+        this._setLayerOpacities = function(){
             if(!this._speciesId) return;
 
             var currentYear = this._year;
@@ -193,7 +245,7 @@
             }
             // finally, update the year indicator
             var $thumb = this._$slider.slider("widget").find('a');
-            
+
             var left = $thumb.position().left + this._$slider.position().left - ($thumb.width() / 2) - this._$yearLabel.width();
             this._$yearLabel.css('left', left + "px");
         }
