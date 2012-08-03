@@ -51,7 +51,11 @@
             if(self._$loadingBar) self._$loadingBar.progressbar({value:0});
 
             //init year label
-            if(self._$yearLabel) self._$yearLabel.text(''+self._year);
+            if(self._$yearLabel) {
+                var year = self._year;
+                self._year = undefined;
+                self.setYear(year);
+            }
 
             //init scenarios
             self._$scenarios.change(function(){
@@ -72,7 +76,14 @@
                 //TODO: change site logo to cyborg raven
             }
 
-            if(this._$yearLabel) this._$yearLabel.text(''+this._year);
+            if(this._$yearLabel){
+                this._$yearLabel.text(''+this._year);
+
+                var $thumb = this._$slider.slider("widget").find('a');
+                var left = $thumb.position().left + this._$slider.position().left - ($thumb.width() / 2) - this._$yearLabel.width();
+                this._$yearLabel.css('left', left + "px");
+            }
+
             this._setLayerOpacities();
         }
 
@@ -199,6 +210,7 @@
 
         this._endLoading = function(){
             this._setLayerOpacities();
+            this.setYear(options.defaultYear);
 
             var self = this;
             this._$loadingContainer.stop().slideUp('fast', function(){
@@ -243,11 +255,6 @@
                     layer.setOpacity(opacity);
                 });
             }
-            // finally, update the year indicator
-            var $thumb = this._$slider.slider("widget").find('a');
-
-            var left = $thumb.position().left + this._$slider.position().left - ($thumb.width() / 2) - this._$yearLabel.width();
-            this._$yearLabel.css('left', left + "px");
         }
     };
 
