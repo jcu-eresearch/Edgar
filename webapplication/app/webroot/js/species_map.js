@@ -250,8 +250,6 @@ function addOccurrencesLayer() {
 
         var cluster_size_render_styles = {
             'large': {
-//                'fontWeight': 'medium',
-//                'fontSize': '12px',
                 'fontWeight': 'bold',
                 'fillOpacity': 0.5,
                 'fontSize': '13px'
@@ -635,7 +633,8 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
 //    layerSwitcher.maximizeControl();
 
     // Add our layers
-    Edgar.map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
+//    Edgar.map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
+    Edgar.map.addLayers([ghyb, gphy]);
     Edgar.map.setBaseLayer(gphy);
 
     // Zoom the map to the zoom_bounds specified earlier
