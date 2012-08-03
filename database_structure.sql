@@ -158,6 +158,7 @@ CREATE TABLE vettings (
     created          TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was created
     modified         TIMESTAMP NOT NULL DEFAULT now(),     -- The time the vetting was modified
     deleted          TIMESTAMP DEFAULT NULL NULL,          -- The time the vetting was deleted (NULL if not deleted)
+    ignored          TIMESTAMP DEFAULT NULL NULL,          -- The time the vetting was ignored (NULL if not ignored)
     last_ala_sync    TIMESTAMP DEFAULT NULL NULL           -- The time the vetting was last synced with ALA (NULL if never sync'd)
 );
 SELECT AddGeometryColumn('vettings', 'area', 4326, 'MULTIPOLYGON', 2);
