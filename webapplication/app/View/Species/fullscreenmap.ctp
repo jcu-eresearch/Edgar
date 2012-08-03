@@ -153,7 +153,7 @@
 
                 <div class="leftcol">
                     <div class="classification" title="invalid: record is an error">
-                        <h2><span class="dot" style="background: #666"></span>invalid</h2>
+                        <h2><span class="dot" style="background: #333"></span>invalid</h2>
                     </div>
                     <div class="classification" title="historic: observation in the past that does not represent modern presence of species">
                         <h2><span class="dot" style="background: #972"></span>historic</h2>
@@ -162,7 +162,7 @@
                         <h2><span class="dot" style="background: #f70"></span>vagrant</h2>
                     </div>
                     <div class="classification" title="irruptive: observation is in an irruptive range and does not represent continued presence of species">
-                        <h2><span class="dot" style="background: #f35"></span>irruptive</h2>
+                        <h2><span class="dot" style="background: #f6a"></span>irruptive</h2>
                     </div>
                 </div>
 

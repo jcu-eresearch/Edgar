@@ -27,7 +27,7 @@ class Vetting extends AppModel {
                 $font_color   = $stroke_color;
                 break;
             case "invalid":
-                $fill_color   = "#666666";
+                $fill_color   = "#333333";
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
@@ -42,7 +42,7 @@ class Vetting extends AppModel {
                 $font_color   = $stroke_color;
                 break;
             case "irruptive":
-                $fill_color   = "#ff3355";
+                $fill_color   = "#ff66aa";
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;

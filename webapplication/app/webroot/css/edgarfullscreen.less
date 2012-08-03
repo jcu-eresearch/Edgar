@@ -800,7 +800,7 @@ ul.vetting_list li .classification {
 }
 
 .olFramedCloudPopupContent thead tr, .olFramedCloudPopupContent tbody {
-    display: block;
+    xdisplay: block;
 }
 
 .olFramedCloudPopupContent thead tr {
@@ -816,7 +816,7 @@ ul.vetting_list li .classification {
 
 .olFramedCloudPopupContent tbody {
     overflow: auto;
-    height: 12em;
+    max-height: 12em;
 }
 
 .olFramedCloudPopupContent dd {
@@ -825,6 +825,8 @@ ul.vetting_list li .classification {
      margin: 0;
      padding: 0;
 }
+
+table.classifications { width: 90%; }
 
 table.classifications tr td {
     padding: 0.5em;
