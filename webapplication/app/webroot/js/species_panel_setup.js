@@ -33,7 +33,7 @@ $(function() {
     $('#button_remodel').click(function() {
         $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.mapdata.species.id });
         $(this).fadeOut('fast', function() {
-            Edgar.mapdata.species.remodelStatus = "Remodelling running";
+            Edgar.mapdata.species.remodelStatus = "Priority queued";
             updateSpeciesStatus(Edgar.mapdata.species);
         });
     });

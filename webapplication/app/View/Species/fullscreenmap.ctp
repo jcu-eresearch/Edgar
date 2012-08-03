@@ -153,7 +153,7 @@
 
                 <div class="leftcol">
                     <div class="classification" title="invalid: record is an error">
-                        <h2><span class="dot" style="background: #333"></span>invalid</h2>
+                        <h2><span class="dot" style="background: #000"></span>invalid</h2>
                     </div>
                     <div class="classification" title="historic: observation in the past that does not represent modern presence of species">
                         <h2><span class="dot" style="background: #972"></span>historic</h2>
