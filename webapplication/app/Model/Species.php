@@ -79,9 +79,11 @@ class Species extends AppModel {
         } else {
             $sql = $sql .
             "SELECT ".
-              "round(CAST (ST_X(location) as numeric) * ?, 0) / ? as longitude, ".
-              "round(CAST (ST_Y(location) as numeric) * ?, 0) / ? as latitude, ";
+              "( floor(CAST (ST_X(location) as numeric) * ?) / ? ) + (1.0 / ( 2.0 * ? ) ) as longitude, ".
+              "( floor(CAST (ST_Y(location) as numeric) * ?) / ? ) + (1.0 / ( 2.0 * ? ) ) as latitude, ";
 
+            $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
+            $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
             $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
             $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
             $query_args[] = $lat_lng_round_to_nearest_nth_fraction;
