@@ -126,8 +126,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
                     "<dt>Longitude</dt><dd>$longitude</dd>";
         } else {
           $properties_array['description'] .=
-                    "<dt>Latitude Range</dt><dd>".$min_latitude_range." - ".$max_latitude_range."</dd>".
-                    "<dt>Longitude Range</dt><dd>".$min_longitude_range." - ".$max_longitude_range."</dd>";
+                    "<dt>Latitude Range</dt><dd>".$min_latitude_range.", ".$max_latitude_range."</dd>".
+                    "<dt>Longitude Range</dt><dd>".$min_longitude_range.", ".$max_longitude_range."</dd>";
         }
 
         $properties_array['description'] .=
