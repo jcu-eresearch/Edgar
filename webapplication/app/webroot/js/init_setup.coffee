@@ -53,12 +53,16 @@ Edgar.util.pluralise = (count, noun, plural) ->
 Edgar.util.showhide = (showlist, hidelist) ->
 	$.each(hidelist,
 		(i, itemid) ->
-			$('#' + itemid).hide('blind','fast')
+			$item = $('#' + itemid)
+			if $item.css('display') != 'none' # apparently in Chrome .is(':visible') doesn't always return true when it should
+				$item.hide('blind','fast')
 	)
 
 	$.each(showlist,
 		(i, itemid) ->
-			$('#' + itemid).show('blind','fast')
+			$item = $('#' + itemid)
+			if $item.is(":visible") == false
+				$item.show('blind','fast')
 	)
 
 # return a map path for a climate suitability map, given a species, year, and

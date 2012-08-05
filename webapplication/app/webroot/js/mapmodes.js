@@ -100,7 +100,7 @@ function addMapModes(theMap) {
                 // special handling for blank-to-blank, the startup mode switch
                 Edgar.util.showhide(
                     ['tool_layers', 'tool_debug', 'tool_layers','tip_no_species'],
-                    ['oldvets','myvets','newvet','tool_legend','tool_future','button_current','button_future','button_vetting']
+                    ['oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_future','button_current','button_future','button_vetting']
                 );
 
             } else if (newMode == 'current') {
@@ -140,14 +140,14 @@ function addMapModes(theMap) {
             // so here we can call _setupNewSpecies to actually switch to the
             // newly selected species.
             _setupNewSpecies();
-            Edgar.util.showhide(['tool_legend','currentspecies'],['speciesselector']);
+            Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend','currentspecies'],['speciesselector']);
             engageCurrentMode();
         }
 
         if (oldMode === 'current' && newMode === 'future' ) {
             disengageCurrentMode();
             // show & hide the appropriate tools
-            Edgar.util.showhide(['tool_legend','tool_future'], []);
+            Edgar.util.showhide(['tool_legend','tool_future'], ['tool_classlegend']);
             // switch off the current layers
             clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             engageFutureMode();
@@ -162,14 +162,16 @@ function addMapModes(theMap) {
 
         if (oldMode === 'future'  && newMode === 'current') {
             disengageFutureMode();
-            Edgar.util.showhide(['tool_legend'], ['tool_future']);
+            Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend'], ['tool_future','speciesselector']);
+            _setupNewSpecies();
             addSpeciesOccurrencesAndSuitabilityLayers();
             engageCurrentMode();
         }
 
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
-            Edgar.util.showhide(['tool_legend'], ['oldvets','newvet','myvets']);
+            _setupNewSpecies();
+            Edgar.util.showhide(['currentspecies','tool_legend'], ['oldvets','newvet','myvets','speciesselector']);
             engageCurrentMode();
         }
 

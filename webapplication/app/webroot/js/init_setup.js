@@ -76,10 +76,18 @@ the global Edgar object
 
   Edgar.util.showhide = function(showlist, hidelist) {
     $.each(hidelist, function(i, itemid) {
-      return $('#' + itemid).hide('blind', 'fast');
+      var $item;
+      $item = $('#' + itemid);
+      if ($item.css('display') !== 'none') {
+        return $item.hide('blind', 'fast');
+      }
     });
     return $.each(showlist, function(i, itemid) {
-      return $('#' + itemid).show('blind', 'fast');
+      var $item;
+      $item = $('#' + itemid);
+      if ($item.is(":visible") === false) {
+        return $item.show('blind', 'fast');
+      }
     });
   };
 

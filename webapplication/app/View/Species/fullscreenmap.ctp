@@ -145,12 +145,9 @@
     </div>
 
     <div class="tool classlegend" id="tool_classlegend">
-        <h1>occurrences legend</h1>
+        <h1>classification legend</h1>
         <div class="toolcontent">
             <div class="classlist clearfix">
-
-                <p>Colour shows classifications:</p>
-
                 <div class="leftcol">
                     <div class="classification" title="invalid: record is an error">
                         <h2><span class="dot" style="background: #000"></span>invalid</h2>
@@ -185,7 +182,7 @@
 
 
             <div class="classnesting clearfix">
-                <p>Two classifications can be shown:</p>
+                <p>Clusters show up to two classes:</p>
                 <div class="classification" title="outer colour is the most common classification, inner colour the second most common">
                     <h2><span class="circle" style="background: #f70; border-color: #02f"></span>many breeding, some vagrant</h2>
                 </div>
