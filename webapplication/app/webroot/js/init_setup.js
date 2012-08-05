@@ -85,9 +85,7 @@ the global Edgar object
     return $.each(showlist, function(i, itemid) {
       var $item;
       $item = $('#' + itemid);
-      if ($item.css('display') === 'none' || $item.is(":visible") === false) {
-        return $item.show('blind', 'fast');
-      }
+      return $item.show('blind', 'fast');
     });
   };
 

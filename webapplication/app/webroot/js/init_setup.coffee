@@ -61,8 +61,8 @@ Edgar.util.showhide = (showlist, hidelist) ->
 	$.each(showlist,
 		(i, itemid) ->
 			$item = $('#' + itemid)
-			if $item.css('display') == 'none' or $item.is(":visible") == false
-				$item.show('blind','fast')
+#			if $item.css('display') == 'none' or $item.is(":visible") == false
+			$item.show('blind','fast')
 	)
 
 # return a map path for a climate suitability map, given a species, year, and
