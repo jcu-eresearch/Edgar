@@ -13,7 +13,7 @@ class GeolocationsBehavior extends ModelBehavior {
 
     // Draw a vetting bbox with a lat and lng of at least +/- this many degrees from
     // the occurrence.
-    const MIN_VETTING_LAT_LNG_RANGE = 0.00001;
+    const MIN_VETTING_LAT_LNG_RANGE = 0.0001;
 
     /**
      * Store the settings for this model.
