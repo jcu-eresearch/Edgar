@@ -195,7 +195,7 @@
         geom = feature.geometry;
         geomBounds = geom.getBounds();
         _this.vectorLayer.removeFeatures([feature]);
-        occurrencesLayer = window.Edgar.occurrences.vectorLayer;
+        occurrencesLayer = window.Edgar.mapdata.layers.occurrences;
         occurrenceClusterFeatures = occurrencesLayer.features;
         featuresWithinBounds = [];
         addPolygonIfWithinBounds = function(clusterFeature, bounds, arrayToAppendTo) {
