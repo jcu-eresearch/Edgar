@@ -91,6 +91,18 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
 
         $properties_array = array();
 
+        if ( is_null($round_to_nearest_nth_fraction) ) {
+          $properties_array['min_latitude_range']  = $latitude  - GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+          $properties_array['max_latitude_range']  = $latitude  + GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+          $properties_array['min_longitude_range'] = $longitude - GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+          $properties_array['max_longitude_range'] = $longitude + GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+        } else {
+          $properties_array['min_latitude_range']  = $latitude  - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+          $properties_array['max_latitude_range']  = $latitude  + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+          $properties_array['min_longitude_range'] = $longitude - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+          $properties_array['max_longitude_range'] = $longitude + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+        }
+
         // Use the vetting classification's fill color to represent the classification
         $properties_array['stroke_color'] = $major_classification_properties['fill_color'];
         $properties_array['fill_color']   = $minor_classification_properties['fill_color'];

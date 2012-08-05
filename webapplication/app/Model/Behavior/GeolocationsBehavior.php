@@ -11,6 +11,10 @@ class GeolocationsBehavior extends ModelBehavior {
     const CLUSTERED_FEATURE_RADIUS       = 8;     // pixels
     const MIN_FEATURE_RADIUS = 3;                 // pixels
 
+    // Draw a vetting bbox with a lat and lng of at least +/- this many degrees from
+    // the occurrence.
+    const MIN_VETTING_LAT_LNG_RANGE = 0.00001;
+
     /**
      * Store the settings for this model.
      */
