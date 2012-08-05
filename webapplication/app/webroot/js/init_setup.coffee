@@ -37,11 +37,11 @@ logged in user?  This is set in fullscreencontent.ctp if there's a logged in use
 ###
 Edgar.user = Edgar.user || null
 
+Edgar.util = Edgar.util || {}
+
 ###
 humanise where possible
 ###
-Edgar.util = Edgar.util || {}
-
 Edgar.util.pluralise = (count, noun, plural) ->
     if count == 1
         count + " " + noun
@@ -61,7 +61,7 @@ Edgar.util.showhide = (showlist, hidelist) ->
 	$.each(showlist,
 		(i, itemid) ->
 			$item = $('#' + itemid)
-			if $item.is(":visible") == false
+			if $item.css('display') == 'none' or $item.is(":visible") == false
 				$item.show('blind','fast')
 	)
 

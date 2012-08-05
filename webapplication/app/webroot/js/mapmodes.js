@@ -140,7 +140,7 @@ function addMapModes(theMap) {
             // so here we can call _setupNewSpecies to actually switch to the
             // newly selected species.
             _setupNewSpecies();
-            Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend','currentspecies'],['speciesselector']);
+            Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend','button_future'],['speciesselector']);
             engageCurrentMode();
         }
 
