@@ -354,10 +354,10 @@ class SpeciesController extends AppController {
         $results = $this->Species->getDataSource()->execute(
             'SELECT * FROM species '.
             'WHERE (? % scientific_name) OR (? % common_name) '.
-            'ORDER BY common_name DESC '.
+            'ORDER BY GREATEST(SIMILARITY(?, scientific_name), SIMILARITY(?, common_name)) DESC '.
             'LIMIT 20',
             array(),
-            array($partial, $partial)
+            array($partial, $partial, $partial, $partial)
         );
 
         // convert $matched_species into json format expected by jquery ui
