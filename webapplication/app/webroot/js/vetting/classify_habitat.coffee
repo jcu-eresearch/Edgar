@@ -25,6 +25,7 @@ Edgar.vetting.classifyHabitat = {
             #   test.
             # 'geometryType': OpenLayers.Geometry.Polygon
             ###
+            displayInLayerSwitcher: false
         }
 
         # Listen for button clicks

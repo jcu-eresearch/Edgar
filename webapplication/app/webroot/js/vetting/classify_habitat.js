@@ -29,6 +29,7 @@
                     # 'geometryType': OpenLayers.Geometry.Polygon
         */
 
+        displayInLayerSwitcher: false
       };
       this._addButtonHandlers();
       consolelog("Finished init-ing the classify habitat interface");
