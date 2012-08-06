@@ -1,33 +1,35 @@
 <?php
 
 function get_features_dotgrid_detail(Model $Model, $bounds) {
+
+    // the earlier listed classes here trump the later ones when deciding colour
+    $trumps = [
+        'unknown',
+        'core',
+        'other',
+
+        "vagrant",
+        "irruptive",
+
+        "breeding", 
+        "non breeding",
+        "introduced breeding",
+        "introduced non breeding",
+
+        "historic",
+
+        'invalid'
+    ];
+
+
     $location_features = array();
 
     $lat_range = $bounds['max_latitude']  - $bounds['min_latitude'];
     $lng_range = $bounds['max_longitude'] - $bounds['min_longitude'];
 
     $lat_lng_range_avg = ( array_sum( array($lat_range, $lng_range) ) / 2 );
-/*
-    // Range to decimal place conversions
-    $round_to_nearest_nth_fraction = 1;
-    if ($lat_lng_range_avg > 200) {
-        $round_to_nearest_nth_fraction = 0.25;
-    } elseif ($lat_lng_range_avg > 100) {
-        $round_to_nearest_nth_fraction = 0.5;
-    } elseif ($lat_lng_range_avg > 50) {
-        $round_to_nearest_nth_fraction = 1;
-    } elseif ($lat_lng_range_avg > 25) {
-        $round_to_nearest_nth_fraction = 2;
-    } elseif ($lat_lng_range_avg > 10) {
-        $round_to_nearest_nth_fraction = 4;
-    } elseif ($lat_lng_range_avg > 5) {
-        $round_to_nearest_nth_fraction = 8;
-    } elseif ($lat_lng_range_avg > 2) {
-        $round_to_nearest_nth_fraction = 16;
-    } else {
-        $round_to_nearest_nth_fraction = null;
-    }
-*/
+
+
     $griddiness = 3.2; // lower number, bigger grid squares
 
     // Range to decimal place conversions
@@ -64,7 +66,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
         $count = $location['total_occurrences'];
 
-        $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.5 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
+        $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.4 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
         $unsorted_contentious_classification_count_array = array(
             "unknown" => $location["contentious_unknown_count"],
@@ -98,28 +100,24 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
         $major_classification_count = null;
         $minor_classification_count = null;
 
-        $class_keys = array_keys($classification_count_array);
-        $class_counts = array_values($classification_count_array);
-
-        $major_classification = $class_keys[0];
-        $major_classification_count = $class_counts[0];
-        if ($class_counts[1] > 0) {
-            $minor_classification = $class_keys[1];
-            $minor_classification_count = $class_counts[1];
-        } else {
-            $minor_classification = $major_classification;
+        // find the first trump with a positive count
+        foreach($trumps as $trump) {
+            $count = $location[$trump . "_count"];
+            if ($count > 0) {
+                $major_classification = $trump;
+                $major_classification_count = $count;
+            }
         }
 
         $major_classification_properties = Vetting::getPropertiesJSONObject($major_classification);
-        $minor_classification_properties = Vetting::getPropertiesJSONObject($minor_classification);
 
         $properties_array = array();
 
         // Use the vetting classification's fill color to represent the classification
         $properties_array['stroke_color'] = $major_classification_properties['fill_color'];
-        $properties_array['fill_color']   = $minor_classification_properties['fill_color'];
+        $properties_array['fill_color']   = $major_classification_properties['fill_color'];
         $properties_array['title'] = '';
-        $properties_array['occurrence_type'] = 'dotgriddetail';
+        $properties_array['occurrence_type'] = 'dotgridtrump';
         $properties_array['description'] = "".
                     "<dl>".
                     "<dt>Latitude</dt><dd>$latitude</dd>".
