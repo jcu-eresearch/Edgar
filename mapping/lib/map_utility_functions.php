@@ -66,6 +66,15 @@ function mu_addStyleClasses($layer, $threshold = "0", $colors = null)
         'END'
     );
 
+    $layer->updateFromString(''.
+        'CLASSITEM "THRESHOLDSPACER" '.
+            'CLASS '.
+                'NAME " " '.
+                'EXPRESSION (1<0) ' .
+            'END '.
+        'END'
+    );
+
     foreach ($ranges as $section) {
         $layer->updateFromString(''.
             'CLASSITEM "[pixel]" '.
