@@ -90,6 +90,7 @@
       console.log("disengageVettingMode");
       Edgar.util.showhide([], ['button_current']);
       Edgar.vetting.myHabitatClassifications.disengage();
+      Edgar.vetting.classifyHabitat.disengage();
       return null;
     }
   };

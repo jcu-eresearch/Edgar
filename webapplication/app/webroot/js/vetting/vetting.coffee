@@ -86,6 +86,7 @@ Edgar.vetting = {
         Edgar.util.showhide([],['button_current'])
         Edgar.vetting.myHabitatClassifications.disengage()
 #        Edgar.vetting.theirHabitatClassifications.disengage()
+        Edgar.vetting.classifyHabitat.disengage()
 
         null
 
