@@ -99,7 +99,7 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
 
         // find the first trump with a positive count
         foreach($trumps as $trump) {
-            if (in_array($trump, $classification_count_array)) {
+            if (array_key_exists($trump, $classification_count_array)) {
                 $count = $classification_count_array[$trump];
                 if ($count > 0) {
                     $major_classification = $trump;
