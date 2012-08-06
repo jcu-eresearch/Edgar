@@ -115,15 +115,46 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
 
         $properties_array = array();
 
+        $min_latitude_range  = 0;
+        $max_latitude_range  = 0;
+        $min_longitude_range = 0;
+        $max_longitude_range = 0;
+
+        if ( is_null($round_to_nearest_nth_fraction) ) {
+          $min_latitude_range  = $latitude  - GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+          $max_latitude_range  = $latitude  + GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+          $min_longitude_range = $longitude - GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+          $max_longitude_range = $longitude + GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
+        } else {
+          $min_latitude_range  = $latitude  - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+          $max_latitude_range  = $latitude  + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+          $min_longitude_range = $longitude - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+          $max_longitude_range = $longitude + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
+        }
+        $properties_array['min_latitude_range']  = $min_latitude_range;
+        $properties_array['max_latitude_range']  = $max_latitude_range;
+        $properties_array['min_longitude_range'] = $min_longitude_range;
+        $properties_array['max_longitude_range'] = $max_longitude_range;
+
         // Use the vetting classification's fill color to represent the classification
         $properties_array['stroke_color'] = $major_classification_properties['fill_color'];
         $properties_array['fill_color']   = $minor_classification_properties['fill_color'];
         $properties_array['title'] = '';
         $properties_array['occurrence_type'] = 'dotgriddetail';
         $properties_array['description'] = "".
-                    "<dl>".
+                    "<dl>";
+
+        if ( is_null($round_to_nearest_nth_fraction) ) {
+          $properties_array['description'] .=
                     "<dt>Latitude</dt><dd>$latitude</dd>".
-                    "<dt>Longitude</dt><dd>$longitude</dd>".
+                    "<dt>Longitude</dt><dd>$longitude</dd>";
+        } else {
+          $properties_array['description'] .=
+                    "<dt>Latitude Range</dt><dd>".$min_latitude_range.", ".$max_latitude_range."</dd>".
+                    "<dt>Longitude Range</dt><dd>".$min_longitude_range.", ".$max_longitude_range."</dd>";
+        }
+
+        $properties_array['description'] .=
                     "</dl>".
                     "<div class='table_wrapper'><table class='classifications'>".
                     "<thead><tr><th>Classification</th><th>Observations</th></tr></thead><tbody>";
