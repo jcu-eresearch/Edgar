@@ -1,6 +1,6 @@
 <?php
 
-function get_features_dotgrid_trump(Model $Model, $bounds) {
+function get_features_dotgrid_trump(Model $Model, $bounds, $simple = false) {
 
     // the earlier listed classes here trump the later ones when deciding colour
     $trumps = array(
@@ -91,6 +91,42 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
             "breeding" => $location["breeding_count"],
             "introduced breeding" => $location["introduced_breeding_count"]
         );
+
+        if ($simple) {
+            $unsorted_contentious_classification_count_array = array(
+                "unknown" => $location["contentious_unknown_count"],
+                "invalid" => $location["contentious_invalid_count"],
+                "other" => (
+                    $location["contentious_historic_count"]
+                    + $location["contentious_vagrant_count"]
+                    + $location["contentious_irruptive_count"]
+                ),
+                "core" => (
+                    $location["contentious_non_breeding_count"]
+                    + $location["contentious_introduced_non_breeding_count"]
+                    + $location["contentious_breeding_count"]
+                    + $location["contentious_introduced_breeding_count"]
+                )
+            );
+
+            $classification_count_array = array(
+                "unknown" => $location["unknown_count"],
+                "invalid" => $location["invalid_count"],
+                "other" => (
+                    $location["historic_count"]
+                    + $location["vagrant_count"]
+                    + $location["irruptive_count"]
+                ),
+                "core" => (
+                    $location["non_breeding_count"]
+                    + $location["introduced_non_breeding_count"]
+                    + $location["breeding_count"]
+                    + $location["introduced_breeding_count"]
+                ),
+            );
+
+        }
+
         $unsorted_classification_count_array  = $classification_count_array;
         arsort($classification_count_array);
 

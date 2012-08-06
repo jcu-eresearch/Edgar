@@ -59,6 +59,10 @@ class GeolocationsBehavior extends ModelBehavior {
             // use dotgrid clustering
             $location_features = get_features_dotgrid_trump($Model, $bounds);
 
+        } elseif ( $cluster_type == "dotgridsimple" ) {
+            // use dotgrid clustering
+            $location_features = get_features_dotgrid_trump($Model, $bounds, true);
+
         } elseif ( $cluster_type == "squaregrid" ) {
             // use dotgrid clustering
             $location_features = get_features_squaregrid($Model, $bounds);
