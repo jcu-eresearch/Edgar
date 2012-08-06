@@ -78,12 +78,12 @@
         <h1>new vetting</h1>
         <div class="toolcontent">
             <div id="newvet_control" class="newvet_control">
-                <button id="newvet_draw_polygon_button" class="ui-state-default ui-corner-all toggle draw_polygon" title="draw vetting polygons"><span class="ui-icon ui-icon-pencil"></span>Draw New Area</button>
-                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button>
-                <button id="newvet_add_polygon_by_occurrences_button" class="ui-state-default ui-corner-all non_toggle add_polygon_by_occurrences" title="add area around occurrence clusters"><span class="ui-icon ui-icon-arrow-2-se-nw"></span>Add Areas Around Clusters</button>
-                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-arrow-4"></span>Modify An Area</button>
-                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button>
-<!--                <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="delete all areas"><span class="ui-icon ui-icon-trash"></span>Delete All Areas</button> -->
+<!--                <button id="newvet_draw_polygon_button" class="ui-state-default ui-corner-all toggle draw_polygon" title="draw vetting polygons"><span class="ui-icon ui-icon-pencil"></span>Draw New Area</button> -->
+<!--                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button> -->
+                <button id="newvet_add_polygon_by_occurrences_button" class="ui-state-default ui-corner-all non_toggle add_polygon_by_occurrences" title="add area around occurrence clusters"><span class="ui-icon ui-icon-arrow-2-se-nw"></span>Select Occurrences</button>
+<!--                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-arrow-4"></span>Modify An Area</button> -->
+<!--                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button> -->
+                <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="clear vetting"><span class="ui-icon ui-icon-trash"></span>Clear Vetting</button>
             </div>
             <!-- new vet form -->
             <form id="vetform">
@@ -103,7 +103,7 @@
                     <textarea id="vetcomment" name="comment"></textarea>
                 </legend>
             </form>
-            <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this vetting</button>
+            <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this Vetting</button>
 
             <div id="vethint" class="hint"></div>
         </div>
