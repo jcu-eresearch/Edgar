@@ -38,7 +38,6 @@ class GeolocationsBehavior extends ModelBehavior {
         include 'clustering/dotradius.php';
         include 'clustering/dotgrid.php';
         include 'clustering/dotgriddetail.php';
-        include 'clustering/dotgridtrump.php';
         include 'clustering/squaregrid.php';
 
         $location_features = array();
