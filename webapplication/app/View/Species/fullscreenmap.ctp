@@ -180,7 +180,7 @@
 
             </div>
 
-
+<!--
             <div class="classnesting clearfix">
                 <p>Clusters show up to two classes:</p>
                 <div class="classification" title="outer colour is the most common classification, inner colour the second most common">
@@ -188,6 +188,7 @@
                 </div>
 
             </div>
+-->
         </div>
     </div>
 
