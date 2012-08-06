@@ -12,9 +12,9 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
         "irruptive",
 
         "breeding", 
-        "non_breeding",
-        "introduced_breeding",
-        "introduced_non_breeding",
+        "non-breeding",
+        "introduced breeding",
+        "introduced non-breeding",
 
         "historic",
 
@@ -30,7 +30,7 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
     $lat_lng_range_avg = ( array_sum( array($lat_range, $lng_range) ) / 2 );
 
 
-    $griddiness = 3.2; // lower number, bigger grid squares
+    $griddiness = 3.4; // lower number, bigger grid squares
 
     // Range to decimal place conversions
     $round_to_nearest_nth_fraction = 1;
@@ -74,8 +74,8 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
             "historic" => $location["contentious_historic_count"],
             "vagrant" => $location["contentious_vagrant_count"],
             "irruptive" => $location["contentious_irruptive_count"],
-            "non breeding" => $location["contentious_non_breeding_count"],
-            "introduced non breeding" => $location["contentious_introduced_non_breeding_count"],
+            "non-breeding" => $location["contentious_non_breeding_count"],
+            "introduced non-breeding" => $location["contentious_introduced_non_breeding_count"],
             "breeding" => $location["contentious_breeding_count"],
             "introduced breeding" => $location["contentious_introduced_breeding_count"]
         );
@@ -86,8 +86,8 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
             "historic" => $location["historic_count"],
             "vagrant" => $location["vagrant_count"],
             "irruptive" => $location["irruptive_count"],
-            "non breeding" => $location["non_breeding_count"],
-            "introduced non breeding" => $location["introduced_non_breeding_count"],
+            "non-breeding" => $location["non_breeding_count"],
+            "introduced non-breeding" => $location["introduced_non_breeding_count"],
             "breeding" => $location["breeding_count"],
             "introduced breeding" => $location["introduced_breeding_count"]
         );
@@ -99,7 +99,7 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
 
         // find the first trump with a positive count
         foreach($trumps as $trump) {
-            $count = $location[$trump . "_count"];
+            $count = $classification_count_array[$trump];
             if ($count > 0) {
                 $major_classification = $trump;
                 $major_classification_count = $count;
