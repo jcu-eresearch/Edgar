@@ -99,11 +99,13 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
 
         // find the first trump with a positive count
         foreach($trumps as $trump) {
-            $count = $classification_count_array[$trump];
-            if ($count > 0) {
-                $major_classification = $trump;
-                $major_classification_count = $count;
-                break; // bail once the current trump is found
+            if (in_array($trump, $classification_count_array)) {
+                $count = $classification_count_array[$trump];
+                if ($count > 0) {
+                    $major_classification = $trump;
+                    $major_classification_count = $count;
+                    break; // bail once the current trump is found
+                }
             }
         }
 
