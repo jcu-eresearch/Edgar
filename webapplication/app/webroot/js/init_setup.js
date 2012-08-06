@@ -57,12 +57,12 @@ the global Edgar object
 
   Edgar.user = Edgar.user || null;
 
+  Edgar.util = Edgar.util || {};
+
   /*
   humanise where possible
   */
 
-
-  Edgar.util = Edgar.util || {};
 
   Edgar.util.pluralise = function(count, noun, plural) {
     if (count === 1) {
@@ -76,10 +76,16 @@ the global Edgar object
 
   Edgar.util.showhide = function(showlist, hidelist) {
     $.each(hidelist, function(i, itemid) {
-      return $('#' + itemid).hide('blind', 'fast');
+      var $item;
+      $item = $('#' + itemid);
+      if ($item.css('display') !== 'none') {
+        return $item.hide('blind', 'fast');
+      }
     });
     return $.each(showlist, function(i, itemid) {
-      return $('#' + itemid).show('blind', 'fast');
+      var $item;
+      $item = $('#' + itemid);
+      return $item.show('blind', 'fast');
     });
   };
 

@@ -37,11 +37,11 @@ logged in user?  This is set in fullscreencontent.ctp if there's a logged in use
 ###
 Edgar.user = Edgar.user || null
 
+Edgar.util = Edgar.util || {}
+
 ###
 humanise where possible
 ###
-Edgar.util = Edgar.util || {}
-
 Edgar.util.pluralise = (count, noun, plural) ->
     if count == 1
         count + " " + noun
@@ -53,12 +53,16 @@ Edgar.util.pluralise = (count, noun, plural) ->
 Edgar.util.showhide = (showlist, hidelist) ->
 	$.each(hidelist,
 		(i, itemid) ->
-			$('#' + itemid).hide('blind','fast')
+			$item = $('#' + itemid)
+			if $item.css('display') != 'none' # apparently in Chrome .is(':visible') doesn't always return true when it should
+				$item.hide('blind','fast')
 	)
 
 	$.each(showlist,
 		(i, itemid) ->
-			$('#' + itemid).show('blind','fast')
+			$item = $('#' + itemid)
+#			if $item.css('display') == 'none' or $item.is(":visible") == false
+			$item.show('blind','fast')
 	)
 
 # return a map path for a climate suitability map, given a species, year, and

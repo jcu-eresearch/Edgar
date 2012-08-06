@@ -493,6 +493,11 @@ html, body {
     overflow: auto;
 }
 
+#toolspanel p {
+    margin: 0;
+    padding: 0.1em 0;
+}
+
 #toolspanel .tool {
     font-size: 80%;
     background-color: white;
@@ -590,7 +595,7 @@ html, body {
 #tool_future .scenario {
     display: block;
     position: relative;
-    padding: 0.1em 0.1em 0.1em 2em;
+    padding: 0.3em 0.1em 0.3em 2em;
     margin: 0.2em 0;
     font-size: 90%;
     line-height: 1.1;
@@ -665,7 +670,72 @@ html, body {
     width: 49%;
 }
 
-/* legend panel content ----------------------------------------------- */
+/* occurrence classification legend panel content --------------------- */
+
+
+#tool_classlegend p {
+    line-height: 1.2em;
+    padding-top: 0.5em;
+    margin-bottom: -0.1em;
+}
+
+#tool_classlegend .toolcontent .classnesting,
+#tool_classlegend .toolcontent .classlist {
+    font-size: 90%;
+}
+
+#tool_classlegend .leftcol {
+    float: left;
+    width: 43%;
+}
+
+#tool_classlegend .rightcol {
+    float: right;
+    width: 56%;
+}
+
+#tool_classlegend .classnesting h2, #tool_classlegend .classlist h2 {
+    margin: 0.7em 0.1em;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1.1em;
+    position: relative;
+    background: transparent;
+}
+
+#tool_classlegend .dot {
+    opacity: 0.75;
+    position: absolute;
+    height: 1.5em;
+    width: 1.5em;
+    .allrounded(0.75em);
+}
+
+#tool_classlegend .leftcol  h2 { padding: 0 1.9em 0 0; text-align: right; }
+#tool_classlegend .rightcol h2 { padding: 0 0 0 1.9em; text-align: left;  }
+
+#tool_classlegend .leftcol  .dot { right: 0; }
+#tool_classlegend .rightcol .dot { left:  0; }
+
+#tool_classlegend .classnesting h2 {
+    padding: 0 0 0 2.9em;
+    line-height: 1.1em;
+}
+
+#tool_classlegend .circle {
+    opacity: 0.75;
+    position: absolute;
+    left: 1em;
+    height: 0.5em;
+    width: 0.5em;
+    border: 0.5em solid white;
+    .allrounded(0.75em);
+}
+
+
+
+/* suitability legend panel content ----------------------------------- */
 
 #toolspanel .legend .toolcontent {
     text-align: center;
@@ -730,7 +800,7 @@ ul.vetting_list li .classification {
 }
 
 .olFramedCloudPopupContent thead tr, .olFramedCloudPopupContent tbody {
-    display: block;
+    xdisplay: block;
 }
 
 .olFramedCloudPopupContent thead tr {
@@ -746,7 +816,7 @@ ul.vetting_list li .classification {
 
 .olFramedCloudPopupContent tbody {
     overflow: auto;
-    height: 12em;
+    max-height: 12em;
 }
 
 .olFramedCloudPopupContent dd {
@@ -755,6 +825,8 @@ ul.vetting_list li .classification {
      margin: 0;
      padding: 0;
 }
+
+table.classifications { width: 90%; }
 
 table.classifications tr td {
     padding: 0.5em;
@@ -779,5 +851,6 @@ table.classifications tr.contentious td {
 }
 
 .classifications tr.none {
+    display: none;
     color: #999;
 }

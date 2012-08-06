@@ -112,26 +112,86 @@
     <div class="tool" id="tool_future">
         <h1>suitability projections</h1>
         <div class="toolcontent">
-            <h3>Emission Scenario</h3>
+            <h3>Future Emission Scenario</h3>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP85" checked="checked">
+                <p>RCP8.5: "Business as usual".  Increasing greenhouse gas emissions over time.</p>
+            </label>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP6">
+                <p>RCP6: emissions stabilise some time after 2100.</p>
+            </label>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP45">
+                <p>RCP4.5: emissions stabilise before 2100.</p>
+            </label>
             <label class="scenario ui-state-default ui-corner-all">
                 <input type="radio" name="scenario" value="RCP3PD">
-                <p>The reductions agreed to at the UNFCCC in 2010 are all achieved, resulting in strong reductions in carbon emissions, keeping warming below 2&deg;C and making teddy bears come alive and give everyone big warm cuddles.</p>
-            </label>
-            <label class="scenario ui-state-default ui-corner-all">
-<!--
-                <input type="radio" name="scenario" value="RCP8.5" checked="checked">
--->
-                <input type="radio" name="scenario" value="RCP85" checked="checked">
-                <p>Situation continues more-or-less as normal.</p>
+                <p>RCP2.6: emissions reduce substantially.</p>
             </label>
 
-            <div class="sliderbox">
-                <span id="year_label"></span>
-                <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
-                <div id="year_slider"></div>
+            <div class="loading_container" style="display: none;">
+                Loading projection maps...
+                <div class="loading_bar"></div>
+            </div>
+            <div class="options_container">
+                <div class="sliderbox">
+                    <span id="year_label"></span>
+                    <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
+                    <div id="year_slider"></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="tool classlegend" id="tool_classlegend">
+        <h1>classification legend</h1>
+        <div class="toolcontent">
+            <div class="classlist clearfix">
+                <div class="leftcol">
+                    <div class="classification" title="invalid: record is an error">
+                        <h2><span class="dot" style="background: #000"></span>invalid</h2>
+                    </div>
+                    <div class="classification" title="historic: observation in the past that does not represent modern presence of species">
+                        <h2><span class="dot" style="background: #972"></span>historic</h2>
+                    </div>
+                    <div class="classification" title="vagrant: observation does not represent continued presence of species">
+                        <h2><span class="dot" style="background: #f70"></span>vagrant</h2>
+                    </div>
+                    <div class="classification" title="irruptive: observation is in an irruptive range and does not represent continued presence of species">
+                        <h2><span class="dot" style="background: #f6a"></span>irruptive</h2>
+                    </div>
+                </div>
+
+                <div class="rightcol">
+                    <div class="classification" title="unclassified: not yet classified (please vet!)">
+                        <h2><span class="dot" style="background: #c00"></span>unclassified</h2>
+                    </div>
+                    <div class="classification" title="non-breeding: observation is within a non-breeding range for a migratory species">
+                        <h2><span class="dot" style="background: #70f"></span>non-breeding</h2>
+                    </div>
+                    <div class="classification" title="breeding: observation is within a breeding range for a species">
+                        <h2><span class="dot" style="background: #02f"></span>breeding</h2>
+                    </div>
+                    <div class="classification" title="introduced: non-native breeding range">
+                        <h2><span class="dot" style="background: #26f"></span>introduced</h2>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="classnesting clearfix">
+                <p>Clusters show up to two classes:</p>
+                <div class="classification" title="outer colour is the most common classification, inner colour the second most common">
+                    <h2><span class="circle" style="background: #f70; border-color: #02f"></span>many breeding, some vagrant</h2>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
 
     <div class="tool legend" id="tool_legend">
         <h1>suitability legend</h1>
@@ -152,10 +212,13 @@
             <hr style="clear: both">
 
             <!-- clustering selector -->
+            Clustering..
             <select id="cluster" style="width: 80%">
                 <option value="dotradius" >Dot Radius (no clustering)</option>
                 <option value="dotgrid">Dot Grid</option>
-                <option value="dotgriddetail" selected="selected">Dot Grid Detail</option>
+                <option value="dotgriddetail">Dot Grid Detail</option>
+                <option value="dotgridsimple" selected="selected">Dot Grid Simple</option>
+                <option value="dotgridtrump">Dot Grid Trump</option>
                 <option value="squaregrid">Square Grid</option>
             </select>
 

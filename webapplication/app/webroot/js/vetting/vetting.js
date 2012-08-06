@@ -16,7 +16,7 @@
       return this.areaStyleMap = new OpenLayers.StyleMap({
         'default': {
           'fillOpacity': 0.3,
-          'strokeOpacity': 0.9,
+          'strokeOpacity': 0.7,
           'fillColor': '${fill_color}',
           'strokeColor': '${stroke_color}',
           'fontColor': '${font_color}',

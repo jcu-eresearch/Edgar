@@ -11,6 +11,10 @@ class GeolocationsBehavior extends ModelBehavior {
     const CLUSTERED_FEATURE_RADIUS       = 8;     // pixels
     const MIN_FEATURE_RADIUS = 3;                 // pixels
 
+    // Draw a vetting bbox with a lat and lng of at least +/- this many degrees from
+    // the occurrence.
+    const MIN_VETTING_LAT_LNG_RANGE = 0.0005;
+
     /**
      * Store the settings for this model.
      */
@@ -34,6 +38,7 @@ class GeolocationsBehavior extends ModelBehavior {
         include 'clustering/dotradius.php';
         include 'clustering/dotgrid.php';
         include 'clustering/dotgriddetail.php';
+        include 'clustering/dotgridtrump.php';
         include 'clustering/squaregrid.php';
 
         $location_features = array();
@@ -49,6 +54,14 @@ class GeolocationsBehavior extends ModelBehavior {
         } elseif ( $cluster_type == "dotgriddetail" ) {
             // use dotgrid clustering
             $location_features = get_features_dotgrid_detail($Model, $bounds);
+
+        } elseif ( $cluster_type == "dotgridtrump" ) {
+            // use dotgrid clustering
+            $location_features = get_features_dotgrid_trump($Model, $bounds);
+
+        } elseif ( $cluster_type == "dotgridsimple" ) {
+            // use dotgrid clustering
+            $location_features = get_features_dotgrid_trump($Model, $bounds, true);
 
         } elseif ( $cluster_type == "squaregrid" ) {
             // use dotgrid clustering

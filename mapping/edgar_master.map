@@ -41,7 +41,7 @@ MAP
         LABEL
             COLOR 64 64 64
             ANTIALIAS true
-            OFFSET 0 -1
+            OFFSET -23 -2
         END
         KEYSIZE 32 14
         KEYSPACING 5 -1

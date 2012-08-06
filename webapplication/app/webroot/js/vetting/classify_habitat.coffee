@@ -206,7 +206,7 @@ Edgar.vetting.classifyHabitat = {
             geomBounds = geom.getBounds()
             @vectorLayer.removeFeatures([feature])
 
-            occurrencesLayer = window.Edgar.occurrences.vectorLayer
+            occurrencesLayer = window.Edgar.mapdata.layers.occurrences
             occurrenceClusterFeatures = occurrencesLayer.features
 
             featuresWithinBounds = []
