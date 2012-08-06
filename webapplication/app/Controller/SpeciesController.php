@@ -351,18 +351,19 @@ class SpeciesController extends AppController {
         $partial = strtolower($this->request->query['term']);
 
         // query db
-        $matched_species = $this->Species->find('all', array(
-            'conditions' => array('OR' => array(
-                array('lower(scientific_name) LIKE' => '%'.$partial.'%'),
-                array('lower(common_name) LIKE' => '%'.$partial.'%')
-            )),
-            'order' => array('common_name DESC')
-        ));
+        $results = $this->Species->getDataSource()->execute(
+            'SELECT * FROM species '.
+            'WHERE (? % scientific_name) OR (? % common_name) '.
+            'ORDER BY common_name DESC '.
+            'LIMIT 20',
+            array(),
+            array($partial, $partial)
+        );
 
         // convert $matched_species into json format expected by jquery ui
-        foreach($matched_species as $key => $value){
-            $species = $this->_speciesToJson($value['Species']);
-            $matched_species[$key] = $species;
+        $matched_species = array();
+        foreach($results as $species){
+            $matched_species[] = $this->_speciesToJson($species);
         }
 
         // render json
