@@ -53,15 +53,15 @@ class GeolocationsBehavior extends ModelBehavior {
 
         } elseif ( $cluster_type == "dotgriddetail" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid_detail($Model, $bounds);
+            $location_features = get_features_dotgrid_detail($Model, $bounds, array('showminor'=>true));
 
         } elseif ( $cluster_type == "dotgridtrump" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid_trump($Model, $bounds);
+            $location_features = get_features_dotgrid_trump($Model, $bounds, array('trump'=>true));
 
         } elseif ( $cluster_type == "dotgridsimple" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid_trump($Model, $bounds, true);
+            $location_features = get_features_dotgrid_detail($Model, $bounds, array('trump'=>false, 'condensed'=>true));
 
         } elseif ( $cluster_type == "squaregrid" ) {
             // use dotgrid clustering
