@@ -178,6 +178,23 @@
                     </div>
                 </div>
             </div>
+
+            <div class="classlist clearfix">
+                <p>Occurrences are grouped into clusters.  The size indicates the number of occurrences.</p>
+                <div class="leftcol">
+                    <div class="classification">
+                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 occur.</h2>
+                    </div>
+                </div>
+    
+                <div class="leftcol">
+                    <div class="classification">
+                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 occur.</h2>
+                    </div>
+                </div>
+    
+            </div>
+
 <!--
             <div class="classnesting clearfix">
                 <p>Clusters show up to two classes:</p>
@@ -194,6 +211,7 @@
     <div class="tool simpleclasslegend" id="tool_simpleclasslegend">
         <h1>classification legend</h1>
         <div class="toolcontent">
+
             <div class="classlist clearfix">
                 <div class="leftcol">
                     <div class="classification" title="invalid: record is an error">
@@ -214,6 +232,23 @@
                 </div>
 
             </div>
+
+            <div class="classlist clearfix">
+                <p>Occurrences are grouped into clusters.  The size indicates the number of occurrences.</p>
+                <div class="leftcol">
+                    <div class="classification">
+                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 occur.</h2>
+                    </div>
+                </div>
+    
+                <div class="leftcol">
+                    <div class="classification">
+                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 occur.</h2>
+                    </div>
+                </div>
+    
+            </div>
+
         </div>
     </div>
 

@@ -527,7 +527,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // Read about this layer here: http://earth-info.nga.mil/publications/vmap0.html
     // and here: http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29
     var vmap0 = new OpenLayers.Layer.WMS(
-        "World Map (VMAP0)",
+        "Plain",
         "http://vmap0.tiles.osgeo.org/wms/vmap0",
         {
             'layers':'basic'
@@ -643,7 +643,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
 
     // Add our layers
 //    Edgar.map.addLayers([vmap0, osm, bing_aerial, bing_hybrid, bing_road, gsat, ghyb, gmap, gphy]);
-    Edgar.map.addLayers([ghyb, gphy]);
+    Edgar.map.addLayers([vmap0, ghyb, gphy]);
     Edgar.map.setBaseLayer(gphy);
 
     // Zoom the map to the zoom_bounds specified earlier

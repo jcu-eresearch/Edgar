@@ -13,6 +13,7 @@ function mu_addStyleClasses($layer, $threshold = "0", $colors = null)
 {
 
     if ($colors === null) {
+/*
         $colors = array(
             array( 0x99, 0x77, 0x00 ),     // tan
             array( 0xbb, 0xaa, 0x00 ),
@@ -27,12 +28,16 @@ function mu_addStyleClasses($layer, $threshold = "0", $colors = null)
             array( 0xbb, 0x33, 0xcc ),
             array( 0xaa, 0x00, 0xff )      // purple
         );
+*/
         $colors = array(
             array( 0xff, 0xff, 0x00 ),     // lemon yellow
-            array( 0x99, 0xdd, 0x00 ),
-            array( 0x66, 0xbb, 0x00 ),
-            array( 0x33, 0x99, 0x00 ),
-            array( 0x00, 0x77, 0x00 )      // purple
+            array( 0xcc, 0xee, 0x00 ),
+            array( 0x99, 0xcc, 0x00 ),
+            array( 0x66, 0xbb, 0x00 ),     // mid green
+            array( 0x44, 0xaa, 0x00 ),
+            array( 0x22, 0x88, 0x00 ),
+            array( 0x00, 0x77, 0x00 )      // green
+
         );
     }
 

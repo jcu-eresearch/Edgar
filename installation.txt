@@ -1,5 +1,5 @@
-install postgres 8.4
-    sudo yum install postgresql-server postgresql
+install postgres 8.4 and contrib modules
+    sudo yum install postgresql postgresql-server postgresql-contrib
 install postgis 1.5
     sudo yum install postgis
 install postgres php plugin (and restart apache)
@@ -15,6 +15,7 @@ sudo -u postgres createdb edgar
 sudo -u postgres createlang plpgsql edgar
 sudo -u postgres psql -d edgar -f postgis.sql
 sudo -u postgres psql -d edgar -f spatial_ref_sys.sql
+sudo -u postgres psql -d edgar -f pg_trgm.sql
 cd ~/Edgar
 sudo -u postgres psql edgar < database_structure.sql
 
