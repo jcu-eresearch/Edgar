@@ -177,9 +177,7 @@
                         <h2><span class="dot" style="background: #26f"></span>introduced</h2>
                     </div>
                 </div>
-
             </div>
-
 <!--
             <div class="classnesting clearfix">
                 <p>Clusters show up to two classes:</p>
@@ -192,6 +190,32 @@
         </div>
     </div>
 
+
+    <div class="tool simpleclasslegend" id="tool_simpleclasslegend">
+        <h1>classification legend</h1>
+        <div class="toolcontent">
+            <div class="classlist clearfix">
+                <div class="leftcol">
+                    <div class="classification" title="invalid: record is an error">
+                        <h2><span class="dot" style="background: #000"></span>invalid</h2>
+                    </div>
+                    <div class="classification" title="other: observation does not represent the species' core range">
+                        <h2><span class="dot" style="background: #f70"></span>other</h2>
+                    </div>
+                </div>
+
+                <div class="rightcol">
+                    <div class="classification" title="unclassified: not yet classified (please vet!)">
+                        <h2><span class="dot" style="background: #c00"></span>unclassified</h2>
+                    </div>
+                    <div class="classification" title="core: observation is within the species' core range">
+                        <h2><span class="dot" style="background: #02f"></span>core</h2>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
     <div class="tool legend" id="tool_legend">

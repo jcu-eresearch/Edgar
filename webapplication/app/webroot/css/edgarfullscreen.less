@@ -667,33 +667,38 @@ html, body {
     padding: 0.5em;
     margin: 0.2em 0;
     overflow: hidden;
-    width: 49%;
+    width: 48%;
 }
 
 /* occurrence classification legend panel content --------------------- */
 
 
-#tool_classlegend p {
+#tool_classlegend p, #tool_simpleclasslegend p {
     line-height: 1.2em;
     padding-top: 0.5em;
     margin-bottom: -0.1em;
 }
 
+#tool_simpleclasslegend .toolcontent .classnesting,
+#tool_simpleclasslegend .toolcontent .classlist,
 #tool_classlegend .toolcontent .classnesting,
 #tool_classlegend .toolcontent .classlist {
     font-size: 90%;
 }
 
+#tool_simpleclasslegend .leftcol,
 #tool_classlegend .leftcol {
     float: left;
     width: 43%;
 }
 
+#tool_simpleclasslegend .rightcol,
 #tool_classlegend .rightcol {
     float: right;
     width: 56%;
 }
 
+#tool_simpleclasslegend .classnesting h2, #tool_simpleclasslegend .classlist h2,
 #tool_classlegend .classnesting h2, #tool_classlegend .classlist h2 {
     margin: 0.7em 0.1em;
     color: inherit;
@@ -705,6 +710,7 @@ html, body {
     white-space: nowrap;
 }
 
+#tool_simpleclasslegend .dot,
 #tool_classlegend .dot {
     opacity: 0.75;
     position: absolute;
@@ -713,13 +719,13 @@ html, body {
     .allrounded(0.75em);
 }
 
-#tool_classlegend .leftcol  h2 { padding: 0 1.9em 0 0; text-align: right; }
-#tool_classlegend .rightcol h2 { padding: 0 0 0 1.9em; text-align: left;  }
+#toolspanel .leftcol h2 { padding: 0 1.9em 0 0; text-align: right; }
+#toolspanel .rightcol h2 { padding: 0 0 0 1.9em; text-align: left;  }
 
-#tool_classlegend .leftcol  .dot { right: 0; }
-#tool_classlegend .rightcol .dot { left:  0; }
+#toolspanel .leftcol  .dot { right: 0; }
+#toolspanel .rightcol .dot { left:  0; }
 
-#tool_classlegend .classnesting h2 {
+#tool_simpleclasslegend .classnesting h2, #tool_classlegend .classnesting h2 {
     padding: 0 0 0 2.9em;
     line-height: 1.1em;
 }
