@@ -33,7 +33,7 @@ def main():
         next_species = next_species_row_to_vet()
         if next_species is None:
             log_info('=========== No species need vetting. Sleeping for a while.')
-            time.sleep(5 * 60)
+            time.sleep(60)
         else:
             vet_species(next_species)
             db.engine.dispose()
