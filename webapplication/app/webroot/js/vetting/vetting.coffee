@@ -29,7 +29,7 @@ Edgar.vetting = {
     init: () ->
         Edgar.vetting.classifyHabitat.init()
         Edgar.vetting.myHabitatClassifications.init()
-        Edgar.vetting.theirHabitatClassifications.init()
+#        Edgar.vetting.theirHabitatClassifications.init()
 
         this._initAreaStyleMap()
 
@@ -72,7 +72,7 @@ Edgar.vetting = {
         console.log "engageVettingMode"
         Edgar.util.showhide(['button_current'],[])
         Edgar.vetting.myHabitatClassifications.engage()
-        Edgar.vetting.theirHabitatClassifications.engage()
+#        Edgar.vetting.theirHabitatClassifications.engage()
         Edgar.vetting.classifyHabitat.engage()
 
         null
@@ -85,7 +85,7 @@ Edgar.vetting = {
         console.log "disengageVettingMode"
         Edgar.util.showhide([],['button_current'])
         Edgar.vetting.myHabitatClassifications.disengage()
-        Edgar.vetting.theirHabitatClassifications.disengage()
+#        Edgar.vetting.theirHabitatClassifications.disengage()
 
         null
 

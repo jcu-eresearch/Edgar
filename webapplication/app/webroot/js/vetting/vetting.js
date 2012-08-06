@@ -35,7 +35,6 @@
     init: function() {
       Edgar.vetting.classifyHabitat.init();
       Edgar.vetting.myHabitatClassifications.init();
-      Edgar.vetting.theirHabitatClassifications.init();
       this._initAreaStyleMap();
       this._bindToChangeModeEvents();
       return null;
@@ -79,7 +78,6 @@
       console.log("engageVettingMode");
       Edgar.util.showhide(['button_current'], []);
       Edgar.vetting.myHabitatClassifications.engage();
-      Edgar.vetting.theirHabitatClassifications.engage();
       Edgar.vetting.classifyHabitat.engage();
       return null;
     },
@@ -92,7 +90,6 @@
       console.log("disengageVettingMode");
       Edgar.util.showhide([], ['button_current']);
       Edgar.vetting.myHabitatClassifications.disengage();
-      Edgar.vetting.theirHabitatClassifications.disengage();
       return null;
     }
   };
