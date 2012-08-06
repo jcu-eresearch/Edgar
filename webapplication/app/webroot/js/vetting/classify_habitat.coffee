@@ -249,7 +249,8 @@ Edgar.vetting.classifyHabitat = {
                 featureOccurrence = new OpenLayers.Feature.Vector polygon, attributes
                 @vectorLayer.addFeatures [featureOccurrence]
 
-            this._activateModifyPolygonMode()
+            # this._activateModifyPolygonMode()
+            null
 
         Edgar.map.addControl @drawBoundingBoxControl
 

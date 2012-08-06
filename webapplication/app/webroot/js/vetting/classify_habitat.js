@@ -227,7 +227,7 @@
           featureOccurrence = new OpenLayers.Feature.Vector(polygon, attributes);
           _this.vectorLayer.addFeatures([featureOccurrence]);
         }
-        return _this._activateModifyPolygonMode();
+        return null;
       };
       return Edgar.map.addControl(this.drawBoundingBoxControl);
     },
