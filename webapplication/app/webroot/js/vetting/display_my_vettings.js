@@ -21,6 +21,7 @@
     },
     _addVectorLayer: function() {
       this.vectorLayer = new OpenLayers.Layer.Vector('My Habitat Classifications', {
+        displayInLayerSwitcher: false,
         isBaseLayer: false,
         projection: Edgar.util.projections.geographic,
         strategies: [new OpenLayers.Strategy.Fixed()],
