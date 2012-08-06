@@ -131,6 +131,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds) {
           $min_longitude_range = $longitude - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
           $max_longitude_range = $longitude + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
         }
+        
         $properties_array['min_latitude_range']  = $min_latitude_range;
         $properties_array['max_latitude_range']  = $max_latitude_range;
         $properties_array['min_longitude_range'] = $min_longitude_range;

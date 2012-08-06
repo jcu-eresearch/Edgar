@@ -215,7 +215,8 @@
             <select id="cluster" style="width: 80%">
                 <option value="dotradius" >Dot Radius (no clustering)</option>
                 <option value="dotgrid">Dot Grid</option>
-                <option value="dotgriddetail" selected="selected">Dot Grid Detail</option>
+                <option value="dotgriddetail">Dot Grid Detail</option>
+                <option value="dotgridtrump" selected="selected">Dot Grid Trump</option>
                 <option value="squaregrid">Square Grid</option>
             </select>
 

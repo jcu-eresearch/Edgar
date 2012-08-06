@@ -238,6 +238,15 @@ function addOccurrencesLayer() {
                 'strokeOpacity': 1,
                 'fillOpacity': 1
             },
+            'dotgridtrump': {
+                'pointRadius': "${point_radius}",
+                'fillColor':   "${fill_color}",
+                'strokeColor': "${stroke_color}",
+                'borderColor': "${border_color}",
+                'strokeWidth': "${stroke_width}",
+                'strokeOpacity': 1,
+                'fillOpacity': 1
+            },
             'squaregrid': {
                 'label': "${label}",
                 'fontOpacity': 1.0,
