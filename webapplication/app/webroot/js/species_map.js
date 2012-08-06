@@ -11,7 +11,6 @@ function consolelog(arg1, arg2, arg3) { if (window.console) {
     if (arg1) { console.log(arg1);             }
 }}
 // ------------------------------------------------------------------
-var occurrence_select_control;
 
 // Projections
 // ----------
@@ -344,7 +343,7 @@ function addOccurrencesLayer() {
         // what to do when the user presses close on the pop-up.
         function onPopupClose(evt) {
             // 'this' is the popup.
-            occurrence_select_control.unselectAll();
+            Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
         }
 
         // what to do when the user clicks a feature
@@ -389,15 +388,20 @@ function addOccurrencesLayer() {
         //
         // Note: change hover to true to make it a on hover interaction (instead
         // of an on-click interaction)
-        occurrence_select_control = new OpenLayers.Control.SelectFeature(
+        if (Edgar.mapdata.controls.occurrencesSelectControl != null) {
+            Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
+            Edgar.mapdata.controls.occurrencesSelectControl.map.removeControl(Edgar.mapdata.controls.occurrencesSelectControl);
+        }
+
+        Edgar.mapdata.controls.occurrencesSelectControl = new OpenLayers.Control.SelectFeature(
             Edgar.mapdata.layers.occurrences, {hover: false}
         );
 
         registerLayerProgress(Edgar.mapdata.layers.occurrences, "species occurrences");
         Edgar.map.addLayer(Edgar.mapdata.layers.occurrences);
 
-        Edgar.map.addControl(occurrence_select_control);
-        occurrence_select_control.activate();
+        Edgar.map.addControl(Edgar.mapdata.controls.occurrencesSelectControl);
+        Edgar.mapdata.controls.occurrencesSelectControl.activate();
 }
 // ------------------------------------------------------------------
 function flattenScientificName(name) {
