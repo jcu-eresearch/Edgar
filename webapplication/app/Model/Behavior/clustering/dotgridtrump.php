@@ -30,7 +30,7 @@ function get_features_dotgrid_trump(Model $Model, $bounds) {
     $lat_lng_range_avg = ( array_sum( array($lat_range, $lng_range) ) / 2 );
 
 
-    $griddiness = 3.4; // lower number, bigger grid squares
+    $griddiness = 3.2; // lower number, bigger grid squares
 
     // Range to decimal place conversions
     $round_to_nearest_nth_fraction = 1;
