@@ -16,6 +16,26 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
     $showminor = $options["showminor"];
     $griddiness = $options["griddiness"];
 
+    // in trump mode, earlier listings will trump later ones when deciding colour
+    $trumps = array(
+        'unknown',
+        'core',
+        'other',
+
+        'vagrant',
+        'irruptive',
+
+        'breeding',
+        'non-breeding',
+        'introduced breeding',
+        'introduced non-breeding',
+
+        'historic',
+
+        'invalid'
+    );
+
+
     $location_features = array();
 
     $lat_range = $bounds['max_latitude']  - $bounds['min_latitude'];
@@ -65,8 +85,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             "historic" => $location["contentious_historic_count"],
             "vagrant" => $location["contentious_vagrant_count"],
             "irruptive" => $location["contentious_irruptive_count"],
-            "non breeding" => $location["contentious_non_breeding_count"],
-            "introduced non breeding" => $location["contentious_introduced_non_breeding_count"],
+            "non-breeding" => $location["contentious_non_breeding_count"],
+            "introduced non-breeding" => $location["contentious_introduced_non_breeding_count"],
             "breeding" => $location["contentious_breeding_count"],
             "introduced breeding" => $location["contentious_introduced_breeding_count"]
         );
@@ -77,8 +97,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             "historic" => $location["historic_count"],
             "vagrant" => $location["vagrant_count"],
             "irruptive" => $location["irruptive_count"],
-            "non breeding" => $location["non_breeding_count"],
-            "introduced non breeding" => $location["introduced_non_breeding_count"],
+            "non-breeding" => $location["non_breeding_count"],
+            "introduced non-breeding" => $location["introduced_non_breeding_count"],
             "breeding" => $location["breeding_count"],
             "introduced breeding" => $location["introduced_breeding_count"]
         );
