@@ -338,6 +338,7 @@
       this.modifyControl.deactivate();
       $('#newvet_modify_polygon_button').removeClass('ui-state-active');
       this._updateNewVetHint();
+      Edgar.mapdata.controls.occurrencesSelectControl.activate();
       return null;
     },
     _activateDrawPolygonMode: function() {
@@ -408,6 +409,7 @@
       $('#newvet_add_polygon_by_occurrences_button').addClass('ui-state-active');
       this.drawBoundingBoxControl.activate();
       this._updateNewVetHint();
+      Edgar.mapdata.controls.occurrencesSelectControl.deactivate();
       return null;
     },
     _removeAllFeatures: function() {

@@ -431,6 +431,7 @@ function handleBlankTile() {
 // ------------------------------------------------------------------
 $(function() {
 
+
     OpenLayers.Util.onImageLoadError = handleBlankTile;
 
     // The Map Object
@@ -454,6 +455,8 @@ $(function() {
 //            restrictedExtent: zoom_bounds
 
     });
+
+    _bindToChangeModeEvents()
 
     // I want to show the layer loading status on the layer-switcher, but
     // OpenLayers keeps remaking the dom elements in the switcher.
@@ -663,3 +666,45 @@ function addLegend() {
 }
 // ------------------------------------------------------------------
 
+function isChangeModeOkay(newMode) {
+    return true;
+}
+
+// bind some functions to the mode change events.
+// NOTE: Edgar.map must be defined before you run this function.
+function _bindToChangeModeEvents() {
+    $(Edgar.map).on(
+        'changemode',
+        function(event, newMode) {
+            if (!isChangeModeOkay(newMode)) {
+                event.preventDefault();
+            }
+        }
+    );
+}
+
+// ------------------------------------------------------------------
+// gets called by mapmodes.js, when the previous mode has been
+// disengeged, and the current mode tools have been shown
+function engageCurrentMode() {
+    Edgar.util.showhide(['button_future'],[]);
+    if (Edgar.user != null) {
+        Edgar.util.showhide(['button_vetting'],[]);
+    }
+
+    // ensure the occurrences select control is active (if it exists)
+    if (Edgar.mapdata.controls.occurrencesSelectControl != null) {
+        Edgar.mapdata.controls.occurrencesSelectControl.activate();
+    }
+
+    // clear the "destination" species
+    Edgar.newSpecies = null;
+}
+
+// ------------------------------------------------------------------
+// gets called by mapmodes.js, when changing out of current 
+// mode, before hiding the current mode tools
+function disengageCurrentMode() {
+    Edgar.util.showhide([],['button_vetting','button_future']);
+
+}

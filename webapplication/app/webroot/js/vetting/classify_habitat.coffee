@@ -369,10 +369,14 @@ Edgar.vetting.classifyHabitat = {
 
         this._updateNewVetHint()
 
+        # activate the occurrences select control
+        Edgar.mapdata.controls.occurrencesSelectControl.activate()
+
         null
 
     _activateDrawPolygonMode: () ->
         this._clearNewVettingMode()
+
         $('#newvet_draw_polygon_button').addClass 'ui-state-active'
         @drawControl.activate()
         this._updateNewVetHint()
@@ -381,6 +385,7 @@ Edgar.vetting.classifyHabitat = {
 
     _activateModifyPolygonMode: () ->
         this._clearNewVettingMode()
+
         $('#newvet_modify_polygon_button').addClass 'ui-state-active'
 
         # Specify the modify mode as reshape and drag 
@@ -448,7 +453,7 @@ Edgar.vetting.classifyHabitat = {
         feature = new OpenLayers.Feature.Vector polygon, attributes
         @vectorLayer.addFeatures [feature]
 
-        consolelog(@vectorLayer.features);
+        consolelog(@vectorLayer.features)
 
         this._activateModifyPolygonMode()
 
@@ -465,6 +470,9 @@ Edgar.vetting.classifyHabitat = {
         $('#newvet_add_polygon_by_occurrences_button').addClass 'ui-state-active'
         @drawBoundingBoxControl.activate()
         this._updateNewVetHint()
+
+        # deactivate the occurrences select control
+        Edgar.mapdata.controls.occurrencesSelectControl.deactivate()
 
         null
 

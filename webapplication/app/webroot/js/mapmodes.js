@@ -205,25 +205,3 @@ function addMapModes(theMap) {
 function disengageBlankMode() {
     Edgar.util.showhide([],['tip_no_species']);
 }
-// ------------------------------------------------------------------
-// gets called by mapmodes.js, when the previous mode has been
-// disengeged, and the current mode tools have been shown
-function engageCurrentMode() {
-    Edgar.util.showhide(['button_future'],[]);
-    if (Edgar.user != null) {
-        Edgar.util.showhide(['button_vetting'],[]);
-    }
-    // clear the "destination" species
-    Edgar.newSpecies = null;
-}
-// ------------------------------------------------------------------
-// gets called by mapmodes.js, when changing out of current 
-// mode, before hiding the current mode tools
-function disengageCurrentMode() {
-    Edgar.util.showhide([],['button_vetting','button_future']);
-}
-
-
-
-
-
