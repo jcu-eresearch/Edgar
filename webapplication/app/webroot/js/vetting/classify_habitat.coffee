@@ -213,7 +213,18 @@ Edgar.vetting.classifyHabitat = {
             featuresWithinBounds = []
             addPolygonIfWithinBounds = (clusterFeature, bounds, arrayToAppendTo) =>
                 featureCentroid = clusterFeature.geometry.getCentroid()
-                isFeatureWithinBounds = bounds.contains(featureCentroid.x, featureCentroid.y)
+
+                min_latitude_range  = feature.attributes['min_latitude_range']
+                max_latitude_range  = feature.attributes['max_latitude_range']
+                min_longitude_range = feature.attributes['min_longitude_range']
+                max_longitude_range = feature.attributes['max_longitude_range']
+
+                min = (new OpenLayers.Geometry.Point(min_longitude_range, min_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
+                max = (new OpenLayers.Geometry.Point(max_longitude_range, max_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
+                feature_cluster_bounds = new OpenLayers.Bounds(min.x, min.y, max.x, max.y)
+
+                isFeatureWithinBounds = bounds.contains(featureCentroid.x, featureCentroid.y) or feature_cluster_bounds.containsBounds(bounds, false, false)
+
                 if isFeatureWithinBounds
                     arrayToAppendTo.push(clusterFeature)
 
@@ -235,9 +246,6 @@ Edgar.vetting.classifyHabitat = {
                     (new OpenLayers.Geometry.Point(max_longitude_range, max_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
                     (new OpenLayers.Geometry.Point(max_longitude_range, min_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
                 ]
-
-                consolelog("POINTS")
-                consolelog(points)
 
                 edgeLine = new OpenLayers.Geometry.LinearRing(points)
 
