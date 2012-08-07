@@ -80,7 +80,7 @@
             <div id="newvet_control" class="newvet_control">
 <!--                <button id="newvet_draw_polygon_button" class="ui-state-default ui-corner-all toggle draw_polygon" title="draw vetting polygons"><span class="ui-icon ui-icon-pencil"></span>Draw New Area</button> -->
 <!--                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button> -->
-                <button id="newvet_add_polygon_by_occurrences_button" class="ui-state-default ui-corner-all non_toggle add_polygon_by_occurrences" title="add area around occurrence clusters"><span class="ui-icon ui-icon-arrow-2-se-nw"></span>Select Occurrences</button>
+                <button id="newvet_add_polygon_by_occurrences_button" class="ui-state-default ui-corner-all non_toggle add_polygon_by_occurrences" title="add area around occurrence clusters"><span class="ui-icon ui-icon-arrow-2-se-nw"></span>Select Observations</button>
 <!--                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-arrow-4"></span>Modify An Area</button> -->
 <!--                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button> -->
                 <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="clear selection"><span class="ui-icon ui-icon-trash"></span>Clear Selection</button>
@@ -89,17 +89,17 @@
             <form id="vetform">
                 <legend>Classification
                     <select id="vetclassification" name="classification">
-                        <option value="" selected=true>-- classify these areas --</option>
+                        <option value="" selected=true>-- classify as.. --</option>
                         <option value="invalid">invalid</option>
-                        <option value="historic">historic</option>
+                        <option value="historic">historical</option>
                         <option value="vagrant">vagrant</option>
                         <option value="irruptive">irruptive</option>
                         <option value="non-breeding">non-breeding</option>
                         <option value="breeding">breeding</option>
-                        <option value="introduced breeding">introduced breeding</option>
+                        <option value="introduced breeding">introduced</option>
                     </select>
                 </legend>
-                <legend>Comment
+                <legend>Optional comment
                     <textarea id="vetcomment" name="comment"></textarea>
                 </legend>
             </form>
@@ -180,16 +180,16 @@
             </div>
 
             <div class="classlist clearfix">
-                <p>Occurrences are grouped into clusters.  The size indicates the number of occurrences.</p>
+                <p>Observations are grouped into clusters.  The size indicates the number of observations.</p>
                 <div class="leftcol">
                     <div class="classification">
-                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 occur.</h2>
+                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 obs.</h2>
                     </div>
                 </div>
     
                 <div class="leftcol">
                     <div class="classification">
-                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 occur.</h2>
+                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 obs.</h2>
                     </div>
                 </div>
     
@@ -232,23 +232,23 @@
                 </div>
 
             </div>
-
+<!--
             <div class="classlist clearfix">
-                <p>Occurrences are grouped into clusters.  The size indicates the number of occurrences.</p>
+                <p>Observations are grouped into clusters.  The size indicates the number of observations.</p>
                 <div class="leftcol">
                     <div class="classification">
-                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 occur.</h2>
+                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 obs.</h2>
                     </div>
                 </div>
     
                 <div class="leftcol">
                     <div class="classification">
-                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 occur.</h2>
+                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 obs.</h2>
                     </div>
                 </div>
     
             </div>
-
+-->
         </div>
     </div>
 

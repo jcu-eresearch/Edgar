@@ -288,7 +288,7 @@ function addOccurrencesLayer() {
         // The occurrences layer
         // Makes use of the BBOX strategy to dynamically load occurrences data.
         Edgar.mapdata.layers.occurrences = new OpenLayers.Layer.Vector(
-            "Occurrences",
+            "Observations",
             {
                 // It's an overlay
                 isBaseLayer: false,
@@ -534,7 +534,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // Read about this layer here: http://earth-info.nga.mil/publications/vmap0.html
     // and here: http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29
     var vmap0 = new OpenLayers.Layer.WMS(
-        "Plain",
+        "Simple",
         "http://vmap0.tiles.osgeo.org/wms/vmap0",
         {
             'layers':'basic'

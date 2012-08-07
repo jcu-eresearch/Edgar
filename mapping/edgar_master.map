@@ -41,10 +41,10 @@ MAP
         LABEL
             COLOR 64 64 64
             ANTIALIAS true
-            OFFSET -23 -2
+            OFFSET -23 -1
         END
-        KEYSIZE 32 14
-        KEYSPACING 5 -1
+        KEYSIZE 32 10
+        KEYSPACING 5 -2
     END
 
     #define the folder that used for generate image

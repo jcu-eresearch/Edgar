@@ -70,6 +70,7 @@ Edgar.vetting = {
     ###
     engageVettingMode: () ->
         console.log "engageVettingMode"
+        $('#cluster').val('dotgridtrump') # switch to trump mode
         Edgar.util.showhide(['button_current'],[])
         Edgar.vetting.myHabitatClassifications.engage()
 #        Edgar.vetting.theirHabitatClassifications.engage()
@@ -83,6 +84,7 @@ Edgar.vetting = {
     ###
     disengageVettingMode: () ->
         console.log "disengageVettingMode"
+        $('#cluster').val('dotgridsimple') # switch back to simple mode
         Edgar.util.showhide([],['button_current'])
         Edgar.vetting.myHabitatClassifications.disengage()
 #        Edgar.vetting.theirHabitatClassifications.disengage()

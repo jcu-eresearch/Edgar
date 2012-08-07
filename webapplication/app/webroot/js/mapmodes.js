@@ -100,7 +100,7 @@ function addMapModes(theMap) {
                 // special handling for blank-to-blank, the startup mode switch
                 Edgar.util.showhide(
                     ['tool_layers', 'tool_debug', 'tool_layers','tip_no_species'],
-                    ['oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_future','button_current','button_future','button_vetting']
+                    ['oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_simpleclasslegend','tool_future','button_current','button_future','button_vetting']
                 );
 
             } else if (newMode == 'current') {
@@ -140,7 +140,7 @@ function addMapModes(theMap) {
             // so here we can call _setupNewSpecies to actually switch to the
             // newly selected species.
             _setupNewSpecies();
-            Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend','button_future'],['speciesselector']);
+            Edgar.util.showhide(['currentspecies','tool_legend','tool_simpleclasslegend','button_future'],['speciesselector']);
             engageCurrentMode();
         }
 
@@ -157,7 +157,7 @@ function addMapModes(theMap) {
             disengageCurrentMode();
             // show & hide the appropriate tools
 //            Edgar.util.showhide(['newvet','oldvets','myvets'], ['tool_legend','tool_future']);
-            Edgar.util.showhide(['newvet'], ['tool_legend','tool_future']);
+            Edgar.util.showhide(['tool_classlegend','newvet'], ['tool_legend','tool_future','tool_simpleclasslegend']);
             Edgar.vetting.engageVettingMode();
         }
 
@@ -173,7 +173,7 @@ function addMapModes(theMap) {
             Edgar.vetting.disengageVettingMode();
             _setupNewSpecies();
 //            Edgar.util.showhide(['currentspecies','tool_legend'], ['oldvets','newvet','myvets','speciesselector']);
-            Edgar.util.showhide(['currentspecies','tool_legend'], ['newvet','speciesselector']);
+            Edgar.util.showhide(['currentspecies','tool_simpleclasslegend'], ['newvet','speciesselector','tool_legend']);
             engageCurrentMode();
         }
 
