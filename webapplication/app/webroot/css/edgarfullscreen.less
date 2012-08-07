@@ -620,14 +620,17 @@ html, body {
     background: white;
     border: 1px solid gray;
     .rounded(0.75em, 0.75em, 0, 0.75em);
+    z-index: 1000;
 }
 
 #play_slider_button {
     position: absolute;
-    top: 3.5em;
+    top: 3.3em;
     left: 0;
-    width: 1.75em;
-    height: 1.75em;
+    width: 2em;
+    height: 2em;
+    .allrounded(1em);
+    border: 3px solid rgba(0,128,0,1);
 }
 
 #year_slider {
