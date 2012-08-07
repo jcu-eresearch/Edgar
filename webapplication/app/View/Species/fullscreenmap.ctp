@@ -58,92 +58,6 @@
 
     </div>
 
-    <div class="tool" id="oldvets">
-        <h1>other people's vettings</h1>
-        <div class="toolcontent">
-            <ul id="their_vettings_list" class="vetting_list theirs">
-            </ul>
-        </div>
-    </div>
-
-    <div class="tool" id="myvets">
-        <h1>my vettings</h1>
-        <div class="toolcontent">
-            <ul id="my_vettings_list" class="vetting_list mine">
-            </ul>
-        </div>
-    </div>
-
-    <div class="tool" id="newvet">
-        <h1>new vetting</h1>
-        <div class="toolcontent">
-            <div id="newvet_control" class="newvet_control">
-<!--                <button id="newvet_draw_polygon_button" class="ui-state-default ui-corner-all toggle draw_polygon" title="draw vetting polygons"><span class="ui-icon ui-icon-pencil"></span>Draw New Area</button> -->
-<!--                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button> -->
-                <button id="newvet_add_polygon_by_occurrences_button" class="ui-state-default ui-corner-all non_toggle add_polygon_by_occurrences" title="add area around occurrence clusters"><span class="ui-icon ui-icon-arrow-2-se-nw"></span>Select Observations</button>
-<!--                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-arrow-4"></span>Modify An Area</button> -->
-<!--                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button> -->
-                <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="clear selection"><span class="ui-icon ui-icon-trash"></span>Clear Selection</button>
-            </div>
-            <!-- new vet form -->
-            <form id="vetform">
-                <legend>Classification
-                    <select id="vetclassification" name="classification">
-                        <option value="" selected=true>-- classify as.. --</option>
-                        <option value="invalid">invalid</option>
-                        <option value="historic">historical</option>
-                        <option value="vagrant">vagrant</option>
-                        <option value="irruptive">irruptive</option>
-                        <option value="non-breeding">non-breeding</option>
-                        <option value="breeding">breeding</option>
-                        <option value="introduced breeding">introduced</option>
-                    </select>
-                </legend>
-                <legend>Optional comment
-                    <textarea id="vetcomment" name="comment"></textarea>
-                </legend>
-            </form>
-            <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this Vetting</button>
-
-            <div id="vethint" class="hint"></div>
-        </div>
-    </div>
-
-    <div class="tool" id="tool_future">
-        <h1>suitability projections</h1>
-        <div class="toolcontent">
-            <h3>Future Emission Scenario</h3>
-            <label class="scenario ui-state-default ui-corner-all">
-                <input type="radio" name="scenario" value="RCP85" checked="checked">
-                <p>RCP8.5: "Business as usual".  Increasing greenhouse gas emissions over time.</p>
-            </label>
-            <label class="scenario ui-state-default ui-corner-all">
-                <input type="radio" name="scenario" value="RCP6">
-                <p>RCP6: emissions stabilise some time after 2100.</p>
-            </label>
-            <label class="scenario ui-state-default ui-corner-all">
-                <input type="radio" name="scenario" value="RCP45">
-                <p>RCP4.5: emissions stabilise before 2100.</p>
-            </label>
-            <label class="scenario ui-state-default ui-corner-all">
-                <input type="radio" name="scenario" value="RCP3PD">
-                <p>RCP2.6: emissions reduce substantially.</p>
-            </label>
-
-            <div class="loading_container" style="display: none;">
-                Loading projection maps...
-                <div class="loading_bar"></div>
-            </div>
-            <div class="options_container">
-                <div class="sliderbox">
-                    <span id="year_label"></span>
-                    <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
-                    <div id="year_slider"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="tool classlegend" id="tool_classlegend">
         <h1>classification legend</h1>
         <div class="toolcontent">
@@ -259,6 +173,93 @@
             <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
         </div>
     </div>
+
+    <div class="tool" id="oldvets">
+        <h1>other people's vettings</h1>
+        <div class="toolcontent">
+            <ul id="their_vettings_list" class="vetting_list theirs">
+            </ul>
+        </div>
+    </div>
+
+    <div class="tool" id="myvets">
+        <h1>my vettings</h1>
+        <div class="toolcontent">
+            <ul id="my_vettings_list" class="vetting_list mine">
+            </ul>
+        </div>
+    </div>
+
+    <div class="tool" id="newvet">
+        <h1>vet observations</h1>
+        <div class="toolcontent">
+            <div id="newvet_control" class="newvet_control">
+<!--                <button id="newvet_draw_polygon_button" class="ui-state-default ui-corner-all toggle draw_polygon" title="draw vetting polygons"><span class="ui-icon ui-icon-pencil"></span>Draw New Area</button> -->
+<!--                <button id="newvet_add_polygon_button" class="ui-state-default ui-corner-all non_toggle add_polygon" title="add new area"><span class="ui-icon ui-icon-circle-plus"></span>Add New Area</button> -->
+                <button id="newvet_add_polygon_by_occurrences_button" class="ui-state-default ui-corner-all non_toggle add_polygon_by_occurrences" title="add area around occurrence clusters"><span class="ui-icon ui-icon-arrow-2-se-nw"></span>Select Observations</button>
+<!--                <button id="newvet_modify_polygon_button" class="ui-state-default ui-corner-all toggle modify_polygon" title="modify areas"><span class="ui-icon ui-icon-arrow-4"></span>Modify An Area</button> -->
+<!--                <button id="newvet_delete_selected_polygon_button" class="ui-state-default ui-corner-all non_toggle delete_selected_polygon ui-state-disabled" title="delete selected area" disabled=true><span class="ui-icon ui-icon-trash"></span>Delete Selected Area</button> -->
+                <button id="newvet_delete_all_polygons_button" class="ui-state-default ui-corner-all non_toggle delete_all_polygons" title="clear selection"><span class="ui-icon ui-icon-trash"></span>Clear Selection</button>
+            </div>
+            <!-- new vet form -->
+            <form id="vetform">
+                <legend>Classification
+                    <select id="vetclassification" name="classification">
+                        <option value="" selected=true>-- classify as.. --</option>
+                        <option value="invalid">invalid</option>
+                        <option value="historic">historical</option>
+                        <option value="vagrant">vagrant</option>
+                        <option value="irruptive">irruptive</option>
+                        <option value="non-breeding">non-breeding</option>
+                        <option value="breeding">breeding</option>
+                        <option value="introduced breeding">introduced</option>
+                    </select>
+                </legend>
+                <legend>Optional comment
+                    <textarea id="vetcomment" name="comment"></textarea>
+                </legend>
+            </form>
+            <button id="vet_submit" class='ui-state-default ui-corner-all' title='save vetting'><span class="ui-icon ui-icon-disk"></span>Save this Vetting</button>
+
+            <div id="vethint" class="hint"></div>
+        </div>
+    </div>
+
+    <div class="tool" id="tool_future">
+        <h1>suitability projections</h1>
+        <div class="toolcontent">
+            <h3>Future Emission Scenario</h3>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP85" checked="checked">
+                <p>RCP8.5: "Business as usual".  Increasing greenhouse gas emissions over time.</p>
+            </label>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP6">
+                <p>RCP6: emissions stabilise some time after 2100.</p>
+            </label>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP45">
+                <p>RCP4.5: emissions stabilise before 2100.</p>
+            </label>
+            <label class="scenario ui-state-default ui-corner-all">
+                <input type="radio" name="scenario" value="RCP3PD">
+                <p>RCP2.6: emissions reduce substantially.</p>
+            </label>
+
+            <div class="loading_container" style="display: none;">
+                Loading projection maps...
+                <div class="loading_bar"></div>
+            </div>
+            <div class="options_container">
+                <div class="sliderbox">
+                    <span id="year_label"></span>
+                    <button id="play_slider_button" class="ui-state-default ui-corner-all ui-icon ui-icon-play">play</button>
+                    <div id="year_slider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="tool" id="tool_layers">
         <h1>showing on the map</h1>

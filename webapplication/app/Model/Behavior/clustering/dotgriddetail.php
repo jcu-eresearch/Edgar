@@ -154,10 +154,10 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             // find the first trump with a positive count
             foreach($trumps as $trump) {
                 if (array_key_exists($trump, $classification_count_array)) {
-                    $count = $classification_count_array[$trump];
-                    if ($count > 0) {
+                    $trump_count = $classification_count_array[$trump];
+                    if ($trump_count > 0) {
                         $major_classification = $trump;
-                        $major_classification_count = $count;
+                        $major_classification_count = $trump_count;
                         break; // bail once the current trump is found
                     }
                 }
@@ -219,13 +219,15 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
                     "<dl>";
 
         if ( is_null($round_to_nearest_nth_fraction) ) {
-          $properties_array['description'] .=
+            // report the lat/long, directly, if we aren't clustering
+            $properties_array['description'] .=
                     "<dt>Latitude</dt><dd>$latitude</dd>".
                     "<dt>Longitude</dt><dd>$longitude</dd>";
         } else {
-          $properties_array['description'] .=
-                    "<dt>Latitude Range</dt><dd>".$min_latitude_range.", ".$max_latitude_range."</dd>".
-                    "<dt>Longitude Range</dt><dd>".$min_longitude_range.", ".$max_longitude_range."</dd>";
+            // report lat/long range, if we are clustering
+            $properties_array['description'] .=
+                    "<dt>Latitude Range</dt><dd>".$max_latitude_range."&deg; to ".$min_latitude_range."&deg;</dd>".
+                    "<dt>Longitude Range</dt><dd>".$min_longitude_range."&deg; to ".$max_longitude_range."&deg;</dd>";
         }
 
         $properties_array['description'] .=
@@ -233,19 +235,29 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
                     "<div class='table_wrapper'><table class='classifications'>".
                     "<thead><tr><th>Classification</th><th>Observations</th></tr></thead><tbody>";
 
+        $row_count = 0;
+
         foreach ($unsorted_classification_count_array as $key => $value) {
             $this_contentious_count = $unsorted_contentious_classification_count_array[$key];
 
-            $properties_array['description'] .=
-                    "<tr class='count ".($value == 0 ? 'none' : 'some' )."'>".
-                    "<td>".$key."</td>".
-                    "<td>".($value == 0 ? '-' : $value)."</td></tr>".
-                    ($this_contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($this_contentious_count in contention)</td></tr>");
+            if ($value > 0) {
+                // only add non-zero rows
+                $row_count++;
+                $properties_array['description'] .=
+                        "<tr class='count ".($value == 0 ? 'none' : 'some' )."'>".
+                        "<td>".$key."</td>".
+                        "<td>".($value == 0 ? '-' : $value)."</td></tr>".
+                        ($this_contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($this_contentious_count in contention)</td></tr>");
+            }
         };
 
-        $properties_array['description'] .=
-                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>").
-                    "</tbody></table></div>";
+        if ($row_count > 1) {
+            // only add a total row if there were more than one class rows..
+            $properties_array['description'] .=
+                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
+        }
+
+        $properties_array['description'] .= "</tbody></table></div>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
 

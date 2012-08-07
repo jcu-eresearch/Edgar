@@ -173,7 +173,7 @@ function addMapModes(theMap) {
             Edgar.vetting.disengageVettingMode();
             _setupNewSpecies();
 //            Edgar.util.showhide(['currentspecies','tool_legend'], ['oldvets','newvet','myvets','speciesselector']);
-            Edgar.util.showhide(['currentspecies','tool_simpleclasslegend'], ['newvet','speciesselector','tool_legend']);
+            Edgar.util.showhide(['currentspecies','tool_simpleclasslegend'], ['newvet','speciesselector','tool_legend','tool_classlegend']);
             engageCurrentMode();
         }
 
