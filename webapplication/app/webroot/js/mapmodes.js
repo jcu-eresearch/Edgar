@@ -147,7 +147,7 @@ function addMapModes(theMap) {
         if (oldMode === 'current' && newMode === 'future' ) {
             disengageCurrentMode();
             // show & hide the appropriate tools
-            Edgar.util.showhide(['tool_legend','tool_future'], ['tool_classlegend']);
+            Edgar.util.showhide(['tool_legend','tool_future'], ['tool_classlegend','tool_simpleclasslegend']);
             // switch off the current layers
             clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             engageFutureMode();
