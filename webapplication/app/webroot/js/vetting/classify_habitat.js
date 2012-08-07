@@ -305,7 +305,7 @@
               #    - Drag
       */
       this.modifyControl = new OpenLayers.Control.ModifyFeature(this.vectorLayer, {
-        mode: OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG,
+        mode: OpenLayers.Control.ModifyFeature.DRAG,
         beforeSelectFeature: function(feature) {
           $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled");
           return null;
@@ -351,7 +351,7 @@
     _activateModifyPolygonMode: function() {
       this._clearNewVettingMode();
       $('#newvet_modify_polygon_button').addClass('ui-state-active');
-      this.modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG;
+      this.modifyControl.mode = OpenLayers.Control.ModifyFeature.DRAG;
       this.modifyControl.activate();
       return this._updateNewVetHint();
     },

@@ -327,7 +327,7 @@ Edgar.vetting.classifyHabitat = {
         @modifyControl = new OpenLayers.Control.ModifyFeature(
             @vectorLayer
             {
-                mode: ( OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG )
+                mode: ( OpenLayers.Control.ModifyFeature.DRAG )
                 beforeSelectFeature: (feature) ->
                     $('#newvet_delete_selected_polygon_button').attr("disabled", false).removeClass("ui-state-disabled")
                     null
@@ -389,7 +389,7 @@ Edgar.vetting.classifyHabitat = {
         $('#newvet_modify_polygon_button').addClass 'ui-state-active'
 
         # Specify the modify mode as reshape and drag 
-        @modifyControl.mode = OpenLayers.Control.ModifyFeature.RESHAPE | OpenLayers.Control.ModifyFeature.DRAG
+        @modifyControl.mode = OpenLayers.Control.ModifyFeature.DRAG
         @modifyControl.activate()
         this._updateNewVetHint()
 
