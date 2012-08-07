@@ -352,12 +352,15 @@ class SpeciesController extends AppController {
 
         // query db
         $results = $this->Species->getDataSource()->execute(
-            'SELECT * FROM species '.
-            'WHERE (? % scientific_name) OR (? % common_name) '.
-            'ORDER BY GREATEST(SIMILARITY(?, scientific_name), SIMILARITY(?, common_name)) DESC '.
+            'SELECT * FROM '.
+            '    (SELECT *, GREATEST(SIMILARITY(?, scientific_name), SIMILARITY(?, common_name)) AS match '.
+            '     FROM species '.
+            '     WHERE has_occurrences) AS matched_and_filtered_species '.
+            'WHERE match >= 0.3 '.
+            'ORDER BY match DESC '.
             'LIMIT 20',
             array(),
-            array($partial, $partial, $partial, $partial)
+            array($partial, $partial)
         );
 
         // convert $matched_species into json format expected by jquery ui

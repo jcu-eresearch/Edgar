@@ -54,6 +54,7 @@ CREATE TABLE species (
     num_dirty_occurrences INT DEFAULT 0 NOT NULL, -- This is the number of occurrences that have changed since the last modelling run happened
     num_contentious_occurrences INT DEFAULT 0 NOT NULL,
     needs_vetting_since TIMESTAMP DEFAULT NULL NULL, -- When this species began needing a re-vet. Null means the species does not need to be re-vetted.
+    has_occurrences BOOL DEFAULT FALSE NOT NULL,
     -- Modelling status (current)
     first_requested_remodel TIMESTAMP DEFAULT NULL NULL, -- The first time, since last modelling run, that a user requested a remodel for this species
     -- Modelling current

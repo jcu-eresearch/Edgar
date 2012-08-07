@@ -42,7 +42,6 @@ class Syncer:
 
 
     def sync(self, sync_species=True, sync_occurrences=True):
-        # add species
         # species are never deleted, because occassionally ALA does
         # not return the full list of species, which would cause species to be
         # deleted locally and orphan their occurrences.
@@ -160,10 +159,23 @@ class Syncer:
         log.info('Checking that local occurrence counts match ALA')
         self.check_occurrence_counts()
 
+        # calculate has_occurrences col for all dirtied species
+        if len(self.num_dirty_records_by_species_id) > 0:
+            log.info('Updating has_occurrences for all species');
+            dirty_ids = [str(int(x)) for x in self.num_dirty_records_by_species_id.keys()]
+            db.engine.execute('''
+                UPDATE species
+                SET has_occurrences = ((SELECT COUNT(*) FROM occurrences
+                                        WHERE species_id = species.id
+                                        LIMIT 1) > 0)
+                WHERE id IN ({dirtied_species});
+            '''.format(
+                dirtied_species=','.join(dirty_ids)
+            ));
+
         # increase number in db.species.num_dirty_occurrences
         log.info('Updating number of dirty occurrences')
         self.update_num_dirty_occurrences()
-
 
 
     def redownload_occurrences_if_needed(self):
