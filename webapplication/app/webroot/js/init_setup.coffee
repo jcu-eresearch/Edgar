@@ -32,6 +32,9 @@ Edgar.mapdata.layers.currentsuitability = null
 Edgar.mapdata.layers.occurrences = null
 Edgar.mapdata.layers.selectoccurrencecontrol = null   # not technically a layer..
 
+Edgar.mapdata.controls = {}  # references to OpenLayers controls to make them easy to enable/disable etc
+Edgar.mapdata.controls.occurrencesSelectControl = null
+
 ###
 logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
 ###

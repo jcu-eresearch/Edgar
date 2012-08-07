@@ -50,6 +50,10 @@ the global Edgar object
 
   Edgar.mapdata.layers.selectoccurrencecontrol = null;
 
+  Edgar.mapdata.controls = {};
+
+  Edgar.mapdata.controls.occurrencesSelectControl = null;
+
   /*
   logged in user?  This is set in fullscreencontent.ctp if there's a logged in user
   */
