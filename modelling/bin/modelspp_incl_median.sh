@@ -1,5 +1,6 @@
 #/bin/bash
 
+
 # Requires ENV Variable AP03_SPP to be set.
 
 # Expected call format
@@ -103,7 +104,7 @@ function model_and_median {
 java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z redoifexists autorun
 
 # Model the 'current' projection ( in the background )
-java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$TRAINCLIMATE" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x &
+java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$TRAINCLIMATE" "$TMP_OUTPUT_DIR/"`basename "$TRAINCLIMATE"`.asc fadebyclamping nowriteclampgrid nowritemess -x &
 
 # Model all models for each scenario year combo
 for SCENARIO in "${SCENARIOS_TO_MODEL[@]}"; do
