@@ -4,7 +4,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
 
     $defaults = array(
         'trump' => false,
-        'condensed' => false,
+        'showdoubtful' => false,
         'showminor' => false,
         'griddiness' => 3.2 // lower number = bigger, more coarse grid squares
     );
@@ -12,14 +12,14 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
     $options = array_merge($defaults, $options);
 
     $trump = $options["trump"];
-    $condensed = $options["condensed"];
+    $showdoubtful = $options["showdoubtful"];
     $showminor = $options["showminor"];
     $griddiness = $options["griddiness"];
 
     // in trump mode, earlier listings will trump later ones when deciding colour
     $trumps = array(
         'unknown',
-        'core',
+
         'non-core',
 
         'vagrant',
@@ -30,7 +30,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
 
         'historic',
 
-        'invalid'
+        'doubtful'
     );
 
 
@@ -79,7 +79,6 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
 
         $unsorted_contentious_classification_count_array = array(
             "unknown" => $location["contentious_unknown_count"],
-            "invalid" => $location["contentious_invalid_count"],
             "historic" => $location["contentious_historic_count"],
             "vagrant" => $location["contentious_vagrant_count"],
             "irruptive" => $location["contentious_irruptive_count"],
@@ -89,7 +88,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
 
         $classification_count_array = array(
             "unknown" => $location["unknown_count"],
-            "invalid" => $location["invalid_count"],
+
             "historic" => $location["historic_count"],
             "vagrant" => $location["vagrant_count"],
             "irruptive" => $location["irruptive_count"],
@@ -97,38 +96,14 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             "introduced" => $location["introduced_count"]
         );
 
-        if ($condensed) {
-
-            // condensed means the classifications are condensed into just four 
-
-            $unsorted_contentious_classification_count_array = array(
-                "unknown" => $location["contentious_unknown_count"],
-                "invalid" => $location["contentious_invalid_count"],
-                "non-core" => (
-                    $location["contentious_historic_count"]
-                    + $location["contentious_vagrant_count"]
-                    + $location["contentious_irruptive_count"]
-                ),
-                "core" => (
-                    $location["contentious_core_count"]
-                    + $location["contentious_introduced_count"]
-                )
-            );
-
-            $classification_count_array = array(
-                "unknown" => $location["unknown_count"],
-                "invalid" => $location["invalid_count"],
-                "non-core" => (
-                    $location["historic_count"]
-                    + $location["vagrant_count"]
-                    + $location["irruptive_count"]
-                ),
-                "core" => (
-                    $location["core_count"]
-                    + $location["introduced_count"]
-                ),
-            );
-
+        if ($showdoubtful) {
+            // if we're showing doubtful, add it in
+            $unsorted_contentious_classification_count_array["doubtful"] = $location["contentious_invalid_count"];
+            $classification_count_array["doubtful"] = $location["invalid_count"];
+        } else {
+            // if we AREN'T showing doubtful, adjust the count
+            $count -= $location["invalid_count"];
+            if ($count < 1) continue;  // bail on this location if we have visible observations
         }
 
         $unsorted_classification_count_array  = $classification_count_array;
@@ -171,7 +146,6 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
         if (!$showminor) {
             $minor_classification = $major_classification;
         }
-
 
         $major_classification_properties = Vetting::getPropertiesJSONObject($major_classification);
         $minor_classification_properties = Vetting::getPropertiesJSONObject($minor_classification);

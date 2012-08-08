@@ -163,15 +163,15 @@ function addMapModes(theMap) {
 
         if (oldMode === 'future'  && newMode === 'current') {
             disengageFutureMode();
-            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
-            Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend'], ['tool_future','speciesselector']);
+            Edgar.util.showhide(['currentspecies','tool_legend','tool_simpleclasslegend'], ['tool_future','speciesselector']);
+            addSpeciesOccurrencesAndSuitabilityLayers();
             _setupNewSpecies();
             engageCurrentMode();
         }
 
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
-            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
+            addSuitabilityLayer();
             _setupNewSpecies();
 //            Edgar.util.showhide(['currentspecies','tool_legend'], ['oldvets','newvet','myvets','speciesselector']);
             Edgar.util.showhide(['currentspecies','tool_simpleclasslegend'], ['newvet','speciesselector','tool_legend','tool_classlegend']);
