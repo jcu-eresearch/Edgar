@@ -35,8 +35,8 @@ log.debug("Starting modeld.py")
 currentJob = None
 currentCycle = 0
 
-minSleepTime = 10
-maxSleepTime = 30
+minSleepTime = 300
+maxSleepTime = 400
 
 # The Main Loop
 while True:
