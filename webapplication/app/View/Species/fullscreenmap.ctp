@@ -64,7 +64,7 @@
             <div class="classlist clearfix">
                 <div class="leftcol">
                     <div class="classification" title="invalid: record is an error">
-                        <h2><span class="dot" style="background: #000"></span>invalid</h2>
+                        <h2><span class="dot" style="background: #c00"></span>invalid</h2>
                     </div>
                     <div class="classification" title="historic: observation in the past that does not represent modern presence of species">
                         <h2><span class="dot" style="background: #972"></span>historic</h2>
@@ -79,7 +79,7 @@
 
                 <div class="rightcol">
                     <div class="classification" title="unclassified: not yet classified (please vet!)">
-                        <h2><span class="dot" style="background: #c00"></span>unclassified</h2>
+                        <h2><span class="dot" style="background: #000"></span>unclassified</h2>
                     </div>
                     <div class="classification" title="non-breeding: observation is within a non-breeding range for a migratory species">
                         <h2><span class="dot" style="background: #70f"></span>non-breeding</h2>
@@ -129,7 +129,7 @@
             <div class="classlist clearfix">
                 <div class="leftcol">
                     <div class="classification" title="invalid: record is an error">
-                        <h2><span class="dot" style="background: #000"></span>invalid</h2>
+                        <h2><span class="dot" style="background: #c00"></span>invalid</h2>
                     </div>
                     <div class="classification" title="other: observation does not represent the species' core range">
                         <h2><span class="dot" style="background: #f70"></span>other</h2>
@@ -138,7 +138,7 @@
 
                 <div class="rightcol">
                     <div class="classification" title="unclassified: not yet classified (please vet!)">
-                        <h2><span class="dot" style="background: #c00"></span>unclassified</h2>
+                        <h2><span class="dot" style="background: #000"></span>unclassified</h2>
                     </div>
                     <div class="classification" title="core: observation is within the species' core range">
                         <h2><span class="dot" style="background: #02f"></span>core</h2>
@@ -231,19 +231,19 @@
             <h3>Future Emission Scenario</h3>
             <label class="scenario ui-state-default ui-corner-all">
                 <input type="radio" name="scenario" value="RCP85" checked="checked">
-                <p>RCP8.5: "Business as usual".  Increasing greenhouse gas emissions over time.</p>
+                <p>"Business as usual": increasing greenhouse gas emissions over time. (RCP8.5)</p>
             </label>
             <label class="scenario ui-state-default ui-corner-all">
                 <input type="radio" name="scenario" value="RCP6">
-                <p>RCP6: emissions stabilise some time after 2100.</p>
+                <p>Emissions stabilise some time after 2100. (RCP6)</p>
             </label>
             <label class="scenario ui-state-default ui-corner-all">
                 <input type="radio" name="scenario" value="RCP45">
-                <p>RCP4.5: emissions stabilise before 2100.</p>
+                <p>Emissions stabilise before 2100. (RCP4.5)</p>
             </label>
             <label class="scenario ui-state-default ui-corner-all">
                 <input type="radio" name="scenario" value="RCP3PD">
-                <p>RCP2.6: emissions reduce substantially.</p>
+                <p>Emissions reduce substantially. (RCP2.6)</p>
             </label>
 
             <div class="loading_container" style="display: none;">

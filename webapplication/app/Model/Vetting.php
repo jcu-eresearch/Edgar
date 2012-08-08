@@ -22,12 +22,12 @@ class Vetting extends AppModel {
 
         switch($classification) {
             case "unknown":
-                $fill_color   = "#cc0000";
+                $fill_color   = "#000000";
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
             case "invalid":
-                $fill_color   = "#000000";
+                $fill_color   = "#cc0000";
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
