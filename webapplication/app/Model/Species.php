@@ -95,20 +95,16 @@ class Species extends AppModel {
               "sum(case when classification = 'historic' then 1 else 0 end) as historic_count, ".
               "sum(case when classification = 'vagrant' then 1 else 0 end) as vagrant_count, ".
               "sum(case when classification = 'irruptive' then 1 else 0 end) as irruptive_count, ".
-              "sum(case when classification = 'non-breeding' then 1 else 0 end) as non_breeding_count, ".
-              "sum(case when classification = 'introduced non-breeding' then 1 else 0 end) as introduced_non_breeding_count, ".
-              "sum(case when classification = 'breeding' then 1 else 0 end) as breeding_count, ".
-              "sum(case when classification = 'introduced breeding' then 1 else 0 end) as introduced_breeding_count, ".
+              "sum(case when classification = 'core' then 1 else 0 end) as core_count, ".
+              "sum(case when classification = 'introduced' then 1 else 0 end) as introduced_count, ".
 
               "sum(case when classification = 'unknown' and contentious = true then 1 else 0 end) as contentious_unknown_count, ".
               "sum(case when classification = 'invalid' and contentious = true then 1 else 0 end) as contentious_invalid_count, ".
               "sum(case when classification = 'historic' and contentious = true then 1 else 0 end) as contentious_historic_count, ".
               "sum(case when classification = 'vagrant' and contentious = true then 1 else 0 end) as contentious_vagrant_count, ".
               "sum(case when classification = 'irruptive' and contentious = true then 1 else 0 end) as contentious_irruptive_count, ".
-              "sum(case when classification = 'non-breeding' and contentious = true then 1 else 0 end) as contentious_non_breeding_count, ".
-              "sum(case when classification = 'introduced non-breeding' and contentious = true then 1 else 0 end) as contentious_introduced_non_breeding_count, ".
-              "sum(case when classification = 'breeding' and contentious = true then 1 else 0 end) as contentious_breeding_count, ".
-              "sum(case when classification = 'introduced breeding' and contentious = true then 1 else 0 end) as contentious_introduced_breeding_count, ".
+              "sum(case when classification = 'core' and contentious = true then 1 else 0 end) as contentious_core_count, ".
+              "sum(case when classification = 'introduced' and contentious = true then 1 else 0 end) as contentious_introduced_count, ".
 
               "sum(case when contentious = true then 1 else 0 end) as contentious_count, ".
 

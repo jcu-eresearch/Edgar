@@ -6,10 +6,8 @@ SELECT
   sum(case when classification = 'historic' then 1 else 0 end) as historic_count,
   sum(case when classification = 'vagrant' then 1 else 0 end) as vagrant_count,
   sum(case when classification = 'irruptive' then 1 else 0 end) as irruptive_count,
-  sum(case when classification = 'non-breeding' then 1 else 0 end) as non_breeding_count,
-  sum(case when classification = 'introduced non-breeding' then 1 else 0 end) as introduced_non_breeding_count,
-  sum(case when classification = 'breeding' then 1 else 0 end) as breeding_count,
-  sum(case when classification = 'introduced breeding' then 1 else 0 end) as introduced_breeding_count,
+  sum(case when classification = 'core' then 1 else 0 end) as core_count,
+  sum(case when classification = 'introduced' then 1 else 0 end) as introduced_count,
   COUNT(*)
 FROM occurrences
 WHERE

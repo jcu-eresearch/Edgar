@@ -17,9 +17,8 @@ def connect(engine_config):
     metadata.bind = engine
 
 
-classification_enum = Enum('unknown', 'invalid', 'historic', 'vagrant', 'irruptive',
-    'non-breeding', 'introduced non-breeding', 'breeding',
-    'introduced breeding');
+classification_enum = Enum('unknown', 'invalid', 'historic', 'vagrant',
+    'irruptive', 'core', 'introduced');
 
 
 species = Table('species', metadata,
