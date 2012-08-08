@@ -447,12 +447,12 @@ $(function() {
             new OpenLayers.Control.ArgParser(),
             new OpenLayers.Control.Attribution(),
             new OpenLayers.Control.Navigation()
-        ],
+        ]
 
         // Setting the restrictedExtent will change the bounds
         // that pressing the 'world' icon zooms to.
         // User can manually zoom out past this point.
-        restrictedExtent: australia_bounds
+        // restrictedExtent: australia_bounds
 
     });
 
