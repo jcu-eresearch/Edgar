@@ -26,8 +26,8 @@ mercator = new OpenLayers.Projection("EPSG:900913");
 
 // Australia Bounds
 australia_bounds = new OpenLayers.Bounds();
-australia_bounds.extend(new OpenLayers.LonLat(111,-11));
-australia_bounds.extend(new OpenLayers.LonLat(152,-43));
+australia_bounds.extend(new OpenLayers.LonLat(111,-10));
+australia_bounds.extend(new OpenLayers.LonLat(152,-44));
 australia_bounds = australia_bounds.transform(geographic, mercator);
 
 // The bounds of the world.
@@ -442,17 +442,17 @@ $(function() {
         displayProjection: geographic,
         units: "m",
         maxResolution: 156543.0339,
-        maxExtent: world_bounds,
+        maxExtent: australia_bounds,
         controls: [
             new OpenLayers.Control.ArgParser(),
             new OpenLayers.Control.Attribution(),
             new OpenLayers.Control.Navigation()
-        ]
+        ],
 
         // Setting the restrictedExtent will change the bounds
         // that pressing the 'world' icon zooms to.
         // User can manually zoom out past this point.
-//            restrictedExtent: zoom_bounds
+        restrictedExtent: australia_bounds
 
     });
 
