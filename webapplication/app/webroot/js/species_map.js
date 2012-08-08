@@ -56,30 +56,20 @@ function updateLegend() {
     $('#map_legend_img').attr('src', legendURL());
 }
 // ------------------------------------------------------------------
-function showLegend() {
-    $('#map_legend_img').show();
-}
-// ------------------------------------------------------------------
-function hideLegend() {
-    $('#map_legend_img').hide();
-}
-// ------------------------------------------------------------------
 // Removes the old layers..
 // Adds the new fresh layers.
 // Unfortunately, the bbox/http strategy doesn't allow the URL to be updated on
 // the fly, so we have to replace our old layers.
 function clearExistingSpeciesOccurrencesAndSuitabilityLayers() {
-
     clearExistingSpeciesOccurrencesLayer();
-
+    clearExistingSpeciesSuitabilityLayer();
+}
+// ------------------------------------------------------------------
+function clearExistingSpeciesSuitabilityLayer() {
     if (Edgar.mapdata.layers["Climate Suitability"]) {
         Edgar.map.removeLayer(Edgar.mapdata.layers["Climate Suitability"]);
         Edgar.mapdata.layers["Climate Suitability"] = null;
     }
-
-    // Get rid of any popups the user may have had on screen.
-    clearMapPopups();
-    hideLegend();
 }
 // ------------------------------------------------------------------
 function clearExistingSpeciesOccurrencesLayer() {
@@ -88,6 +78,9 @@ function clearExistingSpeciesOccurrencesLayer() {
         Edgar.map.removeLayer(Edgar.mapdata.layers.occurrences);
         Edgar.mapdata.layers.occurrences = null;
     }
+
+    // Get rid of any popups the user may have had on screen.
+    clearMapPopups();
 
     // Remove the old occurrence select control.
     if (Edgar.mapdata.layers.selectoccurrencecontrol !== null) {
@@ -104,7 +97,6 @@ function addSpeciesOccurrencesAndSuitabilityLayers() {
     addOccurrencesLayer();
     addSuitabilityLayer("Climate Suitability", Edgar.util.mappath(Edgar.mapdata.species.id, "current"));
     updateLegend();
-    showLegend();
 }
 // ------------------------------------------------------------------
 function clearMapPopups() {

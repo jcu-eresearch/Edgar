@@ -160,7 +160,7 @@
     <div class="tool legend" id="tool_legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
-            <img id='map_legend_img' style='display:none;' src='' alt='map_legend'/>
+            <img id='map_legend_img' src=''/>
         </div>
     </div>
 
