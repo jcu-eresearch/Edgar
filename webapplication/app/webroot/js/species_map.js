@@ -108,7 +108,7 @@ function clearMapPopups() {
 function addSuitabilityLayer(layerName, mapPath) {
 
     if (!layerName) layerName = "Climate Suitability";
-    if (!mapPath) mayPath = Edgar.util.mappath(Edgar.mapdata.species.id, "current");
+    if (!mapPath) mapPath = Edgar.util.mappath(Edgar.mapdata.species.id, "current");
 
     clearExistingSpeciesSuitabilityLayer();
 
