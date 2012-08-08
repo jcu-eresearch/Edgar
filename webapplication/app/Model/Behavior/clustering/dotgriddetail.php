@@ -25,10 +25,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
         'vagrant',
         'irruptive',
 
-        'breeding',
-        'non-breeding',
-        'introduced breeding',
-        'introduced non-breeding',
+        'core',
+        'introduced',
 
         'historic',
 
@@ -85,10 +83,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             "historic" => $location["contentious_historic_count"],
             "vagrant" => $location["contentious_vagrant_count"],
             "irruptive" => $location["contentious_irruptive_count"],
-            "non-breeding" => $location["contentious_non_breeding_count"],
-            "introduced non-breeding" => $location["contentious_introduced_non_breeding_count"],
-            "breeding" => $location["contentious_breeding_count"],
-            "introduced breeding" => $location["contentious_introduced_breeding_count"]
+            "core" => $location["contentious_core_count"],
+            "introduced" => $location["contentious_introduced_count"]
         );
 
         $classification_count_array = array(
@@ -97,10 +93,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             "historic" => $location["historic_count"],
             "vagrant" => $location["vagrant_count"],
             "irruptive" => $location["irruptive_count"],
-            "non-breeding" => $location["non_breeding_count"],
-            "introduced non-breeding" => $location["introduced_non_breeding_count"],
-            "breeding" => $location["breeding_count"],
-            "introduced breeding" => $location["introduced_breeding_count"]
+            "core" => $location["core_count"],
+            "introduced" => $location["introduced_count"]
         );
 
         if ($condensed) {
@@ -116,10 +110,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
                     + $location["contentious_irruptive_count"]
                 ),
                 "core" => (
-                    $location["contentious_non_breeding_count"]
-                    + $location["contentious_introduced_non_breeding_count"]
-                    + $location["contentious_breeding_count"]
-                    + $location["contentious_introduced_breeding_count"]
+                    $location["contentious_core_count"]
+                    + $location["contentious_introduced_count"]
                 )
             );
 
@@ -132,10 +124,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
                     + $location["irruptive_count"]
                 ),
                 "core" => (
-                    $location["non_breeding_count"]
-                    + $location["introduced_non_breeding_count"]
-                    + $location["breeding_count"]
-                    + $location["introduced_breeding_count"]
+                    $location["core_count"]
+                    + $location["introduced_count"]
                 ),
             );
 

@@ -17,12 +17,8 @@ CLASSIFICATIONS_BY_BLA_CATEGORIES = {
         'escaped': 'vagrant',
         'historic': 'historic',
         'suspect': 'invalid',
-        'introduced, breeding and non-breeding': 'introduced breeding',
-        'introduced, breeding': 'introduced breeding',
-        'introduced, non-breeding': 'introduced non-breeding',
-        'core, breeding and non-breeding': 'breeding',
-        'core, breeding': 'breeding',
-        'core, non-breeding': 'non-breeding'
+        'introduced': 'introduced',
+        'core': 'core'
 }
 
 # global logger for this module
@@ -141,9 +137,6 @@ def set_db_id_for_taxons(taxons):
 
 def classification_for_bla_row(row):
     category = row['range_t']
-    if category == 'core' or category == 'introduced':
-        category += ', ' + row['br_rnge_t']
-
     assert category in CLASSIFICATIONS_BY_BLA_CATEGORIES
     return CLASSIFICATIONS_BY_BLA_CATEGORIES[category]
 

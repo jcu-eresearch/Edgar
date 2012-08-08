@@ -21,12 +21,10 @@ DROP TYPE IF EXISTS classification;
 --     "historic" - bird was there when you saw it in 1960, but they don't live there now
 --     "vagrant" - bird might have been seen there, bit it doesn't actually live there/can't survive there
 --     "irruptive" - bird sometimes lives there, like when there's a mouse plague or something, but it's not a persistent habitat
---     "non-breeding" - bird lives there, some or most of the year, but it's migratory and doesn't breed there
---     "introduced non-breeding" - a theoretical classification that's like non-breeding, but it was introduced to the habitat by humans
---     "breeding" - bird lives there, some or all of the year, and breeds there
---     "introduced breeding" - like breeding, but it was introduced to the habitat by humans
+--     "core" - bird lives there, some or all of the year. may or may not breed there.
+--     "introduced" - like "core", but it was introduced to the habitat by humans
 --
--- The occurrence should be used in modelling if the vetting's classification is "irruptive" or better.
+-- The occurrence should be used in modelling if the vetting's classification is "core", "introduced" or "unknown".
 
 CREATE TYPE classification AS ENUM(
     'unknown',
@@ -34,10 +32,8 @@ CREATE TYPE classification AS ENUM(
     'historic',
     'vagrant',
     'irruptive',
-    'non-breeding',
-    'introduced non-breeding',
-    'breeding',
-    'introduced breeding'
+    'core',
+    'introduced'
 );
 
 
