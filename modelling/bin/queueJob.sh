@@ -12,7 +12,8 @@
 
 CURRENT_SPECIES_ID="$1"
 WORKING_DIR="$2"
-INPUT_CSV="$3"
+INPUT_PRIV_CSV="$3"
+INPUT_PUB_CSV="$4"
 
 BIN_DIR="$WORKING_DIR/bin"
 
@@ -21,12 +22,14 @@ TMP_IO_OUTPUT_DIR="$WORKING_DIR/tmp/io"
 
 mkdir -p "$TMP_IO_OUTPUT_DIR" > /dev/null
 
-PRIVATE_OCCUR_DIR="$WORKING_DIR/inputs/$CURRENT_SPECIES_ID"
-mkdir -p "$PRIVATE_OCCUR_DIR" > /dev/null
-PRIVATE_OCCUR_FILE="$PRIVATE_OCCUR_DIR/.private_occur.csv"
+OCCUR_DIR="$WORKING_DIR/inputs/$CURRENT_SPECIES_ID"
+mkdir -p "$OCCUR_DIR" > /dev/null
+PUBLIC_OCCUR_FILE="$OCCUR_DIR/public_occur.csv"
+PRIVATE_OCCUR_FILE="$OCCUR_DIR/.private_occur.csv"
 
 # Copy the input CSV to the private occur file location
-mv "$INPUT_CSV" "$PRIVATE_OCCUR_FILE" > /dev/null
+mv "$INPUT_PRIV_CSV" "$PRIVATE_OCCUR_FILE" > /dev/null
+mv "$INPUT_PUB_CSV" "$PUBLIC_OCCUR_FILE" > /dev/null
 
 AP03_SPP="$CURRENT_SPECIES_ID"
 
