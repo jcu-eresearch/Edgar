@@ -35,6 +35,7 @@
     init: function() {
       Edgar.vetting.classifyHabitat.init();
       Edgar.vetting.myHabitatClassifications.init();
+      Edgar.vetting.theirHabitatClassifications.init();
       this._initAreaStyleMap();
       this._bindToChangeModeEvents();
       return null;
@@ -78,6 +79,10 @@
       console.log("engageVettingMode");
       $('#cluster').val('dotgridtrump').trigger('change');
       Edgar.util.showhide(['button_current'], []);
+      if (Edgar.user.isAdmin) {
+        Edgar.util.showhide(['oldvets'], []);
+        Edgar.vetting.theirHabitatClassifications.engage();
+      }
       Edgar.vetting.myHabitatClassifications.engage();
       Edgar.vetting.classifyHabitat.engage();
       return null;
@@ -92,6 +97,10 @@
       $('#cluster').val('dotgridsimple').trigger('change');
       Edgar.util.showhide([], ['button_current']);
       Edgar.vetting.myHabitatClassifications.disengage();
+      if (Edgar.user.isAdmin) {
+        Edgar.util.showhide([], ['oldvets']);
+        Edgar.vetting.theirHabitatClassifications.disengage();
+      }
       Edgar.vetting.classifyHabitat.disengage();
       return null;
     }

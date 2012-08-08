@@ -63,17 +63,21 @@
         <div class="toolcontent">
             <div class="classlist clearfix">
                 <div class="leftcol">
-                    <div class="classification" title="invalid: record is an error">
-                        <h2><span class="dot" style="background: #c00"></span>invalid</h2>
-                    </div>
+
                     <div class="classification" title="historic: observation in the past that does not represent modern presence of species">
                         <h2><span class="dot" style="background: #972"></span>historic</h2>
+                    </div>
+                    <div class="classification" title="irruptive: observation is in an irruptive range and does not represent continued presence of species">
+                        <h2><span class="dot" style="background: #f6a"></span>irruptive</h2>
                     </div>
                     <div class="classification" title="vagrant: observation does not represent continued presence of species">
                         <h2><span class="dot" style="background: #f70"></span>vagrant</h2>
                     </div>
-                    <div class="classification" title="irruptive: observation is in an irruptive range and does not represent continued presence of species">
-                        <h2><span class="dot" style="background: #f6a"></span>irruptive</h2>
+                    <div class="classification" title="core: observation is within a core range for species">
+                        <h2><span class="dot" style="background: #02f"></span>core</h2>
+                    </div>
+                    <div class="classification" title="introduced: non-native core range">
+                        <h2><span class="dot" style="background: #26f"></span>intro.</h2>
                     </div>
                 </div>
 
@@ -81,34 +85,20 @@
                     <div class="classification" title="unclassified: not yet classified (please vet!)">
                         <h2><span class="dot" style="background: #000"></span>unclassified</h2>
                     </div>
-                    <div class="classification" title="non-breeding: observation is within a non-breeding range for a migratory species">
-                        <h2><span class="dot" style="background: #70f"></span>non-breeding</h2>
+                    <div class="classification" title="invalid: record is an error">
+                        <h2><span class="dot" style="background: #c00"></span>invalid</h2>
                     </div>
-                    <div class="classification" title="breeding: observation is within a breeding range for a species">
-                        <h2><span class="dot" style="background: #02f"></span>breeding</h2>
+                    <div class="classification" style="visibility: hidden;">
+                        <h2><span class="dot"></span>spacer</h2>
                     </div>
-                    <div class="classification" title="introduced: non-native breeding range">
-                        <h2><span class="dot" style="background: #26f"></span>introduced</h2>
+                    <div class="classification">
+                        <h2><span class="dot" style="left: -3px; top: -4px; background: #666; width: 23px; height: 23px"></span>10k obs.</h2>
+                    </div>
+                    <div class="classification">
+                        <h2><span class="dot" style="top: 2px; left: 3px; background: #666; width: 11px; height: 11px"></span>15 obs.</h2>
                     </div>
                 </div>
             </div>
-
-            <div class="classlist clearfix">
-                <p>Observations are grouped into clusters.  The size indicates the number of observations.</p>
-                <div class="leftcol">
-                    <div class="classification">
-                        <h2><span class="dot" style="right: 2px; background: #02f; width: 11px; height: 11px"></span>15 obs.</h2>
-                    </div>
-                </div>
-    
-                <div class="leftcol">
-                    <div class="classification">
-                        <h2 style="padding-left: 2.1em"><span class="dot" style="left: -2px; top: -0.60em; background: #02f; width: 23px; height: 23px"></span>10,000 obs.</h2>
-                    </div>
-                </div>
-    
-            </div>
-
 <!--
             <div class="classnesting clearfix">
                 <p>Clusters show up to two classes:</p>
@@ -131,8 +121,8 @@
                     <div class="classification" title="invalid: record is an error">
                         <h2><span class="dot" style="background: #c00"></span>invalid</h2>
                     </div>
-                    <div class="classification" title="other: observation does not represent the species' core range">
-                        <h2><span class="dot" style="background: #f70"></span>other</h2>
+                    <div class="classification" title="non-core: observation does not represent the species' core range">
+                        <h2><span class="dot" style="background: #f70"></span>non-core</h2>
                     </div>
                 </div>
 
@@ -175,7 +165,7 @@
     </div>
 
     <div class="tool" id="oldvets">
-        <h1>other people's vettings</h1>
+        <h1>other vettings</h1>
         <div class="toolcontent">
             <ul id="their_vettings_list" class="vetting_list theirs">
             </ul>
