@@ -75,7 +75,8 @@ class HPCJob:
         self.jobStatus        = None
         self.jobStatusMsg     = ""
         self.jobQueuedTime    = None
-        self.tempfile         = None
+        self.privateTempfile  = None
+        self.publicTempfile   = None
         self._writeCSVSpeciesJobFile()
 
     def _setJobId(self, jobId):
@@ -106,12 +107,19 @@ class HPCJob:
         self._setJobStatus(HPCJobStatus.queued)
         return True
 
-    def _setTempfile(self, f):
-        if self.tempfile == None:
-            self.tempfile = f
+    def _setPublicTempfile(self, f):
+        if self.publicTempfile == None:
+            self.publicTempfile = f
         else:
-            raise Exception("Can't set tempfile for a job more than once")
-        return self.tempfile
+            raise Exception("Can't set publicTempfile for a job more than once")
+        return self.publicTempfile
+    
+    def _setPrivateTempfile(self, f):
+        if self.privateTempfile == None:
+            self.privateTempfile = f
+        else:
+            raise Exception("Can't set privateTempfile for a job more than once")
+        return self.privateTempfile
 
     def _writeCSVSpeciesJobFile(self):
         try:
@@ -134,14 +142,20 @@ class HPCJob:
                     log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
 
                     # Create a tempfile to write our csv file to
-                    f = tempfile.NamedTemporaryFile(delete=False)
+                    priv_f  = tempfile.NamedTemporaryFile(delete=False)
+                    pub_f   = tempfile.NamedTemporaryFile(delete=False)
                     try:
                         # Remember the path to the csv file
-                        self._setTempfile(f.name)
-                        log.debug("Writing csv to: %s", f.name)
-                        writer = csv.writer(f)
+                        self._setPrivateTempfile(priv_f.name)
+                        self._setPrivateTempfile(pub_f.name)
+                        log.debug("Writing public csv to: %s", pub_f.name)
+                        log.debug("Writing private csv to: %s", priv_f.name)
+                        pub_writer  = csv.writer(pub_f)
+                        priv_writer = csv.writer(priv_f)
+
                         # Write the header
-                        writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
+                        pub_writer.writerow(["LATDEC", "LONGDEC"])
+                        priv_writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
 
                         # Select the occurrences for this species
                         occurrence_rows = sqlalchemy.select([
@@ -156,17 +170,22 @@ class HPCJob:
 
                         # Iterate over the occurrences, and write them to the csv
                         for occurrence_row in occurrence_rows:
+                            pub_lat  = occurrence_row['latitude']
+                            pub_lng  = occurrence_row['longitude']
+                            pub_writer.writerow([pub_lat, pub_lng])
+
                             if occurrence_row['sensitive_longitude'] is None:
-                                lat = occurrence_row['latitude']
-                                lon = occurrence_row['longitude']
+                                priv_lat = occurrence_row['latitude']
+                                priv_lon = occurrence_row['longitude']
                             else:
-                                lat = occurrence_row['sensitive_latitude']
-                                lon = occurrence_row['sensitive_longitude']
-                            writer.writerow([self.speciesId, lat, lon])
+                                priv_lat = occurrence_row['sensitive_latitude']
+                                priv_lon = occurrence_row['sensitive_longitude']
+                            priv_writer.writerow([self.speciesId, priv_lat, priv_lon])
 
                     finally:
                         # Be a good file citizen, and close the file handle
-                        f.close()
+                        pub_f.close()
+                        priv_f.close()
             finally:
                 # Dispose the DB
                 HPCConfig.disposeDB();
@@ -180,14 +199,21 @@ class HPCJob:
     def __exit__(self, type, value, traceback):
         self.cleanup()
 
-    # If we had a tempfile, delete it
+    # If we had tempfile/s, delete it
     def cleanup(self):
-        if self.tempfile:
+        if self.publicTempfile:
             try:
-                os.unlink(self.tempfile)
-                os.path.exists(self.tempfile)
+                os.unlink(self.publicTempfile)
+                os.path.exists(self.publicTempfile)
             except Exception as e:
-                log.warn("Exception while deleting tmpfile (%s) for job. Exception: %s", self.tempfile, e)
+                log.warn("Exception while deleting public tmpfile (%s) for job. Exception: %s", self.publicTempfile, e)
+        
+        if self.privateTempfile:
+            try:
+                os.unlink(self.privateTempfile)
+                os.path.exists(self.privateTempfile)
+            except Exception as e:
+                log.warn("Exception while deleting private tmpfile (%s) for job. Exception: %s", self.privateTempfile, e)
 
     # Has this job expired?
     def isExpired(self):
@@ -206,7 +232,9 @@ class HPCJob:
 
         client_scp = ssh.Connection(HPCConfig.sshHPCDestination, username=HPCConfig.sshUser)
 
-        client_scp.put(self.tempfile, self.tempfile)
+        client_scp.put(self.privateTempfile, self.privateTempfile)
+        client_scp.put(self.publicTempfile, self.publicTempfile)
+
         client_scp.close()
 
         # Connect to the HPC
@@ -216,7 +244,8 @@ class HPCJob:
 
 
         # Run the hpc queue script
-        sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '" + HPCConfig.workingDir + "' '" + self.tempfile + "'"
+        sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '" + HPCConfig.workingDir + "' '" + self.privateTempfile + "' '" + self.publicTempfile + "'" 
+
         log.debug("ssh command: %s", sshCmd)
         chan = client.get_transport().open_session()
         chan.exec_command(sshCmd)
