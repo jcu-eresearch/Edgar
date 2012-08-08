@@ -91,10 +91,10 @@
                     <div class="classification" style="visibility: hidden;">
                         <h2><span class="dot"></span>spacer</h2>
                     </div>
-                    <div class="classification">
-                        <h2><span class="dot" style="left: -3px; top: -4px; background: #666; width: 23px; height: 23px"></span>10k obs.</h2>
+                    <div class="classification" title="this dot size indicates 10,000 observations">
+                        <h2><span class="dot" style="left: -3px; top: -4px; background: #666; width: 23px; height: 23px"></span>10,000 obs.</h2>
                     </div>
-                    <div class="classification">
+                    <div class="classification" title="this dot size indicates 15 observations">
                         <h2><span class="dot" style="top: 2px; left: 3px; background: #666; width: 11px; height: 11px"></span>15 obs.</h2>
                     </div>
                 </div>

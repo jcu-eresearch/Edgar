@@ -110,17 +110,199 @@ $user = AuthComponent::user();
         <h1><?php echo $title_for_layout ?></h1>
     
         <ul id="tabtriggers">
-            <li><a href="#" id="abouttrigger" for="about" class="closed">about Edgar</a></li>
-            <li><a href="#" id="downloadstrigger" for="downloads" class="closed">downloads</a></li>
+            <li><a href="#" id="abouttrigger" for="about" class="closed">about</a></li>
+            <li><a href="#" id="sciencetrigger" for="science" class="closed">the science</a></li>
+            <li><a href="#" id="howtotrigger" for="howto" class="closed">using Edgar</a></li>
+            <li><a href="#" id="glossarytrigger" for="glossary" class="closed">glossary</a></li>
             <li><a href="#" id="abouttrigger" for="acknowledgements" class="closed">credits</a></li>
         </ul>
 
     </div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
-    <div id="downloads" class="triggeredtab"><div class="inner">
-        <p class="significant">
-            When completed in August 2012, Edgar will make occurrence and modelling data available for researchers to download.
-        </p>
+    <div id="science" class="triggeredtab"><div class="inner">
+        <p>
+Edgar uses the 
+<a href="http://www.ala.org.au/">Atlas of Living Australia</a>
+bird observation database to generate current and future species distribution models.  These are built for each of 4 Representative Concentration Pathways (RCPs, which are analogous to carbon emission scenarios) using the median of 18 global climate models (GCMs), and 8 time steps between 2015 and 2085.
+        </p><div class="additionalcontent">
+            <span class="opener">Preparing observation records for modelling</span>
+            <div class="add"><p>
+                Bird observation records retrieved from the
+                <a href="http://www.ala.org.au/">Atlas of Living Australia</a>'s (ALA) database have been filtered based on ALA's 'assertions' and those inappropriate for modelling were excluded. Additionally,
+                <a href="http://www.birdlife.org.au/">BirdLife Australia</a>
+                provided species range information, against which we check each observation to obtain an initial classification as core habitat, introduced, historic, vagrant, irruptive, or invalid/doubful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.
+            </p><p>
+                This initial classification for observations is compared against classifications collected from
+                birdwatchers and other knowledgeable visitors to the Edgar site.  Edgar tracks contentious records, but generally a vetting entered by a logged-in site user will be considered accurate and changes
+                the derived classification of an observation.
+            </p><p>
+                Doubtful records and records that are considered historic, irruptive, or vagrant are not used to model climate suitability for a species.  Only species with &gt;20 unique location records are modeled.
+            </p></div>
+        </div><div class="additionalcontent">
+            <span class="opener">Acquiring and generating current and future climate data</span>
+            <div class="add"><p>
+                We used climate data from the
+                <a href="http://www.bom.gov.au/jsp/awap/">Australian Water Availability Project</a>
+                (AWAP) to caculate important climate variables such as current annual mean temperature, temperature seasonality, and annual precipitation. We generated projected values for those variables using all 18 global climate models (GCMs) for all RCP scenarios (RCP2.6, RCP4.5, RCP6, RCP8.5) at 8 time steps between 2015 and 2085.
+            </p></div>
+        </div><div class="additionalcontent">
+            <span class="opener">Generating climate suitability maps</span>
+            <div class="add"><p>
+                Species distribution models are generated dynamically using the presence-only modelling program
+                <a href="http://www.cs.princeton.edu/~schapire/maxent/">Maxent</a> (Phillips et al 2006). Maxent uses species presence records to statistically relate species occurrence to environmental variables on the principle of maximum entropy.
+            </p><p>
+                Edgar continues to collect new observations from ALA and new vettings from site visitors, and as species observations are changed and refined, Edgar regenerates the species' climate maps using the new data. The most up-to-date maps of climate suitability are displayed on Edgar.
+            </p></div>
+        </div>
+
+    </div></div>
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
+    <div id="glossary" class="triggeredtab"><div class="inner">
+
+        <div class="additionalcontent">
+            <span class="opener">Observation Classifications</span>
+            <div class="add"><dl>
+                <dt>
+                    Unclassified
+                </dt><dd>Observation records that have not been
+    classified within any other category.  With nothing else to go on, these records are assumed to be
+    valid and are included in the modelling.  Please improve future models
+    by classifying these records!
+                </dd><dt>
+                    Core
+                </dt><dd>An observation record that falls within any area essential to
+    survival of the species.  This includes breeding grounds, stop-off
+    points for migratory birds, and locations that are visited seasonally.
+                </dd><dt>
+                    Historic
+                </dt><dd>The species has not been observed at this location since
+    1975.  We use the cutoff date of 1975 because climate change is
+    underway, and this is reflected in species distribution changes.  If a
+    bird species has not been observed at a location since 1975, we cannot
+    assume that the climate at that location has remained suitable for the
+    species.
+                </dd><dt>
+                    Irruptive
+                </dt><dd>Observations at a location represent a dramatic, irregular
+    migration of many birds away from their core range.  These irruptions
+    may occur in cycles over many years, or they may be much more
+    unpredictable.
+                </dd><dt>
+                    Vagrant
+                </dt><dd>Individuals of a species have appeared well outside their
+    core range.  Escapees that have not established a population are
+    included within this definition on this site.
+                </dd><dt>
+                    Introduced
+                </dt><dd>A native or non-native species has established a
+    population within an area well outside their native core range.
+                </dd><dt>
+                    Doubtful or Invalid
+                </dt><dd>It is very unlikely that this species was observed at this location.
+                </dd>
+            </dl></div>
+        </div>
+    </div></div>
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
+    <div id="howto" class="triggeredtab"><div class="inner">
+
+        <p>
+Edgar performs three roles:
+        </p><ol>
+            <li>show observation records and current climate suitability for a species</li>
+            <li>show future climate suitability</li>
+            <li>vet observation records.</li>
+        </ol>
+        <div class="additionalcontent">
+            <span class="opener">Viewing observations and current climate suitability</span>
+            <div class="add"><p>
+Edgar starts by showing you a search box across the top of a map.
+If you are alreadying viewing a species, you can switch back to the search box
+species by clicking the 'change species' button near the species name.
+            </p><p>
+Type a species of your choice into the search box.  As you type Edgar will 
+pop up a list suggesting matching species; when you see the species you are
+looking for, click its name (or use your arrow and Enter keys to select it).
+            </p><p>
+While viewing a species, bird observations are clustered so that a single
+coloured "dot" summaries the observations across an area.  A cluster dot
+is drawn larger to represent a high number of observations in that area,
+and smaller to represent fewer observations.
+            </p><p>
+As you zoom into an area, cluster dots are re-drawn so that each dot 
+covers a smaller area.  When you zoom in far enough, observations 
+un-cluster to represent the recorded location of bird sightings.
+            </p></div>
+        </div><div class="additionalcontent">
+            <span class="opener">To view future climate suitability</span>
+            <div class="add"><p>
+Select the species as described above, then click the "see future projections"
+button near the top right corner of your map.  Edgar will show you a new set of
+tools down the right side of your screen, and start loading map projections.
+This will take a few seconds, or longer on slower internet connections.
+            </p><p>
+Once the future climate suitability maps have loaded, click the
+green-circled play button to watch how the suitability will shift
+into the future.  You can also drag the slider to examine any modelled year
+from 2015 to 2085 in ten year steps.
+            </p><p>
+You can view future climate suitability under an alternative emission scenario
+by selecting the scenario in the right column.
+            </p></div>
+        </div><div class="additionalcontent">
+            <span class="opener">To vet observation records</span>
+            <div class="add"><p>
+To vet observation records, you will need a user account.  To help reduce the
+number of logins you might need to create and remember, Edgar shares the user
+account system from the <a href="https://www.ala.org.au/">Atlas of Living Australia</a>.
+            </p><p>
+Click the 'Log In' button at the top right corner of the screen.  This
+will take you to the Atlas of Living Australia (ALA) website.  If you
+already have a username and password, log in; if you do not, click the
+registration link to register.  Registration with ALA only requires
+your name or alias, and a valid email address.
+            </p><p>
+Once logged in to ALA, you will be returned to the Edgar site.  Enter the
+species you would like to vet into the search box, then click the
+'vet this species' at the top of the right tool bar. Edgar will show you a
+ new set of tools down the right side of your screen, including a 
+ 'vet observations' tool below the classification legend.
+            </p><p>
+Recording a vetting is a three step process:
+            </p><dl>
+                <dt>Step 1: select observations</dt>
+                <dd>
+To record a vetting, click 'Select Observations' and either:
+- click an observation or cluster of observations, or
+- click-and-drag a selection box over multiple observations or clusters of
+observations.
+                </dd><dd>
+Selected areas will be highlighted with orange boxes.
+To de-select these areas, click 'Clear Selection', then choose
+'Select Observations' to start again.
+                </dd><dd>
+Note: You can select multiple areas across Australia and give all 
+selected areas a single classification.  For example, you might wish
+to classify multiple records offshore or in the central desert as
+'doubtful'.
+                </dd>
+                <dt>Step 2: enter your opinion</dt>
+                <dd>
+Having selected the observations you want to re-classify, choose a 
+new classification from the drop-down menu in the 'vet observations' toolbox.
+You may add details about your reasons for your classification choice if you
+like.
+                </dd>
+                <dt>Step 3: save</dt>
+                <dd>
+Finally, click 'Save this Vetting' to apply your classification.  A confirmation popup will appear and the selected
+area will be highlighted according to the classification you provided.
+                </dd>
+            </dl><p>
+When you have finished vetting one species, you can begin vetting
+another species by clicking 'Change species'.
+            </p></div>
+        </div>
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="acknowledgements" class="triggeredtab"><div class="inner">
@@ -151,7 +333,7 @@ $user = AuthComponent::user();
         </div>
 
         <p>
-            Edgar is being developed by
+            Edgar was developed by
             <a href="http://jcu-eresearch.github.com/Edgar/2012/03/22/the-team">a team</a>
             at JCU's eResearch Centre and uses data from the
             <a href="http://www.ala.org.au/">Atlas of Living Australia</a>.
@@ -200,7 +382,7 @@ $user = AuthComponent::user();
                 ));
             ?>
 
-            This project is supported by the 
+            This project was supported by the 
             <a href="http://www.ands.org.au/">Australian National Data Service (ANDS)</a>
             through the National Collaborative Research Infrastructure Strategy Program and the
             Education Investment Fund (EIF) Super Science Initiative, as well as through the
@@ -209,16 +391,24 @@ $user = AuthComponent::user();
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="about" class="triggeredtab"><div class="inner">
-        <p class="significant">
+        <p class="very significant">
             Edgar is a website where visitors can explore the <br>
             <strong style="white-space: nowrap">future impact</strong>
             <strong style="white-space: nowrap">of</strong>
             <strong style="white-space: nowrap">climate change</strong>
             <strong style="white-space: nowrap">on</strong>
             <strong style="white-space: nowrap">Australian birds</strong>.
+        </p><p class="significant">
+            Birdwatchers and other experts can
+            <strong>improve the accuracy</strong>
+            of Edgar's projections by classifying observations.
         </p><p>
-            This early demonstration of Edgar shows locations where a bird species has been observed,
-            and displays the current climate's suitability for that species across Australia.
+            Edgar shows locations where a bird species has been observed 
+            and uses this information to calculate and display how well
+            the climate the climate across Australia suits that species.
+        </p><p>
+            Edgar can also show an animation of how the suitable climate
+            for a species may change into the future.
         </p>
         <div class="additionalcontent">
             <span class="opener">tell me more</span>
@@ -244,8 +434,10 @@ engage in improving our understanding of the species and the modelling of specie
         </div>
         <p>
             Edgar requires a <a href="http://browsehappy.com/">modern web browser</a> with 
-            <a href="http://enable-javascript.com/">JavaScript enabled</a>.  This early
-            demonstration site is unlikely to work correctly in Internet Explorer.
+            <a href="http://enable-javascript.com/">JavaScript enabled</a>.  If you are using
+            an older version of Microsoft Internet Explorer, the
+            <a href="http://www.google.com/chromeframe">Chrome Frame</a>
+            plug-in from Google can significantly improve your experience of this site.
         </p>
 
         <div class="funding clearfix">

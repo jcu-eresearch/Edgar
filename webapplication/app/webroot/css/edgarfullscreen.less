@@ -203,14 +203,14 @@ html, body {
     overflow: auto;
 }
 
-.triggeredtab p, .triggeredtab ul, .triggeredtab dl, .triggeredtab dt, .triggeredtab dd {
+.triggeredtab p, .triggeredtab ul, .triggeredtab ol, .triggeredtab dl, .triggeredtab dt, .triggeredtab dd {
     text-align: left;
     xbackground-color: transparent !important;
     xcolor: inherit;
     xfont-size: inherit;
 }
 
-.triggeredtab p, .triggeredtab dl, .triggeredtab ul {
+.triggeredtab p, .triggeredtab dl, .triggeredtab ul, .triggeredtab ol {
     font-size: 90%;
     margin: 1em 0;
 }
@@ -219,9 +219,23 @@ html, body {
     margin-top: 0.5em;
 }
 
+.triggeredtab h1 {
+    margin: 2em 0 1em;
+    text-align: left;
+    background: inherit;
+    font-size: 90%;
+    color: #fff;
+    font-weight: bold;
+}
+
 .triggeredtab p.significant {
+    max-width: 40em;
+    margin: 2em auto;
     color: #fff;
     text-align: center;
+}
+
+.triggeredtab p.very.significant {
     font-size: inherit;
 }
 
@@ -317,6 +331,12 @@ html, body {
 .triggeredtab .funding img.goleft {
     float: left;
     margin: 0 1em 0 0;
+}
+
+/* things in the glossary --------------------------------------------- */
+
+#glossary dt {
+    font-weight: bold;
 }
 
 /* things in the content area ----------------------------------------- */
