@@ -356,7 +356,7 @@ class SpeciesController extends AppController {
             '    (SELECT *, GREATEST(SIMILARITY(?, scientific_name), SIMILARITY(?, common_name)) AS match '.
             '     FROM species '.
             '     WHERE has_occurrences) AS matched_and_filtered_species '.
-            'WHERE match >= 0.3 '.
+            'WHERE match > 0 '.
             'ORDER BY match DESC '.
             'LIMIT 20',
             array(),
