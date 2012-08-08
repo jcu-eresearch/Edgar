@@ -94,7 +94,7 @@ function model_and_median {
     local I_INT=0
 
     # Cycle through the projections and project the maps
-    for local PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_PROJECTION_PATH"`; do
+    for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_PROJECTION_PATH"`; do
 
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
