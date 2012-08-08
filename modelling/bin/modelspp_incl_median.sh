@@ -78,6 +78,7 @@ mkdir -p "$OUTPUTS_DIR"
 
 declare -a YEARS_TO_MODEL=('2015' '2025' '2035' '2045' '2055' '2065' '2075' '2085')
 declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
+declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
 # declare -a MODELS_TO_MODEL=('cccma-cgcm31' 'ccsr-miroc32hi' 'ccsr-miroc32med' 'cnrm-cm3'), etc.
 
@@ -89,10 +90,22 @@ function model_and_median {
     # where model is anything except an underscore (or /)
     local filter_projection_path=".*/${scenario}_[^_/]+_${year}"
 
+    local py_script_to_run="$WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${scenario}_median_${year}.output.tif --calc='A' --overwrite "
+    local I_INT=0
+
     # Cycle through the projections and project the maps
     for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$filter_projection_path"`; do
+
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
+
+        local letter="${LETTERS[$I_INT]}"
+        py_script_to_run="$py_script_to_run --$letter $TMP_OUTPUT_DIR/`basename $PROJ`.asc"
+        let I_INT+=1
+
     done
+
+    # Execute the py script.
+    # `py_script_to_run`
 
     # At this point, the modelling is complete for this scenario year combo
 }
