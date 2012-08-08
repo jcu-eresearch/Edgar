@@ -151,7 +151,7 @@ class HPCJob:
                             'ST_Y(sensitive_location) as sensitive_latitude']).\
                             select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
                             where(db.occurrences.c.species_id == self.speciesId).\
-                            where(or_(db.occurrences.c.classification == 'unknown', db.occurrences.c.classification >= 'non-breeding')).\
+                            where(or_(db.occurrences.c.classification == 'unknown', db.occurrences.c.classification >= 'core')).\
                             execute()
 
                         # Iterate over the occurrences, and write them to the csv

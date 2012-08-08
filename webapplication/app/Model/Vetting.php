@@ -46,28 +46,6 @@ class Vetting extends AppModel {
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
-/*
-            case "non-breeding":
-                $fill_color   = "#7700ff";
-                $stroke_color = $fill_color;
-                $font_color   = $stroke_color;
-                break;
-            case "introduced non-breeding":
-                $fill_color   = "#bb33ff";
-                $stroke_color = $fill_color;
-                $font_color   = $stroke_color;
-                break;
-            case "breeding":
-                $fill_color   = "#0022ff";
-                $stroke_color = $fill_color;
-                $font_color   = $stroke_color;
-                break;
-            case "introduced breeding":
-                $fill_color   = "#2266ff";
-                $stroke_color = $fill_color;
-                $font_color   = $stroke_color;
-                break;
-*/
             case "core":
                 $fill_color   = "#0022ff";
                 $stroke_color = $fill_color;

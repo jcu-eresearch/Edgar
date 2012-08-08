@@ -103,7 +103,7 @@
             <div class="classnesting clearfix">
                 <p>Clusters show up to two classes:</p>
                 <div class="classification" title="outer colour is the most common classification, inner colour the second most common">
-                    <h2><span class="circle" style="background: #f70; border-color: #02f"></span>many breeding, some vagrant</h2>
+                    <h2><span class="circle" style="background: #f70; border-color: #02f"></span>many core, some vagrant</h2>
                 </div>
 
             </div>
@@ -200,9 +200,8 @@
                         <option value="historic">historical</option>
                         <option value="vagrant">vagrant</option>
                         <option value="irruptive">irruptive</option>
-                        <option value="non-breeding">non-breeding</option>
-                        <option value="breeding">breeding</option>
-                        <option value="introduced breeding">introduced</option>
+                        <option value="core">core</option>
+                        <option value="introduced">introduced</option>
                     </select>
                 </legend>
                 <legend>Optional comment
