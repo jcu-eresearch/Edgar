@@ -40,7 +40,7 @@ export AP03_SPP
 export WORKING_DIR
 
 # Then run the qsub
-CURRENT_HPC_JOB_ID=`qsub -S /bin/bash -V -o "$TMP_IO_OUTPUT_DIR/$AP03_SPP/std.out" -e "$TMP_IO_OUTPUT_DIR/$AP03_SPP/err.out" "$MODELS_SPP_SH"`
+CURRENT_HPC_JOB_ID=`qsub -l nodes=1:ppn=4 -S /bin/bash -V -o "$TMP_IO_OUTPUT_DIR/$AP03_SPP/std.out" -e "$TMP_IO_OUTPUT_DIR/$AP03_SPP/err.out" "$MODELS_SPP_SH"`
 
 CMD_EXIT_CODE="$?"
 
