@@ -76,7 +76,7 @@
 
     engageVettingMode: function() {
       console.log("engageVettingMode");
-      $('#cluster').val('dotgridtrump');
+      $('#cluster').val('dotgridtrump').trigger('change');
       Edgar.util.showhide(['button_current'], []);
       Edgar.vetting.myHabitatClassifications.engage();
       Edgar.vetting.classifyHabitat.engage();
@@ -89,7 +89,7 @@
 
     disengageVettingMode: function() {
       console.log("disengageVettingMode");
-      $('#cluster').val('dotgridsimple');
+      $('#cluster').val('dotgridsimple').trigger('change');
       Edgar.util.showhide([], ['button_current']);
       Edgar.vetting.myHabitatClassifications.disengage();
       Edgar.vetting.classifyHabitat.disengage();

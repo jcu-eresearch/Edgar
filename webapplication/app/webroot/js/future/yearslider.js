@@ -214,7 +214,7 @@
 
             var self = this;
             this._$loadingContainer.stop().slideUp('fast', function(){
-                self._$container.stop().slideDown('fast');
+                self._$container.stop().slideDown('fast').effect('hilight', 'slow');
             });
         }
 
