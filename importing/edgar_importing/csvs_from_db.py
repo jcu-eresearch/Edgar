@@ -27,7 +27,7 @@ def rows_for_species_id(species_id):
         select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
         where(db.occurrences.c.species_id == species_id).\
         where(sqlalchemy.or_(
-            db.occurrences.c.classification >= 'irruptive',
+            db.occurrences.c.classification >= 'core',
             db.occurrences.c.classification == 'unknown'
         )).execute()
 
