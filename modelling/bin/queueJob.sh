@@ -16,7 +16,7 @@ INPUT_CSV="$3"
 
 BIN_DIR="$WORKING_DIR/bin"
 
-MODELS_SPP_SH="$BIN_DIR/modelspp.sh"
+MODELS_SPP_SH="$BIN_DIR/modelspp_incl_median.sh"
 TMP_IO_OUTPUT_DIR="$WORKING_DIR/tmp/io"
 
 mkdir -p "$TMP_IO_OUTPUT_DIR" > /dev/null
