@@ -143,6 +143,19 @@ done
 # Wait for all remaining jobs to go to zero...
 wait
 
+# Zip the output, and copy it to the TDH
+mkdir -p "$TDH_DIR/$SPP"
+
+ZIP_FILE_NAME="latest-climate"                   # zip will append .zip itself
+MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate.zip"  # we copy to this, so add the .zip ourself
+
+zip "$TDH_DIR/$SPP/$ZIP_FILE_NAME" "$TMP_OUTPUT_DIR/*" 
+
+# if we don't have a copy for the month, make a copy
+if [ ! -e "$TDH_DIR/$SPP/$MONTH_ZIP_FILE_NAME" ]; then
+  cp "$TDH_DIR/$SPP/$ZIP_FILE_NAME" "$TDH_DIR/$SPP/$MONTH_ZIP_FILE_NAME"
+fi
+
 # TODO
 # Add some sanity checks before removing any existing good output data
 
@@ -154,3 +167,4 @@ mv "$TMP_OUTPUT_DIR" "$FINAL_OUTPUT_DIR"
 
 # Give read access to everyone
 chmod -R ugo+rX "$FINAL_OUTPUT_DIR"
+
