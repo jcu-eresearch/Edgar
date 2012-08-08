@@ -146,31 +146,32 @@ function addMapModes(theMap) {
 
         if (oldMode === 'current' && newMode === 'future' ) {
             disengageCurrentMode();
+            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             // show & hide the appropriate tools
             Edgar.util.showhide(['tool_legend','tool_future'], ['tool_classlegend','tool_simpleclasslegend']);
             // switch off the current layers
-            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             engageFutureMode();
         }
 
         if (oldMode === 'current' && newMode === 'vetting') {
             disengageCurrentMode();
+            clearExistingSpeciesSuitabilityLayer();
             // show & hide the appropriate tools
-//            Edgar.util.showhide(['newvet','oldvets','myvets'], ['tool_legend','tool_future']);
             Edgar.util.showhide(['tool_classlegend','newvet'], ['tool_legend','tool_future','tool_simpleclasslegend']);
             Edgar.vetting.engageVettingMode();
         }
 
         if (oldMode === 'future'  && newMode === 'current') {
             disengageFutureMode();
+            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             Edgar.util.showhide(['currentspecies','tool_legend','tool_classlegend'], ['tool_future','speciesselector']);
             _setupNewSpecies();
-            addSpeciesOccurrencesAndSuitabilityLayers();
             engageCurrentMode();
         }
 
         if (oldMode === 'vetting' && newMode === 'current') {
             Edgar.vetting.disengageVettingMode();
+            clearExistingSpeciesOccurrencesAndSuitabilityLayers();
             _setupNewSpecies();
 //            Edgar.util.showhide(['currentspecies','tool_legend'], ['oldvets','newvet','myvets','speciesselector']);
             Edgar.util.showhide(['currentspecies','tool_simpleclasslegend'], ['newvet','speciesselector','tool_legend','tool_classlegend']);
