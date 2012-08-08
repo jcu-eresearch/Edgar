@@ -83,31 +83,36 @@ declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 # declare -a MODELS_TO_MODEL=('cccma-cgcm31' 'ccsr-miroc32hi' 'ccsr-miroc32med' 'cnrm-cm3'), etc.
 
 function model_and_median {
-    local scenario=$1
-    local year=$2
+    local SCENARIO=$1
+    local YEAR=$2
 
     # 1 or many any, then /$scenario_$model_$year
     # where model is anything except an underscore (or /)
-    local filter_projection_path=".*/${scenario}_[^_/]+_${year}"
+    local FILTER_PROJECTION_PATH=".*/${SCENARIO}_[^_/]+_${YEAR}"
 
-    local py_script_to_run="$WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${scenario}_median_${year}.output.tif --calc='A' --overwrite "
+    local MEDIAN_SCRIPT_TO_RUN="$WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif --calc='A' --overwrite "
     local I_INT=0
 
     # Cycle through the projections and project the maps
-    for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$filter_projection_path"`; do
+    for local PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_PROJECTION_PATH"`; do
 
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
         local letter="${LETTERS[$I_INT]}"
-        py_script_to_run="$py_script_to_run --$letter $TMP_OUTPUT_DIR/`basename $PROJ`.asc"
+        MEDIAN_SCRIPT_TO_RUN="$MEDIAN_SCRIPT_TO_RUN --$letter $TMP_OUTPUT_DIR/`basename $PROJ`.asc"
         let I_INT+=1
 
     done
+    
+    # At this point, the modelling is complete for this scenario year combo
+    
+    # Now calc the median
 
     # Execute the py script.
-    # `py_script_to_run`
+    $MEDIAN_SCRIPT_TO_RUN
+    # Translate output to ascii grid
+    gdal_translate "$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif" "$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.asc" -of AAIGrid
 
-    # At this point, the modelling is complete for this scenario year combo
 }
 
 # Dump the environmental vars to the output dir
