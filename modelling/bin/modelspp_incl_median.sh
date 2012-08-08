@@ -99,7 +99,7 @@ function model_and_median {
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
         local letter="${LETTERS[$I_INT]}"
-        MEDIAN_SCRIPT_TO_RUN="$MEDIAN_SCRIPT_TO_RUN --$letter $TMP_OUTPUT_DIR/`basename $PROJ`.asc"
+        MEDIAN_SCRIPT_TO_RUN="$MEDIAN_SCRIPT_TO_RUN -$letter $TMP_OUTPUT_DIR/`basename $PROJ`.asc"
         let I_INT+=1
 
     done
