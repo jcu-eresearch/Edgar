@@ -77,7 +77,7 @@
 
     engageVettingMode: function() {
       console.log("engageVettingMode");
-      $('#cluster').val('dotgridtrump').trigger('change');
+      $('#cluster').val('dotgriddetail').trigger('change');
       Edgar.util.showhide(['button_current'], []);
       if (Edgar.user.isAdmin) {
         Edgar.util.showhide(['oldvets'], []);

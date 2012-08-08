@@ -95,7 +95,7 @@ function clearExistingSpeciesOccurrencesLayer() {
 // Add our species specific layers.
 function addSpeciesOccurrencesAndSuitabilityLayers() {
     addOccurrencesLayer();
-    addSuitabilityLayer("Climate Suitability", Edgar.util.mappath(Edgar.mapdata.species.id, "current"));
+    addSuitabilityLayer();
     updateLegend();
 }
 // ------------------------------------------------------------------
@@ -106,6 +106,11 @@ function clearMapPopups() {
 }
 // ------------------------------------------------------------------
 function addSuitabilityLayer(layerName, mapPath) {
+
+    if (!layerName) layerName = "Climate Suitability";
+    if (!mapPath) mayPath = Edgar.util.mappath(Edgar.mapdata.species.id, "current");
+
+    clearExistingSpeciesSuitabilityLayer();
 
     var thisLayer = new OpenLayers.Layer.WMS(
         layerName,
@@ -179,6 +184,10 @@ function addVettingLayer() {
 
 // ------------------------------------------------------------------
 function addOccurrencesLayer() {
+
+
+    clearExistingSpeciesOccurrencesLayer();
+
         // Occurrences Layer
 
         // See: http://geojson.org/geojson-spec.html For the GeoJSON spec.

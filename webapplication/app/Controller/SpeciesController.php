@@ -511,6 +511,32 @@ class SpeciesController extends AppController {
         $this->dieWithStatus(200, 'Request processed');
     }
 
+    /**
+     * bounce the user's download request to the right URL to get the file
+     */
+    public function download_occurrences($species_id) {
+
+        $species = $this->Species->findById($species_id);
+        if($species === False)
+            $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
+
+        $this->redirect(Species::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
+    }
+
+
+    /**
+     * bounce the user's download request to the right URL to get the file
+     */
+    public function download_climate($species_id) {
+
+        $species = $this->Species->findById($species_id);
+        if($species === False)
+            $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
+
+        $this->redirect(Species::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
+    }
+
+
     private function _speciesToJson($species) {
         return array(
             'id' => $species['id'],

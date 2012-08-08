@@ -70,7 +70,7 @@ Edgar.vetting = {
     ###
     engageVettingMode: () ->
         console.log "engageVettingMode"
-        $('#cluster').val('dotgridtrump').trigger('change') # switch to trump mode
+        $('#cluster').val('dotgriddetail').trigger('change') # switch to trump mode
         Edgar.util.showhide(['button_current'],[])
 
         if Edgar.user.isAdmin
