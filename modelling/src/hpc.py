@@ -147,7 +147,7 @@ class HPCJob:
                     try:
                         # Remember the path to the csv file
                         self._setPrivateTempfile(priv_f.name)
-                        self._setPrivateTempfile(pub_f.name)
+                        self._setPublicTempfile(pub_f.name)
                         log.debug("Writing public csv to: %s", pub_f.name)
                         log.debug("Writing private csv to: %s", priv_f.name)
                         pub_writer  = csv.writer(pub_f)
