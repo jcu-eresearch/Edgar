@@ -41,6 +41,7 @@ $user = AuthComponent::user();
         <?php else: ?>
             Edgar.user = {
                 canVet: <?php print ($user['can_vet'] ? 'true' : 'false') ?>,
+                isAdmin: <?php print ($user['is_admin'] ? 'true' : 'false') ?>,
                 canRequestRemodel: <?php print (User::canRequestRemodel($user) ? 'true' : 'false') ?>,
                 id: "<?php print Sanitize::html($user['id']) ?>",
                 email: "<?php print Sanitize::html($user['email']) ?>"

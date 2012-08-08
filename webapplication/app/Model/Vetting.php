@@ -46,6 +46,7 @@ class Vetting extends AppModel {
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
+/*
             case "non-breeding":
                 $fill_color   = "#7700ff";
                 $stroke_color = $fill_color;
@@ -66,12 +67,13 @@ class Vetting extends AppModel {
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
-
-            case "core": // is a consolidation of non-breeding, breeding, and introduced
+*/
+            case "core":
                 $fill_color   = "#0022ff";
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
+
             case "other": // is a consolidation of historic, vagrant, and irruptive
                 $fill_color   = "#ff7700";
                 $stroke_color = $fill_color;

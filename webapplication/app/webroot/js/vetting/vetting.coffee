@@ -29,7 +29,7 @@ Edgar.vetting = {
     init: () ->
         Edgar.vetting.classifyHabitat.init()
         Edgar.vetting.myHabitatClassifications.init()
-#        Edgar.vetting.theirHabitatClassifications.init()
+        Edgar.vetting.theirHabitatClassifications.init()
 
         this._initAreaStyleMap()
 
@@ -72,8 +72,13 @@ Edgar.vetting = {
         console.log "engageVettingMode"
         $('#cluster').val('dotgridtrump').trigger('change') # switch to trump mode
         Edgar.util.showhide(['button_current'],[])
+
+        if Edgar.user.isAdmin
+            # show admin users other people's vettings
+            Edgar.util.showhide(['oldvets'], []);
+            Edgar.vetting.theirHabitatClassifications.engage()
+
         Edgar.vetting.myHabitatClassifications.engage()
-#        Edgar.vetting.theirHabitatClassifications.engage()
         Edgar.vetting.classifyHabitat.engage()
 
         null
@@ -87,7 +92,10 @@ Edgar.vetting = {
         $('#cluster').val('dotgridsimple').trigger('change') # switch back to simple mode
         Edgar.util.showhide([],['button_current'])
         Edgar.vetting.myHabitatClassifications.disengage()
-#        Edgar.vetting.theirHabitatClassifications.disengage()
+        if Edgar.user.isAdmin
+            Edgar.util.showhide([], ['oldvets']);
+            Edgar.vetting.theirHabitatClassifications.disengage()
+
         Edgar.vetting.classifyHabitat.disengage()
 
         null

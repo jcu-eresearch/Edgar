@@ -20,7 +20,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
     $trumps = array(
         'unknown',
         'core',
-        'other',
+        'non-core',
 
         'vagrant',
         'irruptive',
@@ -110,7 +110,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             $unsorted_contentious_classification_count_array = array(
                 "unknown" => $location["contentious_unknown_count"],
                 "invalid" => $location["contentious_invalid_count"],
-                "other" => (
+                "non-core" => (
                     $location["contentious_historic_count"]
                     + $location["contentious_vagrant_count"]
                     + $location["contentious_irruptive_count"]
@@ -126,7 +126,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             $classification_count_array = array(
                 "unknown" => $location["unknown_count"],
                 "invalid" => $location["invalid_count"],
-                "other" => (
+                "non-core" => (
                     $location["historic_count"]
                     + $location["vagrant_count"]
                     + $location["irruptive_count"]
