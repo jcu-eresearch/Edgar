@@ -528,8 +528,8 @@ class SpeciesController extends AppController {
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
-//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/latest-occurrences.zip');
-        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/occurrences/latest-occurrences.zip');
+//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
     }
 
     /**
@@ -541,8 +541,8 @@ class SpeciesController extends AppController {
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
-//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/latest-climate.zip');
-        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/climate-suitability/latest-climate-suitability.zip');
+//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
     }
 
     private function _speciesToJson($species) {
