@@ -153,6 +153,8 @@ wait
 
 # Zip the output, and copy it to the TDH
 mkdir -p "$TDH_DIR/$SPP_NAME"
+mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 
 CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"
