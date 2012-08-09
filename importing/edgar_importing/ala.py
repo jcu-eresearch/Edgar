@@ -21,6 +21,7 @@ OCC_PAGE_SIZE = 1000  # occurrence records per biocache request
 SPECIES_PAGE_SIZE = 500  # species per BIE request
 BIE = 'http://bie.ala.org.au/'
 BIOCACHE = 'http://biocache.ala.org.au/'
+AUSTRALIA_POLY = 'POLYGON((142.35449218749 -9.5513184389362,111.10937499999 -12.870040697133,114.00976562499 -37.137873247106,148.02343749999 -44.067356780858,155.9775390625 -26.838159010597,142.35449218749 -9.5513184389362))'
 
 _log = logging.getLogger(__name__)
 _max_retry_secs = 300 # 5 minutes by default
@@ -135,6 +136,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
             'sensitive_latitude', 'assertions', 'coordinate_uncertainty',
             'sensitive_coordinate_uncertainty', 'occurrence_date')),
         'facet': 'off',
+        'wkt': AUSTRALIA_POLY,
         'pageSize': OCC_PAGE_SIZE
     }
 
@@ -259,7 +261,8 @@ def num_occurrences_for_lsid(lsid):
     j = _fetch_json(create_request(BIOCACHE + 'ws/occurrences/search', {
             'q': q_param(lsid),
             'facet': 'off',
-            'pageSize': 0}))
+            'pageSize': 0,
+            'wkt': AUSTRALIA_POLY}))
     return j['totalRecords']
 
 
@@ -320,12 +323,6 @@ def q_param(species_lsid=None, changed_since=None):
         # aggregate subspecies records into species
         '''
         (rank:species OR subspecies_name:[* TO *]) AND
-        ''',
-
-        # bounding box of australia
-        '''
-        longitude:[112.60412597657 TO 154.44006347657] AND
-        latitude:[-43.734590478689 TO -9.9190742304658] AND
         ''',
 
         # filter on uncertainty (must be unspecified, or < 25km)
