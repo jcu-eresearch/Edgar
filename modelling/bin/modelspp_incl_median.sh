@@ -1,14 +1,21 @@
 #/bin/bash
 
 
-# Requires ENV Variable AP03_SPP to be set.
+# Requires ENV Variable AP03_SPP, WORKING_DIR and AP03_SPP_CLEAN_NAME to be set.
 
 # Expected call format
 #
 # $: mkdir -p ~/tmp
 # $: rm -rfd  ~/tmp/*
-# $: AP03_SPP "MAGPIES"
+#
+# $: AP03_SPP "1"
+# $: AP03_SPP_CLEAN_NAME "MAGPIES"
+# $: WORKING_DIR /some_path/
+#
 # $: export AP03_SPP
+# $: export AP03_SPP_CLEAN_NAME
+# $: export WORKING_DIR
+#
 # $: qsub -S /bin/bash -V -o ~/tmp/my_std_out -e ~/tmp/my_std_err modelspp.sh
 #
 # -V means pass all env variables from the caller's env through to the script env.
@@ -40,6 +47,7 @@ if [ -z "$AP03_SPP" ]; then
 fi
 
 SPP=$AP03_SPP
+SPP_NAME=$AP03_SPP_CLEAN_NAME
 
 # Determine the occurrences file.
 # Use the private file if it exists, fall back to the public file if it doesn't
@@ -144,31 +152,31 @@ done
 wait
 
 # Zip the output, and copy it to the TDH
-mkdir -p "$TDH_DIR/$SPP"
+mkdir -p "$TDH_DIR/$SPP_NAME"
 
-CLIM_ZIP_FILE_NAME="latest-climate.zip"
-CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate.zip"
+CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
+CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"
 
 pushd $TMP_OUTPUT_DIR
-zip -r "$TDH_DIR/$SPP/tmp_$CLIM_ZIP_FILE_NAME" *
-mv "$TDH_DIR/$SPP/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$CLIM_ZIP_FILE_NAME"
+zip -r "$TDH_DIR/$SPP_NAME/climate-suitability/tmp_$CLIM_ZIP_FILE_NAME" *
+mv "$TDH_DIR/$SPP_NAME/climate-suitability/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME"
 popd
 
 # if we don't have a copy for the month, make a copy
-if [ ! -e "$TDH_DIR/$SPP/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
-  cp "$TDH_DIR/$SPP/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$CLIM_MONTH_ZIP_FILE_NAME"
+if [ ! -e "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
+  cp "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME"
 fi
 
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
 OCCUR_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-occurrences.zip"
 
-zip -j "$TDH_DIR/$SPP/tmp_$OCCUR_ZIP_FILE_NAME" "$PUBLIC_OCCUR"
-mv "$TDH_DIR/$SPP/tmp_$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$OCCUR_ZIP_FILE_NAME"
+zip -j "$TDH_DIR/$SPP_NAME/occurrences/tmp_$OCCUR_ZIP_FILE_NAME" "$PUBLIC_OCCUR"
+mv "$TDH_DIR/$SPP_NAME/occurrences/tmp_$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME"
 
 # if we don't have a copy for the month, make a copy
-if [ ! -e "$TDH_DIR/$SPP/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
-  cp "$TDH_DIR/$SPP/$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$OCCUR_MONTH_ZIP_FILE_NAME"
+if [ ! -e "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
+  cp "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME"
 fi
 
 # TODO
