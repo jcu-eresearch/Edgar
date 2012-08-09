@@ -149,17 +149,22 @@ mkdir -p "$TDH_DIR/$SPP"
 CLIM_ZIP_FILE_NAME="latest-climate.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate.zip"
 
-zip "$TDH_DIR/$SPP/$CLIM_ZIP_FILE_NAME" $TMP_OUTPUT_DIR/*
+pushd $TMP_OUTPUT_DIR
+zip -r "$TDH_DIR/$SPP/tmp_$CLIM_ZIP_FILE_NAME" *
+mv "$TDH_DIR/$SPP/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$CLIM_ZIP_FILE_NAME"
+popd
 
 # if we don't have a copy for the month, make a copy
 if [ ! -e "$TDH_DIR/$SPP/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$CLIM_MONTH_ZIP_FILE_NAME"
 fi
 
+
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
 OCCUR_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-occurrences.zip"
 
-zip "$TDH_DIR/$SPP/$OCCUR_ZIP_FILE_NAME" "$PUBLIC_OCCUR"
+zip -j "$TDH_DIR/$SPP/tmp_$OCCUR_ZIP_FILE_NAME" "$PUBLIC_OCCUR"
+mv "$TDH_DIR/$SPP/tmp_$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP/$OCCUR_ZIP_FILE_NAME"
 
 # if we don't have a copy for the month, make a copy
 if [ ! -e "$TDH_DIR/$SPP/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then

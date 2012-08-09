@@ -23,6 +23,7 @@ def main():
     # wipe
     db.sensitive_occurrences.delete().execute()
     db.occurrences.delete().execute()
+    db.vettings.delete().execute()
     db.species.delete().execute()
     db.sources.delete().execute()
 
