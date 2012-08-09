@@ -513,6 +513,12 @@ class SpeciesController extends AppController {
         $this->dieWithStatus(200, 'Request processed');
     }
 
+    private function _canonicalName($species) {
+        $longName = $species['Species']['common_name'] . " (" . $species['Species']['scientific_name'] . ")";
+        $cleanName = preg_replace("[^A-Za-z0-9'-_., ()]", "_", $longName);
+        return trim($cleanName);
+    }
+
     /**
      * bounce the user's download request to the right URL to get the file
      */
@@ -522,9 +528,9 @@ class SpeciesController extends AppController {
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
+//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->Species->canonicalName($species) . '/latest-occurrences.zip');
         $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
     }
-
 
     /**
      * bounce the user's download request to the right URL to get the file
@@ -535,9 +541,9 @@ class SpeciesController extends AppController {
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
+//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/latest-climate.zip');
         $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
     }
-
 
     private function _speciesToJson($species) {
         return array(

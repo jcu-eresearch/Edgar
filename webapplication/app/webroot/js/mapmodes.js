@@ -99,8 +99,8 @@ function addMapModes(theMap) {
             if (newMode == 'blank') {
                 // special handling for blank-to-blank, the startup mode switch
                 Edgar.util.showhide(
-                    ['tool_layers', 'tool_debug', 'tool_layers','tip_no_species'],
-                    ['tool_specieslinks','oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_simpleclasslegend','tool_future','button_current','button_future','button_vetting']
+                    ['tool_layers','tool_layers','tip_no_species'],
+                    ['tool_debug','tool_specieslinks','oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_simpleclasslegend','tool_future','button_current','button_future','button_vetting']
                 );
 
             } else if (newMode == 'current') {

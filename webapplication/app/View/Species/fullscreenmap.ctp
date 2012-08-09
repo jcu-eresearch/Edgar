@@ -85,8 +85,8 @@
                     <div class="classification" title="unclassified: not yet classified (please vet!)">
                         <h2><span class="dot" style="background: #000"></span>unclassified</h2>
                     </div>
-                    <div class="classification" title="invalid: record is an error">
-                        <h2><span class="dot" style="background: #c00"></span>invalid</h2>
+                    <div class="classification" title="doubtful: record is likely to be an error">
+                        <h2><span class="dot" style="background: #c00"></span>doubtful</h2>
                     </div>
                     <div class="classification" style="visibility: hidden;">
                         <h2><span class="dot"></span>spacer</h2>
@@ -184,7 +184,7 @@
                 <legend>Classification
                     <select id="vetclassification" name="classification">
                         <option value="" selected=true>-- classify as.. --</option>
-                        <option value="invalid">invalid</option>
+                        <option value="invalid">doubtful</option>
                         <option value="historic">historical</option>
                         <option value="vagrant">vagrant</option>
                         <option value="irruptive">irruptive</option>
