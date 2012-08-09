@@ -5,8 +5,6 @@ class Species extends AppModel {
     public $name = 'Species';
     public $recursive = -1; //stops queries fetching all the occurrences
 
-    const DOWNLOAD_URL_PREFIX = "http://tropicaldatahub.org/data/Edgar/";
-
     // Define behaviours
     public $actsAs = array(
         'HPCQueueable' => array(),

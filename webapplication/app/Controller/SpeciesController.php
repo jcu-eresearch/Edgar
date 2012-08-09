@@ -12,6 +12,8 @@ class SpeciesController extends AppController {
     public $components = array('RequestHandler');
     public $helpers = array('Form', 'Html', 'Js', 'Time');
 
+    const DOWNLOAD_URL_PREFIX = "https://eresearch.jcu.edu.au/tdh/datasets/Edgar/";
+
     // Don't allow a user to insert a vetting unless they are logged in.
     public function beforeFilter() {
         parent::beforeFilter();
@@ -514,26 +516,26 @@ class SpeciesController extends AppController {
     /**
      * bounce the user's download request to the right URL to get the file
      */
-    public function download_occurrences($species_id) {
+    public function downloadOccurrences($species_id) {
 
         $species = $this->Species->findById($species_id);
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
-        $this->redirect(Species::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
     }
 
 
     /**
      * bounce the user's download request to the right URL to get the file
      */
-    public function download_climate($species_id) {
+    public function downloadClimate($species_id) {
 
         $species = $this->Species->findById($species_id);
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
-        $this->redirect(Species::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
     }
 
 

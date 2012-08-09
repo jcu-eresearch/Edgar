@@ -53,4 +53,9 @@ $(function() {
         }
     });
 
+    //
+    // set up the species downloading buttons
+    //
+    updateDownloadButtons();
+
 });

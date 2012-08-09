@@ -115,12 +115,39 @@ function _setupNewSpecies() {
         $('#currentspecies h2').text(newSpecies.scientificName);  // set the static panel names
 
         updateSpeciesStatus(newSpecies);
-
         updateWindowHistory();
+        updateDownloadButtons();
 
         Edgar.newSpecies = null;
 
         $(Edgar.map).trigger('specieschanged', oldSpecies);
+    }
+}
+// ------------------------------------------------------------------
+// update the download buttons to point to the current species.
+function updateDownloadButtons() {
+
+    var $occur = $('#btn_species_occur');
+    var $clim = $('#btn_species_clim');
+
+    if (Edgar.mapdata.species) {
+        $occur.off('click');
+        $occur.attr("disabled", false);
+        $occur.click( function() {
+            window.open(Edgar.baseUrl + "species/downloadOccurrences/" + Edgar.mapdata.species.id ,'_blank');
+        });
+
+        $clim.off('click');
+        $clim.attr("disabled", false);
+        $clim.click( function() {
+            window.open(Edgar.baseUrl + "species/downloadClimate/" + Edgar.mapdata.species.id ,'_blank');
+        });
+
+    } else {
+
+        $occur.attr("disabled", true);
+        $clim.attr("disabled", true);
+
     }
 }
 // ------------------------------------------------------------------

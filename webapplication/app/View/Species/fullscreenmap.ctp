@@ -237,10 +237,17 @@
         </div>
     </div>
 
-
     <div class="tool" id="tool_layers">
         <h1>showing on the map</h1>
         <div id="layerstool" class="toolcontent"></div>
+    </div>
+
+    <div class="tool startclosed" id="tool_specieslinks">
+        <h1>downloadable data</h1>
+        <div class="toolcontent">
+            <button id="btn_species_occur" class="downloadbtn ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">Occurrence data</button>
+            <button id="btn_species_clim" class="downloadbtn ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">Climate data</button>
+        </div>
     </div>
 
     <div class="tool startclosed" id="tool_debug">
@@ -265,7 +272,7 @@
         </div>
     </div>
 
-</div>
+</div><!-- end of tools panel -->
 
 <div id="speciespanel" class="top panel speciespanel clearfix">
 
