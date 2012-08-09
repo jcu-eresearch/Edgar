@@ -113,7 +113,7 @@ class HPCJob:
         else:
             raise Exception("Can't set publicTempfile for a job more than once")
         return self.publicTempfile
-    
+
     def _setPrivateTempfile(self, f):
         if self.privateTempfile == None:
             self.privateTempfile = f
@@ -207,7 +207,6 @@ class HPCJob:
                 os.path.exists(self.publicTempfile)
             except Exception as e:
                 log.warn("Exception while deleting public tmpfile (%s) for job. Exception: %s", self.publicTempfile, e)
-        
         if self.privateTempfile:
             try:
                 os.unlink(self.privateTempfile)
