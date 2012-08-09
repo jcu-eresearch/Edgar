@@ -11,9 +11,10 @@
 # 3. The input CSV containing the species occurrence data for modelling.
 
 CURRENT_SPECIES_ID="$1"
-WORKING_DIR="$2"
-INPUT_PRIV_CSV="$3"
-INPUT_PUB_CSV="$4"
+CURRENT_SPECIES_CLEAN_NAME="$2"
+WORKING_DIR="$3"
+INPUT_PRIV_CSV="$4"
+INPUT_PUB_CSV="$5"
 
 BIN_DIR="$WORKING_DIR/bin"
 
@@ -32,6 +33,7 @@ mv "$INPUT_PRIV_CSV" "$PRIVATE_OCCUR_FILE" > /dev/null
 mv "$INPUT_PUB_CSV" "$PUBLIC_OCCUR_FILE" > /dev/null
 
 AP03_SPP="$CURRENT_SPECIES_ID"
+AP03_SPP_CLEAN_NAME="$CURRENT_SPECIES_CLEAN_NAME"
 
 # Setup the IO dir
 rm -rfd "$TMP_IO_OUTPUT_DIR/$AP03_SPP" > /dev/null
@@ -40,6 +42,7 @@ mkdir -p "$TMP_IO_OUTPUT_DIR/$AP03_SPP" > /dev/null
 # Set the species env var (AP03_SPP) for the model script
 # Set the working directory for the model script
 export AP03_SPP
+export AP03_SPP_CLEAN_NAME
 export WORKING_DIR
 
 # Then run the qsub
