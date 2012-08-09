@@ -16,6 +16,7 @@ import tempfile
 import ala
 import paramiko
 import ssh
+import re
 from hpc_config import HPCConfig
 import sqlalchemy
 from sqlalchemy import or_
@@ -74,14 +75,31 @@ class HPCJob:
         self.jobId            = None
         self.jobStatus        = None
         self.jobStatusMsg     = ""
+        self.speciesCommonName  = ""
+        self.speciesSciName     = ""
         self.jobQueuedTime    = None
         self.privateTempfile  = None
         self.publicTempfile   = None
         self._writeCSVSpeciesJobFile()
 
+    def getSafeSpeciesName(self):
+        speciesName = ("%s (%s)", self.speciesCommonName, self.speciesSciName)
+        cleanName = re.sub(r"[^A-Za-z0-9'_., ()-]", '_', speciesName)
+        strippedCleanName = cleanName.strip()
+
+        return strippedCleanName
+
     def _setJobId(self, jobId):
         self.jobId = jobId
         return self.jobId
+
+    def _setSpeciesCommonName(self, speciesCommonName):
+        self.speciesCommonName = speciesCommonName
+        return self.speciesCommonName
+
+    def _setSpeciesSciName(self, speciesSciName):
+        self.speciesSciName = speciesSciName
+        return self.speciesSciName
 
     def _setDirtyOccurrences(self, dirtyOccurrences):
         self.dirtyOccurrences = dirtyOccurrences
