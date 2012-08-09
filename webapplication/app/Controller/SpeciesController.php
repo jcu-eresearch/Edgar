@@ -528,7 +528,7 @@ class SpeciesController extends AppController {
         if($species === False)
             $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
 
-//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->Species->canonicalName($species) . '/latest-occurrences.zip');
+//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/latest-occurrences.zip');
         $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
     }
 
