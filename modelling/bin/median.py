@@ -224,6 +224,8 @@ def doit(opts, args):
             myNDVs=numpy.zeros(myBufSize)
             myNDVs.shape=(nYValid,nXValid)
 
+            evalAlphas = []
+
             # fetch data for each input layer
             for i,Alpha in enumerate(myAlphaList):
 
@@ -237,12 +239,13 @@ def doit(opts, args):
 
                 # create an array of values for this block
                 exec("%s=myval" %Alpha)
+                exec("evalAlphas.append(%s)" %Alpha)
                 myval=None
 
 
             # try the calculation on the array blocks
             try:
-                myResult = numpy.median(numpy.array([A,B]),axis=0)#eval(opts.calc)
+                myResult = numpy.median(numpy.array(evalAlphas),axis=0)#eval(opts.calc)
             except:
                 print("evaluation of calculation %s failed" %(opts.calc))
                 raise
