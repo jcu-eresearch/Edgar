@@ -58,3 +58,36 @@ vim ~/Edgar/webapplication/app/Config/database.php
         'prefix' => '',
         'encoding' => 'utf8'
     );
+
+
+
+==================
+Setting Up Backups
+==================
+
+The command to dump the vettings, users, and species table to a
+compressed sql file is:
+
+    pg_dump -t users -t species -t vettings edgar | bzip2 > "$(date "+edgar-backup_%F_%H:%M:%S.sql.bz2")"
+
+This assumes the database is named "edgar". The above command will
+create a file in the current directory named with the current date and
+time, such as:
+
+    edgar-backup_2012-08-09_16:53:18.sql.bz2
+
+This should be run as the `postgres` user to have full access to the
+database.
+
+To run this every night at midnight as the `postgres` user, edit the
+crontab of the `postgres` user with:
+
+    sudo -u postgres crontab -e
+
+Then paste this into the file:
+
+    # min hr  dom mth dow cmd
+      00  00  *   *   *   cd /where/you/want/the/backups; pg_dump -t users -t species -t vettings edgar | bzip2 > "$(date "+edgar-backup_%F_%H:%M:%S.sql.bz2")"
+
+Change "/where/you/want/the/backups" to an appropriate directory, and
+close the crontab file.

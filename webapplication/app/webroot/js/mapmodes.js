@@ -99,8 +99,8 @@ function addMapModes(theMap) {
             if (newMode == 'blank') {
                 // special handling for blank-to-blank, the startup mode switch
                 Edgar.util.showhide(
-                    ['tool_layers', 'tool_debug', 'tool_layers','tip_no_species'],
-                    ['oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_simpleclasslegend','tool_future','button_current','button_future','button_vetting']
+                    ['tool_layers','tool_layers','tip_no_species'],
+                    ['tool_debug','tool_specieslinks','oldvets','myvets','newvet','tool_legend','tool_classlegend','tool_simpleclasslegend','tool_future','button_current','button_future','button_vetting']
                 );
 
             } else if (newMode == 'current') {
@@ -140,7 +140,7 @@ function addMapModes(theMap) {
             // so here we can call _setupNewSpecies to actually switch to the
             // newly selected species.
             _setupNewSpecies();
-            Edgar.util.showhide(['currentspecies','tool_legend','tool_simpleclasslegend','button_future'],['speciesselector']);
+            Edgar.util.showhide(['tool_specieslinks','currentspecies','tool_legend','tool_simpleclasslegend','button_future'],['speciesselector']);
             engageCurrentMode();
         }
 

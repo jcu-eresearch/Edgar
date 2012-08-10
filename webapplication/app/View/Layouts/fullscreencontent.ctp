@@ -130,7 +130,7 @@ bird observation database to generate current and future species distribution mo
                 Bird observation records retrieved from the
                 <a href="http://www.ala.org.au/">Atlas of Living Australia</a>'s (ALA) database have been filtered based on ALA's 'assertions' and those inappropriate for modelling were excluded. Additionally,
                 <a href="http://www.birdlife.org.au/">BirdLife Australia</a>
-                provided species range information, against which we check each observation to obtain an initial classification as core habitat, introduced, historic, vagrant, irruptive, or invalid/doubful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.
+                provided species range information, against which we check each observation to obtain an initial classification as core habitat, introduced, historic, vagrant, irruptive, or doubful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.
             </p><p>
                 This initial classification for observations is compared against classifications collected from
                 birdwatchers and other knowledgeable visitors to the Edgar site.  Edgar tracks contentious records, but generally a vetting entered by a logged-in site user will be considered accurate and changes
@@ -197,7 +197,7 @@ bird observation database to generate current and future species distribution mo
                 </dt><dd>A native or non-native species has established a
     population within an area well outside their native core range.
                 </dd><dt>
-                    Doubtful or Invalid
+                    Doubtful
                 </dt><dd>It is very unlikely that this species was observed at this location.
                 </dd>
             </dl></div>
@@ -273,9 +273,10 @@ Recording a vetting is a three step process:
                 <dt>Step 1: select observations</dt>
                 <dd>
 To record a vetting, click 'Select Observations' and either:
-- click an observation or cluster of observations, or
-- click-and-drag a selection box over multiple observations or clusters of
-observations.
+                    <ul>
+                        <li>click an observation or cluster of observations, or</li>
+                        <li>click-and-drag a selection box over multiple observations or clusters.</li>
+                    </ul>
                 </dd><dd>
 Selected areas will be highlighted with orange boxes.
 To de-select these areas, click 'Clear Selection', then choose

@@ -83,7 +83,7 @@ class HPCJob:
         self._writeCSVSpeciesJobFile()
 
     def getSafeSpeciesName(self):
-        speciesName = ("%s (%s)", self.speciesCommonName, self.speciesSciName)
+        speciesName = self.speciesCommonName + " (" + self.speciesSciName + ")"
         cleanName = re.sub(r"[^A-Za-z0-9'_., ()-]", '_', speciesName)
         strippedCleanName = cleanName.strip()
 
@@ -157,6 +157,8 @@ class HPCJob:
                     # Now record the no. of dirtyOccurrences
                     dirtyOccurrences = species_row['num_dirty_occurrences']
                     self._setDirtyOccurrences(dirtyOccurrences)
+                    self._setSpeciesCommonName(species_row['common_name'])
+                    self._setSpeciesSciName(species_row['scientific_name'])
                     log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
 
                     # Create a tempfile to write our csv file to
@@ -261,7 +263,7 @@ class HPCJob:
 
 
         # Run the hpc queue script
-        sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '" + HPCConfig.workingDir + "' '" + self.privateTempfile + "' '" + self.publicTempfile + "'" 
+        sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '"  + self.getSafeSpeciesName() +  "' '" + HPCConfig.workingDir + "' '" + self.privateTempfile + "' '" + self.publicTempfile + "'" 
 
         log.debug("ssh command: %s", sshCmd)
         chan = client.get_transport().open_session()

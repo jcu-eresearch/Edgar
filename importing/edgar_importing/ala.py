@@ -403,7 +403,7 @@ def _fetch_json(request, check_not_empty=True):
     JSON text that was fetched'''
 
     start_time = time.time()
-    response = urllib2.urlopen(request, timeout=20.0)
+    response = urllib2.urlopen(request, timeout=40.0)
     response_time = time.time()
     response_str = response.read()
     end_time = time.time()
