@@ -18,20 +18,21 @@ log = logging.getLogger(__name__)
 
 class Syncer:
 
-    def __init__(self, ala, species_type="birds"):
+    def __init__(self, ala, species_type, connection):
         '''The `ala` param is the ala.py module. This is passed in a a ctor
         param because it will be substituded with mockala.py during unit
         testing.
 
         species_type can be "birds" or "vertebrates".'''
 
-        row = db.sources.select()\
-                .where(db.sources.c.name == 'ALA')\
-                .execute().fetchone()
+        row = connection.execute(db.sources.select()
+                .where(db.sources.c.name == 'ALA')
+            ).fetchone()
 
         if row is None:
             raise RuntimeError('ALA row missing from sources table in db')
 
+        self.conn = connection
         self.source_row_id = row['id']
         self.last_import_time = row['last_import_time']
         self.num_dirty_records_by_species_id = {}
@@ -60,7 +61,7 @@ class Syncer:
 
     def local_species(self):
         '''Returns all db.species rows in the local database.'''
-        return db.species.select().execute().fetchall()
+        return self.conn.execute(db.species.select()).fetchall()
 
 
     def local_species_by_scientific_name(self):
@@ -68,7 +69,7 @@ class Syncer:
         key, the db row is the value.'''
 
         species = {}
-        for row in db.species.select().execute():
+        for row in self.conn.execute(db.species.select()):
             species[row['scientific_name']] = row;
         return species
 
@@ -116,9 +117,9 @@ class Syncer:
         object'''
 
         log.info('Adding new species "%s"', species.scientific_name)
-        db.species.insert().execute(
+        self.conn.execute(db.species.insert().values(
             scientific_name=species.scientific_name,
-            common_name=species.common_name)
+            common_name=species.common_name))
 
 
     def delete_species(self, row):
@@ -126,7 +127,7 @@ class Syncer:
         db.species table'''
 
         log.info('Deleting species "%s"', row['scientific_name'])
-        db.species.delete().where(db.species.c.id == row['id']).execute()
+        self.conn.execute(db.species.delete().where(db.species.c.id == row['id']))
 
 
     def sync_occurrences(self):
@@ -144,10 +145,9 @@ class Syncer:
             self.upsert_occurrence(occ, occ.species_id)
 
         # update last import time for ALA
-        db.sources.update().\
-            where(db.sources.c.id == self.source_row_id).\
-            values(last_import_time=start_time).\
-            execute()
+        self.conn.execute(db.sources.update()
+            .where(db.sources.c.id == self.source_row_id)
+            .values(last_import_time=start_time))
 
         # Brute force re-download all occurrences if the local and
         # remote counts don't match
@@ -163,7 +163,7 @@ class Syncer:
         if len(self.num_dirty_records_by_species_id) > 0:
             log.info('Updating has_occurrences for all species');
             dirty_ids = [str(int(x)) for x in self.num_dirty_records_by_species_id.keys()]
-            db.engine.execute('''
+            self.conn.execute('''
                 UPDATE species
                 SET has_occurrences = ((SELECT COUNT(*) FROM occurrences
                                         WHERE species_id = species.id
@@ -209,10 +209,9 @@ class Syncer:
 
             # delete local records
             # will cascade into sensitive_occurrences table
-            db.occurrences.delete().\
-                where(db.occurrences.c.species_id == row['id']).\
-                where(db.occurrences.c.source_id == self.source_row_id).\
-                execute()
+            self.conn.execute(db.occurrences.delete()
+                .where(db.occurrences.c.species_id == row['id'])
+                .where(db.occurrences.c.source_id == self.source_row_id))
 
             # keep track of the deletions and additions
             self.increase_dirty_count(row['id'], abs(lc - rc))
@@ -312,13 +311,12 @@ class Syncer:
         counts = {}
 
         for row in self.local_species():
-            local_count = \
-                db.engine.execute(select(
+            local_count = self.conn.execute(select(
                     [func.count('*')],
                     #where
                      (db.occurrences.c.species_id == row['id']) &
-                     (db.occurrences.c.source_id == self.source_row_id))
-                ).scalar()
+                     (db.occurrences.c.source_id == self.source_row_id)
+                )).scalar()
 
             counts[row['id']] = local_count
 
@@ -371,7 +369,7 @@ class Syncer:
                 record_id=postgres_escape_bytea(occ.uuid.bytes)
             )
 
-        db.engine.execute(text(sql).execution_options(autocommit=True))
+        self.conn.execute(text(sql).execution_options(autocommit=True))
 
 
 
@@ -389,7 +387,7 @@ class Syncer:
         over the network.'''
 
         if species_to_fetch is None:
-            species_to_fetch = db.species.select().execute();
+            species_to_fetch = self.conn.execute(db.species.select());
 
         input_q = multiprocessing.Queue(10000)
         pool = multiprocessing.Pool(5, _mp_init, [input_q, self.ala])
@@ -463,7 +461,7 @@ class Syncer:
 
         for row in self.local_species():
             q = select(['count(*)'], db.occurrences.c.species_id == row['id'])
-            if db.engine.execute(q).scalar() == 0:
+            if self.conn.execute(q).scalar() == 0:
                 yield row
 
 
@@ -481,12 +479,11 @@ class Syncer:
                 continue
 
             dirty_col = db.species.c.num_dirty_occurrences
-            db.species.update()\
+            self.conn.execute(db.species.update()
                 .values(
                     num_dirty_occurrences=(dirty_col + newly_dirty),
                     needs_vetting_since=func.now()
-                ).where(db.species.c.id == row['id'])\
-                .execute()
+                ).where(db.species.c.id == row['id']))
 
 
 def classification_for_occurrence(occ):

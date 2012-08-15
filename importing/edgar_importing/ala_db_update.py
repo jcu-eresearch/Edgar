@@ -44,10 +44,18 @@ def main():
         ala.set_max_retry_secs(float(config['maxRetrySeconds']));
 
     logging.info("Started at %s", str(datetime.now()))
+    connection = db.engine.connect()
+    transaction = connection.begin()
     try:
-        syncer = sync.Syncer(ala, args.species_type[0])
+        syncer = sync.Syncer(ala, args.species_type[0], connection)
         syncer.sync(sync_species=config['updateSpecies'],
                     sync_occurrences=config['updateOccurrences'])
+        logging.info('Committing transaction');
+        transaction.commit()
+    except:
+        logging.critical('Performing rollback due to exception')
+        transaction.rollback()
+        raise
     finally:
         logging.info("Ended at %s", str(datetime.now()))
 
