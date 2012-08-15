@@ -13,13 +13,12 @@ from datetime import datetime
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Synchronises local database with ALA')
 
-    parser.add_argument('config', metavar='config_file', type=str, nargs=1,
+    parser.add_argument('config', metavar='config_file', type=str,
             help='''The path to the JSON config file.''')
 
-    parser.add_argument('--species_type', type=str, nargs=1, default=["birds"],
+    parser.add_argument('--species_type', type=str, default="birds",
             choices=["birds", "vertebrates"], help='''Type of species to
             sync. Default is birds.''')
 
@@ -28,7 +27,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    with open(args.config[0], 'rb') as f:
+    with open(args.config, 'rb') as f:
         config = json.load(f)
 
     db.connect(config)
@@ -45,17 +44,10 @@ def main():
 
     logging.info("Started at %s", str(datetime.now()))
     connection = db.engine.connect()
-    transaction = connection.begin()
     try:
-        syncer = sync.Syncer(ala, args.species_type[0], connection)
+        syncer = sync.Syncer(ala, args.species_type, connection)
         syncer.sync(sync_species=config['updateSpecies'],
                     sync_occurrences=config['updateOccurrences'])
-        logging.info('Committing transaction');
-        transaction.commit()
-    except:
-        logging.critical('Performing rollback due to exception')
-        transaction.rollback()
-        raise
     finally:
         logging.info("Ended at %s", str(datetime.now()))
 
