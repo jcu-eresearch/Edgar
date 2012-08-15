@@ -90,6 +90,9 @@ $user = AuthComponent::user();
 <body>
 
     <div id="header">
+        <a href="<?php print $this->Html->url('/'); ?>">
+            <img id="edgar-logo" src="<?php print $this->Html->url('/img/edgarlogo41.png'); ?>" />
+        </a>
 
         <div id="user">
             <?php
