@@ -2,6 +2,7 @@ import csv
 import argparse
 import json
 import logging
+import textwrap
 from edgar_importing import db
 from edgar_importing import ala
 from geoalchemy import WKTSpatialElement
@@ -60,24 +61,41 @@ class Taxon(object):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='''Loads Birdlife Australia shapefiles into the database as
-        vettings.''')
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent('''
+        Loads Birdlife Australia shapefiles into the database as
+        vettings.
 
-    parser.add_argument('csv', type=str, nargs=1, help='''The path the the csv
-        file, which was converted from the TaxonList_May11.xlsx file supplied
-        by Birdlife Australia''')
+        The shapefile first needs to be loaded into the database using the
+        `shp2pgsql` command provided by PostGIS. Assuming the database is named
+        "edgar", and the shapefile is named "TaxonPolys1.shp", the following
+        command will load the shapefile into the database:
 
-    parser.add_argument('config', type=str, nargs=1, help='''The path to the
-        JSON config file.''')
+            shp2pgsql TaxonPolys1.shp birdlife_import | sudo -u postgres psql edgar'''
+        ))
 
-    parser.add_argument('user_id', type=int, nargs=1, help='''The id Birdlife
+    parser.add_argument('config', type=str, help='''The path to the JSON config
+        file.''')
+
+    parser.add_argument('csv', type=str, help='''The path the the CSV file,
+        which was converted from the TaxonList_May11.xlsx file supplied by Birdlife
+        Australia''')
+
+    parser.add_argument('user_id', type=int, help='''The id Birdlife
         Australia user. This user will own the vettings that are added to the
         database.''')
+
+    parser.add_argument('--species_translations', type=str, help='''A CSV that
+        translates Birdlife Australia (BLA) species names into names that ALA
+        recognises.  First column is the exact BLA species name (from the SpSciName
+        column of the other CSV). The second column is the ALA species name. The
+        first row of this file will be ignored, so use it for column
+        headings.''')
 
     return parser.parse_args()
 
 
-def load_taxons_by_spno(csv_path):
+def load_taxons_by_spno(csv_path, translations):
     taxons = {}
 
     with open(csv_path, 'rb') as f:
@@ -94,9 +112,15 @@ def load_taxons_by_spno(csv_path):
             if taxon_spno in taxons:
                 raise RuntimeError('Duplicate SpNo: ' + str(taxon_spno))
 
-            species = ala.species_for_scientific_name(row['SpSciName'], convert_subspecies=True)
+            species_name = row['SpSciName']
+            if species_name in translations:
+                _log.info('Translating species "%s" into "%s"', species_name,
+                    translations[species_name])
+                species_name = translations[species_name]
+
+            species = ala.species_for_scientific_name(species_name, convert_subspecies=True)
             if species is None:
-                _log.warning("Can't find species '%s' at ALA", row['SpSciName'])
+                _log.warning("Can't find species '%s' at ALA", species_name)
                 continue
 
             taxons[taxon_spno] = Taxon(common=species.common_name,
@@ -136,15 +160,15 @@ def set_db_id_for_taxons(taxons):
 
 
 def classification_for_bla_row(row):
-    category = row['range_t']
+    category = row['rnge']
     assert category in CLASSIFICATIONS_BY_BLA_CATEGORIES
     return CLASSIFICATIONS_BY_BLA_CATEGORIES[category]
 
 
 def polys_for_spno(spno):
     q = sqlalchemy.select([
-        'range_t',
-        'br_rnge_t',
+        'rnge',
+        'brrnge',
         'ST_AsText(the_geom) as the_geom'])\
         .select_from(db.birdlife_import)\
         .where(db.birdlife_import.c.spno == spno)\
@@ -191,22 +215,41 @@ def insert_vettings_for_taxon(taxon, spno, user_id):
     _log.info('Inserted %d vettings for %s', num_inserted, taxon.sci_name)
 
 
+def load_translations(csv_path):
+    translations = {}
+
+    with open(csv_path, 'rb') as f:
+        reader = csv.reader(f)
+        reader.__next__() # skip row of headings
+        for row in reader:
+            assert len(row) == 2
+            translations[row[0].strip()] = row[1].strip()
+
+    return translations
+
+
 def main():
     logging.basicConfig()
     logging.root.setLevel(logging.INFO)
     args = parse_args()
 
     # connect to db
-    with open(args.config[0], 'rb') as f:
+    with open(args.config, 'rb') as f:
         db.connect(json.load(f))
 
+    # load translations if present
+    translations = {}
+    if args.species_translations is not None:
+        translations = load_translations(args.species_translations)
+        _log.info('Loaded %d species name translations', len(translations))
+
     # lookup taxons (species) in BLA and local db
-    taxons = load_taxons_by_spno(args.csv[0])
+    taxons = load_taxons_by_spno(args.csv, translations)
     set_db_id_for_taxons(taxons.itervalues())
 
     # wipe existing vettings
-    db.vettings.delete().where(db.vettings.c.user_id == args.user_id[0]).execute()
+    db.vettings.delete().where(db.vettings.c.user_id == args.user_id).execute()
 
     # create new vettings
     for spno, taxon in taxons.iteritems():
-        insert_vettings_for_taxon(taxon, spno, args.user_id[0])
+        insert_vettings_for_taxon(taxon, spno, args.user_id)
