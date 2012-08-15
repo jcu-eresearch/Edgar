@@ -208,14 +208,18 @@ bird observation database to generate current and future species distribution mo
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="howto" class="triggeredtab"><div class="inner">
-
-        <p>
+        <div class="additionalcontent">
+            <span class="opener">Introduction</span>
+            <div class="add"><p>
 Edgar performs three roles:
-        </p><ol>
-            <li>show observation records and current climate suitability for a species</li>
-            <li>show future climate suitability</li>
-            <li>vet observation records.</li>
-        </ol>
+                </p><ol>
+                    <li>show observation records and current climate suitability for a species</li>
+                    <li>show future climate suitability</li>
+                    <li>vet observation records.</li>
+                </ol><p>
+                </p>
+            </div>
+        </div>
         <div class="additionalcontent">
             <span class="opener">Viewing observations and current climate suitability</span>
             <div class="add"><p>
@@ -237,7 +241,7 @@ covers a smaller area.  When you zoom in far enough, observations
 un-cluster to represent the recorded location of bird sightings.
             </p></div>
         </div><div class="additionalcontent">
-            <span class="opener">To view future climate suitability</span>
+            <span class="opener">Viewing future climate suitability</span>
             <div class="add"><p>
 Select the species as described above, then click the "see future projections"
 button near the top right corner of your map.  Edgar will show you a new set of
@@ -253,7 +257,7 @@ You can view future climate suitability under an alternative emission scenario
 by selecting the scenario in the right column.
             </p></div>
         </div><div class="additionalcontent">
-            <span class="opener">To vet observation records</span>
+            <span class="opener">Vetting observation records</span>
             <div class="add"><p>
 To vet observation records, you will need a user account.  To help reduce the
 number of logins you might need to create and remember, Edgar shares the user
@@ -307,6 +311,20 @@ When you have finished vetting one species, you can begin vetting
 another species by clicking 'Change species'.
             </p></div>
         </div>
+
+        <div class="additionalcontent">
+            <span class="opener">Frequently Asked Questions</span>
+            <div class="add"><dl>
+
+                <dt>
+Why can't I find the species I'm interested in?
+                </dt><dd>
+We filter the species list to only include species for which we have observations.  It's possible that the Atlas of Living Australia has no observation records for the species you're looking for. 
+                </dd>
+
+            </dl></div>
+        </div>
+
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="acknowledgements" class="triggeredtab"><div class="inner">
