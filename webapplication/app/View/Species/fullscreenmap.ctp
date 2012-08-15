@@ -77,7 +77,7 @@
                         <h2><span class="dot" style="background: #02f"></span>core</h2>
                     </div>
                     <div class="classification" title="introduced: non-native core range">
-                        <h2><span class="dot" style="background: #26f"></span>intro.</h2>
+                        <h2><span class="dot" style="background: #70f"></span>intro.</h2>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@
                         <h2><span class="dot" style="background: #02f"></span>core</h2>
                     </div>
                     <div class="classification" title="introduced: non-native core range">
-                        <h2><span class="dot" style="background: #26f"></span>introduced</h2>
+                        <h2><span class="dot" style="background: #70f"></span>introduced</h2>
                     </div>
                 </div>
             </div>

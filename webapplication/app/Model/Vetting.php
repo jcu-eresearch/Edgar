@@ -51,6 +51,11 @@ class Vetting extends AppModel {
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
+            case "introduced":
+                $fill_color   = "#7700ff";
+                $stroke_color = $fill_color;
+                $font_color   = $stroke_color;
+                break;
 
             case "other": // is a consolidation of historic, vagrant, and irruptive
                 $fill_color   = "#ff7700";
