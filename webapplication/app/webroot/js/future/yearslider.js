@@ -29,10 +29,23 @@
         this._$scenarios = $('input[name=' + options.scenarioElemName + ']');
         this._$loadingBar = (options.loadingBar === null ? null : $(options.loadingBar));
         this._$yearLabel = (options.yearLabelElem === null ? null : $(options.yearLabelElem));
+        this._numReloadSuspensions = 0;
+        this._needsReload = false;
         var self = this;
 
-        //initial setup
-        $(document).ready(function(){
+        //initial setup (runs once upon object creation)
+        this._init = function(){
+            self._map.events.register('movestart', this, function(){
+                self._suspendReloadOfLayers();
+            });
+            self._map.events.register('moveend', this, function(){
+                //reload layers after a delay to stop uneccessary requests to the map server
+                setTimeout(function(){
+                    self._resumeReloadOfLayers();
+                    self._reloadLayers();
+                }, 2000);
+            });
+
             //init slider
             self._$slider.slider({
                 min: self.MIN_YEAR,
@@ -63,7 +76,7 @@
                     self.setScenario();
                 }, 1);
             });
-       });
+        };
 
         this.setYear = function(year){
             year = parseInt(year);
@@ -128,6 +141,16 @@
         }
 
         this._reloadLayers = function(){
+            //check if reload is suspended
+            if(this._numReloadSuspensions > 0){
+                this._needsReload = true;
+                console.log('Blocked! ' + this._numReloadSuspensions);
+                return;
+            } else {
+                this._needsReload = false;
+                console.log('GOGOGOG');
+            }
+
             this._removeAllLayers();
 
             if(this._speciesId){
@@ -140,6 +163,14 @@
                 this._addLayerForYear(2065);
                 this._addLayerForYear(2075);
             }
+        }
+
+        this._suspendReloadOfLayers = function(){
+            this._numReloadSuspensions += 1;
+        }
+
+        this._resumeReloadOfLayers = function(){
+            this._numReloadSuspensions -= 1;
         }
 
         this._addLayerForYear = function(year){
@@ -256,6 +287,9 @@
                 });
             }
         }
+
+        //do init last
+        $(document).ready(function(){ self._init(); })
     };
 
 })(jQuery);
