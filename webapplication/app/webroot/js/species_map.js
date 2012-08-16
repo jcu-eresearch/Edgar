@@ -443,7 +443,7 @@ $(function() {
         displayProjection: geographic,
         units: "m",
         maxResolution: 156543.0339,
-        maxExtent: australia_bounds,
+        maxExtent: world_bounds,
         controls: [
             new OpenLayers.Control.ArgParser(),
             new OpenLayers.Control.Attribution(),
