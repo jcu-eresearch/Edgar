@@ -56,7 +56,8 @@ def next_vetting_to_sync():
             ST_AsText(vettings.area) as area,
             species.scientific_name as scientific_name,
             users.email as email,
-            users.authority as authority
+            users.authority as authority,
+            users.is_admin as is_admin
         FROM vettings
             INNER JOIN users ON vettings.user_id = users.id
             INNER JOIN species ON vettings.species_id = species.id
@@ -118,7 +119,8 @@ def send_existing_vetting(vetting, status, ala_url):
         'comment': vetting['comment'],
         'user':{
             'email': vetting['email'],
-            'authority': vetting['authority']
+            'authority': vetting['authority'],
+            'isAdmin': vetting['is_admin']
             },
         'area': vetting['area']
         })
