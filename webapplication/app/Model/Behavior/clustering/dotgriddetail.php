@@ -42,29 +42,48 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
     $lat_lng_range_avg = ( array_sum( array($lat_range, $lng_range) ) / 2 );
 
     // Range to decimal place conversions
-    $round_to_nearest_nth_fraction = 1;
+    $cluster_by_rounding_to_nearest_nth_fraction = null;
+    $vet_by_rounding_to_nearest_nth_fraction = 1;
     if ($lat_lng_range_avg > ($griddiness * 200)) {
-        $round_to_nearest_nth_fraction = 0.125;
+        $cluster_by_rounding_to_nearest_nth_fraction = 0.125;
+        $vet_by_rounding_to_nearest_nth_fraction = 0.125;
     } elseif ($lat_lng_range_avg > ($griddiness * 100)) {
-        $round_to_nearest_nth_fraction = 0.25;
+        $cluster_by_rounding_to_nearest_nth_fraction = 0.25;
+        $vet_by_rounding_to_nearest_nth_fraction = 0.25;
     } elseif ($lat_lng_range_avg > ($griddiness * 50)) {
-        $round_to_nearest_nth_fraction = 0.5;
+        $cluster_by_rounding_to_nearest_nth_fraction = 0.5;
+        $vet_by_rounding_to_nearest_nth_fraction = 0.5;
     } elseif ($lat_lng_range_avg > ($griddiness * 25)) {
-        $round_to_nearest_nth_fraction = 1;
+        $cluster_by_rounding_to_nearest_nth_fraction = 1;
+        $vet_by_rounding_to_nearest_nth_fraction = 1;
     } elseif ($lat_lng_range_avg > ($griddiness * 12)) {
-        $round_to_nearest_nth_fraction = 2;
+        $cluster_by_rounding_to_nearest_nth_fraction = 2;
+        $vet_by_rounding_to_nearest_nth_fraction = 2;
     } elseif ($lat_lng_range_avg > ($griddiness * 5)) {
-        $round_to_nearest_nth_fraction = 4;
+        $cluster_by_rounding_to_nearest_nth_fraction = 4;
+        $vet_by_rounding_to_nearest_nth_fraction = 4;
     } elseif ($lat_lng_range_avg > ($griddiness * 2)) {
-        $round_to_nearest_nth_fraction = 8;
+        $cluster_by_rounding_to_nearest_nth_fraction = 8;
+        $vet_by_rounding_to_nearest_nth_fraction = 8;
     } elseif ($lat_lng_range_avg > ($griddiness * 1)) {
-        $round_to_nearest_nth_fraction = 16;
+        $cluster_by_rounding_to_nearest_nth_fraction = 16;
+        $vet_by_rounding_to_nearest_nth_fraction = 16;
+    # don't cluster occurrences beyond this point
+    # but do continue to calculate vetting areas
+    } elseif ($lat_lng_range_avg > ($griddiness * 0.5)) {
+        $vet_by_rounding_to_nearest_nth_fraction = 32;
+    } elseif ($lat_lng_range_avg > ($griddiness * 0.25)) {
+        $vet_by_rounding_to_nearest_nth_fraction = 64;
+    } elseif ($lat_lng_range_avg > ($griddiness * 0.125)) {
+        $vet_by_rounding_to_nearest_nth_fraction = 128;
+    } elseif ($lat_lng_range_avg > ($griddiness * 0.05)) {
+        $vet_by_rounding_to_nearest_nth_fraction = 256;
     } else {
-        $round_to_nearest_nth_fraction = null;
+        $vet_by_rounding_to_nearest_nth_fraction = 512;
     }
 
-    # if round_to_nearest_nth_fraction null, don't round
-    foreach($Model->detailedClusteredOccurrencesInBounds($bounds, $round_to_nearest_nth_fraction) as $location) {
+    # if cluster_by_rounding_to_nearest_nth_fraction null, don't round
+    foreach($Model->detailedClusteredOccurrencesInBounds($bounds, $cluster_by_rounding_to_nearest_nth_fraction) as $location) {
         $longitude = (float)(string) $location['longitude'];
         $latitude = (float)(string) $location['latitude'];
 
@@ -75,7 +94,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
         $classification = (!isset($classification) || is_null($classification)) ? "N/A" : $classification;
         $count = $location['total_occurrences'];
 
-        $point_radius = is_null($round_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.5 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
+        $point_radius = is_null($cluster_by_rounding_to_nearest_nth_fraction) ? GeolocationsBehavior::MIN_FEATURE_RADIUS : ( floor(log($count, 2) * 0.5 ) + GeolocationsBehavior::MIN_FEATURE_RADIUS);
 
         $unsorted_contentious_classification_count_array = array(
             "unknown" => $location["contentious_unknown_count"],
@@ -152,23 +171,11 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
 
         $properties_array = array();
 
-        $min_latitude_range  = 0;
-        $max_latitude_range  = 0;
-        $min_longitude_range = 0;
-        $max_longitude_range = 0;
+        $min_latitude_range  = $latitude  - (1 / ( 2 * $vet_by_rounding_to_nearest_nth_fraction) );
+        $max_latitude_range  = $latitude  + (1 / ( 2 * $vet_by_rounding_to_nearest_nth_fraction) );
+        $min_longitude_range = $longitude - (1 / ( 2 * $vet_by_rounding_to_nearest_nth_fraction) );
+        $max_longitude_range = $longitude + (1 / ( 2 * $vet_by_rounding_to_nearest_nth_fraction) );
 
-        if ( is_null($round_to_nearest_nth_fraction) ) {
-          $min_latitude_range  = $latitude  - GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
-          $max_latitude_range  = $latitude  + GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
-          $min_longitude_range = $longitude - GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
-          $max_longitude_range = $longitude + GeolocationsBehavior::MIN_VETTING_LAT_LNG_RANGE;
-        } else {
-          $min_latitude_range  = $latitude  - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
-          $max_latitude_range  = $latitude  + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
-          $min_longitude_range = $longitude - (1 / ( 2 * $round_to_nearest_nth_fraction ) );
-          $max_longitude_range = $longitude + (1 / ( 2 * $round_to_nearest_nth_fraction ) );
-        }
-        
         $properties_array['min_latitude_range']  = $min_latitude_range;
         $properties_array['max_latitude_range']  = $max_latitude_range;
         $properties_array['min_longitude_range'] = $min_longitude_range;
@@ -182,7 +189,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
         $properties_array['description'] = "".
                     "<dl>";
 
-        if ( is_null($round_to_nearest_nth_fraction) ) {
+        if ( is_null($cluster_by_rounding_to_nearest_nth_fraction) ) {
             // report the lat/long, directly, if we aren't clustering
             $properties_array['description'] .=
                     "<dt>Latitude</dt><dd>$latitude</dd>".
