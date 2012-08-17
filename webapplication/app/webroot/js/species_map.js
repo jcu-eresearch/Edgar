@@ -141,46 +141,6 @@ function addSuitabilityLayer(layerName, mapPath) {
 
     Edgar.map.addLayer(thisLayer);
 }
-// ------------------------------------------------------------------
-/*
-function addVettingLayer() {
-    console.log('Adding vetting layer')
-    var format = new OpenLayers.Format.GeoJSON({});
-
-    var vettingStyleMap = new OpenLayers.StyleMap({
-        'default': {
-            'fillOpacity': 0.3,
-            'strokeOpacity': 0.9,
-            'fillColor': '${fill_color}',
-            'strokeColor': '${stroke_color}',
-            'fontColor': '${font_color}',
-            'label': '${classification}',
-        },
-        'select': {
-            'fillOpacity': 1.0,
-            'strokeOpacity': 1.0
-        }
-    });
-    vettingLayer = new OpenLayers.Layer.Vector('Vetting Areas', {
-        isBaseLayer: false,
-        projection: geographic,
-        strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
-        protocol: new OpenLayers.Protocol.HTTP({
-            url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.mapdata.species.id + ".json"),
-            format: new OpenLayers.Format.GeoJSON({})
-        }),
-        styleMap: vettingStyleMap
-    });
-    vettingLayerControl = new OpenLayers.Control.SelectFeature(vettingLayer, {hover: true});
-    // NOTE: can't have two SelectFeature controls active at the same time...
-    // SO.. TODO:
-    //            convert code to use a single select feature control,
-    //            and inject/remove layers from that select feature as necessary.
-    Edgar.map.addLayer(vettingLayer);
-    Edgar.map.addControl(vettingLayerControl);
-    vettingLayerControl.activate();
-}
-*/
 
 // ------------------------------------------------------------------
 function addOccurrencesLayer() {
@@ -453,6 +413,8 @@ $(function() {
         // Setting the restrictedExtent will change the bounds
         // that pressing the 'world' icon zooms to.
         // User can manually zoom out past this point.
+        // That said, user can't pan once zoomed out past this point.
+        // i.e. Causes some weird behaviour.
         // restrictedExtent: australia_bounds
 
     });

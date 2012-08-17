@@ -20,16 +20,25 @@
         'internalProjection': Edgar.map.baseLayer.projection,
         'externalProjection': Edgar.util.projections.geographic
       });
+      this.styleMap = new OpenLayers.StyleMap({
+        'default': {
+          'fillOpacity': 0.4,
+          'strokeOpacity': 0.9,
+          'fillColor': '#9f3',
+          'strokeColor': '#9f3'
+        }
+      });
       this.vectorLayerOptions = {
         /*
-                    # NOTE: Due to OpenLayers Bug.. can't do this.
+                    # NOTE: Due to OpenLayers -Bug- Limitation.. can't do this.
                     #   The modify feature control draws points onto the vector layer
                     #   to show vertice drag points.. these drag points fail the geometryType
                     #   test.
                     # 'geometryType': OpenLayers.Geometry.Polygon
         */
 
-        displayInLayerSwitcher: false
+        displayInLayerSwitcher: false,
+        styleMap: this.styleMap
       };
       this._addButtonHandlers();
       consolelog("Finished init-ing the classify habitat interface");

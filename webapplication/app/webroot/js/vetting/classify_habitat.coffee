@@ -17,15 +17,25 @@ Edgar.vetting.classifyHabitat = {
             'externalProjection': Edgar.util.projections.geographic
         }
 
+        @styleMap = new OpenLayers.StyleMap({
+            'default': {
+                'fillOpacity': 0.4
+                'strokeOpacity': 0.9
+                'fillColor': '#9f3'
+                'strokeColor': '#9f3'
+            }
+        })
+
         @vectorLayerOptions = {
             ###
-            # NOTE: Due to OpenLayers Bug.. can't do this.
+            # NOTE: Due to OpenLayers -Bug- Limitation.. can't do this.
             #   The modify feature control draws points onto the vector layer
             #   to show vertice drag points.. these drag points fail the geometryType
             #   test.
             # 'geometryType': OpenLayers.Geometry.Polygon
             ###
             displayInLayerSwitcher: false
+            styleMap: @styleMap
         }
 
         # Listen for button clicks
