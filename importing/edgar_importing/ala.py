@@ -57,12 +57,13 @@ class Occurrence(object):
     '''Plain old data structure for an occurrence record'''
 
     def __init__(self, coord=None, sens_coord=None, uuid_in=None,
-            assertions=[], uncertainty=None, date=None):
+            assertions=[], uncertainty=None, date=None, basis=None):
         self.coord = coord
         self.sensitive_coord = sens_coord
         self.assertions = set(assertions)
         self.uncertainty = uncertainty # in meters (not sure if radius, or AABB)
         self.date = date # datetime.date or None
+        self.basis = basis
 
         if uuid_in is None:
             self.uuid = None
@@ -127,14 +128,15 @@ def set_max_retry_secs(max_retry_secs):
 
 
 def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=False):
-    '''A generator for Occurrenceobjects fetched from ALA'''
+    '''A generator for Occurrence objects fetched from ALA'''
 
     url = BIOCACHE + 'ws/occurrences/search'
     params = {
         'q': q_param(species_lsid, changed_since),
         'fl': ','.join(('id', 'latitude', 'longitude', 'sensitive_longitude',
             'sensitive_latitude', 'assertions', 'coordinate_uncertainty',
-            'sensitive_coordinate_uncertainty', 'occurrence_date')),
+            'sensitive_coordinate_uncertainty', 'occurrence_date',
+            'basis_of_record')),
         'facet': 'off',
         'wkt': AUSTRALIA_POLY,
         'pageSize': OCC_PAGE_SIZE
@@ -166,7 +168,8 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
                 uncertainty=uncertainty,
-                date=date
+                date=date,
+                basis=occ['basisOfRecord']
             )
 
 

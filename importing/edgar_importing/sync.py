@@ -12,6 +12,12 @@ import shapely.geometry
 from sqlalchemy import func, select, text
 from cStringIO import StringIO
 
+BASIS_TRANSLATION = {
+    'HumanObservation': 'Human observation',
+    'MachineObservation': 'Machine observation',
+    'PreservedSpecimen': 'Preserved specimen'
+}
+
 
 log = logging.getLogger(__name__)
 
@@ -383,6 +389,7 @@ class Syncer:
             {slat},
             {slon},
             {uncertainty},
+            {basis},
             {species_id},
             {source_id},
             {record_id});'''.format(
@@ -394,6 +401,7 @@ class Syncer:
                 slat=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.lati))),
                 slon=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.longi))),
                 uncertainty=('NULL' if occ.uncertainty is None else str(int(occ.uncertainty))),
+                basis=('NULL' if occ.basis is None else "'"+BASIS_TRANSLATION[occ.basis]+"'"),
                 species_id=str(int(species_id)),
                 source_id=str(int(self.source_row_id)),
                 record_id=postgres_escape_bytea(occ.uuid.bytes)
