@@ -78,8 +78,8 @@ GeometryDDL(vettings)
 #     shp2pgsql TaxonPolys1.shp birdlife_import | sudo -u postgres psql edgar
 birdlife_import = Table('birdlife_import', metadata,
     Column('spno', SmallInteger()),
-    Column('range_t', String(50)),
-    Column('br_rnge_t', String(50)),
+    Column('rnge', Integer()),
+    Column('brrnge', Integer()),
     GeometryExtensionColumn('the_geom', MultiPolygon(2, srid=-1))
 )
 GeometryDDL(birdlife_import)
