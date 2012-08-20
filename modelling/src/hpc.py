@@ -227,10 +227,9 @@ class HPCJob:
                             source_url  = source_row['url']
                             source_name = source_row['name']
 
-                            meta_data_source_array.append({
-                                "species_name" :  self.getSpeciesNameForMetaData(),
-                                "data_source_website" : self.getMetaDataSourceDict(source_name, source_url)
-                            })
+                            meta_data_source_array.append(
+                                self.getMetaDataSourceDict(source_name, source_url)
+                            )
 
                         # Dump the source metadata
                         metaDataString = json.dumps({
