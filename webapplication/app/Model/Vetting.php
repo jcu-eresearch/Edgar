@@ -26,6 +26,7 @@ class Vetting extends AppModel {
                 $stroke_color = $fill_color;
                 $font_color   = $stroke_color;
                 break;
+            case "invalid":
             case "doubtful":
                 $fill_color   = "#cc0000";
                 $stroke_color = $fill_color;
