@@ -56,6 +56,7 @@ SPP_NAME=$AP03_SPP_CLEAN_NAME
 # the public file may contain obfiscated data.
 PUBLIC_OCCUR="$WORKING_DIR/inputs/$SPP/public_occur.csv"
 PRIVATE_OCCUR="$WORKING_DIR/inputs/$SPP/.private_occur.csv"
+METADATA_JSON_FILE="$WORKING_DIR/inputs/$SPP/metadata.json"
 
 OCCUR=""
 
@@ -155,6 +156,9 @@ wait
 mkdir -p "$TDH_DIR/$SPP_NAME"
 mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
+
+# copy the metadata.json file to the TDH dir
+cp "$METADATA_JSON_FILE" "$TDH_DIR/$SPP_NAME/metadata.json"
 
 CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"

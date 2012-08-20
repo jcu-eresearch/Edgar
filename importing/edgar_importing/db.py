@@ -37,6 +37,7 @@ species = Table('species', metadata,
 sources = Table('sources', metadata,
     Column('id', Integer(), primary_key=True),
     Column('name', String(256), nullable=False),
+    Column('url', String(256), nullable=False),
     Column('last_import_time', DateTime(), nullable=True)
 )
 
