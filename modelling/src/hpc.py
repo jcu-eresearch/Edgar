@@ -121,11 +121,11 @@ class HPCJob:
         return self.jobId
 
     def _setSpeciesCommonName(self, speciesCommonName):
-        self.speciesCommonName = speciesCommonName
+        self.speciesCommonName = speciesCommonName or ""
         return self.speciesCommonName
 
     def _setSpeciesSciName(self, speciesSciName):
-        self.speciesSciName = speciesSciName
+        self.speciesSciName = speciesSciName or ""
         return self.speciesSciName
 
     def _setDirtyOccurrences(self, dirtyOccurrences):
@@ -192,8 +192,8 @@ class HPCJob:
                     dirtyOccurrences = species_row['num_dirty_occurrences']
                     self._setDirtyOccurrences(dirtyOccurrences)
 
-                    self._setSpeciesCommonName(species_row['common_name'] or "")
-                    self._setSpeciesSciName(species_row['scientific_name'] or "")
+                    self._setSpeciesCommonName(species_row['common_name'])
+                    self._setSpeciesSciName(species_row['scientific_name'])
                     log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
 
                     # Create tempfiles to write our csv content to
