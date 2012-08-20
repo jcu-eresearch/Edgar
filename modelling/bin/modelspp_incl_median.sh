@@ -89,8 +89,6 @@ declare -a YEARS_TO_MODEL=('2015' '2025' '2035' '2045' '2055' '2065' '2075' '208
 declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
 declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
-# declare -a MODELS_TO_MODEL=('cccma-cgcm31' 'ccsr-miroc32hi' 'ccsr-miroc32med' 'cnrm-cm3'), etc.
-
 function model_and_median {
     local SCENARIO=$1
     local YEAR=$2
@@ -112,9 +110,9 @@ function model_and_median {
         let I_INT+=1
 
     done
-    
+
     # At this point, the modelling is complete for this scenario year combo
-    
+
     # Now calc the median
 
     # Execute the py script.
@@ -129,6 +127,12 @@ function model_and_median {
 
 # Produce training data
 java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z redoifexists autorun
+
+# If the median didn't produce a valid output, then exit
+if [ ! -e "$TMP_OUTPUT_DIR/${SPP}.lambdas" ]; then
+    echo "The model didn't produce any lambdas. Can't continue." >&2
+    exit 3
+fi
 
 # Model the 'current' projection ( in the background )
 java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$TRAINCLIMATE" "$TMP_OUTPUT_DIR/"`basename "$TRAINCLIMATE"`.asc fadebyclamping nowriteclampgrid nowritemess -x &
