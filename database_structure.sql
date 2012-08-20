@@ -193,6 +193,7 @@ GRANT USAGE, SELECT ON vettings_id_seq TO edgar_backend;
 
 -- edgar_frontend
 GRANT SELECT, UPDATE ON species TO edgar_frontend;
+GRANT SELECT ON sources TO edgar_frontend;
 GRANT SELECT, INSERT ON users TO edgar_frontend;
 GRANT SELECT ON occurrences TO edgar_frontend;
 GRANT SELECT, INSERT, UPDATE ON vettings TO edgar_frontend;
