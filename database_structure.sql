@@ -83,6 +83,7 @@ CREATE TABLE species (
 CREATE TABLE sources (
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(256) NOT NULL, -- arbitrary human-readble identifier for the source
+    homepage_url VARCHAR(256) DEFAULT "" NOT NULL,  -- (http://www.example.com/) this will be used in the metadata to provide a link to the source's homepage
     last_import_time TIMESTAMP NULL -- the last time data was imported from this source
 );
 
