@@ -1,6 +1,6 @@
 -- SQL compatible with PostgreSQL v8.4 + PostGIS 1.5
 
-DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, DATE, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, INT, INT, bytea);
+DROP FUNCTION IF EXISTS EdgarUpsertOccurrence(classification, DATE, INT, FLOAT, FLOAT, FLOAT, FLOAT, occurrence_basis, INT, INT, INT, bytea);
 DROP TABLE IF EXISTS sensitive_occurrences;
 DROP TABLE IF EXISTS occurrences;
 DROP TABLE IF EXISTS sources;
@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS vettings;
 DROP TABLE IF EXISTS species;
 DROP TABLE IF EXISTS users;
 DROP TYPE IF EXISTS classification;
+DROP TYPE IF EXISTS occurrence_basis;
 
 
 
@@ -34,6 +35,12 @@ CREATE TYPE classification AS ENUM(
     'irruptive',
     'core',
     'introduced'
+);
+
+CREATE TYPE occurrence_basis AS ENUM(
+    'Preserved specimen',
+    'Human observation',
+    'Machine observation'
 );
 
 
@@ -76,6 +83,7 @@ CREATE TABLE species (
 CREATE TABLE sources (
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(256) NOT NULL, -- arbitrary human-readble identifier for the source
+    homepage_url VARCHAR(256) DEFAULT '' NOT NULL,  -- (http://www.example.com/) this will be used in the metadata to provide a link to the source's homepage
     last_import_time TIMESTAMP NULL -- the last time data was imported from this source
 );
 
@@ -91,6 +99,7 @@ CREATE TABLE occurrences (
     uncertainty INT NULL,
     date DATE NULL, -- when the occurrence/sighting happened
     classification classification NOT NULL, -- The canonical classification (a.k.a "vetting") for the occurrence
+    basis occurrence_basis NULL,
     contentious BOOL DEFAULT FALSE NOT NULL,
     source_classification classification NOT NULL, -- The vetting classification as obtained from the source (i.e. ALA assertions translated to our vettings system)
     source_record_id bytea NULL, -- the id of the record as obtained from the source (e.g. the uuid from ALA)
@@ -105,7 +114,6 @@ SELECT AddGeometryColumn('occurrences', 'location', 4326, 'POINT', 2);
 ALTER TABLE occurrences ALTER COLUMN location SET NOT NULL;
 CREATE INDEX occurrences_species_id_idx ON occurrences (species_id);
 CREATE UNIQUE INDEX occurrences_source_record_idx ON occurrences (source_id, source_record_id);
-CREATE INDEX occurrences_location_idx ON occurrences USING GIST (location);
 -- Reduces disk access for queries with `where species_id = ?` (which is like 100% of queries)
 -- Do this manually, can take hours and a double the disk space of the table:
 -- CLUSTER occurrences USING occurrences_species_id_idx;
@@ -211,6 +219,7 @@ CREATE FUNCTION EdgarUpsertOccurrence(
     inSensLat FLOAT,
     inSensLon FLOAT,
     inUncertainty INT,
+    inBasis occurrence_basis,
     inSpeciesId INT,
     inSourceId INT,
     inSourceRecordId bytea) RETURNS VOID AS $$
@@ -226,7 +235,8 @@ BEGIN
             species_id = inSpeciesId,
             source_classification = inClassification,
             date = inDate,
-            uncertainty = inUncertainty
+            uncertainty = inUncertainty,
+            basis = inBasis
         WHERE
             source_id = inSourceId
             AND source_record_id = inSourceRecordId
@@ -240,6 +250,7 @@ BEGIN
                 classification,
                 date,
                 uncertainty,
+                basis,
                 species_id,
                 source_id,
                 source_record_id
@@ -249,6 +260,7 @@ BEGIN
                 inClassification,
                 inDate,
                 inUncertainty,
+                inBasis,
                 inSpeciesId,
                 inSourceId,
                 inSourceRecordId

@@ -12,6 +12,12 @@ import shapely.geometry
 from sqlalchemy import func, select, text
 from cStringIO import StringIO
 
+BASIS_TRANSLATION = {
+    'HumanObservation': 'Human observation',
+    'MachineObservation': 'Machine observation',
+    'PreservedSpecimen': 'Preserved specimen'
+}
+
 
 log = logging.getLogger(__name__)
 
@@ -48,15 +54,26 @@ class Syncer:
         # deleted locally and orphan their occurrences.
         if sync_species:
             log.info('Syncing species list')
-            added_species, deleted_species = self.added_and_deleted_species()
-            for species in added_species:
-                self.add_species(species)
+
+            transaction = self.conn.begin()
+            try:
+                added_species, deleted_species = self.added_and_deleted_species()
+                for species in added_species:
+                    self.add_species(species)
+
+                log.info('Committing newly added species')
+                transaction.commit()
+            except:
+                log.critical('Performing rollback due to exception')
+                transaction.rollback()
+                raise
 
 
         # update occurrences
         if sync_occurrences:
             log.info('Syncing occurrence records')
             self.sync_occurrences()
+
 
 
     def local_species(self):
@@ -139,21 +156,40 @@ class Syncer:
         start_time = datetime.datetime.utcnow()
 
         # insert new, and update existing, occurrences
-        occ_generator = self.mp_fetch_occurrences(since=self.last_import_time,
-                                                  record_dirty=True)
-        for occ in occ_generator:
-            self.upsert_occurrence(occ, occ.species_id)
+        transaction = self.conn.begin()
+        try:
+            occ_generator = self.mp_fetch_occurrences(since=self.last_import_time,
+                                                      record_dirty=True)
+            for occ in occ_generator:
+                self.upsert_occurrence(occ, occ.species_id)
 
-        # update last import time for ALA
-        self.conn.execute(db.sources.update()
-            .where(db.sources.c.id == self.source_row_id)
-            .values(last_import_time=start_time))
+            # update last import time for ALA
+            self.conn.execute(db.sources.update()
+                .where(db.sources.c.id == self.source_row_id)
+                .values(last_import_time=start_time))
+
+            log.info('Committing updated occurrences')
+            transaction.commit()
+        except:
+            log.critical('Performing rollback due to exception')
+            transaction.rollback()
+            raise
+
 
         # Brute force re-download all occurrences if the local and
         # remote counts don't match
         log.info('Performing re-download of occurrences for species'+
                  'with incorrect occurrence counts');
-        self.redownload_occurrences_if_needed()
+        transaction = self.conn.begin()
+        try:
+            self.redownload_occurrences_if_needed()
+
+            log.info('Committing re-downloaded occurrences')
+            transaction.commit()
+        except:
+            log.critical('Performing rollback due to exception')
+            transaction.rollback()
+            raise
 
         # log warnings if the counts dont match up
         log.info('Checking that local occurrence counts match ALA')
@@ -353,6 +389,7 @@ class Syncer:
             {slat},
             {slon},
             {uncertainty},
+            {basis},
             {species_id},
             {source_id},
             {record_id});'''.format(
@@ -364,6 +401,7 @@ class Syncer:
                 slat=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.lati))),
                 slon=('NULL' if occ.sensitive_coord is None else str(float(occ.sensitive_coord.longi))),
                 uncertainty=('NULL' if occ.uncertainty is None else str(int(occ.uncertainty))),
+                basis=('NULL' if occ.basis is None else "'"+BASIS_TRANSLATION[occ.basis]+"'"),
                 species_id=str(int(species_id)),
                 source_id=str(int(self.source_row_id)),
                 record_id=postgres_escape_bytea(occ.uuid.bytes)

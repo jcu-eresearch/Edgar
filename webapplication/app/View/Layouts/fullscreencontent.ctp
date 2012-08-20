@@ -118,6 +118,9 @@ $user = AuthComponent::user();
             <li><a href="#" id="howtotrigger" for="howto" class="closed">using Edgar</a></li>
             <li><a href="#" id="glossarytrigger" for="glossary" class="closed">glossary</a></li>
             <li><a href="#" id="abouttrigger" for="acknowledgements" class="closed">credits</a></li>
+            <?php if(AuthComponent::user('is_admin')): ?>
+                <li><a href="#" id="admintrigger" for="admin" class="closed">admin</a></li>
+            <?php endif ?>
         </ul>
 
     </div>
@@ -482,6 +485,14 @@ engage in improving our understanding of the species and the modelling of specie
             <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
         </div>
     </div></div>
+    <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
+    <?php if(AuthComponent::user('is_admin')): ?>
+        <div id="admin" class="triggeredtab"><div class="inner">
+            <ul>
+                <li><?php print $this->Html->link('Contentious Species', '/admin') ?></li>
+            </ul>
+        </div></div>
+    <?php endif ?>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="content">
         <?php echo $this->fetch('content') ?>

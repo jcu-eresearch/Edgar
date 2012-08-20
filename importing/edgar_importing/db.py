@@ -20,6 +20,10 @@ def connect(engine_config):
 classification_enum = Enum('unknown', 'invalid', 'historic', 'vagrant',
     'irruptive', 'core', 'introduced');
 
+basis_enum = Enum('Preserved specimen', 'Human observation',
+    'Machine observation')
+
+
 
 species = Table('species', metadata,
     Column('id', Integer(), primary_key=True),
@@ -43,6 +47,7 @@ occurrences = Table('occurrences', metadata,
     Column('uncertainty', Integer(), nullable=False),
     Column('date', Date(), nullable=True),
     Column('classification', classification_enum, nullable=False),
+    Column('basis', basis_enum, nullable=True),
     Column('species_id', SmallInteger(), ForeignKey('species.id'), nullable=False),
     Column('source_id', SmallInteger(), ForeignKey('sources.id'), nullable=False),
     Column('source_record_id', BINARY(16), nullable=True),
@@ -73,8 +78,8 @@ GeometryDDL(vettings)
 #     shp2pgsql TaxonPolys1.shp birdlife_import | sudo -u postgres psql edgar
 birdlife_import = Table('birdlife_import', metadata,
     Column('spno', SmallInteger()),
-    Column('range_t', String(50)),
-    Column('br_rnge_t', String(50)),
+    Column('rnge', Integer()),
+    Column('brrnge', Integer()),
     GeometryExtensionColumn('the_geom', MultiPolygon(2, srid=-1))
 )
 GeometryDDL(birdlife_import)
