@@ -169,7 +169,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
                 uncertainty=uncertainty,
                 date=date,
-                basis=occ['basisOfRecord']
+                basis=(occ['basisOfRecord'] if 'basisOfRecord' in occ else None)
             )
 
 
