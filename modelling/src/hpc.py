@@ -114,7 +114,7 @@ class HPCJob:
             resultURL = sourceHomePage
             resultNotes = "" + sourceName + " - home page"
 
-        return { "harvester": { "type": "directory", "metadata": { "identifier" : { "type": "uri", "value": resultURL }, "notes" : resultNotes } } }
+        return { "identifier" : { "type": "uri", "value": resultURL }, "notes" : resultNotes }
 
     def _setJobId(self, jobId):
         self.jobId = jobId
@@ -233,14 +233,19 @@ class HPCJob:
 
                         # Dump the source metadata
                         metaDataString = json.dumps({
-                          "occurrences": [{
-                            "species_name" : self.getSpeciesNameForMetaData(),
-                            "data_source_website" : meta_data_source_array
-                          }],
-                          "suitability": [{
-                            "species_name" : self.getSpeciesNameForMetaData(),
-                            "data_source_website" : meta_data_source_array
-                          }]
+                            "harvester": {
+                                "type": "directory",
+                                "metadata": {
+                                    "occurrences": [{
+                                        "species_name" : self.getSpeciesNameForMetaData(),
+                                        "data_source_website" : meta_data_source_array
+                                    }],
+                                    "suitability": [{
+                                        "species_name" : self.getSpeciesNameForMetaData(),
+                                        "data_source_website" : meta_data_source_array
+                                    }]
+                                }
+                            }
                         })
 
                         metaData_f.write(metaDataString)
