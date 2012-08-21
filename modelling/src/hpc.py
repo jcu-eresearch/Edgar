@@ -114,7 +114,7 @@ class HPCJob:
             resultURL = sourceHomePage
             resultNotes = "" + sourceName + " - home page"
 
-        return { "identifier" : { "type": "uri", "value": resultURL }, "notes" : resultNotes }
+        return { "harvester": { "type": "directory", "metadata": { "identifier" : { "type": "uri", "value": resultURL }, "notes" : resultNotes } } }
 
     def _setJobId(self, jobId):
         self.jobId = jobId

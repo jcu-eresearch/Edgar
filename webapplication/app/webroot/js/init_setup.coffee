@@ -86,27 +86,3 @@ Edgar.util.mappath = (species, year, scenario) ->
     else
         "#{speciesid}/#{scenario}_median_#{year}.asc"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
