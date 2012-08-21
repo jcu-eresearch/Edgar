@@ -156,13 +156,24 @@ done
 # Wait for all remaining jobs to go to zero...
 wait
 
-# Zip the output, and copy it to the TDH
-mkdir -p "$TDH_DIR/$SPP_NAME"
+if [ -e "$TDH_DIR/$SPP_NAME" ]; then
+    # Update the metadata file
+    # copy the metadata.json file to the TDH dir
+    cp "$METADATA_JSON_FILE" "$TDH_DIR/$SPP_NAME/metadata.json"
+else
+    mkdir -p "$TMP_OUTPUT_DIR/tmp_metadata_dir"
+    cp "$METADATA_JSON_FILE" "$TMP_OUTPUT_DIR/tmp_metadata_dir"
+    # move the temp meta data dir to the real TDH dir
+    mv "$TMP_OUTPUT_DIR/tmp_metadata_dir" "$TDH_DIR/$SPP_NAME"
+fi
+
 mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 
-# copy the metadata.json file to the TDH dir
-cp "$METADATA_JSON_FILE" "$TDH_DIR/$SPP_NAME/metadata.json"
+# Zip the output, and copy it to the TDH
+mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
+
 
 CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"
@@ -176,7 +187,6 @@ popd
 if [ ! -e "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME"
 fi
-
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
 OCCUR_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-occurrences.zip"
