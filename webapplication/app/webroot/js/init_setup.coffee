@@ -54,19 +54,19 @@ Edgar.util.pluralise = (count, noun, plural) ->
         count + " " + noun + "s"
 
 Edgar.util.showhide = (showlist, hidelist) ->
-	$.each(hidelist,
-		(i, itemid) ->
-			$item = $('#' + itemid)
-			if $item.css('display') != 'none' # apparently in Chrome .is(':visible') doesn't always return true when it should
-				$item.hide('blind','fast')
-	)
+    $.each(hidelist,
+        (i, itemid) ->
+            $item = $('#' + itemid)
+            if $item.css('display') != 'none' # apparently in Chrome .is(':visible') doesn't always return true when it should
+                $item.hide('blind','fast')
+    )
 
-	$.each(showlist,
-		(i, itemid) ->
-			$item = $('#' + itemid)
-#			if $item.css('display') == 'none' or $item.is(":visible") == false
-			$item.show('blind','fast')
-	)
+    $.each(showlist,
+        (i, itemid) ->
+            $item = $('#' + itemid)
+#           if $item.css('display') == 'none' or $item.is(":visible") == false
+            $item.show('blind','fast')
+    )
 
 # return a map path for a climate suitability map, given a species, year, and
 # emission scenario.
@@ -75,16 +75,16 @@ Edgar.util.showhide = (showlist, hidelist) ->
 # Arg 'scenario' is ignored if the year is "current", otherwise is assumed to
 # be the string name of the emission scenario
 Edgar.util.mappath = (species, year, scenario) ->
-	# find the species id
-	speciesid = species
-	if typeof species == 'object'
-		speciesid = species.id
+    # find the species id
+    speciesid = species
+    if typeof species == 'object'
+        speciesid = species.id
 
-	if typeof year == 'string' and year.toLowerCase() == 'current'
-		# find the current map for the species
-		"#{speciesid}/1990.asc"
-	else
-		"#{speciesid}/#{scenario}_csiro-mk30_#{year}.asc"
+    if typeof year == 'string' and year.toLowerCase() == 'current'
+        # find the current map for the species
+        "#{speciesid}/1990.asc"
+    else
+        "#{speciesid}/#{scenario}_median_#{year}.asc"
 
 
 
