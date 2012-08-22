@@ -27,17 +27,21 @@ def main():
         config = json.load(f)
         db.connect(config)
 
-    if 'alaVettingSyncUrl' not in config:
-        logging.critical('The "alaVettingSyncUrl" must be present in the config')
+    if 'alaVettingSyncUrl' not in config or len(config['alaVettingSyncUrl']) == 0:
+        logging.critical('"alaVettingSyncUrl" must be present in the config')
+        return
+
+    if 'alaApiKey' not in config or len(config['alaApiKey']) == 0:
+        logging.critical('"alaApiKey" must be present in the config')
         return
 
     while True:
         next_vetting = next_vetting_to_sync()
         if next_vetting is None:
             log_info('=========== No vettings to send. Sleeping for a while.')
-            time.sleep(5 * 60)
+            time.sleep(60)
         else:
-            send_vetting(next_vetting, config['alaVettingSyncUrl'])
+            send_vetting(next_vetting, config['alaVettingSyncUrl'], config['alaApiKey'])
             db.engine.dispose()
             time.sleep(5)
 
@@ -72,7 +76,7 @@ def next_vetting_to_sync():
         ''').fetchone()
 
 
-def send_vetting(vetting, ala_url):
+def send_vetting(vetting, ala_url, ala_api_key):
     log_info('>>>>>>>>>>> Sending vetting %d, by "%s" for species "%s"',
             vetting['id'],
             vetting['email'],
@@ -80,24 +84,23 @@ def send_vetting(vetting, ala_url):
 
     # new vettings
     if vetting['last_ala_sync'] is None:
-        if send_existing_vetting(vetting, 'new', ala_url):
+        if send_existing_vetting(vetting, 'new', ala_url, ala_api_key):
             update_sync_date_on_vetting(vetting['id'])
 
     # deleted vettings
     elif vetting['deleted'] is not None:
-        if send_deleted_vetting(vetting, ala_url):
+        if send_deleted_vetting(vetting, ala_url, ala_api_key):
             delete_vetting(vetting['id'])
 
     # modified vettings
     else:
-        if send_existing_vetting(vetting, 'modified', ala_url):
+        if send_existing_vetting(vetting, 'modified', ala_url, ala_api_key):
             update_sync_date_on_vetting(vetting['id'])
-
 
     log_info('<<<<<<<<<<< Finished')
 
 
-def send_existing_vetting(vetting, status, ala_url):
+def send_existing_vetting(vetting, status, ala_url, ala_api_key):
     log_info('Sending status="%s" message', status)
 
     lastModified = vetting['modified']
@@ -105,7 +108,7 @@ def send_existing_vetting(vetting, status, ala_url):
         lastModified = vetting['created']
     assert lastModified is not None
 
-
+    # remove the microseconds (whole seconds only)
     if lastModified.microsecond > 0:
         lastModified -= datetime.timedelta(microseconds=lastModified.microsecond)
 
@@ -113,6 +116,7 @@ def send_existing_vetting(vetting, status, ala_url):
         'id': vetting['id'],
         'status': status,
         'lastModified': lastModified.isoformat(),
+        'apiKey': ala_api_key,
         'ignored': (False if vetting['ignored'] is None else True),
         'species': vetting['scientific_name'],
         'classification': vetting['classification'],
@@ -126,7 +130,7 @@ def send_existing_vetting(vetting, status, ala_url):
         })
 
 
-def send_deleted_vetting(vetting, ala_url):
+def send_deleted_vetting(vetting, ala_url, ala_api_key):
     log_info('Sending status="deleted" message')
 
     if vetting['last_ala_sync'] is None:
@@ -137,7 +141,8 @@ def send_deleted_vetting(vetting, ala_url):
     return send_json(ala_url, {
         'id': vetting['id'],
         'status': 'deleted',
-        'lastModified': vetting['deleted'].isoformat()
+        'lastModified': vetting['deleted'].isoformat(),
+        'apiKey': ala_api_key
         })
 
 
@@ -146,6 +151,7 @@ def send_json(ala_url, json_object):
     assert 'id' in json_object
     assert 'status' in json_object
     assert 'lastModified' in json_object
+    assert 'apiKey' in json_object
 
     request = urllib2.Request(ala_url, json.dumps(json_object), {
         'Content-Type': 'application/json',
