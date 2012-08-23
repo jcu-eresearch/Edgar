@@ -242,7 +242,7 @@ by the list they have to choose from.  Conversely, it's a bad
 list if none of the offered classifications match the expert's
 opinion.
 
-I can detect that by offering the vetting users a comments box 
+I<a id="commentsmeasure"> </a>can detect that by offering the vetting users a comments box 
 as well as a classification selector.  If a user feels like none
 of the classifications offered are suitable, they're more likely
 to write an explanatory comment; if they can select a completely
