@@ -8,6 +8,8 @@ categories: [Development]
 tags:    [testing, user, UI, learning]
 ---
 
+# DRAFT
+
 Early in August we tested the almost complete site on some real users.  In this probably rather long post I will describe our test users, go through the testing outcomes that most users agreed on, and then point out some specific things we learned from individual users.
 
 ### Our test users
