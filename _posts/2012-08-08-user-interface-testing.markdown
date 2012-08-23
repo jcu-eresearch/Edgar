@@ -38,7 +38,7 @@ _What succeeded:_
 
 Users easily found the general information tabs across the top of the window.  Positioning general navigation across the top of a web site is very common.
 
-_What failed:_ 
+_What we learned:_ 
 
 Clicking on a tab causes a panel of text to slide down into view, partially covering the map.  The tabs included a [disclosure triangle](http://en.wikipedia.org/wiki/Disclosure_widget) that points to the right when the info panel is closed, and rotates to point down when the tab is clicked and the info panel is opened.  I had expected this to indicate that clicking the tab a second time would slide away the info panel; instead it appears that users thought of the info panel as a transient element and clicked outside the panel, which works to cancel [dropdowns](http://en.wikipedia.org/wiki/Drop-down_list) and menus.
 
@@ -50,7 +50,7 @@ _What succeeded:_
 
 We used an [input prompt](http://ui-patterns.com/patterns/InputPrompt/) of "Type species common/scientific name here" inside a very large text box; this technique is common particularly for login and password entry boxes and is therefore very familiar to most web users.
 
-_What failed:_
+_What we learned:_
 
 The auto-suggest was a little too picky for our first test users; they needed to correctly enter the hyphens in names like "Blue-breasted Fairy-wren" for the species to show up.  We tweaked the suggestion mechanism between users and the end results were successful.
 
@@ -62,7 +62,7 @@ _What succeeded:_
 
 All users described the grid of dots as summarising the observations in that region, and correctly guessed that the dot size was related to the observation count.  They also identified that the colour of the dot indicated the classification of the observations there.  Most users spontaneously discovered the pop-up info box that appears when clicking a cluster dot, and all users correctly anticipated finer-grained clustering when zooming in.  When we pointed out that the dot could represent observations across several classifications, users were okay with the dot colour being taken from the most common classification.
 
-_What failed:_
+_What we learned:_
 
 Some users didn't like the simplified classifications we used in current mode.  Our full set of seven classifications [described earlier]({{ BASE_PATH }}/Development/2012/05/29/classifying-occurrences/) were being merged into four: unknown, invalid, core (breeding, non-breeding and introduced merged) and other (historic, vagrant, and irruptive merged).
 
@@ -76,7 +76,7 @@ _What succeeded:_
 
 Users immediately grasped the colour scale we chose, with yellow indicating marginally suitable areas through to dark green indicating the most suitable.  Our domain experts have told us that using yellow (or tan)-to-green is the standard convention for showing suitability and distribution data.
 
-_What failed:_
+_What we learned:_
 
 Several users thought the suitability colours mixed with the map background too much.  We reduced the transparency of the suitability layer to reduce this effect.  Also, we added a third map background, the mostly-blank [VMAP0](http://en.wikipedia.org/wiki/Vector_map#Level_Zero_.28VMAP0.29), for when Google's physical terrain or satellite map backgrounds are too busy.
 
@@ -94,7 +94,7 @@ Everyone understood the scenarios and year slider, and when watching the animati
 
 All users showed a good understanding of the implications of the future projections.
 
-_What failed:_
+_What we learned:_
 
 Not everyone noticed the play button immediately.  The default button styling was rather subtle; we have given the button a green edge to increase its visual weight.
 
@@ -114,7 +114,7 @@ _What succeeded:_
 
 The red colour did catch vetting users' eyes.
 
-_What failed:_
+_What we learned:_
 
 Every user assumed that red meant "known to be bad", despite a legend telling them the opposite.  (This was true in current mode too, but it wasn't until the vetting section of our user test that it became obvious.)
 
@@ -138,7 +138,7 @@ _What succeeded:_
 
 When users wanted to select multiple clusters, they attempted a click-and-drag selection, which worked as expected.
 
-_What failed:_
+_What we learned:_
 
 When users wanted to select a single cluster, they clicked directly on the cluster.  This didn't select the cluster, but it did open a pop-up box describing the observations in the cluster (just as it would when clicking on a cluster in current mode).  Users assumed that cluster would be included in their vetting.
 
@@ -152,7 +152,7 @@ _What succeeded:_
 
 When vetting, most users understood that dragging would select observations.
 
-_What failed:_
+_What we learned:_
 
 Most users didn't discover they could switch out of selection mode by clicking the "Select Observations" button a second time.
 
@@ -164,7 +164,7 @@ _What succeeded:_
 
 All users we able to perform trial vettings and understood how to select a new classification, enter a comment, and save their vetting.
 
-_What failed:_
+_What we learned:_
 
 We [expected commenting to be rare]({{ BASE_PATH }}/Development/2012/05/29/classifying-occurrences/#commentsmeasure), but most users wrote something in the comment box every time.  In this situation it's possible users were simply testing the field, but my sense is that users would still feel the need to add a comment in normal usage.
 
