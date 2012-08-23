@@ -10,7 +10,7 @@ tags:    [testing, user, UI, learning]
 
 # DRAFT
 
-Early in August we tested the almost complete site on some real users.  In this probably rather long post I will describe our test users, go through the testing outcomes that most users agreed on, and then point out some specific things we learned from individual users.
+Early in August we tested the almost complete site on some real users.  In this probably rather long post I will describe our test users, go through the testing outcomes that most users agreed on, and then point out some specific things we learned from individual users.  Here I'm focusing on quite fine-grained aspects of the Edgar user interface; [Lauren](2012/03/22/the-team/#lauren)'s [user testing post]({{ BASE_PATH }}/Development/2012/08/09/user-tests/) describes our user testing results with respect to Edgar's overall usefulness.
 
 ### Our test users
 
@@ -18,11 +18,11 @@ Early in August we tested the almost complete site on some real users.  In this 
 
 **User 2** was an administrator in a university department.  We expected this user to represent the general public exploring the information Edgar has on offer.
 
-**User 3** was a bird watcher and internationally respected environmental scientist with broad ranging expertise including conservation managment, biodiversity, the tropical environment, and the knowledge economy.  We expected this user to represent birdwatchers, researchers, and policymaking site users.
+**User 3** was a bird watcher and internationally respected environmental scientist with broad ranging expertise including conservation managment, biodiversity, the tropical environment, and the knowledge economy.  We expected this user to represent birdwatchers, researchers, users who could supply vetting information, and policymaking site users.
 
-**User 4** was a bird watcher, bird ecologist, wildlife researcher and wildlife photographer.  We expected this user to represent birdwatching users.
+**User 4** was a bird watcher, bird ecologist, wildlife researcher and wildlife photographer.  We expected this user to represent birdwatching and users who could supply vetting information.
 
-**User 5** was a bird watcher and author of a bird atlas, also representing bird watchers.
+**User 5** was a bird watcher and author of a bird atlas, also representing bird watchers and users who could supply vetting information.
 
 ## Common testing outcomes
 
