@@ -126,7 +126,7 @@ function model_and_median {
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
 
 # Produce training data
-java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z redoifexists autorun
+java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z -N bioclim_02 -N bioclim_03 -N bioclim_06 -N bioclim_07 -N bioclim_08 -N bioclim_09 -N bioclim_10 -N bioclim_11 -N bioclim_13 -N bioclim_14 -N bioclim_18 -N bioclim_19 redoifexists autorun
 
 # If the median didn't produce a valid output, then exit
 if [ ! -e "$TMP_OUTPUT_DIR/${SPP}.lambdas" ]; then
