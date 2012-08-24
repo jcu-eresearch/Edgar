@@ -8,8 +8,7 @@ categories: [Development]
 tags:    [modelling, HPC, distribution maps]
 ---
 
-Introduction
-==============
+## Introduction
 
 One of the requirements of AP03 is that the species distribution maps (under
 various climate change scenarios), be automatically generated. The following is
@@ -25,8 +24,8 @@ and starts jobs to model the species indicated by the web service. It also
 monitors the state of jobs, and sends modelling status updates to the web
 service.
 
-What To Model?
-==============
+## What To Model?
+
 
 The first thing to consider is how do we determine what needs to be modelled.
 
@@ -42,8 +41,8 @@ interactive level models are ran before background priority models.
 Within the given priority level, model priority is determined by the number of
 dirty occurrences. The model with the most dirty occurrences is ran first.
 
-What To Model? - Web Service Interaction
-----------------------------------------
+### What To Model? - Web Service Interaction
+
 
 The web service provides the following URI: <code>/species/next_job/</code>.
 The web service either returns the species id of the species to model next,
@@ -55,8 +54,7 @@ If it receives a 204, it knows that there is nothing to run at the moment.
 The URI will continue to return the same species id (the highest priority species)
 until it receives a HTTP POST indicating that a HPC job has been queued.
 
-Modelling the Species
-========================
+## Modelling the Species
 
 The HPC script determines what species to model using the aforementioned URI.
 Assuming there is a species in need of remodelling, the HPC script would
@@ -90,8 +88,7 @@ that the job has failed, or has been running for an excessively long period of
 time, it will abort the job, and send a status update of **FINISHED_FAILURE** 
 to the cake app.
 
-Finishing Modelling
-========================
+## Finishing Modelling
 
 The HPC script operates as a simple loop, so when it completes a species 
 distribution map job, it simply moves on to the next species to model. When there 
@@ -107,8 +104,7 @@ a species did receive occurrence updates, then the number of dirty occurrences
 would be above zero after the subtraction, meaning that the species distribution 
 model is still out of date.
 
-Benefits
-=============
+## Benefits
 
 By separating the automated modelling into two sections, we can get the 
 following benefits:

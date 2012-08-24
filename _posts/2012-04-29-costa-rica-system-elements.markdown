@@ -8,7 +8,7 @@ categories: [Development]
 tags:    [progress, costa rica, interoperability, map server, map script, mapping, threshold]
 ---
 
-# Introduction
+## Introduction
 
 The Costa Rica mini project involved producing a prototype website using
 species data provided in a CSV file. From the time the Costa Rica mini project
@@ -17,7 +17,7 @@ purpose of the Costa Rica mini project, it wasn't necessary to vet the
 occurrence data.
 
 
-## What Needed To Be Done
+### What Needed To Be Done
 
 To produce a prototype that met the client's requirements, it was necessary to
 do the following:
@@ -42,7 +42,7 @@ do the following:
    3. the legend of the distribution map.
 
 
-# System Elements
+## System Elements
 
 We can break what needed to be done into the following sections:
 
@@ -52,7 +52,7 @@ We can break what needed to be done into the following sections:
 * Web Application
 
 
-## Importing
+### Importing
 
 Normally our importing process involves gathering species occurrence records
 from ALA. Tom is our resident expert on ALA importing. For more information on
@@ -81,7 +81,7 @@ The [import python script](https://github.com/jcu-eresearch/Edgar/blob/costa_ric
    2. Add the species occurrence to the occurrences table.
 
 
-## Modeling
+### Modeling
 
 As part of our main ALA branch, we've produced scripts to work with the HPC
 to generate distribution maps for Australian bird species. These scripts
@@ -90,13 +90,13 @@ reason, our normal modeling scripts weren't applicable to the Costa Rica data.
 Jeremy, our client, produced the distribution maps for the Costa Rica species.
 
 
-## Mapping
+### Mapping
 
 Our web interface uses OpenLayers to provide our interactive map. We are using 
 Map Server and the associated PHP library, Map Script, to generate map layer 
 images from the model output ascii grid files.
 
-### OpenLayers
+#### OpenLayers
 
 [OpenLayers](http://openlayers.org/) is the javascript library we used to provide our interactive map.
 
@@ -176,7 +176,7 @@ of Google Maps, Bing Maps and Open Street Maps for the base layer. The
 <code>map_with_threshold.php</code> URL points to our map script php file used
 to generate map images with input threshold values.
 
-### Map Server and Map Script
+#### Map Server and Map Script
 
 [Map Server](http://mapserver.org/) does a lot of things. For our purposes, 
 we will use it to generate map images from ascii grid files. We do this by specifying:
@@ -188,7 +188,7 @@ we will use it to generate map images from ascii grid files. We do this by speci
 * A _data file_, which acts as the data input to generate the map from.
 
 
-#### The Map File
+##### The Map File
 
 The following is our Costa Rica map file:
 
@@ -411,7 +411,7 @@ The following image shows the map colour transition:
 
 <img src="{{site.JB.BASE_PATH}}/images/costa-rica-map-example.png" />
 
-#### Map Script
+##### Map Script
 
 [Map Script](http://mapserver.org/mapscript/mapscript.html) is the php library 
 we use to interface with Map Server.

@@ -1,4 +1,5 @@
-    img {
+
+img {
     /* OMFG eff-ing IE OMG@!! */
     position: relative;
 }
@@ -55,6 +56,18 @@ footer {
     padding-right: 1em;
     float: left;
     margin: 5px;
+}
+
+/* headings ------------------------------------- */
+
+h1, h2, h3, h4, h5 {
+    xborder: 1px solid red;
+    margin: 1.5em 0 1em 0;
+    padding: 0.25em 0;
+}
+
+h2 {
+    border-bottom: 1px solid #ccc;
 }
 
 /* sidebar ------------------------------------- */

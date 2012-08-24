@@ -36,7 +36,7 @@ for a few reasons:
 Keeping a local copy of the occurrence records poses its own problems,
 however.
 
-## Disk Size
+### Disk Size
 
 Initial testing indicates that we can keep each record under 100 bytes
 in a MySQL database. ALA has around 18 million occurrence records for
@@ -45,7 +45,7 @@ less than two gigabytes of storage on disk. The size itself shouldn't be
 a problem in this case, but the performance of database that size
 remains untested.
 
-## Speed
+### Speed
 
 Importing 18 million records at once will take a considerable amount of
 time. Instead of repeatedly downloading all records when Edgar needs an
@@ -59,14 +59,14 @@ roughly 500 to 2000 records per second using a concurrent architecture
 for HTTP requests. This means the initial import of 18 million records
 should take between 3 and 10 hours.
 
-## Species Changes
+### Species Changes
 
 The list of bird species will change as new species are found, and
 existing species are merged together or split apart. As part of the ALA
 syncing process, these additions, splits and merges will be incorporated
 into the local database.
 
-## Connectivity and Availability Problems
+### Connectivity and Availability Problems
 
 Because an import can run for hours, it's highly likely that ALA web
 services may become unavailable while an import is running. This could
@@ -86,7 +86,7 @@ Five retries over five minutes should be sufficient to overcome common
 availability problems, but if there are recurring import failures it may
 require more sophisticated error handling.
 
-## Data Quality
+### Data Quality
 
 ALA aggregates occurrence records from many different sources, so the
 data quality varies. Some occurrences are too old to be reliable, such
@@ -116,7 +116,7 @@ map, but the accurate coordinates will not be display. The accurate
 coordinates will only be used to generate distribution maps, which will
 not contain any individual occurrence coordinates when displayed.
 
-# Implementation
+## Implementation
 
 The syncing will be performed by python scripts. These are currently
 available from
