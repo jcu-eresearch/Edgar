@@ -16,7 +16,7 @@ def exp():
     startup()
 
     output = csv.writer(sys.stdout)
-    for occ in db.occurrences.select().execute():
+    for occ in db.occurrences.select().execution_options(stream_results=True).execute():
         if occ['basis'] is not None:
             recid = str(uuid.UUID(bytes=occ['source_record_id']))
             output.writerow([recid, occ['basis']])
@@ -37,4 +37,5 @@ def imp():
         db.occurrences.update()\
             .values(basis=basis_in)\
             .where(db.occurrences.c.source_record_id == recid.bytes)\
+            .where(db.occurrences.c.source_id == 1)\
             .execute()
