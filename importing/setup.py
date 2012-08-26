@@ -12,5 +12,7 @@ setup(
         csvs_from_db = edgar_importing.csvs_from_db:main
         vettingd = edgar_importing.vettingd:main
         vetting_syncd = edgar_importing.vetting_syncd:main
+        basis_export = edgar_importing.basis:exp
+        basis_import = edgar_importing.basis:imp
         ''')
 )
