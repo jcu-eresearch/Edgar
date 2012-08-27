@@ -19,6 +19,7 @@ $(function() {
             tab.css('width', w_o_p_percent);
             tab.css('bottom', '');
         });
+        $('html').unbind('click', closeAllTabs);
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - 
     function opentab(tab) {
@@ -27,8 +28,16 @@ $(function() {
         tab.show('blind', 'fast', function() {
             tab.css('width', w_o_p_percent);
         });
+        $('html').bind('click', closeAllTabs);
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - 
+    function closeAllTabs() {
+        var alltriggers = $('#tabtriggers li a');
+        alltriggers.each( function(tindex, trig) {
+            $(trig).addClass('closed');
+            closetab($('#' + $(trig).attr('for')));
+        });
+    }
 
     //
     // deal with tabs
@@ -63,6 +72,10 @@ $(function() {
             });
         });
     });
+
+    //needed so that closeAllTabs doesn't get called
+    //when clicking inside the tab
+    tabs.click(function(e){ e.stopPropagation(); });
     
     //
     // deal with triggers
@@ -83,12 +96,7 @@ $(function() {
             var closedclickedtrigger = $(event.target).filter('.closed');
             var closedclickedtab = $( '#' + closedclickedtrigger.attr('for') );
 
-            // close every tab
-            var alltriggers = $('#tabtriggers li a');
-            alltriggers.each( function(tindex, trig) {
-                $(trig).addClass('closed');
-                closetab($('#' + $(trig).attr('for')));
-            });
+            closeAllTabs()
 
             // re-open the tab that was clicked on, if it started closed
             closedclickedtrigger.removeClass('closed');
