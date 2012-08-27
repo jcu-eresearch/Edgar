@@ -127,16 +127,19 @@ function _setupNewSpecies() {
 // update the download buttons to point to the current species.
 function updateDownloadButtons() {
 
-    if (Edgar.mapdata.species.hasDownloadables) {
-        Edgar.util.showhide(['downloadables'],['nodownloadables']);
-    } else {
-        Edgar.util.showhide(['nodownloadables'],['downloadables']);
-    }
-
     var $occur = $('#btn_species_occur');
     var $clim = $('#btn_species_clim');
 
     if (Edgar.mapdata.species) {
+
+        // show/hide the downloadable buttons
+        if (Edgar.mapdata.species.hasDownloadables) {
+            Edgar.util.showhide(['downloadables'],['nodownloadables']);
+        } else {
+            Edgar.util.showhide(['nodownloadables'],['downloadables']);
+        }
+
+        // update the button actions
         $occur.off('click');
         $occur.attr("disabled", false);
         $occur.click( function() {
