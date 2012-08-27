@@ -134,11 +134,9 @@
             //check if reload is suspended
             if(this._numReloadSuspensions > 0){
                 this._needsReload = true;
-                consolelog('Blocked! ' + this._numReloadSuspensions);
                 return;
             } else {
                 this._needsReload = false;
-                consolelog('GOGOGOG');
             }
 
             this._removeAllLayers();
