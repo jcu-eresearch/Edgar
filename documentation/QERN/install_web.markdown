@@ -33,7 +33,7 @@ Install php xml support (needed for cakephp):
 
 ```bash
 
-php-xml
+sudo yum install php-xml
 ```
 
 Install git:
