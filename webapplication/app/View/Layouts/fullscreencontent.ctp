@@ -164,7 +164,7 @@ bird observation database to generate current and future species distribution mo
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="glossary" class="triggeredtab"><div class="inner">
-
+		
         <div class="additionalcontent">
             <span class="opener">Observation Classifications</span>
             <div class="add"><dl>
@@ -208,6 +208,43 @@ bird observation database to generate current and future species distribution mo
                 </dd>
             </dl></div>
         </div>
+		
+		<div class="additionalcontent">
+            <span class="opener">Emission Pathways: RCPs</span>
+            <div class="add">
+				<p>
+					RCP stands for <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#descript" target="_blank">Representative Concentration Pathway</a>.  The RCPs are not new, fully integrated scenarios (i.e., they are not a complete package of socioeconomic, emissions, and climate projections). They are consistent sets of projections of only the components of radiative forcing that are meant to serve as input for climate modeling, pattern scaling, and atmospheric chemistry modeling.  Here, we have used <a href="http://wallaceinitiative.org/climate_2012/tdhtools/Search/DataDownload.php" target="_blank">climate layers</a> developed by Jeremy VanDerWal that have been derived from the following RCPs:
+				</p><dl>
+					<dt>
+						RCP2.6
+					</dt><dd>
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP2.6</a> emission pathway is representative for scenarios leading to very low greenhouse gas concentration levels: peak in radiative forcing at ~ 3 W/m2 before 2100 and decline.
+					</dd>
+					<dd>
+						Mean temperature increase for Australia: 0.91 degrees by 2085
+					</dd><dt>
+						RCP4.5
+					</dt><dd>
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP4.5</a> emission pathway It is a stabilization scenario : stabilization without overshoot pathway to 4.5 W/m2 at stabilization after 2100.
+					</dd><dd>
+						Mean temperature increase for Australia: 1.83 degrees by 2085
+					</dd><dt>
+						RCP6
+					</dt><dd>
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP6</a> emission pathway is a stabilization scenario : stabilization without overshoot pathway to 6 W/m2 at stabilization after 2100.
+					</dd><dd>
+						Mean temperature increase for Australia: 2.29 degrees by 2085
+					</dd><dt>
+						RCP8.5
+					</dt><dd>
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP8.5</a> is characterized by increasing greenhouse gas emissions over time: rising radiative forcing pathway leading to 8.5 W/m2 in 2100. 
+					</dd><dd>
+						Mean temperature increase for Australia: 3.78 degrees by 2085
+					</dd>
+				</dl>
+			</div>
+		</div>
+		
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="howto" class="triggeredtab"><div class="inner">
@@ -324,6 +361,30 @@ Why can't I find the species I'm interested in?
                 </dt><dd>
 We filter the species list to only include species for which we have observations.  It's possible that the Atlas of Living Australia has no observation records for the species you're looking for. 
                 </dd>
+ 
+				<dt>
+Why are there no records for this species?
+                </dt><dd>
+We display all bird observation records retrieved from ALA so that we can classify those records and send that classification back to ALA.  If no records are shown for a species, it means that all records for that species have been classified as 'doubtful'.  If you wish to see the doubtful records, register an account with <a href="http://www.ala.org.au" target="_blank">ALA</a> and log in to Edgar.  You may then see and vet the records.
+                </dd>
+				
+				<dt>
+Why is there no climate suitability map for some species? (ie. Why has a species not been modelled?)
+                </dt><dd>
+We can only model species that have 20 or more observations at unique locations at a 5km resolution.
+                </dd>
+				
+				<dt>
+How do I obtain accurate observation records for a species?
+                </dt><dd>
+Most data available for download on Edgar is accurate, however some location observations for some species are considered sensitive information and we cannot release it either visually (displayed on the map), or as downloadable data.  If you require accurate observation records for a species, contact <a href="http://www.ala.org.au" target="_blank">ALA</a>.
+                </dd>
+				
+				<dt>
+How do I report a bug/suggest a new feature for Edgar?
+                </dt><dd>
+Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
+                </dd>
 
             </dl></div>
         </div>
@@ -341,7 +402,7 @@ We filter the species list to only include species for which we have observation
                 echo $this->Html->image('tdh_logo.png', array(
                     'alt'=>'Tropical Data Hub',
                     'url'=>'http://tropicaldatahub.org/',
-                    'class' => 'unpaddedlogo'
+					'class' => 'unpaddedlogo'
                 ));
                 echo $this->Html->image('ala_logo.jpg', array(
                     'alt'=>'Altas of Living Australia',
@@ -354,7 +415,7 @@ We filter the species list to only include species for which we have observation
                 echo $this->Html->image('eresearch_logo.png', array(
                     'alt'=>'JCU eResearch Centre',
                     'url'=>'http://eresearch.jcu.edu.au/',
-                    'class' => 'unpaddedlogo'
+					'class' => 'unpaddedlogo'
                 ));
             ?>
         </div>
@@ -443,9 +504,9 @@ We filter the species list to only include species for which we have observation
                 <p>
 Currently there is a general lack of engagement and knowledge transfer between professional researchers and end-users of research (general public, conservation managers, decision-makers, etc.). This is reflected in a general lack of acceptance and acknowledgement by the general public of the potential impacts of climate change. Indeed, the ABC reported 27 June 2011 that
                 </p><p><cite>
-“The Lowy Institute's annual poll asked about 1,000 people for their opinions ... The poll shows that there has been a steep fall in the number of Australians who think climate change is a serious problem which needs addressing now.”
+"The Lowy Institute's annual poll asked about 1,000 people for their opinions ... The poll shows that there has been a steep fall in the number of Australians who think climate change is a serious problem which needs addressing now."
                 </cite></p><p>
-Research individuals or groups spend considerable time and effort to bring together species occurrence data, but substantial effort is still required and limitations exist with respect to a) the accuracy of the localities, removing only blatantly incorrect records outside known locality, or b) using painstaking manual processes whereby occurrence records are presented as hardcopy maps to “species experts.”  These experts then write metadata (e.g. provenance information), corrections, and other information about further records on the maps and return the comments for interpretation. This is a cumbersome, labour-intensive, and error-prone process which needs to be repeated for each project.
+Research individuals or groups spend considerable time and effort to bring together species occurrence data, but substantial effort is still required and limitations exist with respect to a) the accuracy of the localities, removing only blatantly incorrect records outside known locality, or b) using painstaking manual processes whereby occurrence records are presented as hardcopy maps to "species experts."  These experts then write metadata (e.g. provenance information), corrections, and other information about further records on the maps and return the comments for interpretation. This is a cumbersome, labour-intensive, and error-prone process which needs to be repeated for each project.
                 </p><p>
 There is currently a scarcity of transparent online tools which integrate species distribution data, locality data with climate change scenarios in an integrated fashion which will facilitate the modelling of current and future species distributions based on climate scenarios.
                 </p><p>

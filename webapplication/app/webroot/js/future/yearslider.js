@@ -11,7 +11,7 @@
             map: null,                  // REQUIRED: the open layers map object
             loadingBar: null,           // Will turn this empty div into a progress bar for loading
             yearLabelElem: null,        // Will change the inner text of this elem when the year changes
-            defaultYear: 2015,
+            defaultYear: 2015
         }, options);
 
 
@@ -181,7 +181,7 @@
                     transitionEffect: 'resize',
                     displayInLayerSwitcher: false,
                     singleTile: true,
-                    ratio: 1.5,
+                    ratio: 1.5
                 }
             );
 
