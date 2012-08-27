@@ -144,7 +144,6 @@
         </div>
     </div>
 
-
     <div class="tool legend" id="tool_legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">

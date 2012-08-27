@@ -340,7 +340,8 @@ We filter the species list to only include species for which we have observation
                 ));
                 echo $this->Html->image('tdh_logo.png', array(
                     'alt'=>'Tropical Data Hub',
-                    'url'=>'http://tropicaldatahub.org/'
+                    'url'=>'http://tropicaldatahub.org/',
+                    'class' => 'unpaddedlogo'
                 ));
                 echo $this->Html->image('ala_logo.jpg', array(
                     'alt'=>'Altas of Living Australia',
@@ -352,7 +353,8 @@ We filter the species list to only include species for which we have observation
                 ));
                 echo $this->Html->image('eresearch_logo.png', array(
                     'alt'=>'JCU eResearch Centre',
-                    'url'=>'http://eresearch.jcu.edu.au/'
+                    'url'=>'http://eresearch.jcu.edu.au/',
+                    'class' => 'unpaddedlogo'
                 ));
             ?>
         </div>
