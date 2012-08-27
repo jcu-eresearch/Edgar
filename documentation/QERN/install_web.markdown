@@ -77,7 +77,7 @@ sudo ln -s /var/www/Edgar/webapplication/ Edgar
 Update httpd conf to allow cakephp to perform re-writes
 
 Add the following to the httpd.conf (/etc/httpd/conf/httpd.conf).
-This should be added after the default directory settings (&lt;Directory "/var/www/html"&gt;&lt;/Directory&gt;).
+This should be added after the default directory settings (&lt;Directory "/var/www/html"&gt;&hellip;&lt;/Directory&gt;).
 
 ```conf
 
