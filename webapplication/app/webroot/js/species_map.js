@@ -131,7 +131,7 @@ function addSuitabilityLayer(layerName, mapPath) {
             isBaseLayer: false,
             transitionEffect: 'resize',
             singleTile: true,
-            ratio: 1.5,
+            ratio: 1.5
         }
     );
 
@@ -263,7 +263,7 @@ function addOccurrencesLayer() {
 //                strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
                 strategies: [
                     new OpenLayers.Strategy.BBOX({
-                        resFactor: 1.1,
+                        resFactor: 1.1
                     })
                 ],
                 protocol: new OpenLayers.Protocol.HTTP({
