@@ -72,9 +72,7 @@
 
             //init scenarios
             self._$scenarios.change(function(){
-                setTimeout(function(){
-                    self.setScenario();
-                }, 1);
+                self._reloadLayers();
             });
         };
 
@@ -113,14 +111,6 @@
             this._reloadLayers();
         }
 
-        this.setScenario = function(){
-            scenario = '' + self._$scenarios.filter(':checked').val();
-            if(this._scenario == scenario) return;
-
-            this._scenario = scenario;
-            this._reloadLayers();
-        }
-
         this.playAnimation = function(){
             var self = this;
 
@@ -144,11 +134,11 @@
             //check if reload is suspended
             if(this._numReloadSuspensions > 0){
                 this._needsReload = true;
-                console.log('Blocked! ' + this._numReloadSuspensions);
+                consolelog('Blocked! ' + this._numReloadSuspensions);
                 return;
             } else {
                 this._needsReload = false;
-                console.log('GOGOGOG');
+                consolelog('GOGOGOG');
             }
 
             this._removeAllLayers();
@@ -174,7 +164,8 @@
         }
 
         this._addLayerForYear = function(year){
-            var mapPath = Edgar.util.mappath(this._speciesId, year, this._scenario);
+            scenario = '' + self._$scenarios.filter(':checked').val();
+            var mapPath = Edgar.util.mappath(this._speciesId, year, scenario);
 
             var layer = new OpenLayers.Layer.WMS(
                 "Climate Suitability in " + year,

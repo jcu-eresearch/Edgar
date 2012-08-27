@@ -19,6 +19,7 @@ import ssh
 import re
 from hpc_config import HPCConfig
 import sqlalchemy
+from sqlalchemy import distinct
 from sqlalchemy import or_
 
 log = logging.getLogger()
@@ -76,8 +77,9 @@ class HPCJob:
         self.jobStatus        = None
         self.jobStatusMsg     = ""
         self.speciesCommonName  = ""
-        self.speciesSciName     = ""
+        self.speciesSciName   = ""
         self.jobQueuedTime    = None
+        self.metaDataTempfile = None
         self.privateTempfile  = None
         self.publicTempfile   = None
         self._writeCSVSpeciesJobFile()
@@ -89,16 +91,41 @@ class HPCJob:
 
         return strippedCleanName
 
+    def getSpeciesNameForMetaData(self):
+        speciesName = self.speciesCommonName + " (" + self.speciesSciName + ")"
+        strippedCleanName = speciesName.strip()
+
+        return strippedCleanName
+
+    def getMetaDataSourceDict(self, sourceName, sourceHomePage):
+        resultURL = None
+
+        # Special handle the case where the source is the ALA
+        # We can build a species specific URL for these guys
+        if (sourceName == 'ALA') :
+            speciesSciName = self.speciesSciName
+            processedName = re.sub(r"[ ]", '+', speciesSciName)
+            processedName = processedName.strip()
+            resultURL = "http://bie.ala.org.au/species/" + processedName
+            resultNotes = "ALA - Species page for " + self.getSpeciesNameForMetaData()
+        # Else..
+        # Just use the defined source home page URL
+        else :
+            resultURL = sourceHomePage
+            resultNotes = "" + sourceName + " - home page"
+
+        return { "identifier" : { "type": "uri", "value": resultURL }, "notes" : resultNotes }
+
     def _setJobId(self, jobId):
         self.jobId = jobId
         return self.jobId
 
     def _setSpeciesCommonName(self, speciesCommonName):
-        self.speciesCommonName = speciesCommonName
+        self.speciesCommonName = speciesCommonName or ""
         return self.speciesCommonName
 
     def _setSpeciesSciName(self, speciesSciName):
-        self.speciesSciName = speciesSciName
+        self.speciesSciName = speciesSciName or ""
         return self.speciesSciName
 
     def _setDirtyOccurrences(self, dirtyOccurrences):
@@ -139,6 +166,13 @@ class HPCJob:
             raise Exception("Can't set privateTempfile for a job more than once")
         return self.privateTempfile
 
+    def _setMetaDataTempfile(self, f):
+        if self.metaDataTempfile == None:
+            self.metaDataTempfile = f
+        else:
+            raise Exception("Can't set metaDataTempfile for a job more than once")
+        return self.metaDataTempfile
+
     def _writeCSVSpeciesJobFile(self):
         try:
             # Connect the DB
@@ -153,23 +187,69 @@ class HPCJob:
                     # this shouldn't happen...
                    raise Exception("Couldn't find species with id " + self.speciesId + " in table. This shouldn't happen.")
                 else:
-                    # We foudn it
+                    # We found it
                     # Now record the no. of dirtyOccurrences
                     dirtyOccurrences = species_row['num_dirty_occurrences']
                     self._setDirtyOccurrences(dirtyOccurrences)
+
                     self._setSpeciesCommonName(species_row['common_name'])
                     self._setSpeciesSciName(species_row['scientific_name'])
                     log.debug("Found %s dirtyOccurrences for species %s", dirtyOccurrences, self.speciesId)
 
-                    # Create a tempfile to write our csv file to
-                    priv_f  = tempfile.NamedTemporaryFile(delete=False)
-                    pub_f   = tempfile.NamedTemporaryFile(delete=False)
+                    # Create tempfiles to write our csv content to
+                    priv_f     = tempfile.NamedTemporaryFile(delete=False)
+                    pub_f      = tempfile.NamedTemporaryFile(delete=False)
+                    metaData_f = tempfile.NamedTemporaryFile(delete=False)
                     try:
                         # Remember the path to the csv file
                         self._setPrivateTempfile(priv_f.name)
                         self._setPublicTempfile(pub_f.name)
+                        self._setMetaDataTempfile(metaData_f.name)
+
                         log.debug("Writing public csv to: %s", pub_f.name)
                         log.debug("Writing private csv to: %s", priv_f.name)
+                        log.debug("Writing meta data json to: %s", metaData_f.name)
+
+                        # Write the metadata
+
+                        # Get access to the sources for this species
+                        # SELECT DISTINCT url, name, source_id FROM occurrences, sources WHERE occurrences.source_id=sources.id AND species_id=1;
+                        source_rows = sqlalchemy.select(['url', 'name', 'source_id']).\
+                            select_from(db.occurrences.join(db.sources)).\
+                            where(db.occurrences.c.species_id == self.speciesId).\
+                            distinct().\
+                            execute()
+
+                        meta_data_source_array = []
+
+                        # Append to our meta data source array each source we found
+                        for source_row in source_rows :
+                            source_url  = source_row['url']
+                            source_name = source_row['name']
+
+                            meta_data_source_array.append(
+                                self.getMetaDataSourceDict(source_name, source_url)
+                            )
+
+                        # Dump the source metadata
+                        metaDataString = json.dumps({
+                            "harvester": {
+                                "type": "directory",
+                                "metadata": {
+                                    "occurrences": [{
+                                        "species_name" : self.getSpeciesNameForMetaData(),
+                                        "data_source_website" : meta_data_source_array
+                                    }],
+                                    "suitability": [{
+                                        "species_name" : self.getSpeciesNameForMetaData(),
+                                        "data_source_website" : meta_data_source_array
+                                    }]
+                                }
+                            }
+                        })
+
+                        metaData_f.write(metaDataString)
+
                         pub_writer  = csv.writer(pub_f)
                         priv_writer = csv.writer(priv_f)
 
@@ -206,6 +286,7 @@ class HPCJob:
                         # Be a good file citizen, and close the file handle
                         pub_f.close()
                         priv_f.close()
+                        metaData_f.close()
             finally:
                 # Dispose the DB
                 HPCConfig.disposeDB();
@@ -227,12 +308,20 @@ class HPCJob:
                 os.path.exists(self.publicTempfile)
             except Exception as e:
                 log.warn("Exception while deleting public tmpfile (%s) for job. Exception: %s", self.publicTempfile, e)
+
         if self.privateTempfile:
             try:
                 os.unlink(self.privateTempfile)
                 os.path.exists(self.privateTempfile)
             except Exception as e:
                 log.warn("Exception while deleting private tmpfile (%s) for job. Exception: %s", self.privateTempfile, e)
+
+        if self.metaDataTempfile:
+            try:
+                os.unlink(self.metaDataTempfile)
+                os.path.exists(self.metaDataTempfile)
+            except Exception as e:
+                log.warn("Exception while deleting meta data tmpfile (%s) for job. Exception: %s", self.metaDataTempfile, e)
 
     # Has this job expired?
     def isExpired(self):
@@ -253,6 +342,7 @@ class HPCJob:
 
         client_scp.put(self.privateTempfile, self.privateTempfile)
         client_scp.put(self.publicTempfile, self.publicTempfile)
+        client_scp.put(self.metaDataTempfile, self.metaDataTempfile)
 
         client_scp.close()
 
@@ -263,7 +353,7 @@ class HPCJob:
 
 
         # Run the hpc queue script
-        sshCmd = HPCConfig.queueJobScriptPath + " '" + self.speciesId + "' '"  + self.getSafeSpeciesName() +  "' '" + HPCConfig.workingDir + "' '" + self.privateTempfile + "' '" + self.publicTempfile + "'" 
+        sshCmd = HPCConfig.queueJobScriptPath + ' "' + self.speciesId + '" "'  + self.getSafeSpeciesName() +  '" "' + HPCConfig.workingDir + '" "' + self.privateTempfile + '" "' + self.publicTempfile +  '" "' + self.metaDataTempfile +  '"'
 
         log.debug("ssh command: %s", sshCmd)
         chan = client.get_transport().open_session()
@@ -368,4 +458,4 @@ class HPCJob:
 
         except (urllib2.URLError, urllib2.HTTPError, socket.timeout) as e:
             log.warn("Error reporting job status: %s", e)
-            return False      
+            return False

@@ -4,7 +4,6 @@
 function engageFutureMode() {
     Edgar.util.showhide(['button_current'],[]);
     Edgar.yearSlider.setSpeciesId(Edgar.mapdata.species.id);
-    Edgar.yearSlider.setScenario();
 }
 // ------------------------------------------------------------------
 // gets called by mapmodes.js, when changing out of future 

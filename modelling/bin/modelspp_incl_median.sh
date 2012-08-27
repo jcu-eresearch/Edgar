@@ -56,6 +56,7 @@ SPP_NAME=$AP03_SPP_CLEAN_NAME
 # the public file may contain obfiscated data.
 PUBLIC_OCCUR="$WORKING_DIR/inputs/$SPP/public_occur.csv"
 PRIVATE_OCCUR="$WORKING_DIR/inputs/$SPP/.private_occur.csv"
+METADATA_JSON_FILE="$WORKING_DIR/inputs/$SPP/metadata.json"
 
 OCCUR=""
 
@@ -88,8 +89,6 @@ declare -a YEARS_TO_MODEL=('2015' '2025' '2035' '2045' '2055' '2065' '2075' '208
 declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
 declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
-# declare -a MODELS_TO_MODEL=('cccma-cgcm31' 'ccsr-miroc32hi' 'ccsr-miroc32med' 'cnrm-cm3'), etc.
-
 function model_and_median {
     local SCENARIO=$1
     local YEAR=$2
@@ -111,9 +110,9 @@ function model_and_median {
         let I_INT+=1
 
     done
-    
+
     # At this point, the modelling is complete for this scenario year combo
-    
+
     # Now calc the median
 
     # Execute the py script.
@@ -127,7 +126,13 @@ function model_and_median {
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
 
 # Produce training data
-java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z redoifexists autorun
+java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z -N bioclim_02 -N bioclim_03 -N bioclim_06 -N bioclim_07 -N bioclim_08 -N bioclim_09 -N bioclim_10 -N bioclim_11 -N bioclim_13 -N bioclim_14 -N bioclim_18 -N bioclim_19 redoifexists autorun
+
+# If the median didn't produce a valid output, then exit
+if [ ! -e "$TMP_OUTPUT_DIR/${SPP}.lambdas" ]; then
+    echo "The model didn't produce any lambdas. Can't continue." >&2
+    exit 3
+fi
 
 # Model the 'current' projection ( in the background )
 java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$TRAINCLIMATE" "$TMP_OUTPUT_DIR/"`basename "$TRAINCLIMATE"`.asc fadebyclamping nowriteclampgrid nowritemess -x &
@@ -151,10 +156,24 @@ done
 # Wait for all remaining jobs to go to zero...
 wait
 
-# Zip the output, and copy it to the TDH
-mkdir -p "$TDH_DIR/$SPP_NAME"
+if [ -e "$TDH_DIR/$SPP_NAME" ]; then
+    # Update the metadata file
+    # copy the metadata.json file to the TDH dir
+    cp "$METADATA_JSON_FILE" "$TDH_DIR/$SPP_NAME/metadata.json"
+else
+    mkdir -p "$TMP_OUTPUT_DIR/tmp_metadata_dir"
+    cp "$METADATA_JSON_FILE" "$TMP_OUTPUT_DIR/tmp_metadata_dir"
+    # move the temp meta data dir to the real TDH dir
+    mv "$TMP_OUTPUT_DIR/tmp_metadata_dir" "$TDH_DIR/$SPP_NAME"
+fi
+
 mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
+
+# Zip the output, and copy it to the TDH
+mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
+
 
 CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"
@@ -168,7 +187,6 @@ popd
 if [ ! -e "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME"
 fi
-
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
 OCCUR_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-occurrences.zip"

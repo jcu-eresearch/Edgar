@@ -102,7 +102,7 @@ the global Edgar object
     if (typeof year === 'string' && year.toLowerCase() === 'current') {
       return "" + speciesid + "/1990.asc";
     } else {
-      return "" + speciesid + "/" + scenario + "_csiro-mk30_" + year + ".asc";
+      return "" + speciesid + "/" + scenario + "_median_" + year + ".asc";
     }
   };
 
