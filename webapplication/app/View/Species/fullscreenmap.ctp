@@ -144,7 +144,6 @@
         </div>
     </div>
 
-
     <div class="tool legend" id="tool_legend">
         <h1>suitability legend</h1>
         <div class="toolcontent">
@@ -245,9 +244,17 @@
     <div class="tool startclosed" id="tool_specieslinks">
         <h1>downloadable data</h1>
         <div class="toolcontent">
-            For this species:
-            <button id="btn_species_occur" class="downloadbtn ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">Occurrence data</button>
-            <button id="btn_species_clim" class="downloadbtn ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">Climate data</button>
+
+            <div id="downloadables">
+                For this species:
+                <button id="btn_species_occur" class="downloadbtn ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">Observations</button>
+                <button id="btn_species_clim" class="downloadbtn ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">Projected distributions</button>
+            </div>
+
+            <div id="nodownloadables">
+                Downloadable files are created when the species is modelled.  No downloads are currently available for this species.
+            </div>
+
         </div>
     </div>
 

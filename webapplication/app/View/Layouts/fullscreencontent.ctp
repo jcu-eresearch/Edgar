@@ -401,7 +401,8 @@ Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
                 ));
                 echo $this->Html->image('tdh_logo.png', array(
                     'alt'=>'Tropical Data Hub',
-                    'url'=>'http://tropicaldatahub.org/'
+                    'url'=>'http://tropicaldatahub.org/',
+					'class' => 'unpaddedlogo'
                 ));
                 echo $this->Html->image('ala_logo.jpg', array(
                     'alt'=>'Altas of Living Australia',
@@ -413,7 +414,8 @@ Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
                 ));
                 echo $this->Html->image('eresearch_logo.png', array(
                     'alt'=>'JCU eResearch Centre',
-                    'url'=>'http://eresearch.jcu.edu.au/'
+                    'url'=>'http://eresearch.jcu.edu.au/',
+					'class' => 'unpaddedlogo'
                 ));
             ?>
         </div>
@@ -502,9 +504,9 @@ Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
                 <p>
 Currently there is a general lack of engagement and knowledge transfer between professional researchers and end-users of research (general public, conservation managers, decision-makers, etc.). This is reflected in a general lack of acceptance and acknowledgement by the general public of the potential impacts of climate change. Indeed, the ABC reported 27 June 2011 that
                 </p><p><cite>
-“The Lowy Institute's annual poll asked about 1,000 people for their opinions ... The poll shows that there has been a steep fall in the number of Australians who think climate change is a serious problem which needs addressing now.”
+"The Lowy Institute's annual poll asked about 1,000 people for their opinions ... The poll shows that there has been a steep fall in the number of Australians who think climate change is a serious problem which needs addressing now."
                 </cite></p><p>
-Research individuals or groups spend considerable time and effort to bring together species occurrence data, but substantial effort is still required and limitations exist with respect to a) the accuracy of the localities, removing only blatantly incorrect records outside known locality, or b) using painstaking manual processes whereby occurrence records are presented as hardcopy maps to “species experts.”  These experts then write metadata (e.g. provenance information), corrections, and other information about further records on the maps and return the comments for interpretation. This is a cumbersome, labour-intensive, and error-prone process which needs to be repeated for each project.
+Research individuals or groups spend considerable time and effort to bring together species occurrence data, but substantial effort is still required and limitations exist with respect to a) the accuracy of the localities, removing only blatantly incorrect records outside known locality, or b) using painstaking manual processes whereby occurrence records are presented as hardcopy maps to "species experts."  These experts then write metadata (e.g. provenance information), corrections, and other information about further records on the maps and return the comments for interpretation. This is a cumbersome, labour-intensive, and error-prone process which needs to be repeated for each project.
                 </p><p>
 There is currently a scarcity of transparent online tools which integrate species distribution data, locality data with climate change scenarios in an integrated fashion which will facilitate the modelling of current and future species distributions based on climate scenarios.
                 </p><p>

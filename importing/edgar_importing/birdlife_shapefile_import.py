@@ -13,13 +13,14 @@ from shapely.geometry import Polygon, MultiPolygon
 
 # map of BLA categories to db classification enum values
 CLASSIFICATIONS_BY_BLA_CATEGORIES = {
-        'irruptive': 'irruptive',
-        'vagrant': 'vagrant',
-        'escaped': 'vagrant',
-        'historic': 'historic',
-        'suspect': 'invalid',
-        'introduced': 'introduced',
-        'core': 'core'
+    1: 'core',
+    2: 'invalid', # aka suspect
+    3: 'vagrant',
+    4: 'historic',
+    5: 'irruptive',
+    6: 'introduced',
+    7: 'core', # only applies to one species, not 100% sure what classification 7 is
+    8: 'vagrant' # aka escaped
 }
 
 # global logger for this module
@@ -220,7 +221,7 @@ def load_translations(csv_path):
 
     with open(csv_path, 'rb') as f:
         reader = csv.reader(f)
-        reader.__next__() # skip row of headings
+        reader.next() # skip row of headings
         for row in reader:
             assert len(row) == 2
             translations[row[0].strip()] = row[1].strip()

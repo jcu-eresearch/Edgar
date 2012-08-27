@@ -553,6 +553,7 @@ class SpeciesController extends AppController {
             'numDirtyOccurrences' => $species['num_dirty_occurrences'],
             'canRequestRemodel' => (bool)($species['num_dirty_occurrences'] > 0 && $species['first_requested_remodel'] === null),
             'remodelStatus' => $this->_speciesRemodelStatusMessage($species),
+            'hasDownloadables' => ($species['last_successfully_completed_model_finish_time'] != null),
             'label' => $species['common_name'].' - '.$species['scientific_name']
         );
     }
