@@ -57,6 +57,13 @@ Fetch the git repo (read only):
 sudo git fetch "git://github.com/jcu-eresearch/Edgar.git"
 ```
 
+Update the tmp directory of the web app so that cake can read and write to the tmp dir.
+
+```bash
+
+sudo chmod ugo+wrX -R /var/www/Edgar/webapplication/app/tmp/
+```
+
 Change dir to html, and create link to webapplication component of git repo in www dir
 
 ```bash
