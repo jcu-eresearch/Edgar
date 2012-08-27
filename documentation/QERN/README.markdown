@@ -21,9 +21,9 @@ climatebird2.qern.qcif.edu.au (Web)
     * 2100 MHz
     * 512 KB cache 
 * Disk
-    * 8 G   /
-    * 30 G  /opt
-    * 350 T /data (shared)
+    * 8G   /
+    * 30G  /opt
+    * 350T /data (shared)
 
 climatebird3.qern.qcif.edu.au (Modelling)
 -----------------------------
@@ -33,6 +33,6 @@ climatebird3.qern.qcif.edu.au (Modelling)
     * 2100 MHz
     * 512 KB cache 
 * Disk
-    * 14 G   /
-    * 350 T /opt (shared)
+    * 14G   /
+    * 350T /opt (shared)
 
