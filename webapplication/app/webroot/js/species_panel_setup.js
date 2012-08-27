@@ -127,6 +127,12 @@ function _setupNewSpecies() {
 // update the download buttons to point to the current species.
 function updateDownloadButtons() {
 
+    if (Edgar.mapdata.species.hasDownloadables) {
+        Edgar.util.showhide(['downloadables'],['nodownloadables']);
+    } else {
+        Edgar.util.showhide(['nodownloadables'],['downloadables']);
+    }
+
     var $occur = $('#btn_species_occur');
     var $clim = $('#btn_species_clim');
 
