@@ -22,8 +22,7 @@ Birdlife Australia, museums, research organisations and institutions, and indivi
 
 Edgar displays the almost 18 million ALA bird observation records potentially suitable for modelling on a map.  In doing this, it provides an interface for users to vet these displayed records. Given the newly vetted records, Edgar then automatically models reclassified data each time records are modified, and creates maps of future projections of the species distribution.
 
-We [showed a near completed version]({{ BASE_PATH }}/Development/2012/08/08/user-interface-testing/) of Edgar to researchers and bird enthusiasts to find out whether Edgar succeeded in these goals.
-
+We [showed a near completed version]({{ site.JB.BASE_PATH }}/Development/2012/08/08/user-interface-testing/) of Edgar to researchers and bird enthusiasts to find out whether Edgar succeeded in these goals.  
 ## Vetting the data
 
 In 18 million records over some 900+ species, some records are bound to be inaccurate.  Inaccurate records suggest that areas of unsuitable climate are suitable, which creates inaccuracies in the model of the relationship between observations and climate.  There was a glaring gap in fast and easy ways to vet out these inaccurate records, which is necessary to generate informative climate suitability models.

@@ -10,7 +10,7 @@ tags:    [testing, user, UI, learning]
 
 # DRAFT
 
-Early in August we tested the almost complete site on some real users.  In this probably rather long post I will describe our test users, go through the testing outcomes that most users agreed on, and then point out some specific things we learned from individual users.  Here I'm focusing on quite fine-grained aspects of the Edgar user interface; [Lauren](2012/03/22/the-team/#lauren)'s [user testing post]({{ BASE_PATH }}/Development/2012/08/09/user-tests/) describes our user testing results with respect to Edgar's overall usefulness.
+Early in August we tested the almost complete site on some real users.  In this probably rather long post I will describe our test users, go through the testing outcomes that most users agreed on, and then point out some specific things we learned from individual users.  Here I'm focusing on quite fine-grained aspects of the Edgar user interface; [Lauren]({{ site.JB.BASE_PATH }}/2012/03/22/the-team/#lauren)'s [user testing post]({{ site.JB.BASE_PATH }}/Development/2012/08/09/user-tests/) describes our user testing results with respect to Edgar's overall usefulness.
 
 ### Our test users
 
@@ -64,7 +64,7 @@ All users described the grid of dots as summarising the observations in that reg
 
 _What we learned:_
 
-Some users didn't like the simplified classifications we used in current mode.  Our full set of seven classifications [described earlier]({{ BASE_PATH }}/Development/2012/05/29/classifying-occurrences/) were being merged into four: unknown, invalid, core (breeding, non-breeding and introduced merged) and other (historic, vagrant, and irruptive merged).
+Some users didn't like the simplified classifications we used in current mode.  Our full set of seven classifications [described earlier]({{ site.JB.BASE_PATH }}/Development/2012/05/29/classifying-occurrences/) were being merged into four: unknown, invalid, core (breeding, non-breeding and introduced merged) and other (historic, vagrant, and irruptive merged).
 
 We explained the merges but most users were uncomfortable with our merge groupings.  We resolved this by abandoning the merge-based simplification, instead using a different set of classifications that I will describe later in the vetting section.
 
@@ -166,7 +166,7 @@ All users we able to perform trial vettings and understood how to select a new c
 
 _What we learned:_
 
-We [expected commenting to be rare]({{ BASE_PATH }}/Development/2012/05/29/classifying-occurrences/#commentsmeasure), but most users wrote something in the comment box every time.  In this situation it's possible users were simply testing the field, but my sense is that users would still feel the need to add a comment in normal usage.
+We [expected commenting to be rare]({{ site.JB.BASE_PATH }}/Development/2012/05/29/classifying-occurrences/#commentsmeasure), but most users wrote something in the comment box every time.  In this situation it's possible users were simply testing the field, but my sense is that users would still feel the need to add a comment in normal usage.
 
 We altered the comment field name to read "Optional comment" to reduce the number of unnecessary comments.
 
