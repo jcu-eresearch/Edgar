@@ -101,4 +101,37 @@ Restart apache:
 sudo /etc/init.d/httpd restart
 ```
 
+Add apache to the "on boot" services:
+
+```bash
+
+sudo chkconfig --add httpd
+sudo chkconfig --level 345 httpd on
+```
+
+Confirm that it's added by looking at:
+
+```bash
+
+sudo chkconfig --list
+```
+
+You may need to open port 80 of your firewall.
+You can check your firewall settings via:
+
+
+```bash
+
+sudo iptables -L -v
+```
+
+You can add the rule to open port 80 by doing the following.
+Note: Don't follow this part blindly, you should have at least a basic understanding of firewalls before you do this.
+
+```bash
+
+sudo iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+sudo service iptables save
+```
+
 At this point, everything should be working. Go to http://localhost/Edgar and enjoy
