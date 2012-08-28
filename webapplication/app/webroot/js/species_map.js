@@ -486,7 +486,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
 
     // not sure how to position controls while adding them in constructor.
     // instead I'm just adding the control here in the right place.
-    Edgar.map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(5,60));
+    Edgar.map.addControl(new OpenLayers.Control.PanZoom(), new OpenLayers.Pixel(7,47));
 
 
     // VMap0
