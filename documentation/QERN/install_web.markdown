@@ -135,3 +135,100 @@ sudo service iptables save
 ```
 
 At this point, everything should be working. Go to http://localhost/Edgar and enjoy
+
+
+
+Postgres Database - climatebird1.qern.qcif.edu.au
+==============================================================
+
+Install PostgreSQL 8.4 with contrib modules:
+
+    ```bash
+    sudo yum install postgresql postgresql-server postgresql-contrib```
+
+(Optional) Change the Postgres data directory by creating/editing the
+file `/etc/sysconfig/pgsql/postgresql` to contain this:
+
+    ```txt
+    PGDATA=/opt/pgsql/data
+    PGLOG=/opt/pgsql/pgstartup.log```
+
+Install PostGIS 1.5
+
+    ```bash
+
+    #TODO: make this nicer
+    cd /etc/pki/rpm-gpg/
+    sudo wget http://elgis.argeo.org/RPM-GPG-KEY-ELGIS
+
+    sudo yum install postgis```
+
+Create the Edgar database:
+
+    ```bash
+    sudo -u postgres createdb edgar```
+
+Find the Postgres contrib directory. It is `/usr/share/pgsql/contrib/`
+on CentOS. Now install all the requried contrib modules:
+
+    ```bash
+    cd /usr/share/pgsql/contrib/
+    sudo -u postgres createlang plpgsql edgar
+    sudo -u postgres psql -d edgar -f postgis.sql
+    sudo -u postgres psql -d edgar -f spatial_ref_sys.sql
+    sudo -u postgres psql -d edgar -f pg_trgm.sql```
+
+Create the two database roles (a.k.a users) inside the psql console:
+
+    ```bash
+    sudo -u postgres psql edgar```
+
+    ```sql
+    create role edgar_backend with password 'make_up_password_here';
+    create role edgar_frontend with password 'make_up_password_here';```
+
+Fetch a copy of Edgar. In this case, we will fetch it to `~/Edgar`:
+
+    ```bash
+    sudo yum install git
+    cd ~
+    git clone "git://github.com/jcu-eresearch/Edgar.git"```
+
+Initialise the database:
+
+    ```bash
+    sudo -u postgres psql edgar < ~/Edgar/database_structure.sql```
+
+Edit the `pg\_hba.conf` file in the Postgresql data directory. The
+default data directory is `/var/lib/pgsql/data/` on CentOS. The
+following config will allow access from `localhost` only.
+
+    ```txt
+    local  edgar  edgar_frontend                md5
+    local  edgar  edgar_backend                 md5
+    host   edgar  edgar_frontend  127.0.0.1/32  md5
+    host   edgar  edgar_backend   127.0.0.1/32  md5```
+
+Restart Postgres:
+
+    ```bash
+    sudo service postgresql restart```
+
+TODO: allow access to postgres port through firewall
+
+
+ALA importer
+============
+
+Add the ALA row to the sources table:
+
+    ```txt
+    sudo -u postgres psql edgar
+    insert into sources(name) values('ALA');```
+
+Copy the example config and change the settings:
+
+    ```bash
+    cd ~/Edgar/importing/
+    cp config.example.json config.json
+    vim config.json```
