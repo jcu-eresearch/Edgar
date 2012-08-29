@@ -61,3 +61,8 @@ following config will allow access from `localhost` only.
 Restart Postgres:
 
     sudo service postgresql restart
+    
+Add to auto-start processes:
+
+    sudo chkconfig --add  postgresql 
+    sudo chkconfig --level 345 postgresql on
