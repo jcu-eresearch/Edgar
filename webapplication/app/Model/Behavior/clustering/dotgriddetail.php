@@ -1,6 +1,6 @@
 <?php
 
-function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
+function get_features_dotgrid_detail(Model $Model, $bounds, $offset=0, $limit=null, $options=array()) {
 
     $defaults = array(
         'trump' => false,
@@ -83,7 +83,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
     }
 
     # if cluster_by_rounding_to_nearest_nth_fraction null, don't round
-    foreach($Model->detailedClusteredOccurrencesInBounds($bounds, $cluster_by_rounding_to_nearest_nth_fraction) as $location) {
+    foreach($Model->detailedClusteredOccurrencesInBounds($bounds, $cluster_by_rounding_to_nearest_nth_fraction, $offset, $limit) as $location) {
         $longitude = (float)(string) $location['longitude'];
         $latitude = (float)(string) $location['latitude'];
 

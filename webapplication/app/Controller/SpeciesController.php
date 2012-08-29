@@ -136,7 +136,16 @@ class SpeciesController extends AppController {
             $cluster_type = $this->request->query['clustered'];
         }
 
-        $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $cluster_type));
+        $limit = null;
+        if ( array_key_exists('limit', $this->request->query) ) {
+            $limit = $this->request->query['limit'];
+        }
+        $offset = 0;
+        if ( array_key_exists('offset', $this->request->query) ) {
+            $offset = $this->request->query['offset'];
+        }
+
+        $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $cluster_type, $offset, $limit));
 
         // Specify the output for the json view.
         $this->set('_serialize', 'geo_object');

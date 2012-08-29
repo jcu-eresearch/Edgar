@@ -9,10 +9,10 @@
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-function get_features_dotradius(Model $Model, $bounds = null) {
+function get_features_dotradius(Model $Model, $bounds = null, $offset=0, $limit=null) {
     $location_features = array();
 
-    foreach($Model->occurrencesInBounds($bounds) as $location) {
+    foreach($Model->occurrencesInBounds($bounds, $offset, $limit) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
         $contentious = $location['contentious'] ? "yes" : "no";

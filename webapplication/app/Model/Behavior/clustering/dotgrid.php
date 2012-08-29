@@ -9,7 +9,7 @@
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-function get_features_dotgrid(Model $Model, $bounds ) {
+function get_features_dotgrid(Model $Model, $bounds, $offset=0, $limit=null ) {
 
     $GRID_RANGE_LONGITUDE = 120;    // how many longitude slices to make (cut into GRID_RANGE_LONGITUDE along the x axis)
     $MIN_FEATURE_RADIUS   = 3;     // pixels
@@ -56,7 +56,7 @@ function get_features_dotgrid(Model $Model, $bounds ) {
     );
 
     // Iterate over the locations (pass instance location by reference)
-    foreach($Model->occurrencesInBounds($bounds) as $location) {
+    foreach($Model->occurrencesInBounds($bounds, $offset, $limit) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
 

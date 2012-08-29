@@ -9,7 +9,7 @@
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-function get_features_squaregrid(Model $Model, $bounds ) {
+function get_features_squaregrid(Model $Model, $bounds, $offset=0, $limit=null ) {
 
     $MAX_SQUARES_LONG = 90;    // how many longitude slices to make, at most
     $SIDE_LENGTH_OPTIONS = array(8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125);  // four per parent
@@ -67,7 +67,7 @@ function get_features_squaregrid(Model $Model, $bounds ) {
     );
 
     // Iterate over the locations (pass instance location by reference)
-    foreach($Model->occurrencesInBounds($bounds) as $location) {
+    foreach($Model->occurrencesInBounds($bounds, $offset, $limit) as $location) {
         $longitude = $location['longitude'];
         $latitude = $location['latitude'];
 

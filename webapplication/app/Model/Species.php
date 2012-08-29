@@ -16,22 +16,21 @@ class Species extends AppModel {
         'Occurrence' => array(
             'className' => 'Occurrence',
             'dependent' => true,
-//            'order'     => 'rand()',
-//            'limit'     => 10000
         ),
         'Vetting' => array(
             'className' => 'Vetting',
             'dependent' => true,
-//            'order'     => 'rand()',
-//            'limit'     => 10000
         )
     );
 
     // Returns a PDOStatement of occurrence rows within the bounding box for this species
-    public function occurrencesInBounds($bounds=null) {
-        $sql = 'SELECT source_classification, classification, contentious, ST_X(location) as longitude, ST_Y(location) as latitude '.
-               'FROM occurrences '.
-               'WHERE species_id = ? ';
+    public function occurrencesInBounds($bounds = null, $offset = 0, $limit = null) {
+        $sql = 'SELECT sources.name as source_name, sources.url as source_url, source_id, source_classification, basis, date, uncertainty, classification, contentious, ST_X(location) as longitude, ST_Y(location) as latitude '.
+               'FROM occurrences, sources '.
+               'WHERE occurrences.source_id = sources.id AND species_id = ? ';
+
+        $query_args = array();
+        $query_args[] = $this->data['Species']['id'];
 
         if($bounds !== null){
             $bounds = sprintf("SetSRID('BOX(%.12F %.12F,%.12F %.12F)'::box2d,4326)",
@@ -42,10 +41,20 @@ class Species extends AppModel {
             $sql .= 'AND location && ' . $bounds;
         }
 
+        if ( !is_null($limit) && !is_null($offset) ) {
+          $sql = $sql .
+            'LIMIT ? ' .
+            'OFFSET ? ';
+            'ORDER BY species_id';
+
+          $query_args[] = $limit;
+          $query_args[] = $offset;
+        }
+
         return $this->getDataSource()->execute(
             $sql,
             array(),
-            array($this->data['Species']['id'])
+            $query_args
         );
     }
 
@@ -66,9 +75,8 @@ class Species extends AppModel {
     }
 
     // Returns a PDOStatement of clustered occurrence rows within the bounding box for this species
-
     // if $lat_lng_round_to_nearest_nth_fraction is null, don't round (simply group by).
-    public function detailedClusteredOccurrencesInBounds($bounds, $lat_lng_round_to_nearest_nth_fraction = null) {
+    public function detailedClusteredOccurrencesInBounds($bounds, $lat_lng_round_to_nearest_nth_fraction = null, $offset=0, $limit=null) {
         $bounds = sprintf("SetSRID('BOX(%.12F %.12F,%.12F %.12F)'::box2d,4326)",
                           $bounds['min_longitude'],
                           $bounds['min_latitude'],
@@ -120,9 +128,18 @@ class Species extends AppModel {
             'WHERE '.
               'species_id = ? '.
               'AND location && ' . $bounds .' '.
-            'GROUP BY longitude, latitude';
-
+            'GROUP BY longitude, latitude ';
         $query_args[] = $this->data['Species']['id'];
+
+        if ( !is_null($limit) && !is_null($offset) ) {
+          $sql = $sql .
+            'LIMIT ? ' .
+            'OFFSET ? ';
+            'ORDER BY longitude, latitude ';
+
+          $query_args[] = $limit;
+          $query_args[] = $offset;
+        }
 
         return $this->getDataSource()->execute(
             $sql,

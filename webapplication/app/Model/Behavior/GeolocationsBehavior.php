@@ -33,7 +33,7 @@ class GeolocationsBehavior extends ModelBehavior {
      *
      * Clustered will return features in clusters, rather than a single feature per location.
      */
-    public function toGeoJSONArray(Model $Model, $bounds = null, $cluster_type="dotradius" ) {
+    public function toGeoJSONArray(Model $Model, $bounds = null, $cluster_type="dotradius", $offset = 0, $limit=null ) {
 
         include 'clustering/dotradius.php';
         include 'clustering/dotgrid.php';
@@ -44,39 +44,58 @@ class GeolocationsBehavior extends ModelBehavior {
 
         if ( $cluster_type == "dotradius" ) {
             // use the dotradius "clustering" method (it's not really clustering..)
-            $location_features = get_features_dotradius($Model, $bounds);
+            $location_features = get_features_dotradius($Model, $bounds, $offset, $limit);
 
         } elseif ( $cluster_type == "dotgrid" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid($Model, $bounds);
+            $location_features = get_features_dotgrid($Model, $bounds, $offset, $limit);
 
         } elseif ( $cluster_type == "dotgriddetail" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid_detail( $Model, $bounds,
+            $location_features = get_features_dotgrid_detail( $Model, $bounds, $offset, $limit,
                             array('showdoubtful'=>true,'showminor'=>true) );
 
         } elseif ( $cluster_type == "dotgridtrump" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid_detail($Model, $bounds, array('showdoubtful'=>true,'trump'=>true));
+            $location_features = get_features_dotgrid_detail($Model, $bounds, $offset, $limit, array('showdoubtful'=>true,'trump'=>true));
 
         } elseif ( $cluster_type == "dotgridsimple" ) {
             // use dotgrid clustering
-            $location_features = get_features_dotgrid_detail($Model, $bounds);
+            $location_features = get_features_dotgrid_detail($Model, $bounds, $offset, $limit);
 
         } elseif ( $cluster_type == "squaregrid" ) {
             // use dotgrid clustering
-            $location_features = get_features_squaregrid($Model, $bounds);
+            $location_features = get_features_squaregrid($Model, $bounds, $offset, $limit);
 
         } else {
             // unrecognised clustering type, or clustering type == none
-            foreach($Model->occurrencesInBounds($bounds) as $location) {
+            foreach($Model->occurrencesInBounds($bounds, $offset, $limit) as $location) {
                 $longitude = $location['longitude'];
                 $latitude = $location['latitude'];
+
+                $source_url = $location['source_url'];
+                $source_name = $location['source_name'];
+
+                $basis = $location['basis'];
+                $date  = $location['date'];
+                $classification = $location['classification'];
+                $source_classification = $location['source_classification'];
+                $uncertainty = $location['uncertainty'];
+
                 $location_features[] = array(
                     "type" => "Feature",
                     'properties' => array(
                         'title' => "Occurrence",
-                        'description' => "<dl><dt>Latitude</dt><dd>$latitude</dd><dt>Longitude</dt><dd>$longitude</dd>",
+                        'source_name'  => $source_name,
+                        'source_url'   => $source_url,
+                        'latitude'     => $latitude,
+                        'longitude'    => $longitude,
+                        'basis'        => $basis,
+                        'date'         => $date,
+                        'uncertainty'  => $uncertainty,
+                        'classification'  => $classification,
+                        'source_classification'  => $source_classification,
+                        'description'  => "<dl><dt>Latitude</dt><dd>$latitude</dd><dt>Longitude</dt><dd>$longitude</dd>",
                         'point_radius' => GeolocationsBehavior::NON_CLUSTERED_FEATURE_RADIUS
                     ),
                     'geometry' => array(
