@@ -54,7 +54,7 @@ Fetch the git repo (read only):
 
 ```bash
 
-sudo git fetch "git://github.com/jcu-eresearch/Edgar.git"
+sudo git clone "git://github.com/jcu-eresearch/Edgar.git"
 ```
 
 Update the tmp directory of the web app so that cake can read and write to the tmp dir.
