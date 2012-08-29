@@ -61,20 +61,3 @@ following config will allow access from `localhost` only.
 Restart Postgres:
 
     sudo service postgresql restart
-
-
-ALA importer
-============
-
-Add the ALA row to the sources table:
-
-    sudo -u postgres psql edgar
-    insert into sources(name) values('ALA');
-
-Copy the example config and change the settings:
-
-    cd ~/Edgar/importing/
-    cp config.example.json config.json
-    vim config.json
-
-TODO: the rest of this
