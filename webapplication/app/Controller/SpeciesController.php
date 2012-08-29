@@ -516,7 +516,7 @@ class SpeciesController extends AppController {
     /**
      * bounce the user's download request to the right URL to get the file
      */
-    public function downloadOccurrences($species_id) {
+    public function download_occurrences($species_id) {
         $this->Species->recursive = 0;
         $this->Species->id = $species_id;
         if (!$this->Species->exists()) {
@@ -529,7 +529,7 @@ class SpeciesController extends AppController {
     /**
      * bounce the user's download request to the right URL to get the file
      */
-    public function downloadClimate($species_id) {
+    public function download_climate($species_id) {
         $this->Species->recursive = 0;
         $this->Species->id = $species_id;
         if (!$this->Species->exists()) {
