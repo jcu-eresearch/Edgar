@@ -50,7 +50,7 @@ Change dir to www (not html dir):
 cd /var/www
 ```
 
-Fetch the git repo (read only):
+Clone the git repo (read only):
 
 ```bash
 
