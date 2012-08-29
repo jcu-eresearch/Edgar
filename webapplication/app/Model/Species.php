@@ -58,6 +58,13 @@ class Species extends AppModel {
         );
     }
 
+    // Get the canonical name of the species
+    public function canonicalName() {
+        $longName = $this->data['Species']['common_name'] . " (" . $this->data['Species']['scientific_name'] . ")";
+        $cleanName = preg_replace("[^A-Za-z0-9'-_., ()]", "_", $longName);
+        return trim($cleanName);
+    }
+
     // Returns a PDOStatement of clustered occurrence rows within the bounding box for this species
 
     // if $lat_lng_round_to_nearest_nth_fraction is null, don't round (simply group by).
