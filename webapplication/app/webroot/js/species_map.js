@@ -313,13 +313,13 @@ function addOccurrencesLayer() {
             popup = new OpenLayers.Popup.FramedCloud(
                 "featurePopup",
                 feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(100,100),
-                "<h2>" + feature.attributes.title + "</h2>" +
+                new OpenLayers.Size(322,200),
                 feature.attributes.description,
                 null, true, onPopupClose);
                 feature.popup = popup;
                 popup.feature = feature;
-                Edgar.map.addPopup(popup);
+                popup.autoSize = false;
+                Edgar.map.addPopup(popup);                
         }
 
         // what to do when a feature is no longed seected

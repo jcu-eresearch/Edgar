@@ -186,7 +186,8 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
         $properties_array['fill_color']   = $minor_classification_properties['fill_color'];
         $properties_array['title'] = '';
         $properties_array['occurrence_type'] = 'dotgriddetail';
-        $properties_array['description'] = "".
+
+        $properties_array['description'] = "<div class='popupcontent'>".
                     "<dl>";
 
         if ( is_null($cluster_by_rounding_to_nearest_nth_fraction) ) {
@@ -222,13 +223,21 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $options=array()) {
             }
         };
 
-        if ($row_count > 1) {
+//        if ($row_count > 1) {
             // only add a total row if there were more than one class rows..
             $properties_array['description'] .=
                     "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
-        }
+            $properties_array['description'] .=
+                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
+            $properties_array['description'] .=
+                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
+            $properties_array['description'] .=
+                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
+            $properties_array['description'] .=
+                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
+//        }
 
-        $properties_array['description'] .= "</tbody></table></div>";
+        $properties_array['description'] .= "</tbody></table></div></div>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
 
