@@ -136,7 +136,16 @@ class SpeciesController extends AppController {
             $cluster_type = $this->request->query['clustered'];
         }
 
-        $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $cluster_type));
+        $limit = null;
+        if ( array_key_exists('limit', $this->request->query) ) {
+            $limit = $this->request->query['limit'];
+        }
+        $offset = 0;
+        if ( array_key_exists('offset', $this->request->query) ) {
+            $offset = $this->request->query['offset'];
+        }
+
+        $this->set('geo_object', $this->Species->toGeoJSONArray($bbox, $cluster_type, $offset, $limit));
 
         // Specify the output for the json view.
         $this->set('_serialize', 'geo_object');
@@ -513,36 +522,30 @@ class SpeciesController extends AppController {
         $this->dieWithStatus(200, 'Request processed');
     }
 
-    private function _canonicalName($species) {
-        $longName = $species['Species']['common_name'] . " (" . $species['Species']['scientific_name'] . ")";
-        $cleanName = preg_replace("[^A-Za-z0-9'-_., ()]", "_", $longName);
-        return trim($cleanName);
+    /**
+     * bounce the user's download request to the right URL to get the file
+     */
+    public function download_occurrences($species_id) {
+        $this->Species->recursive = 0;
+        $this->Species->id = $species_id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException('No species found with id = ' . $species_id);
+        }
+        $this->Species->read();
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->Species->canonicalName() . '/occurrences/latest-occurrences.zip');
     }
 
     /**
      * bounce the user's download request to the right URL to get the file
      */
-    public function downloadOccurrences($species_id) {
-
-        $species = $this->Species->findById($species_id);
-        if($species === False)
-            $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
-
-        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/occurrences/latest-occurrences.zip');
-//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-occurrences.zip');
-    }
-
-    /**
-     * bounce the user's download request to the right URL to get the file
-     */
-    public function downloadClimate($species_id) {
-
-        $species = $this->Species->findById($species_id);
-        if($species === False)
-            $this->dieWithStatus(404, 'No species found with id = ' . $species_id);
-
-        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->_canonicalName($species) . '/climate-suitability/latest-climate-suitability.zip');
-//        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $species_id . '/latest-climate.zip');
+    public function download_climate($species_id) {
+        $this->Species->recursive = 0;
+        $this->Species->id = $species_id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException('No species found with id = ' . $species_id);
+        }
+        $this->Species->read();
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->Species->canonicalName() . '/climate-suitability/latest-climate-suitability.zip');
     }
 
     private function _speciesToJson($species) {
