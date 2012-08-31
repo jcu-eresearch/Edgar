@@ -863,38 +863,95 @@ ul.vetting_list li .classification {
     width: 100%;
 }
 
-.olFramedCloudPopupContent {
-    overflow:auto;
+#featurePopup_contentDiv {
+    padding: 0 !important;
+}
+
+#featurePopup .map-popup-tabs {
+    padding: 0;
+    border: none;
     font-size: small;
-    overflow: auto;
+    overflow:hidden;
+
+    .ui-tabs-nav {
+        border-radius: 0;
+
+        li a {
+            padding: 3px 7px;
+        }
+    }
+
+    .ui-tabs-panel {
+        overflow: auto;
+        height: 191px; /* hard coded, y'all */
+    }
+
+    .loading {
+        text-align: center;
+        padding: 1em 0;
+    }
+
+    .prev-page {
+        float: left;
+    }
+
+    .page-nav {
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    .next-page {
+        float: right;
+    }
+
+    .curr-page {
+        text-align: center;
+        font-size: inherit;
+        color: inherit;
+    }
+
+    .none-found {
+        text-align: center;
+        margin: 1em 0;
+    }
+
+    .detail-content {
+        clear: both;
+    }
+
+    .occurrence-detail {
+        padding: 5px;
+        border-top: 1px solid silver;
+    }
+
+    thead tr, tbody {
+        xdisplay: block;
+    }
+
+    thead tr {
+        background-color: #ccf;
+    }
+
+    tbody {
+        overflow: auto;
+        max-height: 12em;
+    }
+
+    dt {
+         float:left;
+         width:40%; /* adjust the width; make sure the total of both is 100% */
+         margin: 0;
+         padding: 0;
+    }
+
+    dd {
+         float:left;
+         width:60%; /* adjust the width; make sure the total of both is 100% */
+         margin: 0;
+         padding: 0;
+    }
 }
 
-.olFramedCloudPopupContent thead tr, .olFramedCloudPopupContent tbody {
-    xdisplay: block;
-}
-
-.olFramedCloudPopupContent thead tr {
-    background-color: #ccf;
-}
-
-.olFramedCloudPopupContent dt {
-     float:left;
-     width:40%; /* adjust the width; make sure the total of both is 100% */
-     margin: 0;
-     padding: 0;
-}
-
-.olFramedCloudPopupContent tbody {
-    overflow: auto;
-    max-height: 12em;
-}
-
-.olFramedCloudPopupContent dd {
-     float:left;
-     width:60%; /* adjust the width; make sure the total of both is 100% */
-     margin: 0;
-     padding: 0;
-}
 
 table.classifications { width: 90%; }
 

@@ -9,48 +9,111 @@
  * @param? occurrenceCoord The lat/lon of occurrence clicked on.
  * @param? classificationTotals The number of occurrences per classification.
  */
-{template .detailPopupContent}
-    <dl>
-        {if $gridBounds}
-            <dt>Latitude Range</dt>
-            <dd>{$gridBounds.minlat}&deg; to {$gridBounds.maxlat}&deg;</dd>
-            <dt>Longitude Range</dt>
-            <dd>{$gridBounds.minlon}&deg; to {$gridBounds.maxlon}&deg;</dd>
-        {elseif $occurrenceCoord}
-            <dt>Latitude</dt>
-            <dd>{$occurrenceCoord.lat}</dd>
-            <dt>Longitude</dt>
-            <dd>{$occurrenceCoord.lon}</dd>
-        {/if}
-    </dl>
-    {if $classificationTotals}
-        <div class="table_wrapper">
-            <table class="classifications">
-                <thead>
-                    <tr>
-                        <th>Classification</th>
-                        <th>Observations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {foreach $row in $classificationTotals}
-                        {if $row.isGrandTotal}
-                            <tr class="total">
-                        {else}
-                            <tr class="count {print $row.total == 0 ? 'none' : 'some'}">
-                        {/if}
-                            <td>{$row.label}</td>
-                            <td>{print $row.total == 0 ? '-' : $row.total}</td>
-                        </tr>
+{template .mapPopup}
+    <div class="map-popup-tabs">
 
-                        {if $row.contentious > 0}
-                            <tr class="contentious">
-                                <td colspan="2">({$row.contentious} in contention)</td>
+        <ul class="tab-strip">
+            <li><a>summary</a></li>
+            <li><a>detail</a></li>
+        </ul>
+
+        <div class="tab-panel summary-panel">
+            <dl>
+                {if $gridBounds}
+                    <dt>Latitude Range</dt>
+                    <dd>{$gridBounds.minlat}&deg; to {$gridBounds.maxlat}&deg;</dd>
+                    <dt>Longitude Range</dt>
+                    <dd>{$gridBounds.minlon}&deg; to {$gridBounds.maxlon}&deg;</dd>
+                {elseif $occurrenceCoord}
+                    <dt>Latitude</dt>
+                    <dd>{$occurrenceCoord.lat}</dd>
+                    <dt>Longitude</dt>
+                    <dd>{$occurrenceCoord.lon}</dd>
+                {/if}
+            </dl>
+
+            {if $classificationTotals}
+                <div class="table_wrapper">
+                    <table class="classifications">
+                        <thead>
+                            <tr>
+                                <th>Classification</th>
+                                <th>Observations</th>
                             </tr>
-                        {/if}
-                    {/foreach}
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            {foreach $row in $classificationTotals}
+                                {if $row.isGrandTotal}
+                                    <tr class="total">
+                                {else}
+                                    <tr class="count {print $row.total == 0 ? 'none' : 'some'}">
+                                {/if}
+                                    <td>{$row.label}</td>
+                                    <td>{print $row.total == 0 ? '-' : $row.total}</td>
+                                </tr>
+
+                                {if $row.contentious > 0}
+                                    <tr class="contentious">
+                                        <td colspan="2">({$row.contentious} in contention)</td>
+                                    </tr>
+                                {/if}
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            {/if}
         </div>
-    {/if}
+
+        <div class="tab-panel details-panel">
+        </div>
+
+    </div>
+{/template}
+
+
+/**
+ * The content of the details panel in .mapPopup
+ *
+ * @param pageIdx The index of the current page
+ * @param pageSize The number of occurrences per page
+ * @param totalOccurrences Total number of occurrencs in all pages
+ * @param features The geojson loaded for this page.
+ */
+{template .mapPopupDetailsPanel}
+    <h3 class="curr-page">
+        showing {$pageIdx * $pageSize + 1} - {$pageIdx * $pageSize + length($features)} of {$totalOccurrences}
+    </h3>
+
+    <div class="page-nav">
+        {if $pageIdx > 0}
+            <a class="prev-page">&laquo; previous {$pageSize}</a>
+        {/if}
+
+        {if $pageIdx < ceiling($totalOccurrences / $pageSize) - 1}
+            <a class="next-page">next {$pageSize} &raquo;</a>
+        {/if}
+    </div>
+
+    {foreach $f in $features}
+        <div class="occurrence-detail">
+            {$f.properties.basis ? $f.properties.basis : 'Unknown basis'}<br />
+            ({$f.geometry.coordinates.0}, {$f.geometry.coordinates.1})<br />
+            {$f.properties.date} ({$f.properties.uncertainty}m accuracy)<br />
+            source: <a href="{$f.properties.source_url}">{$f.properties.source_name}</a>
+        </div>
+    {ifempty}
+        <p class="none-found">No occurrences found.</p>
+    {/foreach}
+{/template}
+
+
+/**
+ * The loading html for the details panel in .mapPopup
+ *
+ * @param baseUrl The root url of the site (see javascript: Edgar.baseUrl)
+ */
+{template .mapPopupLoading}
+    <div class="loading">
+        <img src="{$baseUrl}img/loading-bar.gif" />
+    </div>
 {/template}
