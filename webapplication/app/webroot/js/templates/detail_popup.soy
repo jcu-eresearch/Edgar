@@ -97,10 +97,10 @@
 
     {foreach $f in $features}
         <div class="occurrence-detail">
-            {$f.properties.basis ? $f.properties.basis : 'Unknown basis'}<br />
-            ({$f.geometry.coordinates.0}, {$f.geometry.coordinates.1})<br />
-            {$f.properties.date} ({$f.properties.uncertainty}m accuracy)<br />
-            source: <a href="{$f.properties.source_url}">{$f.properties.source_name}</a>
+            ({$f.geometry.coordinates.0}, {$f.geometry.coordinates.1}) with {$f.properties.uncertainty}m accuracy<br />
+            Basis: {$f.properties.basis ? $f.properties.basis : 'unknown'}<br />
+            Date: {$f.properties.date ? $f.properties.date : 'unknown'}<br />
+            Source: <a href="{$f.properties.source_url}">{$f.properties.source_name}</a>
         </div>
     {ifempty}
         <p class="none-found">No occurrences found.</p>

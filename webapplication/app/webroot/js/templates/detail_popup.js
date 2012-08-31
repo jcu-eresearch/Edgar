@@ -31,7 +31,7 @@ Edgar.templates.mapPopupDetailsPanel = function(opt_data, opt_sb) {
   if (fListLen65 > 0) {
     for (var fIndex65 = 0; fIndex65 < fListLen65; fIndex65++) {
       var fData65 = fList65[fIndex65];
-      output.append('<div class="occurrence-detail">', soy.$$escapeHtml(fData65.properties.basis ? fData65.properties.basis : 'Unknown basis'), '<br />(', soy.$$escapeHtml(fData65.geometry.coordinates[0]), ', ', soy.$$escapeHtml(fData65.geometry.coordinates[1]), ')<br />', soy.$$escapeHtml(fData65.properties.date), ' (', soy.$$escapeHtml(fData65.properties.uncertainty), 'm accuracy)<br />source: <a href="', soy.$$escapeHtml(fData65.properties.source_url), '">', soy.$$escapeHtml(fData65.properties.source_name), '</a></div>');
+      output.append('<div class="occurrence-detail">(', soy.$$escapeHtml(fData65.geometry.coordinates[0]), ', ', soy.$$escapeHtml(fData65.geometry.coordinates[1]), ') with ', soy.$$escapeHtml(fData65.properties.uncertainty), 'm accuracy<br />Basis: ', soy.$$escapeHtml(fData65.properties.basis ? fData65.properties.basis : 'unknown'), '<br />Date: ', soy.$$escapeHtml(fData65.properties.date ? fData65.properties.date : 'unknown'), '<br />Source: <a href="', soy.$$escapeHtml(fData65.properties.source_url), '">', soy.$$escapeHtml(fData65.properties.source_name), '</a></div>');
     }
   } else {
     output.append('<p class="none-found">No occurrences found.</p>');
