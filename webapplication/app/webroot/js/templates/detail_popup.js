@@ -25,7 +25,7 @@ Edgar.templates.mapPopup = function(opt_data, opt_sb) {
 
 Edgar.templates.mapPopupDetailsPanel = function(opt_data, opt_sb) {
   var output = opt_sb || new soy.StringBuilder();
-  output.append('<h3 class="curr-page">showing ', soy.$$escapeHtml(opt_data.pageIdx * opt_data.pageSize + 1), ' - ', soy.$$escapeHtml(opt_data.pageIdx * opt_data.pageSize + opt_data.features.length), ' of ', soy.$$escapeHtml(opt_data.totalOccurrences), '</h3><div class="page-nav">', (opt_data.pageIdx > 0) ? '<a class="prev-page">&laquo; previous ' + soy.$$escapeHtml(opt_data.pageSize) + '</a>' : '', (opt_data.pageIdx < Math.ceil(opt_data.totalOccurrences / opt_data.pageSize) - 1) ? '<a class="next-page">next ' + soy.$$escapeHtml(opt_data.pageSize) + ' &raquo;</a>' : '', '</div>');
+  output.append('<h3 class="curr-page">showing ', soy.$$escapeHtml(opt_data.pageIdx * opt_data.pageSize + 1), ' - ', soy.$$escapeHtml(opt_data.pageIdx * opt_data.pageSize + opt_data.features.length), ' of ', soy.$$escapeHtml(opt_data.totalOccurrences), '</h3><div class="page-nav">', (opt_data.pageIdx > 0) ? '<a class="prev-page">&laquo; previous ' + soy.$$escapeHtml(opt_data.pageSize) + '</a>' : '', (opt_data.pageIdx < Math.ceil(opt_data.totalOccurrences / opt_data.pageSize) - 1) ? '<a class="next-page">next ' + soy.$$escapeHtml(opt_data.pageSize) + ' &raquo;</a>' : '', '</div><div class="occurrence-list">');
   var fList65 = opt_data.features;
   var fListLen65 = fList65.length;
   if (fListLen65 > 0) {
@@ -36,6 +36,7 @@ Edgar.templates.mapPopupDetailsPanel = function(opt_data, opt_sb) {
   } else {
     output.append('<p class="none-found">No occurrences found.</p>');
   }
+  output.append('</div>');
   return opt_sb ? '' : output.toString();
 };
 
