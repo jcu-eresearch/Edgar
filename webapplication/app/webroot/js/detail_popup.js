@@ -25,6 +25,9 @@
     }
 
     DetailPopup.prototype.endPopup = function() {
+      if (this.hasClosed) {
+        return;
+      }
       this.hasClosed = true;
       this.feature.layer.map.events.unregister('zoomend', this, this.endPopup);
       this.feature.layer.events.unregister('featureunselected', this, this.endPopup);
@@ -36,6 +39,10 @@
     DetailPopup.prototype.initPopupContent = function() {
       var $tabsElem, self, tabPrefix;
       $tabsElem = $(this.popup.contentDiv).find('.map-popup-tabs');
+      self = this;
+      $tabsElem.find('.close-button').click(function() {
+        return self.endPopup();
+      });
       tabPrefix = "popup" + (tabIdCounter++);
       $tabsElem.find('ul.tab-strip > li > a').each(function(idx, elem) {
         return $(elem).attr('href', "\#" + tabPrefix + "-tab" + (idx + 1));
@@ -43,7 +50,6 @@
       $tabsElem.children('.tab-panel').each(function(idx, elem) {
         return $(elem).attr('id', "" + tabPrefix + "-tab" + (idx + 1));
       });
-      self = this;
       return $tabsElem.tabs({
         select: function(event, ui) {
           return self.onTabSelected(ui);

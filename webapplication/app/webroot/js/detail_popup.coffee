@@ -26,6 +26,8 @@ class DetailPopup
 
 
     endPopup: () ->
+        return if @hasClosed
+
         @hasClosed = true
         @feature.layer.map.events.unregister('zoomend', this, @endPopup)
         @feature.layer.events.unregister('featureunselected', this, @endPopup)
@@ -37,6 +39,10 @@ class DetailPopup
 
     initPopupContent: () ->
         $tabsElem = $(@popup.contentDiv).find('.map-popup-tabs')
+        self = this
+
+        # openlayers close box was causing layout issues, so just did one myself
+        $tabsElem.find('.close-button').click( () -> self.endPopup() )
 
         # jquery ui tabs require ids, but ids have to be unique, so we generate
         # all the ids with tabPrefix out the front to ensure they are unique
@@ -47,8 +53,6 @@ class DetailPopup
         $tabsElem.children('.tab-panel').each( (idx, elem) ->
             $(elem).attr('id', "#{tabPrefix}-tab#{idx+1}")
         )
-
-        self = this
         $tabsElem.tabs({
             select: (event, ui) -> self.onTabSelected(ui)
         })
