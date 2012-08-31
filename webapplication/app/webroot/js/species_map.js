@@ -301,49 +301,16 @@ function addOccurrencesLayer() {
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------
 
-        // what to do when the user presses close on the pop-up.
-        function onPopupClose(evt) {
-            // 'this' is the popup.
-            Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
-        }
-
         // what to do when the user clicks a feature
         function onFeatureSelect(evt) {
             feature = evt.feature;
-            popup = new OpenLayers.Popup.FramedCloud(
-                "featurePopup",
-                feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(100,100),
-                "<h2>" + feature.attributes.title + "</h2>" +
-                feature.attributes.description,
-                null, true, onPopupClose);
-                feature.popup = popup;
-                popup.feature = feature;
-                Edgar.map.addPopup(popup);
+            var popup = new Edgar.DetailPopup(feature, function(){
+                //on close
+                Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
+            });
         }
-
-        // what to do when a feature is no longed seected
-        function onFeatureUnselect(evt) {
-            feature = evt.feature;
-            if (feature.popup) {
-                popup.feature = null;
-                Edgar.map.removePopup(feature.popup);
-                feature.popup.destroy();
-                feature.popup = null;
-            }
-        }
-
         // Associate the above functions with the appropriate callbacks
-        Edgar.mapdata.layers.occurrences.events.on({
-            'featureselected': onFeatureSelect,
-            'featureunselected': onFeatureUnselect
-        });
-
-        // Clear any popups when the zoom changes.
-        // If we don't do this, the popup can become stuck (can't be closed).
-        Edgar.map.events.on({
-            'zoomend': clearMapPopups
-        });
+        Edgar.mapdata.layers.occurrences.events.register('featureselected', this, onFeatureSelect);
 
         // Specify the selection control for the occurrences layer.
         //

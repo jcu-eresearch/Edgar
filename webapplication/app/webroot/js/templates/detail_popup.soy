@@ -1,0 +1,56 @@
+{namespace Edgar.templates}
+
+/**
+ * The inner HTML for the popup that is shows when the user clicks on a cluster
+ * of occurrences on the map. Takes the values in $properties_array generated
+ * in dotgriddetail.php
+ *
+ * @param? gridBounds The min/max lat/lon of the bounding box clicked on.
+ * @param? occurrenceCoord The lat/lon of occurrence clicked on.
+ * @param? classificationTotals The number of occurrences per classification.
+ */
+{template .detailPopupContent}
+    <dl>
+        {if $gridBounds}
+            <dt>Latitude Range</dt>
+            <dd>{$gridBounds.minlat}&deg; to {$gridBounds.maxlat}&deg;</dd>
+            <dt>Longitude Range</dt>
+            <dd>{$gridBounds.minlon}&deg; to {$gridBounds.maxlon}&deg;</dd>
+        {elseif $occurrenceCoord}
+            <dt>Latitude</dt>
+            <dd>{$occurrenceCoord.lat}</dd>
+            <dt>Longitude</dt>
+            <dd>{$occurrenceCoord.lon}</dd>
+        {/if}
+    </dl>
+    {if $classificationTotals}
+        <div class="table_wrapper">
+            <table class="classifications">
+                <thead>
+                    <tr>
+                        <th>Classification</th>
+                        <th>Observations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $row in $classificationTotals}
+                        {if $row.isGrandTotal}
+                            <tr class="total">
+                        {else}
+                            <tr class="count {print $row.total == 0 ? 'none' : 'some'}">
+                        {/if}
+                            <td>{$row.label}</td>
+                            <td>{print $row.total == 0 ? '-' : $row.total}</td>
+                        </tr>
+
+                        {if $row.contentious > 0}
+                            <tr class="contentious">
+                                <td colspan="2">({$row.contentious} in contention)</td>
+                            </tr>
+                        {/if}
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    {/if}
+{/template}
