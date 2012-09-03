@@ -217,7 +217,7 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $offset=0, $limit=nu
             }
         };
 
-//        if ($row_count > 1) {
+        if ($row_count > 1) {
             // only add a total row if there were more than one class rows..
             $properties_array['classificationTotals'][] = array(
                 'label' => "TOTAL",
