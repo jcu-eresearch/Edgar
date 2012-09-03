@@ -85,7 +85,7 @@
           bound: true,
           clustered: 'none',
           limit: DETAIL_PAGE_SIZE,
-          offset: DETAIL_PAGE_SIZE * pageIdx,
+          offset: DETAIL_PAGE_SIZE * self.detailsPageIdx,
           bbox: "" + bbox.minlon + "," + bbox.minlat + "," + bbox.maxlon + "," + bbox.maxlat
         },
         success: (function(data, status, xhr) {
@@ -97,7 +97,7 @@
           console.log(status);
           console.log(xhr);
           return setTimeout((function() {
-            return self.loadDetails(self.pageIdx);
+            return self.loadDetails(self.detailsPageIdx);
           }), 2000);
         }
       });

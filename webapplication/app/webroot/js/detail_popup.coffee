@@ -86,7 +86,7 @@ class DetailPopup
                 bound: true,
                 clustered: 'none',
                 limit: DETAIL_PAGE_SIZE,
-                offset: DETAIL_PAGE_SIZE*pageIdx,
+                offset: DETAIL_PAGE_SIZE*self.detailsPageIdx,
                 bbox: "#{bbox.minlon},#{bbox.minlat},#{bbox.maxlon},#{bbox.maxlat}"
             }
             success: ((data, status, xhr) -> self.showDetails(data)),
@@ -96,7 +96,7 @@ class DetailPopup
                 console.log(status)
                 console.log(xhr)
                 # just retry after waiting a bit
-                setTimeout((() -> self.loadDetails(self.pageIdx)), 2000)
+                setTimeout((() -> self.loadDetails(self.detailsPageIdx)), 2000)
         })
 
 

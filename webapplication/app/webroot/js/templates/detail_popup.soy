@@ -98,7 +98,11 @@
     <div class="occurrence-list">
         {foreach $f in $features}
             <div class="occurrence-detail">
-                ({$f.geometry.coordinates.0}, {$f.geometry.coordinates.1}) with {$f.properties.uncertainty}m accuracy<br />
+                ({$f.geometry.coordinates.0}, {$f.geometry.coordinates.1}) with 
+                {$f.properties.uncertainty ? ' ' : ''}
+                {$f.properties.uncertainty ? $f.properties.uncertainty : ' unknown '}
+                {$f.properties.uncertainty ? 'm ' : ''}
+                accuracy<br />
                 Basis: {$f.properties.basis ? $f.properties.basis : 'unknown'}<br />
                 Date: {$f.properties.date ? $f.properties.date : 'unknown'}<br />
                 Source: <a href="{$f.properties.source_url}">{$f.properties.source_name}</a>
