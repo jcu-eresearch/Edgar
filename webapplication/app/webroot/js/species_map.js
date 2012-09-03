@@ -301,15 +301,10 @@ function addOccurrencesLayer() {
         // Occurrence Feature Selection (on-click or on-hover)
         // --------------------------------------------------
 
-        // what to do when the user presses close on the pop-up.
-        function onPopupClose(evt) {
-            // 'this' is the popup.
-            Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
-        }
-
         // what to do when the user clicks a feature
         function onFeatureSelect(evt) {
             feature = evt.feature;
+/*
             popup = new OpenLayers.Popup.FramedCloud(
                 "featurePopup",
                 feature.geometry.getBounds().getCenterLonLat(),
@@ -331,19 +326,15 @@ function addOccurrencesLayer() {
                 feature.popup.destroy();
                 feature.popup = null;
             }
+*/
+            var popup = new Edgar.DetailPopup(feature, function(){
+                //on close
+                Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
+            });
+
         }
-
         // Associate the above functions with the appropriate callbacks
-        Edgar.mapdata.layers.occurrences.events.on({
-            'featureselected': onFeatureSelect,
-            'featureunselected': onFeatureUnselect
-        });
-
-        // Clear any popups when the zoom changes.
-        // If we don't do this, the popup can become stuck (can't be closed).
-        Edgar.map.events.on({
-            'zoomend': clearMapPopups
-        });
+        Edgar.mapdata.layers.occurrences.events.register('featureselected', this, onFeatureSelect);
 
         // Specify the selection control for the occurrences layer.
         //

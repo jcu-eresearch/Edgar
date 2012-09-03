@@ -184,60 +184,49 @@ function get_features_dotgrid_detail(Model $Model, $bounds, $offset=0, $limit=nu
         // Use the vetting classification's fill color to represent the classification
         $properties_array['stroke_color'] = $major_classification_properties['fill_color'];
         $properties_array['fill_color']   = $minor_classification_properties['fill_color'];
-        $properties_array['title'] = '';
         $properties_array['occurrence_type'] = 'dotgriddetail';
-
-        $properties_array['description'] = "<div class='popupcontent'>".
-                    "<dl>";
 
         if ( is_null($cluster_by_rounding_to_nearest_nth_fraction) ) {
             // report the lat/long, directly, if we aren't clustering
-            $properties_array['description'] .=
-                    "<dt>Latitude</dt><dd>$latitude</dd>".
-                    "<dt>Longitude</dt><dd>$longitude</dd>";
+            $properties_array['occurrenceCoord'] = array('lat'=>$latitude, 'lon'=>$longitude);
         } else {
             // report lat/long range, if we are clustering
-            $properties_array['description'] .=
-                    "<dt>Latitude Range</dt><dd>".$max_latitude_range."&deg; to ".$min_latitude_range."&deg;</dd>".
-                    "<dt>Longitude Range</dt><dd>".$min_longitude_range."&deg; to ".$max_longitude_range."&deg;</dd>";
+            $properties_array['gridBounds'] = array(
+                'minlat' => $min_latitude_range,
+                'maxlat' => $max_latitude_range,
+                'minlon' => $min_longitude_range,
+                'maxlon' => $max_longitude_range
+            );
         }
-
-        $properties_array['description'] .=
-                    "</dl>".
-                    "<div class='table_wrapper'><table class='classifications'>".
-                    "<thead><tr><th>Classification</th><th>Observations</th></tr></thead><tbody>";
 
         $row_count = 0;
 
+        $properties_array['classificationTotals'] = array();
         foreach ($unsorted_classification_count_array as $key => $value) {
             $this_contentious_count = $unsorted_contentious_classification_count_array[$key];
 
             if ($value > 0) {
                 // only add non-zero rows
                 $row_count++;
-                $properties_array['description'] .=
-                        "<tr class='count ".($value == 0 ? 'none' : 'some' )."'>".
-                        "<td>".$key."</td>".
-                        "<td>".($value == 0 ? '-' : $value)."</td></tr>".
-                        ($this_contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($this_contentious_count in contention)</td></tr>");
+                $properties_array['classificationTotals'][] = array(
+                    'label' => $key,
+                    'total' => $value,
+                    'contentious' => $this_contentious_count,
+                    'isGrandTotal' => false
+                );
             }
         };
 
 //        if ($row_count > 1) {
             // only add a total row if there were more than one class rows..
-            $properties_array['description'] .=
-                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
-            $properties_array['description'] .=
-                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
-            $properties_array['description'] .=
-                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
-            $properties_array['description'] .=
-                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
-            $properties_array['description'] .=
-                    "<tr class='totals'><td>TOTAL</td><td>".$count."</td></tr>".($contentious_count == 0 ? '' : "<tr class='contentious'><td colspan='2'>($contentious_count in contention)</td></tr>");
-//        }
+            $properties_array['classificationTotals'][] = array(
+                'label' => "TOTAL",
+                'total' => $count,
+                'contentious' => $contentious_count,
+                'isGrandTotal' => true
+            );
+        }
 
-        $properties_array['description'] .= "</tbody></table></div></div>";
         $properties_array['point_radius'] = $point_radius;
         $properties_array['stroke_width'] = $point_radius;
 

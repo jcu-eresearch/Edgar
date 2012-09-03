@@ -136,7 +136,7 @@ bird observation database to generate current and future species distribution mo
                 Bird observation records retrieved from the
                 <a href="http://www.ala.org.au/">Atlas of Living Australia</a>'s (ALA) database have been filtered based on ALA's 'assertions' and those inappropriate for modelling were excluded. Additionally,
                 <a href="http://www.birdlife.org.au/">BirdLife Australia</a>
-                provided species range information, against which we check each observation to obtain an initial classification as core habitat, introduced, historic, vagrant, irruptive, or doubful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.
+                provided species range information, against which we check each observation to obtain an initial classification as core habitat, introduced, historic, vagrant, irruptive, or doubtful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.
             </p><p>
                 This initial classification for observations is compared against classifications collected from
                 birdwatchers and other knowledgeable visitors to the Edgar site.  Edgar tracks contentious records, but generally a vetting entered by a logged-in site user will be considered accurate and changes
@@ -213,7 +213,7 @@ bird observation database to generate current and future species distribution mo
             <span class="opener">Emission Pathways: RCPs</span>
             <div class="add">
 				<p>
-					RCP stands for <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#descript" target="_blank">Representative Concentration Pathway</a>.  The RCPs are not new, fully integrated scenarios (i.e., they are not a complete package of socioeconomic, emissions, and climate projections). They are consistent sets of projections of only the components of radiative forcing that are meant to serve as input for climate modeling, pattern scaling, and atmospheric chemistry modeling.  Here, we have used <a href="http://wallaceinitiative.org/climate_2012/tdhtools/Search/DataDownload.php" target="_blank">climate layers</a> developed by Jeremy VanDerWal that have been derived from the following RCPs:
+					RCP stands for <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#descript" target="_blank">Representative Concentration Pathway</a>.  The RCPs are not new, fully integrated scenarios (i.e., they are not a complete package of socioeconomic, emissions, and climate projections). They are consistent sets of projections of only the components of radiative forcing that are meant to serve as input for climate modelling, pattern scaling, and atmospheric chemistry modeling.  Here, we have used <a href="http://wallaceinitiative.org/climate_2012/tdhtools/Search/DataDownload.php" target="_blank">climate layers</a> developed by Jeremy VanDerWal that have been derived from the following RCPs:
 				</p><dl>
 					<dt>
 						RCP2.6
