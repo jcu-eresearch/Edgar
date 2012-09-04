@@ -356,9 +356,13 @@ def _date_for_occurrence_json(occ):
         return (datetime.date.fromtimestamp(0) + offset)
     elif 'year' in occ:
         # inaccurate date (day, and possibly month, are unknown)
+        month = (int(occ['month']) if 'month' in occ else 1)
+        if month < 1: month = 1
+        if month > 12: month = 12
+
         return datetime.date(
             year=int(occ['year']),
-            month=(int(occ['month']) if 'month' in occ else 1),
+            month=month,
             day=1)
     else:
         # no date present in record
