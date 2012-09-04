@@ -9,7 +9,7 @@
   DetailPopup = (function() {
 
     function DetailPopup(feature, onClose) {
-      var self;
+      var relPosition, self;
       this.feature = feature;
       this.onClose = onClose;
       this.detailsPageIdx = null;
@@ -19,6 +19,8 @@
         return self.endPopup();
       });
       this.feature.layer.map.addPopup(this.popup);
+      relPosition = this.popup.relativePosition;
+      $(this.popup.div).addClass(relPosition);
       this.initPopupContent();
       this.feature.layer.events.register('featureunselected', this, this.endPopup);
       this.feature.layer.map.events.register('zoomend', this, this.endPopup);
