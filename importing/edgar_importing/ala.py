@@ -136,7 +136,7 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
         'fl': ','.join(('id', 'latitude', 'longitude', 'sensitive_longitude',
             'sensitive_latitude', 'assertions', 'coordinate_uncertainty',
             'sensitive_coordinate_uncertainty', 'occurrence_date',
-            'basis_of_record')),
+            'basis_of_record', 'year', 'month')),
         'facet': 'off',
         'wkt': AUSTRALIA_POLY,
         'pageSize': OCC_PAGE_SIZE
@@ -156,19 +156,13 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
             elif 'coordinateUncertaintyInMeters' in occ:
                 uncertainty = int(occ['coordinateUncertaintyInMeters'])
 
-            date = None
-            if 'eventDate' in occ:
-                # posix timestamp, but in milliseconds instead of seconds
-                offset = datetime.timedelta(milliseconds=occ['eventDate'])
-                date = datetime.date.fromtimestamp(0) + offset
-
             yield Occurrence(
                 uuid_in=uuid.UUID(occ['uuid']),
                 coord=Coord.from_dict(occ, 'decimalLatitude', 'decimalLongitude'),
                 sens_coord=Coord.from_dict(occ, 'sensitiveDecimalLatitude', 'sensitiveDecimalLongitude'),
                 assertions=(occ['assertions'] if 'assertions' in occ else set()),
                 uncertainty=uncertainty,
-                date=date,
+                date=_date_for_occurrence_json(occ),
                 basis=(occ['basisOfRecord'] if 'basisOfRecord' in occ else None)
             )
 
@@ -355,6 +349,20 @@ def q_param(species_lsid=None, changed_since=None):
         )
         ''')))
 
+def _date_for_occurrence_json(occ):
+    if 'eventDate' in occ:
+        # posix timestamp, but in milliseconds instead of seconds
+        offset = datetime.timedelta(milliseconds=occ['eventDate'])
+        return (datetime.date.fromtimestamp(0) + offset)
+    elif 'year' in occ:
+        # inaccurate date (day, and possibly month, are unknown)
+        return datetime.date(
+            year=int(occ['year']),
+            month=(int(occ['month']) if 'month' in occ else 1),
+            day=1)
+    else:
+        # no date present in record
+        return None
 
 def _fetch_species_list(params):
     '''Generator for Species objects'''
