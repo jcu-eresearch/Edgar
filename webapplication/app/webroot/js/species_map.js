@@ -171,14 +171,19 @@ function addOccurrencesLayer() {
                 'strokeOpacity': 0,
                 'fontFamily': 'sans-serif',
                 'fontSize': '13px',
-                'pointRadius': 4
+                'pointRadius': 4,
+                'strokeDashstyle': 'solid', // default
+                'strokeLinecap': 'round'    // default
             },
             'select': {
                 'fillColor': "#83aeef",
                 'strokeColor': "#000000",
                 'fillOpacity': 1.0,
                 'strokeOpacity': 1.0,
-                'pointRadius': 4
+                'pointRadius': 4,
+                'strokeDashstyle': 'solid',
+                'strokeLinecap': 'round',
+                'graphicName': 'star'
             }
         });
 
@@ -304,6 +309,13 @@ function addOccurrencesLayer() {
         // what to do when the user clicks a feature
         function onFeatureSelect(evt) {
             feature = evt.feature;
+
+            var popup = new Edgar.DetailPopup(feature, function(){
+                //on close
+                Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
+            });
+        }
+
 /*
             popup = new OpenLayers.Popup.FramedCloud(
                 "featurePopup",
@@ -327,12 +339,7 @@ function addOccurrencesLayer() {
                 feature.popup = null;
             }
 */
-            var popup = new Edgar.DetailPopup(feature, function(){
-                //on close
-                Edgar.mapdata.controls.occurrencesSelectControl.unselectAll();
-            });
 
-        }
         // Associate the above functions with the appropriate callbacks
         Edgar.mapdata.layers.occurrences.events.register('featureselected', this, onFeatureSelect);
 

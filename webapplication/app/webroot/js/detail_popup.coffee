@@ -19,6 +19,9 @@ class DetailPopup
 
         @feature.layer.map.addPopup(@popup)
 
+        relPosition = @popup.relativePosition # br, tr, tl or bl
+        $(@popup.div).addClass(relPosition)
+
         @initPopupContent()
 
         @feature.layer.events.register('featureunselected', this, @endPopup)
