@@ -380,10 +380,18 @@ How do I obtain accurate observation records for a species?
 Most data available for download on Edgar is accurate, however some location observations for some species are considered sensitive information and we cannot release it either visually (displayed on the map), or as downloadable data.  If you require accurate observation records for a species, contact <a href="http://www.ala.org.au" target="_blank">ALA</a>.
                 </dd>
 				
-				<dt>
+                <dt>
 How do I report a bug/suggest a new feature for Edgar?
                 </dt><dd>
 Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
+                </dd>
+
+                <dt>
+Can I use Edgar / Edgar's data / pictures from Edgar / text from Edgar in my project?
+                </dt><dd>
+Edgar's source code is released under a <a href="http://tropicaldatahub.org/apps/edgar/license">BSD-style licence</a> and available from <a href="https://github.com/jcu-eresearch/Edgar">github</a>.
+                </dd><dd>
+Edgar's content, including Edgar's documentation, is licenced using <a href="http://creativecommons.org/licenses/by/3.0/au/">CC-BY</a>, which essentially means you can do whatever you like with Edgar's data, as long as you credit it properly.
                 </dd>
 
             </dl></div>
@@ -546,6 +554,11 @@ engage in improving our understanding of the species and the modelling of specie
             through the National Collaborative Research Infrastructure Strategy Program and the
             Education Investment Fund (EIF) Super Science Initiative, as well as through the
             <a href="http://www.qcif.edu.au/">Queensland Cyber Infrastructure Foundation (QCIF)</a>
+
+            <div class="cc-by">
+                <a rel="license" href="http://creativecommons.org/licenses/by/3.0/au/"><img alt="Creative Commons License" id="cc-logo" src="http://i.creativecommons.org/l/by/3.0/au/88x31.png" /></a>
+                This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" rel="dct:type">site</span> by the <a xmlns:cc="http://creativecommons.org/ns#" href="http://www.jcu.edu.au/ctbcc/" property="cc:attributionName" rel="cc:attributionURL">Centre for Tropical Biodiversity &amp; Climate Change</a> and the <a xmlns:cc="http://creativecommons.org/ns#" href="http://eresearch.jcu.edu.au" property="cc:attributionName" rel="cc:attributionURL">eResearch Centre</a>, <a href="http://www.jcu.edu.au">James Cook University</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/au/">Creative Commons Attribution 3.0 Australia License</a>.
+            </div>
         </div>
     </div></div>
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->

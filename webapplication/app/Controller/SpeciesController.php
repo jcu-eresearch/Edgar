@@ -507,8 +507,8 @@ class SpeciesController extends AppController {
      * Called when the user requests remodelling for a species
      */
     public function request_model_rerun($species_id) {
-        if(!User::canRequestRemodel(AuthComponent::user()))
-            $this->dieWithStatus(403);
+//        if(!User::canRequestRemodel(AuthComponent::user()))
+//            $this->dieWithStatus(403);
 
         $species = $this->Species->findById($species_id);
         if($species === False)

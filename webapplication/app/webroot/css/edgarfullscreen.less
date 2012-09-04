@@ -196,20 +196,14 @@ html, body {
 }
 
 .triggeredtab .inner {
-/*
-*/
     .borderbox();
     height: 100%;
-    xxmargin: 2em;
     padding: 1em;
     overflow: auto;
 }
 
 .triggeredtab p, .triggeredtab ul, .triggeredtab ol, .triggeredtab dl, .triggeredtab dt, .triggeredtab dd {
     text-align: left;
-    xbackground-color: transparent !important;
-    xcolor: inherit;
-    xfont-size: inherit;
 }
 
 .triggeredtab p, .triggeredtab dl, .triggeredtab ul, .triggeredtab ol {
@@ -218,8 +212,12 @@ html, body {
 }
 
 .triggeredtab dt {
-    margin-top: 0.5em;
+    margin-top: 0.6em;
     font-weight: bold;
+}
+
+.triggeredtab dd {
+    margin-top: 0.3em;
 }
 
 .triggeredtab h1 {
@@ -302,6 +300,22 @@ html, body {
 .triggeredtab .funding img.goleft {
     float: left;
     margin: 0 1em 0 0;
+}
+
+.cc-by {
+    font-size: 90%;
+    padding-top: 2em;
+    clear: left;
+    text-align: left;
+}
+
+#cc-logo {
+    float: left;
+    border: none;
+    background: none;
+    .allrounded(0);
+    padding: 0 0.5em 0 0;
+    margin: 0;
 }
 
 /* things in the "acknowledgements" area ------------------------------ */
