@@ -70,10 +70,12 @@ Edgar.vetting.theirHabitatClassifications = {
             featureData    = feature.data
             classification = featureData['classification']
             comment        = featureData['comment']
+            user           = featureData['user']
+
             $liVetting     = $('<li class="ui-state-default"><span class="classification">' +
-                             classification + '</span><span class="comment">' + 
-                             comment +
-                             '</span></li>')
+                             classification + '</span> <span class="user">by ' + user +
+                             '</span><p class="comment" style="display:none">' + comment +
+                             '</p></li>')
 
             $liVetting.data('feature', feature)
             $liVetting.hover(
@@ -82,8 +84,11 @@ Edgar.vetting.theirHabitatClassifications = {
                     Edgar.vetting.theirHabitatClassifications.selectControl.select(thisFeature)
                     $(this).addClass("ui-state-hover")
                 () ->
-                    Edgar.vetting.theirHabitatClassifications.selectControl.unselectAll();
+                    Edgar.vetting.theirHabitatClassifications.selectControl.unselectAll()
                     $(this).removeClass("ui-state-hover")
+            )
+            $liVetting.click( () ->
+                $(this).find('.comment').stop().slideToggle('fast')
             )
 
             $ul.append($liVetting)

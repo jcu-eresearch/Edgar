@@ -842,16 +842,23 @@ firefox
 
 
 /* vetting customisations ------------------------------------------ */
-ul.vetting_list li button {
-    float: right;
-    vertical-align: top;
-}
+#toolspanel ul.vetting_list li {
+    overflow: hidden;
 
-ul.vetting_list li .classification {
-    font-weight: bold;
-    margin-right: 1em;
-    display: inline-block;
-    width: 50%;
+    button {
+        float: right;
+        vertical-align: top;
+    }
+
+    .classification {
+        font-weight: bold;
+    }
+
+    .comment {
+        margin-top: 0.5em;
+        padding-top: 0.5em;
+        border-top: 1px solid silver;
+    }
 }
 
 #vetform {

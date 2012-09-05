@@ -189,7 +189,8 @@ class SpeciesController extends AppController {
 
         if ($by_user_id and $inverse_user_id_filter) {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT vettings.id, ST_AsGeoJSON(area), classification, comment, fname, lname '.
+                'FROM vettings INNER JOIN users ON user_id = users.id '.
                 'WHERE species_id = ? AND user_id <> ? AND deleted is NULL '.
                 'LIMIT 1000',
                 array(),
@@ -197,7 +198,8 @@ class SpeciesController extends AppController {
             );
         } elseif ($by_user_id) {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT vettings.id, ST_AsGeoJSON(area), classification, comment, fname, lname '.
+                'FROM vettings INNER JOIN users ON user_id = users.id '.
                 'WHERE species_id = ? AND user_id = ? AND deleted is NULL '.
                 'LIMIT 1000',
                 array(),
@@ -205,7 +207,8 @@ class SpeciesController extends AppController {
             );
         } else {
             $results = $this->Species->getDataSource()->execute(
-                'SELECT id, ST_AsGeoJSON(area), classification, comment FROM vettings '.
+                'SELECT vettings.id, ST_AsGeoJSON(area), classification, comment, fname, lname '.
+                'FROM vettings INNER JOIN users ON user_id = users.id '.
                 'WHERE species_id = ? AND deleted is NULL '.
                 'LIMIT 1000',
                 array(),
@@ -223,10 +226,13 @@ class SpeciesController extends AppController {
                 $area_json  = $row[1];
                 $classification = $row[2];
                 $comment = $row[3];
+                $user = $row[4] . ' ' . $row[5];
 
                 $properties_json_array = Vetting::getPropertiesJSONObject($classification);
                 $properties_json_array['classification'] = $classification;
                 $properties_json_array['vetting_id'] = $vetting_id;
+                $properties_json_array['comment'] = $comment;
+                $properties_json_array['user'] = $user;
 
                 // decode the json
                 array_push($geo_json_features_array, array('type' => 'Fetaure', 'geometry' => json_decode($area_json), 'properties' => $properties_json_array));
