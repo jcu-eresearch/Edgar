@@ -1,15 +1,16 @@
 ##script to model only species with 20 or more records
 ##Edgar project 2012
 ##developed by Lauren Hodgson...lhodgson86@gmail.com
+##
+## Expects 1 arg, the path to the occurrences file to be tested.
 
 library(SDMTools);
 
-wd='/scratch/jc155857/EdgarMaster/modelling/inputs/';
+args=commandArgs(TRUE);
 
-spp='1'; #define spp object.  needs to correspond to $SPP arg in bash
-occur='public_occur.csv'; #define occur object. needs to correspond to $OCCUR
+occur_file=args[1];
 
-toccur=read.csv(paste(wd,spp,'/',occur,sep=''));
+toccur=read.csv(paste(occur_file,sep=''));
 toccur$LATDEC = round(toccur$LATDEC/0.05)*0.05;
 toccur$LONGDEC = round(toccur$LONGDEC/0.05)*0.05;
 
