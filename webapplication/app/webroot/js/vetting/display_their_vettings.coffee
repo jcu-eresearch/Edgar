@@ -23,7 +23,7 @@ Edgar.vetting.theirHabitatClassifications = {
 
     _addVectorLayer: () ->
         @vectorLayer = new OpenLayers.Layer.Vector('Their Habitat Classifications', {
-            displayInLayerSwitcher: false
+            #displayInLayerSwitcher: false
             isBaseLayer: false
             projection: Edgar.util.projections.geographic
             strategies: [new OpenLayers.Strategy.Fixed()]
