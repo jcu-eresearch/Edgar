@@ -36,6 +36,7 @@ class DetailPopup
         @feature.layer.events.unregister('featureunselected', this, @endPopup)
 
         @feature.layer.map.removePopup(@popup)
+
         @popup.destroy()
         @onClose()
 
@@ -46,7 +47,6 @@ class DetailPopup
 
         # openlayers close box was causing layout issues, so just did one myself
         $tabsElem.find('.close-button').click( () -> self.endPopup() )
-
         # jquery ui tabs require ids, but ids have to be unique, so we generate
         # all the ids with tabPrefix out the front to ensure they are unique
         tabPrefix = "popup#{tabIdCounter++}"
@@ -94,10 +94,10 @@ class DetailPopup
             }
             success: ((data, status, xhr) -> self.showDetails(data)),
             error: (data, status, xhr) ->
-                console.log('Failed to fetch occurrence details (data/status/xhr):')
-                console.log(data)
-                console.log(status)
-                console.log(xhr)
+                consolelog('Failed to fetch occurrence details (data/status/xhr):')
+                consolelog(data)
+                consolelog(status)
+                consolelog(xhr)
                 # just retry after waiting a bit
                 setTimeout((() -> self.loadDetails(self.detailsPageIdx)), 2000)
         })
@@ -110,7 +110,7 @@ class DetailPopup
         details.pageIdx = @detailsPageIdx
         details.pageSize = DETAIL_PAGE_SIZE
         details.totalOccurrences = @totalOccurrencesInFeature()
-        console.log(details)
+        consolelog(details)
         html = Edgar.templates.mapPopupDetailsPanel(details)
 
         $detailsPanel = $(@popup.contentDiv).find('.details-panel')

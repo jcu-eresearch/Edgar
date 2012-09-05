@@ -21,7 +21,6 @@
     },
     _addVectorLayer: function() {
       this.vectorLayer = new OpenLayers.Layer.Vector('Their Habitat Classifications', {
-        displayInLayerSwitcher: false,
         isBaseLayer: false,
         projection: Edgar.util.projections.geographic,
         strategies: [new OpenLayers.Strategy.Fixed()],
@@ -61,11 +60,12 @@
       $myVettingsList.empty();
       features = this.vectorLayer.features;
       addVettingToVettingsList = function(feature, $ul) {
-        var $liVetting, classification, comment, featureData;
+        var $liVetting, classification, comment, featureData, user;
         featureData = feature.data;
         classification = featureData['classification'];
         comment = featureData['comment'];
-        $liVetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span><span class="comment">' + comment + '</span></li>');
+        user = featureData['user'];
+        $liVetting = $('<li class="ui-state-default"><span class="classification">' + classification + '</span> <span class="user">by ' + user + '</span><p class="comment" style="display:none">' + comment + '</p></li>');
         $liVetting.data('feature', feature);
         $liVetting.hover(function() {
           var thisFeature;
@@ -75,6 +75,9 @@
         }, function() {
           Edgar.vetting.theirHabitatClassifications.selectControl.unselectAll();
           return $(this).removeClass("ui-state-hover");
+        });
+        $liVetting.click(function() {
+          return $(this).find('.comment').stop().slideToggle('fast');
         });
         return $ul.append($liVetting);
       };
