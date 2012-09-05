@@ -110,7 +110,7 @@ class DetailPopup
         details.pageIdx = @detailsPageIdx
         details.pageSize = DETAIL_PAGE_SIZE
         details.totalOccurrences = @totalOccurrencesInFeature()
-        log(details)
+        consolelog(details)
         html = Edgar.templates.mapPopupDetailsPanel(details)
 
         $detailsPanel = $(@popup.contentDiv).find('.details-panel')

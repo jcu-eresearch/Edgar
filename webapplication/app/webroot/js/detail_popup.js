@@ -113,7 +113,7 @@
       details.pageIdx = this.detailsPageIdx;
       details.pageSize = DETAIL_PAGE_SIZE;
       details.totalOccurrences = this.totalOccurrencesInFeature();
-      log(details);
+      consolelog(details);
       html = Edgar.templates.mapPopupDetailsPanel(details);
       $detailsPanel = $(this.popup.contentDiv).find('.details-panel');
       $detailsPanel.html(html);
