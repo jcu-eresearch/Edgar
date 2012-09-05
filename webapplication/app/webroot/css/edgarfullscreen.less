@@ -22,20 +22,90 @@
     border-bottom-left-radius: @bottomleft;
 }
 
-.shiny() {
-    /* one day, maybe */
-    xbackground: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(45px,rgba(0,0,0,0)));
-    background: -webkit-linear-gradient(top, rgba(192,192,192,0.5) 0%, rgba(192,192,192,0.5) 49.9%, rgba(128,128,128,0.5) 50%, rgba(255,255,255,0.5) 100%);
-    xbackground: -moz-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45px);
-    xbackground: -o-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45px);
-    xbackground: -ms-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45px);
-    xbackground: linear-gradient(top, rgba(1,1,1,0.8) 0%, rgba(1,1,1,0.8) 49%, rgba(1,1,1,0.3) 50%, rgba(1,1,1,1) 100%);
-}
-
 .borderbox() {
     -moz-box-sizing:border-box;
     -webkit-box-sizing:border-box;
     box-sizing:border-box;
+}
+
+.cornerpointer(bl, @arrowcolor: #fe8, @background: white) {
+    background: @background;
+    background: -webkit-linear-gradient(45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -webkit-linear-gradient(-45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -moz-linear-gradient(45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -moz-linear-gradient(-45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -o-linear-gradient(45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -o-linear-gradient(-45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -ms-linear-gradient(45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -ms-linear-gradient(-45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: linear-gradient(45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , linear-gradient(-45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    -moz-background-size: 200px 200px;
+    -webkit-background-size: 200px 200px;
+    -o-background-size: 200px 200px;
+    background-size: 200px 200px;
+    background-repeat: no-repeat;
+    background-position: bottom left;
+}
+
+.cornerpointer(tl, @arrowcolor: #fe8, @background: white) {
+    background: @background;
+    background: -webkit-linear-gradient(-45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -webkit-linear-gradient(-135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -moz-linear-gradient(-45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -moz-linear-gradient(-135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -o-linear-gradient(-45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -o-linear-gradient(-135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -ms-linear-gradient(-45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -ms-linear-gradient(-135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: linear-gradient(-45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , linear-gradient(-135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    -moz-background-size: 200px 200px;
+    -webkit-background-size: 200px 200px;
+    -o-background-size: 200px 200px;
+    background-size: 200px 200px;
+    background-repeat: no-repeat;
+    background-position: top left;
+}
+
+.cornerpointer(tr, @arrowcolor: #fe8, @background: white) {
+    background: @background;
+    background: -webkit-linear-gradient(-135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -webkit-linear-gradient(135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -moz-linear-gradient(-135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -moz-linear-gradient(135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -o-linear-gradient(-135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -o-linear-gradient(135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -ms-linear-gradient(-135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -ms-linear-gradient(135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: linear-gradient(-135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , linear-gradient(135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    -moz-background-size: 200px 200px;
+    -webkit-background-size: 200px 200px;
+    -o-background-size: 200px 200px;
+    background-size: 200px 200px;
+    background-repeat: no-repeat;
+    background-position: top right;
+}
+
+.cornerpointer(br, @arrowcolor: #fe8, @background: white) {
+    background: @background;
+    background: -webkit-linear-gradient(135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -webkit-linear-gradient(45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -moz-linear-gradient(135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -moz-linear-gradient(45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -o-linear-gradient(135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -o-linear-gradient(45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: -ms-linear-gradient(135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , -ms-linear-gradient(45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    background: linear-gradient(135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
+              , linear-gradient(45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
+    -moz-background-size: 200px 200px;
+    -webkit-background-size: 200px 200px;
+    -o-background-size: 200px 200px;
+    background-size: 200px 200px;
+    background-repeat: no-repeat;
+    background-position: bottom right;
 }
 
 
@@ -880,8 +950,12 @@ ul.vetting_list li .classification {
 /* popups ---------------------------------------------------------- */
 
 #featurePopup {
-    box-sizing: border-box;
+    .borderbox();
     background-color: transparent !important;
+}
+
+#featurePopup_contentDiv {
+    overflow: hidden;
 }
 
 #featurePopup ul.tab-strip {
@@ -889,51 +963,21 @@ ul.vetting_list li .classification {
     background-color: rgba(100, 100, 100, 0.2) !important;
 }
 
-#featurePopup.bl .map-popup-tabs {
-background: rgb(255,255,255); /* Old browsers */
-background: -moz-linear-gradient(45deg,  rgba(255,255,255,1) 85%, rgba(242,220,53,1) 95%); /* FF3.6+ */
-background: -webkit-gradient(linear, left bottom, right top, color-stop(85%,rgba(255,255,255,1)), color-stop(95%,rgba(242,220,53,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(45deg,  rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(45deg,  rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* Opera 11.10+ */
-background: -ms-linear-gradient(45deg,  rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* IE10+ */
-background: linear-gradient(45deg,  rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* W3C */
+#featurePopup ul.tab-strip li {
+    opacity: 0.8;
 }
 
-#featurePopup.tr .map-popup-tabs {
-background: rgb(242,220,53); /* Old browsers */
-background: -moz-linear-gradient(45deg,  rgba(242,220,53,1) 5%, rgba(255,255,255,1) 15%); /* FF3.6+ */
-background: -webkit-gradient(linear, left bottom, right top, color-stop(5%,rgba(242,220,53,1)), color-stop(15%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* Opera 11.10+ */
-background: -ms-linear-gradient(45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* IE10+ */
-background: linear-gradient(45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* W3C */
-}
+#featurePopup .map-popup-wrapper { background: white; }
 
-#featurePopup.br .map-popup-tabs {
-background: rgb(242,220,53); /* Old browsers */
-background: -moz-linear-gradient(-45deg,  rgba(242,220,53,1) 5%, rgba(255,255,255,1) 15%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, right bottom, color-stop(5%,rgba(242,220,53,1)), color-stop(15%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(-45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(-45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* Opera 11.10+ */
-background: -ms-linear-gradient(-45deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* IE10+ */
-background: linear-gradient(135deg,  rgba(242,220,53,1) 5%,rgba(255,255,255,1) 15%); /* W3C */
-}
-
-#featurePopup.tl .map-popup-tabs {
-background: rgb(255,255,255); /* Old browsers */
-background: -moz-linear-gradient(-45deg, rgba(255,255,255,1) 85%, rgba(242,220,53,1) 95%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, right bottom, color-stop(85%,rgba(255,255,255,1)), color-stop(95%,rgba(242,220,53,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(-45deg, rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(-45deg, rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* Opera 11.10+ */
-background: -ms-linear-gradient(-45deg, rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* IE10+ */
-background: linear-gradient(135deg, rgba(255,255,255,1) 85%,rgba(242,220,53,1) 95%); /* W3C */
-}
+#featurePopup.tr .map-popup-tabs {  .cornerpointer(bl);  }
+#featurePopup.br .map-popup-tabs {  .cornerpointer(tl);  }
+#featurePopup.bl .map-popup-tabs {  .cornerpointer(tr);  }
+#featurePopup.tl .map-popup-tabs {  .cornerpointer(br);  }
 
 #featurePopup .map-popup-tabs {
     padding: 0;
-    border: none;
     font-size: small;
-    overflow:hidden;
+    overflow: hidden;
     position: relative;
 
     .close-button {
@@ -1000,11 +1044,8 @@ background: linear-gradient(135deg, rgba(255,255,255,1) 85%,rgba(242,220,53,1) 9
         border-top: 1px solid silver;
     }
 
-    thead tr, tbody {
-        xdisplay: block;
-    }
-
     thead tr {
+        opacity: 0.8;
         background-color: #ccf;
     }
 

@@ -94,10 +94,10 @@
           return self.showDetails(data);
         }),
         error: function(data, status, xhr) {
-          console.log('Failed to fetch occurrence details (data/status/xhr):');
-          console.log(data);
-          console.log(status);
-          console.log(xhr);
+          consolelog('Failed to fetch occurrence details (data/status/xhr):');
+          consolelog(data);
+          consolelog(status);
+          consolelog(xhr);
           return setTimeout((function() {
             return self.loadDetails(self.detailsPageIdx);
           }), 2000);
@@ -113,7 +113,7 @@
       details.pageIdx = this.detailsPageIdx;
       details.pageSize = DETAIL_PAGE_SIZE;
       details.totalOccurrences = this.totalOccurrencesInFeature();
-      console.log(details);
+      log(details);
       html = Edgar.templates.mapPopupDetailsPanel(details);
       $detailsPanel = $(this.popup.contentDiv).find('.details-panel');
       $detailsPanel.html(html);
