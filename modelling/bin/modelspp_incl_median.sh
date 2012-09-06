@@ -90,6 +90,17 @@ declare -a YEARS_TO_MODEL=('2015' '2025' '2035' '2045' '2055' '2065' '2075' '208
 declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
 declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
+function finalise {
+    # Remove any existing final output
+    rm -rfd "$FINAL_OUTPUT_DIR"
+
+    # Move the tmp output to the final output location
+    mv "$TMP_OUTPUT_DIR" "$FINAL_OUTPUT_DIR"
+
+    # Give read access to everyone
+    chmod -R ugo+rX "$FINAL_OUTPUT_DIR"
+}
+
 function model_and_median {
     local SCENARIO=$1
     local YEAR=$2
@@ -133,7 +144,10 @@ status=$?
 
 if [ $status -ne 0 ]; then
     echo "Insufficient diverse occurrences to perform modelling" >&2
-    exit $status
+
+    finalise
+
+    exit 3
 fi
 
 # Produce training data
@@ -142,7 +156,10 @@ java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$O
 # If the median didn't produce a valid output, then exit
 if [ ! -e "$TMP_OUTPUT_DIR/${SPP}.lambdas" ]; then
     echo "The model didn't produce any lambdas. Can't continue." >&2
-    exit 3
+
+    finalise
+
+    exit 4
 fi
 
 # Model the 'current' projection ( in the background )
@@ -210,15 +227,4 @@ if [ ! -e "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME"
 fi
 
-# TODO
-# Add some sanity checks before removing any existing good output data
-
-# Remove any existing final output
-rm -rfd "$FINAL_OUTPUT_DIR"
-
-# Move the tmp output to the final output location
-mv "$TMP_OUTPUT_DIR" "$FINAL_OUTPUT_DIR"
-
-# Give read access to everyone
-chmod -R ugo+rX "$FINAL_OUTPUT_DIR"
-
+finalise
