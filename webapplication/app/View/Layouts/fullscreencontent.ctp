@@ -127,18 +127,17 @@ $user = AuthComponent::user();
     <!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
     <div id="science" class="triggeredtab"><div class="inner">
         <p>
-Edgar uses the 
+Edgar uses bird observation records from the
 <a href="http://www.ala.org.au/">Atlas of Living Australia</a>
-bird observation database to generate current and future species distribution models.  These are built for each of 4 Representative Concentration Pathways (RCPs, which are analogous to carbon emission scenarios) using the median of 18 global climate models (GCMs), and 8 time steps between 2015 and 2085.
+database to generate current and future species distribution models.  These are built for each of 4 Representative Concentration Pathways (RCPs, analogous to greenhouse gas emission scenarios) using the mid-point of 18 global climate models (GCMs) at decadal time steps between 2015 and 2085.
         </p><div class="additionalcontent">
             <span class="opener">Preparing observation records for modelling</span>
             <div class="add"><p>
                 Bird observation records retrieved from the
-                <a href="http://www.ala.org.au/">Atlas of Living Australia</a>'s (ALA) database have been filtered based on ALA's 'assertions' and those inappropriate for modelling were excluded. Additionally,
-                <a href="http://www.birdlife.org.au/">BirdLife Australia</a>
-                provided species range information, against which we check each observation to obtain an initial classification as core habitat, introduced, historic, vagrant, irruptive, or doubtful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.
+                <a href="http://www.ala.org.au/">Atlas of Living Australia</a>'s (ALA) database have been filtered to exclude records with obvious issues. <a href="http://www.birdlife.org.au/">BirdLife Australia</a>
+                provided detailed species range information that allows us to classify records as core habitat, introduced, historic, vagrant, irruptive, or doubtful. Observation records that fall outside these ranges are marked as unclassified, and are assumed to be valid for modelling.  However, we need input from birdwatchers and experts to classify these records so as to improve the models.  Additionally, there may be pockets of unsuitable climate space within core habitat, which also requires vetting.
             </p><p>
-                This initial classification for observations is compared against classifications collected from
+                The initial Birdlife classification for observations is compared against classifications collected from
                 birdwatchers and other knowledgeable visitors to the Edgar site.  Edgar tracks contentious records, but generally a vetting entered by a logged-in site user will be considered accurate and changes
                 the derived classification of an observation.
             </p><p>
@@ -149,13 +148,12 @@ bird observation database to generate current and future species distribution mo
             <div class="add"><p>
                 We used climate data from the
                 <a href="http://www.bom.gov.au/jsp/awap/">Australian Water Availability Project</a>
-                (AWAP) to caculate important climate variables such as current annual mean temperature, temperature seasonality, and annual precipitation. We generated projected values for those variables using all 18 global climate models (GCMs) for all RCP scenarios (RCP2.6, RCP4.5, RCP6, RCP8.5) at 8 time steps between 2015 and 2085.
+                (AWAP) to caculate important climate variables such as current annual mean temperature, temperature seasonality, and annual precipitation. We calculated likely future climate for each climate variable considered important to bird distributions using all 18 global climate models (GCMs) for all RCP scenarios (RCP2.6, RCP4.5, RCP6, RCP8.5) at 8 time steps between 2015 and 2085.
             </p></div>
         </div><div class="additionalcontent">
             <span class="opener">Generating climate suitability maps</span>
             <div class="add"><p>
-                Species distribution models are generated dynamically using the presence-only modelling program
-                <a href="http://www.cs.princeton.edu/~schapire/maxent/">Maxent</a> (Phillips et al 2006). Maxent uses species presence records to statistically relate species occurrence to environmental variables on the principle of maximum entropy.
+                Climate suitabiliy maps for a species represent what scientists call a Species distribution model. These model shows the relationship between where species have been observed and the climate at that location.  Edgar shows all potentially suitable climate space, even if the species has not been observed there.
             </p><p>
                 Edgar continues to collect new observations from ALA and new vettings from site visitors, and as species observations are changed and refined, Edgar regenerates the species' climate maps using the new data. The most up-to-date maps of climate suitability are displayed on Edgar.
             </p></div>
@@ -213,31 +211,31 @@ bird observation database to generate current and future species distribution mo
             <span class="opener">Emission Pathways: RCPs</span>
             <div class="add">
 				<p>
-					RCP stands for <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#descript" target="_blank">Representative Concentration Pathway</a>.  The RCPs are not new, fully integrated scenarios (i.e., they are not a complete package of socioeconomic, emissions, and climate projections). They are consistent sets of projections of only the components of radiative forcing that are meant to serve as input for climate modelling, pattern scaling, and atmospheric chemistry modeling.  Here, we have used <a href="http://wallaceinitiative.org/climate_2012/tdhtools/Search/DataDownload.php" target="_blank">climate layers</a> developed by Jeremy VanDerWal that have been derived from the following RCPs:
+					<a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#descript" target="_blank">Representative Concentration Pathways</a> are four green house gas trajectories adopted by the IPCC for it's fifth Assessment Report.  The RCPs are not new, fully integrated scenarios (i.e., they are not a complete package of socioeconomic, emissions, and climate projections). Here, we have used <a href="http://wallaceinitiative.org/climate_2012/tdhtools/Search/DataDownload.php" target="_blank">climate layers</a> generated by Jeremy VanDerWal that have been derived from the following RCPs:
 				</p><dl>
 					<dt>
 						RCP2.6
 					</dt><dd>
-						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP2.6</a> emission pathway is representative for scenarios leading to very low greenhouse gas concentration levels: peak in radiative forcing at ~ 3 W/m2 before 2100 and decline.
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP2.6</a> emission pathway represents scenarios leading to very low greenhouse gas concentration levels.  A peak in in greenhouse gas levels is reached mid-century after which levels subsequently decline.  Emissions reduce substantially over time.
 					</dd>
 					<dd>
 						Mean temperature increase for Australia: 0.91 degrees by 2085
 					</dd><dt>
 						RCP4.5
 					</dt><dd>
-						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP4.5</a> emission pathway It is a stabilization scenario : stabilization without overshoot pathway to 4.5 W/m2 at stabilization after 2100.
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP4.5</a> emission pathway is a stabilization scenario where emissions stabilise before 2100 by employment of a range of technologies and strategies for reducing greenhouse gas emissions.
 					</dd><dd>
 						Mean temperature increase for Australia: 1.83 degrees by 2085
 					</dd><dt>
 						RCP6
 					</dt><dd>
-						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP6</a> emission pathway is a stabilization scenario : stabilization without overshoot pathway to 6 W/m2 at stabilization after 2100.
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP6</a> emission pathway is a stabilization scenario where emissions stabilise after 2100 by employment of a range of technologies and strategies for reducing greenhouse gas emissions.
 					</dd><dd>
 						Mean temperature increase for Australia: 2.29 degrees by 2085
 					</dd><dt>
 						RCP8.5
 					</dt><dd>
-						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP8.5</a> is characterized by increasing greenhouse gas emissions over time: rising radiative forcing pathway leading to 8.5 W/m2 in 2100. 
+						The <a href="http://www.iiasa.ac.at/web-apps/tnt/RcpDb/dsd?Action=htmlpage&page=welcome#rcpinfo" target="_blank">RCP8.5</a> is characterized by increasing greenhouse gas emissions over time leading to high greenhouse gas concentration levels. 
 					</dd><dd>
 						Mean temperature increase for Australia: 3.78 degrees by 2085
 					</dd>
@@ -372,6 +370,12 @@ We display all bird observation records retrieved from ALA so that we can classi
 Why is there no climate suitability map for some species? (ie. Why has a species not been modelled?)
                 </dt><dd>
 We can only model species that have 20 or more observations at unique locations at a 5km resolution.
+                </dd>
+				
+				<dt>
+Why does the climate suitability map show suitable areas outside of where a species has been observed? (ie. Species observed only in Victoria has suitable climate space in Western Australia)
+                </dt><dd>
+Edgar shows all potentially suitable climate space, even if the species has not been observed there.  This is because managers may need to take all potentially suitable climate into consideration when developing conservation plans for a species into the future.
                 </dd>
 				
 				<dt>
