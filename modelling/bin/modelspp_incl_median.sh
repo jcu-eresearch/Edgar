@@ -195,25 +195,24 @@ else
     mv "$TMP_OUTPUT_DIR/tmp_metadata_dir" "$TDH_DIR/$SPP_NAME"
 fi
 
-mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/projected-distributions"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 
 # Zip the output, and copy it to the TDH
-mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/projected-distributions"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 
-
-CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
-CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"
+CLIM_ZIP_FILE_NAME="latest-projected-distributions.zip"
+CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-projected-distributions.zip"
 
 pushd $TMP_OUTPUT_DIR
-zip -r "$TDH_DIR/$SPP_NAME/climate-suitability/tmp_$CLIM_ZIP_FILE_NAME" *
-mv "$TDH_DIR/$SPP_NAME/climate-suitability/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME"
+zip -r "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" *
+mv "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME"
 popd
 
 # if we don't have a copy for the month, make a copy
-if [ ! -e "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
-  cp "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME"
+if [ ! -e "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
+  cp "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME"
 fi
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
