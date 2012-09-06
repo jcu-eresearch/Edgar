@@ -130,7 +130,7 @@ function updateDownloadButtons() {
     var $occur = $('#btn_species_occur');
     var $clim = $('#btn_species_clim');
 
-    if (Edgar.mapdata.species) {
+    if (Edgar.mapdata && Edgar.mapdata.species) {
 
         // show/hide the downloadable buttons
         if (Edgar.mapdata.species.hasDownloadables) {
