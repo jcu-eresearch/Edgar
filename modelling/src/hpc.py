@@ -254,7 +254,7 @@ class HPCJob:
                         priv_writer = csv.writer(priv_f)
 
                         # Write the header
-                        pub_writer.writerow(["LATDEC", "LONGDEC"])
+                        pub_writer.writerow(["LATDEC", "LONGDEC", "DATE", "BASIS", "CLASSIFICATION"])
                         priv_writer.writerow(["SPPCODE", "LATDEC", "LONGDEC"])
 
                         # Select the occurrences for this species
@@ -262,7 +262,10 @@ class HPCJob:
                             'ST_X(location) as longitude',
                             'ST_Y(location) as latitude',
                             'ST_X(sensitive_location) as sensitive_longitude',
-                            'ST_Y(sensitive_location) as sensitive_latitude']).\
+                            'ST_Y(sensitive_location) as sensitive_latitude',
+                            'date',
+                            'basis',
+                            'classification']).\
                             select_from(db.occurrences.outerjoin(db.sensitive_occurrences)).\
                             where(db.occurrences.c.species_id == self.speciesId).\
                             where(or_(db.occurrences.c.classification == 'unknown', db.occurrences.c.classification >= 'core')).\
@@ -272,7 +275,10 @@ class HPCJob:
                         for occurrence_row in occurrence_rows:
                             pub_lat  = occurrence_row['latitude']
                             pub_lng  = occurrence_row['longitude']
-                            pub_writer.writerow([pub_lat, pub_lng])
+                            pub_date = ('' if occurrence_row['date'] is None else occurrence_row['date'].isoformat())
+                            pub_basis = ('' if occurrence_row['basis'] is None else occurrence_row['basis'])
+                            pub_classi = ('' if occurrence_row['classification'] is None else occurrence_row['classification'])
+                            pub_writer.writerow([pub_lat, pub_lng, pub_date, pub_basis, pub_classi])
 
                             if occurrence_row['sensitive_longitude'] is None:
                                 priv_lat = occurrence_row['latitude']
