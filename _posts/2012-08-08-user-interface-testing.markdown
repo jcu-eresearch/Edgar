@@ -8,8 +8,6 @@ categories: [Development]
 tags:    [testing, user, UI, learning]
 ---
 
-# DRAFT
-
 Early in August we tested the almost complete site on some real users.  In this probably rather long post I will describe our test users, go through the testing outcomes that most users agreed on, and then point out some specific things we learned from individual users.  Here I'm focusing on quite fine-grained aspects of the Edgar user interface; [Lauren]({{ site.JB.BASE_PATH }}/2012/03/22/the-team/#lauren)'s [user testing post]({{ site.JB.BASE_PATH }}/Development/2012/08/09/user-tests/) describes our user testing results with respect to Edgar's overall usefulness.
 
 ### Our test users
