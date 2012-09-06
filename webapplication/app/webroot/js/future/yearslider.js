@@ -150,6 +150,7 @@
                 this._addLayerForYear(2055);
                 this._addLayerForYear(2065);
                 this._addLayerForYear(2075);
+                this._addLayerForYear(2085);
             }
         }
 
