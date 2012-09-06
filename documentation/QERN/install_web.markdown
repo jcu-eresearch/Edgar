@@ -1,6 +1,8 @@
 climatebird2.qern.qcif.edu.au (Web)
 ====================================
 
+This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu <code>apt-get</code> packages.
+
 Install apache:
 
 ```bash

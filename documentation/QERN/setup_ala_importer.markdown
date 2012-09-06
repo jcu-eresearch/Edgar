@@ -1,6 +1,8 @@
 ALA importer
 ============
 
+This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu <code>apt-get</code> packages.
+
 This assumes you have a copy of Edgar in the directory `~/Edgar`, and
 have a database named `edgar`.
 
