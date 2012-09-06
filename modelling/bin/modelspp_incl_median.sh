@@ -75,6 +75,7 @@ module load java
 # Move to the species directory
 cd "$WORKING_DIR/inputs/$SPP"
 
+
 # Generate the name of the tmp output dir (use the PID to uniquely name the dir)
 TMP_DIR_NAME="$SPP-$$"
 # Make an output directory
@@ -124,6 +125,16 @@ function model_and_median {
 
 # Dump the environmental vars to the output dir
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
+
+# Run the pre-check
+R --no-save < "$WORKING_DIR/bin/model_pre_check.r" --args "$OCCUR"
+
+status=$?
+
+if [ $status -ne 0 ]; then
+    echo "Insufficient diverse occurrences to perform modelling" >&2
+    exit $status
+fi
 
 # Produce training data
 java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$OCCUR" outputdirectory="$TMP_OUTPUT_DIR" -J -P -x -z -N bioclim_02 -N bioclim_03 -N bioclim_06 -N bioclim_07 -N bioclim_08 -N bioclim_09 -N bioclim_10 -N bioclim_11 -N bioclim_13 -N bioclim_14 -N bioclim_18 -N bioclim_19 redoifexists autorun
