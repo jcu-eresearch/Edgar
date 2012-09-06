@@ -52,14 +52,7 @@ Climate suitability is shown on the map for the selected year and RCP scenario. 
 
 ## Vetting Mode
 
-
-
 Vetting mode lets birdwatchers and experts improve Edgar's modelling by correcting and classifying bird observations.
 
 <img src="{{ site.JB.BASE_PATH }}/images/cassowaryvetting.png" />
 
-## Edgar's potential
-
-Everyone can enjoy using Edgar to explore the impact of climate change on birds; Edgar also makes the corrected observations and projected climate data files available for download.
-
-Edgar not only collects corrections to observations, but shares them with the [Atlas of Living Australia](http://www.ala.org.au/), so bird experts' knowledge is available to all.
