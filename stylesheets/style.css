@@ -70,6 +70,14 @@ h2 {
     border-bottom: 1px solid #ccc;
 }
 
+/* page content -------------------------------- */
+/* post content -------------------------------- */
+
+.pagecolumn img, .postcolumn img {
+    display: block;
+    margin: 3em auto;
+}
+
 /* sidebar ------------------------------------- */
 
 .sidebar h4 {

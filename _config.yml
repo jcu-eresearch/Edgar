@@ -55,7 +55,7 @@ JB :
   #   - Only the following values are falsy: ["", null, false]
   #   - When setting BASE_PATH it must be a valid url.
   #     This means always setting the protocol (http|https) or prefixing with "/"
-  BASE_PATH : /Edgar
+#  BASE_PATH : /Edgar
 
   # By default, the asset_path is automatically defined relative to BASE_PATH plus the enabled theme.
   # ex: [BASE_PATH]/assets/themes/[THEME-NAME]
@@ -124,6 +124,27 @@ JB :
   #   ./_includes/custom/[HELPER]
   # where [HELPER] is the name of the helper you are overriding.
 
+# page list for the top nav
+navlinks:
+  - group: 'navigation'
+    url: "/"
+    title: 'Home'
+  - group: 'navigation'
+    url: "/userguide.html"
+    title: "User's Guide"
+  - group: 'navigation'
+    url: "/developermanual.html"
+    title: "Develop &amp; Deploy Manual"
+  - group: 'navigation'
+    url: "/archive.html"
+    title: 'Blog Posts'
+  - group: 'navigation'
+    url: "/catagories.html"
+    title: 'Blog Categories'
+  - group: 'navigation'
+    url: "/tags.html"
+    title: 'Tags'
+
 # intreesting info for using elsewhere..
 people:
   daniel:
@@ -141,4 +162,5 @@ people:
   tom:
     displayname: Tom Dalling
     gravatar: 05463d616d56d33fd6a61df100fbbb94
+
 
