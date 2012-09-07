@@ -8,7 +8,7 @@ categories: [Documentation]
 tags:    []
 ---
 
-This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu <code>apt-get</code> packages.
+This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu via the appropriate <code>apt-get</code> packages.
 
 #Install Database
 
@@ -75,12 +75,10 @@ Restart Postgres:
 
 Add to auto-start processes:
 
-    sudo chkconfig --add  postgresql 
+    sudo chkconfig --add  postgresql
     sudo chkconfig --level 345 postgresql on
 
 #Setup ALA Importer
-
-This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu <code>apt-get</code> packages.
 
 This assumes you have a copy of Edgar in the directory `~/Edgar`, and
 have a database named `edgar`.
@@ -115,7 +113,6 @@ ALA. The easiest way to do this is to set up a cron job. See the file
 
 #Install Web Application
 
-
 Install apache:
 
     sudo yum install httpd mod_ssl
@@ -148,11 +145,11 @@ Clone the git repo (read only):
 
     sudo git clone "git://github.com/jcu-eresearch/Edgar.git"
 
-Update the tmp directory of the web app so that cake can read and write to the tmp dir.
+Update the tmp directory of the web app so that cake can read and write to the tmp dir
 
     sudo chmod ugo+wrX -R /var/www/Edgar/webapplication/app/tmp/
 
-Change dir to html, and create link to webapplication component of git repo in www dir
+Change dir to html, and create sym link to webapplication component of git repo in www dir
 
     cd /var/www/html
     sudo ln -s /var/www/Edgar/webapplication/ Edgar
@@ -168,6 +165,7 @@ This should be added after the default directory settings (&lt;Directory "/var/w
         Order allow,deny
         Allow from all
     </Directory>
+
 Update the database config settings:
 
     sudo cp /var/www/Edgar/webapplication/app/Config/database.php.default /var/www/Edgar/webapplication/app/Config/database.php
@@ -177,7 +175,7 @@ Restart apache:
 
     sudo /etc/init.d/httpd restart
 
-Add apache to the "on boot" services:
+Add apache to the `on boot` services:
 
     sudo chkconfig --add httpd
     sudo chkconfig --level 345 httpd on
