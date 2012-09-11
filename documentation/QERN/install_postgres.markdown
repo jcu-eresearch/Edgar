@@ -1,6 +1,8 @@
 Postgres Database - climatebird1.qern.qcif.edu.au
 ==============================================================
 
+This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu <code>apt-get</code> packages.
+
 Install PostgreSQL 8.4 with contrib modules:
 
     sudo yum install postgresql postgresql-server postgresql-contrib

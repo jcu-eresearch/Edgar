@@ -551,7 +551,7 @@ class SpeciesController extends AppController {
             throw new NotFoundException('No species found with id = ' . $species_id);
         }
         $this->Species->read();
-        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->Species->canonicalName() . '/climate-suitability/latest-climate-suitability.zip');
+        $this->redirect(SpeciesController::DOWNLOAD_URL_PREFIX . $this->Species->canonicalName() . '/projected-distributions/latest-projected-distributions.zip');
     }
 
     private function _speciesToJson($species) {

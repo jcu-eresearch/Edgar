@@ -90,6 +90,17 @@ declare -a YEARS_TO_MODEL=('2015' '2025' '2035' '2045' '2055' '2065' '2075' '208
 declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
 declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
+function finalise {
+    # Remove any existing final output
+    rm -rfd "$FINAL_OUTPUT_DIR"
+
+    # Move the tmp output to the final output location
+    mv "$TMP_OUTPUT_DIR" "$FINAL_OUTPUT_DIR"
+
+    # Give read access to everyone
+    chmod -R ugo+rX "$FINAL_OUTPUT_DIR"
+}
+
 function model_and_median {
     local SCENARIO=$1
     local YEAR=$2
@@ -133,7 +144,10 @@ status=$?
 
 if [ $status -ne 0 ]; then
     echo "Insufficient diverse occurrences to perform modelling" >&2
-    exit $status
+
+    finalise
+
+    exit 3
 fi
 
 # Produce training data
@@ -142,7 +156,10 @@ java -mx2048m -jar "$MAXENT" environmentallayers="$TRAINCLIMATE" samplesfile="$O
 # If the median didn't produce a valid output, then exit
 if [ ! -e "$TMP_OUTPUT_DIR/${SPP}.lambdas" ]; then
     echo "The model didn't produce any lambdas. Can't continue." >&2
-    exit 3
+
+    finalise
+
+    exit 4
 fi
 
 # Model the 'current' projection ( in the background )
@@ -178,25 +195,24 @@ else
     mv "$TMP_OUTPUT_DIR/tmp_metadata_dir" "$TDH_DIR/$SPP_NAME"
 fi
 
-mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/projected-distributions"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 
 # Zip the output, and copy it to the TDH
-mkdir -p "$TDH_DIR/$SPP_NAME/climate-suitability"
+mkdir -p "$TDH_DIR/$SPP_NAME/projected-distributions"
 mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 
-
-CLIM_ZIP_FILE_NAME="latest-climate-suitability.zip"
-CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-climate-suitability.zip"
+CLIM_ZIP_FILE_NAME="latest-projected-distributions.zip"
+CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-projected-distributions.zip"
 
 pushd $TMP_OUTPUT_DIR
-zip -r "$TDH_DIR/$SPP_NAME/climate-suitability/tmp_$CLIM_ZIP_FILE_NAME" *
-mv "$TDH_DIR/$SPP_NAME/climate-suitability/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME"
+zip -r "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" *
+mv "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME"
 popd
 
 # if we don't have a copy for the month, make a copy
-if [ ! -e "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
-  cp "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/climate-suitability/$CLIM_MONTH_ZIP_FILE_NAME"
+if [ ! -e "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
+  cp "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME"
 fi
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
@@ -210,15 +226,4 @@ if [ ! -e "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME"
 fi
 
-# TODO
-# Add some sanity checks before removing any existing good output data
-
-# Remove any existing final output
-rm -rfd "$FINAL_OUTPUT_DIR"
-
-# Move the tmp output to the final output location
-mv "$TMP_OUTPUT_DIR" "$FINAL_OUTPUT_DIR"
-
-# Give read access to everyone
-chmod -R ugo+rX "$FINAL_OUTPUT_DIR"
-
+finalise
