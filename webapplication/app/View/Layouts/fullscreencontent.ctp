@@ -398,7 +398,7 @@ Most data available for download on Edgar is accurate, however some location obs
                 <dt>
 How do I report a bug/suggest a new feature for Edgar?
                 </dt><dd>
-Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
+Email <a href="mailto:jeremy.vanderwal@jcu.edu.au">Jeremy VanDerWal</a>.
                 </dd>
 
                 <dt>
@@ -454,13 +454,13 @@ Edgar's content, including Edgar's documentation, is licenced using <a href="htt
             <a href="http://github.com/jcu-eresearch/Edgar">github</a>.
         </p><p>
             The principal researcher and project advisor is
-            <a href="http://www.jjvanderwal.com/">Dr Jeremy VanDerWal</a>.
+            <a href="mailto:jeremy.vanderwal@jcu.edu.au">Dr Jeremy VanDerWal</a>.
         </p><div class="additionalcontent">
             <span class="opener">Contact Dr VanDerWal</span>
             <div class="add">
                 <dl>
-                    <dt>on the web:</dt>
-                    <dd><a href="http://www.jjvanderwal.com/">http://www.jjvanderwal.com/</a></dd>
+                    <dt>via email:</dt>
+                    <dd><a href="mailto:jeremy.vanderwal@jcu.edu.au">jeremy.vanderwal@jcu.edu.au</a></dd>
 
                     <dt>by post:</dt>
                     <dd>
@@ -471,11 +471,6 @@ Edgar's content, including Edgar's documentation, is licenced using <a href="htt
                         Australia
                     </dd>
 
-                    <dt>via <a href="http://www.skype.com">Skype</a>:</dt>
-                    <dd><a href="skype:jjvanderwal?userinfo">jjvanderwal</a></dd>
-
-                    <dt>via email:</dt>
-                    <dd><a href="mailto:jjvanderwal@gmail.com">jjvanderwal@gmail.com</a></dd>
                 </dl>
             </div>
         </div>
