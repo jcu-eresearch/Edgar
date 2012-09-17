@@ -355,11 +355,6 @@ body {
   max-height: -webkit-calc(100% - 5em);
   max-height: calc(100% - 5em);
 }
-.bottom.float.panel {
-  left: 1em;
-  right: 1em;
-  bottom: 1em;
-}
 /* species panel content ------------------------------------------------ */
 .speciespanel {
   text-align: left;
@@ -504,21 +499,27 @@ firefox
     display: none;
 */
 
+  left: 1em;
+  right: 1em;
+  top: 50%;
+  margin: -3em 0 0 0;
+  padding: 0;
   text-align: center;
 }
 #alertpanel > div {
   display: inline-block;
-  padding: 0.5em 1em;
+  padding: 1em 2em;
   -webkit-border-radius: 1em;
   -moz-border-radius: 1em;
   border-radius: 1em;
   border: 2px solid yellow;
-  background: rgba(255, 255, 200, 0.5);
-  max-width: 35em;
+  background: rgba(255, 255, 200, 0.9);
+  max-width: 27em;
 }
 #alertpanel > div .closebutton {
-  margin: -0.25em -0.75em 0 0;
+  margin: -0.75em -1.75em 0 0;
   float: right;
+  position: relative;
   height: 1.5em;
   width: 1.5em;
   line-height: 1em;
@@ -533,7 +534,7 @@ firefox
 }
 #alertpanel > div p {
   font-size: 80%;
-  margin: 0;
+  margin: 0.25em 0;
 }
 /* tools panel content ------------------------------------------------ */
 #toolspanel {
