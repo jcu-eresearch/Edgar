@@ -7,6 +7,7 @@ excerpt:
 categories: [Documentation]
 tags:    []
 ---
+{% include JB/setup %}
 
 #DRAFT
 
@@ -52,7 +53,29 @@ Climate suitability is shown on the map for the selected year and RCP scenario. 
 
 ## Vetting Mode
 
-Vetting mode lets birdwatchers and experts improve Edgar's modelling by correcting and classifying bird observations.
+Edgar's modelling starts by working out which aspects of the climate a bird is sensitive to.  Edgar uses bird observations to determine where the species lives, and then examines the climate in those areas.  This means having good observation records is important to get accurate modelling results.
+
+Edgar's set of bird observations comes from the aggregated data of the [Atlas of Living Australia](http://www.ala.org.au/about-the-atlas/).  The Atlas contains data from many sources and vintages, including observations that are inaccurate in either species identification or geographic position.
+
+In addition to the outright accuracy of observations, Edgar should include only observations of a bird surviving and thriving in the wild.  An observation of a cassowary in a zoo enclosure in Darwin is technically accurate, but does not help to identify Darwin's climate as suitable for cassowaries.
+
+If you are inclined to help the Edgar project and have some knowledge of the ranges of particular birds, you can help classify observations.
+
+### Step 1: obtain a login and password from ALA
+
+Before you can vet records in Edgar, you need an ALA account, obtainable from the [ALA 'Create your account' page](http://auth.ala.org.au/emmet/selfRegister.html), or simply clicking Edgar's 'Log In' button and following the registration instructions.
+
+### Step 2: log in to Edgar
+
+Edgar's 'Log In' button in in the top right corner of the site.  This takes you to an ALA login page, where you can enter your ALA account details.  Choose 'Remember Me' if you want your web browser to remember your login for a while.
+
+<img src="{{ site.JB.BASE_PATH }}/images/ala-login.png" />
+
+### Step 3: select species and switch to Vetting Mode
+
+### Step 4: find and classify occurrences
+
+### Step 5: save your classification
 
 <img src="{{ site.JB.BASE_PATH }}/images/cassowaryvetting.png" />
 
