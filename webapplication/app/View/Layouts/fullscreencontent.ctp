@@ -49,13 +49,11 @@ $user = AuthComponent::user();
         <?php endif ?>
     </script>
 
-    <link rel="stylesheet/less" type="text/css" href="<?php echo $this->Html->url('/'); ?>css/edgarfullscreen.less">
-
     <?php
         echo $this->Html->meta('icon');
         echo $this->Html->css('h5bp');  // html5boilerplate "sanity reset" css
         echo $this->Html->css('edgar');
-//        echo $this->Html->css('edgarfullscreen');
+        echo $this->Html->css('edgarfullscreen');
         echo $this->Html->css('../js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
         echo $this->Html->css('openlayers');
         echo $this->Html->css('openlayers_extended');
@@ -63,8 +61,6 @@ $user = AuthComponent::user();
 
         // include Modernizr for html5 shims and feature detection.  this needs to go early!
         $this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
-        $this->Html->script('less-1.3.0.min.js', array('inline' => false, 'block'=>'earlyscript'));
-
 
         // Include jQuery and jQueryUI
         $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false, 'block'=>'libscript'));

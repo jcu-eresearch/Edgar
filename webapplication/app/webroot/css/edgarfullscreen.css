@@ -1,0 +1,1052 @@
+@charset "utf-8";
+/* LESS mixins ------------------------------------------------------- */
+/* openlayers fixups -------------------------------------------------- */
+/* hide error tiles (don't show pink tiles with image error icons) */
+.olImageLoadError {
+  background-color: transparent !important;
+}
+/* overall layout ----------------------------------------------------- */
+/* all the main things should be full screen size */
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+#header,
+#content {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+#header {
+  top: 0;
+  height: 50px;
+}
+#content {
+  top: 50px;
+  bottom: 0;
+}
+/* things in the main layout */
+#flash,
+#footer,
+#sidebar {
+  display: none;
+}
+/* things in the header ----------------------------------------------- */
+#header {
+  margin: 0;
+  background-color: #222;
+  color: #ccc;
+  z-index: 1000000;
+  overflow: hidden;
+}
+#edgar-logo {
+  float: left;
+  margin: 7px 0 0 4px;
+}
+#header h1 {
+  display: none;
+}
+#user {
+  float: right;
+  margin: 13px 0;
+  font-size: 13px;
+  height: 24px;
+  line-height: 24px;
+}
+#user a {
+  display: inline-block;
+  background: white;
+  color: #222;
+  text-decoration: inherit;
+  white-space: nowrap;
+  padding: 0 13px;
+  margin: 0 13px;
+  -webkit-border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  border-radius: 0.25em;
+  font-weight: bold;
+}
+#user a.login {
+  line-height: inherit;
+}
+#user a.logout {
+  background: #999;
+}
+#user a:hover {
+  text-decoration: underline;
+}
+/* tab triggers in the header ----------------------------------------- */
+#tabtriggers {
+  position: absolute;
+  left: 10%;
+  margin: 13px 0 0 0;
+  padding: 0;
+  line-height: 24px;
+  text-decoration: inherit;
+}
+#tabtriggers li {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+#tabtriggers li .closed {
+  background-color: #222;
+  background-color: rgba(34, 34, 34, 0.5);
+  /* #222 with 0.5 opacity */
+
+  color: #999;
+  border-top-color: transparent;
+}
+#tabtriggers li a:hover {
+  color: white;
+}
+#tabtriggers li a {
+  font-size: 85%;
+  border-top: 2px solid #ccc;
+  text-decoration: inherit;
+  padding: 0 1em 0;
+  display: inline-block;
+  height: 50px;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background: #333;
+  color: #ccc;
+  white-space: nowrap;
+  cursor: pointer;
+}
+#tabtriggers li a:before {
+  /* show a disclosure triangle */
+
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  line-height: 1.1em;
+  margin-right: 0.2em;
+  text-align: right;
+  content: '\25be';
+  /* 25be is a small downward-pointing triangle */
+
+  opacity: 0.7;
+}
+#tabtriggers li a.closed:before {
+  content: '\25b8';
+  /* 25b8 is a small right-pointing triangle */
+
+}
+.triggeredtab {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 1em;
+  position: absolute;
+  top: 50px;
+  left: 10%;
+  width: 80%;
+  /* if you change this width also edit tabpanel_setup.js */
+
+  background-color: #333;
+  color: #ddd;
+  z-index: 10000000;
+  -webkit-border-top-left-radius: 0;
+  -webkit-border-top-right-radius: 0;
+  -webkit-border-bottom-right-radius: 1em;
+  -webkit-border-bottom-left-radius: 1em;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-topright: 0;
+  -moz-border-radius-bottomright: 1em;
+  -moz-border-radius-bottomleft: 1em;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 1em;
+  border-bottom-left-radius: 1em;
+}
+.triggeredtab .inner {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 1em;
+  overflow: auto;
+}
+.triggeredtab p,
+.triggeredtab ul,
+.triggeredtab ol,
+.triggeredtab dl,
+.triggeredtab dt,
+.triggeredtab dd {
+  text-align: left;
+}
+.triggeredtab p,
+.triggeredtab dl,
+.triggeredtab ul,
+.triggeredtab ol {
+  font-size: 90%;
+  margin: 1em 0;
+}
+.triggeredtab dt {
+  margin-top: 0.6em;
+  font-weight: bold;
+  color: #fff;
+}
+.triggeredtab dd {
+  margin-top: 0.3em;
+}
+.triggeredtab h1 {
+  margin: 2em 0 1em;
+  text-align: left;
+  background: inherit;
+  font-size: 90%;
+  color: #fff;
+  font-weight: bold;
+}
+.triggeredtab p.significant {
+  max-width: 40em;
+  margin: 2em auto;
+  color: #fff;
+  text-align: center;
+}
+.triggeredtab p.very.significant {
+  font-size: inherit;
+}
+.triggeredtab a {
+  color: #fea;
+  text-decoration: none;
+}
+.triggeredtab a:hover {
+  text-decoration: underline;
+}
+/* additionalcontent in triggeredtabs --------------------------------- */
+.triggeredtab .additionalcontent {
+  margin: 1em 0;
+}
+.triggeredtab .additionalcontent .opener {
+  display: block;
+  text-align: left;
+  padding: 0.1em 0.5em;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  cursor: pointer;
+  color: #eee;
+}
+.triggeredtab .additionalcontent .opener:hover {
+  background-color: #555;
+  color: #fff;
+}
+.triggeredtab .additionalcontent .opener:after {
+  content: ' \bb';
+}
+.triggeredtab .additionalcontent.open .opener:after {
+  content: ' \ab';
+}
+.triggeredtab .additionalcontent .add {
+  margin-left: 1em;
+  padding-left: 1em;
+  border-left: 1px solid #444;
+}
+/* funding area ------------------------------ */
+.triggeredtab .funding {
+  padding-top: 2em;
+  font-size: 75%;
+}
+.triggeredtab .funding img {
+  background-color: #fff;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  border: 1em solid white;
+  float: right;
+  margin: 0 0 0 1em;
+}
+.triggeredtab .funding img.goleft {
+  float: left;
+  margin: 0 1em 0 0;
+}
+.cc-by {
+  font-size: 90%;
+  padding-top: 2em;
+  clear: left;
+  text-align: left;
+}
+#cc-logo {
+  float: left;
+  border: none;
+  background: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  padding: 0 0.5em 0 0;
+  margin: 0;
+}
+/* things in the "acknowledgements" area ------------------------------ */
+#acknowledgements .whitelogos {
+  text-align: center;
+  background-color: #fff;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+}
+#acknowledgements .whitelogos img {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.5em 2em;
+}
+.unpaddedlogo {
+  padding: 15px 0;
+}
+.triggeredtab .funding {
+  padding-top: 2em;
+  font-size: 75%;
+}
+.triggeredtab .funding img {
+  background-color: #fff;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  border: 1em solid white;
+  float: right;
+  margin: 0 0 0 1em;
+}
+.triggeredtab .funding img.goleft {
+  float: left;
+  margin: 0 1em 0 0;
+}
+/* things in the glossary --------------------------------------------- */
+#glossary dt {
+  font-weight: bold;
+}
+/* things in the content area ----------------------------------------- */
+#map {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.panel {
+  position: absolute;
+  z-index: 10000;
+  opacity: 0.95;
+  background-color: transparent;
+  color: black;
+}
+.panel:hover {
+  opacity: 1.0;
+}
+.top.panel {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5em;
+}
+.side.panel {
+  right: 0;
+  top: 0;
+  width: 13em;
+  overflow: auto;
+  top: 5em;
+  /* height of top panel */
+
+  /* TODO:  */
+
+  max-height: -moz-calc(100% - 5em);
+  max-height: -webkit-calc(100% - 5em);
+  max-height: calc(100% - 5em);
+}
+.bottom.float.panel {
+  left: 1em;
+  right: 1em;
+  bottom: 1em;
+}
+/* species panel content ------------------------------------------------ */
+.speciespanel {
+  text-align: left;
+  background: transparent;
+  overflow: hidden;
+}
+.speciespanel button {
+  font-size: 80%;
+  font-weight: bold;
+  padding: 0.25em 0.5em;
+}
+#currentspecies,
+#speciesselector {
+  position: absolute;
+  top: 1px;
+  bottom: 0;
+  left: 1px;
+  right: 1px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  background-color: white;
+  overflow: hidden;
+}
+#speciesselector .button-cancelselect {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+  width: 6em;
+  font-weight: bold;
+  padding: inherit 0;
+}
+#speciesselector {
+  padding: 10px;
+}
+#species_autocomplete {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 2em;
+  padding: 0 0.5em;
+  /*
+firefox
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+*/
+
+  width: 100%;
+  height: 100%;
+}
+#currentspecies .speciesname {
+  position: relative;
+  height: 4.5em;
+  padding: 0.5em 6em 0 1em;
+  /* room at right for change sp btn */
+
+  text-align: left;
+  display: inline-block;
+}
+#currentspecies h1,
+#currentspecies h2 {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  color: #444;
+}
+#currentspecies h1 {
+  /* the common name for a species */
+
+  display: inline;
+  font-size: 185%;
+  font-weight: normal;
+}
+#currentspecies h2 {
+  /* the scientific name for a species */
+
+  margin-top: -0.33em;
+}
+#currentspecies .changebtn {
+  position: absolute;
+  right: 0.5em;
+  top: 1em;
+  height: 4em;
+  opacity: 0.33;
+}
+#currentspecies:hover .changebtn {
+  opacity: 0.66;
+}
+#currentspecies .changebtn:hover {
+  opacity: 1;
+}
+#currentspecies .speciesinfo {
+  float: right;
+  text-align: right;
+  width: 16em;
+  /* should be same as .side.panel, but too much text to fit in */
+
+  height: 5em;
+  xborder: 1px solid blue;
+}
+#currentspecies .status {
+  padding: 10px 10px 0 0;
+  margin: 0;
+  font-size: 70%;
+  font-weight: normal;
+  color: #999;
+}
+#currentspecies .status em {
+  font-weight: bold;
+  font-style: normal;
+  white-space: nowrap;
+}
+#button_remodel {
+  margin: 5px 10px 0 0;
+}
+/* old vvv ||| new ^^^ */
+.minor.label {
+  margin: 0;
+  padding: 0.2em;
+  font-size: 80%;
+  font-weight: bold;
+  color: #666;
+}
+#species_showing_label {
+  text-align: left;
+  display: none;
+}
+#species_modelling_status {
+  float: right;
+  text-align: right;
+  display: none;
+}
+/* alert panel content ------------------------------------------------ */
+#alertpanel {
+  /* UNCOMMENT the display:none BELOW to hide the alert panel. */
+
+  /*
+    display: none;
+*/
+
+  text-align: center;
+}
+#alertpanel > div {
+  display: inline-block;
+  padding: 0.5em 1em;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+  border: 2px solid yellow;
+  background: rgba(255, 255, 200, 0.5);
+  max-width: 35em;
+}
+#alertpanel > div .closebutton {
+  margin: -0.25em -0.75em 0 0;
+  float: right;
+  height: 1.5em;
+  width: 1.5em;
+  line-height: 1em;
+  border: none;
+  background: none;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+#alertpanel > div .closebutton:hover {
+  background: rgba(0, 0, 0, 0.33);
+}
+#alertpanel > div p {
+  font-size: 80%;
+  margin: 0;
+}
+/* tools panel content ------------------------------------------------ */
+#toolspanel {
+  overflow: auto;
+}
+#toolspanel p {
+  margin: 0;
+  padding: 0.1em 0;
+}
+#toolspanel .tool {
+  font-size: 80%;
+  background-color: white;
+  color: black;
+  text-align: left;
+  margin: 1px;
+  padding: 0.2em;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#toolspanel .tool h1,
+#toolspanel .tool h2 {
+  color: #003d4c;
+  background-color: white;
+  margin: 0;
+  -webkit-border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  border-radius: 0.25em;
+  padding: 0.1em 0.2em;
+  font-size: inherit;
+}
+#toolspanel .tool h1 {
+  cursor: pointer;
+}
+#toolspanel .tool h1:before {
+  /* show a disclosure triangle */
+
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  line-height: 1.1em;
+  margin-right: 0.2em;
+  text-align: right;
+  content: '\25bc';
+  /* 25bc is a downward-pointing triangle */
+
+  opacity: 0.7;
+}
+#toolspanel .tool h1.closed:before {
+  content: '\25b6';
+  /* 25b6 is a right-pointing triangle */
+
+}
+#toolspanel .tool .toolcontent {
+  background-color: #eee;
+  font-size: 90%;
+  padding: 0.5em;
+  -webkit-border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  border-radius: 0.25em;
+}
+#toolspanel .tool ul {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0.5em;
+}
+#toolspanel .tool ul li {
+  list-style: none;
+  padding: 0.2em;
+  margin: 0.1em;
+}
+#layerstool br {
+  display: none;
+}
+#toolspanel input[type="radio"],
+#toolspanel input[type="checkbox"] {
+  float: left;
+  font-size: inherit;
+  height: 1.7em;
+  vertical-align: bottom;
+  /* OpenLayers adds valign: b to the labelSpan */
+
+  width: auto;
+  margin: 0 0.5em 0 0;
+}
+#toolspanel .labelSpan {
+  font-size: inherit;
+  display: block;
+  height: 1.7em;
+  line-height: 1.7em;
+  white-space: nowrap;
+}
+#toolspanel .dataLayersDiv .labelSpan.loading:before {
+  float: right;
+  content: url(../img/loading-bar.gif);
+}
+/* future projections tool panel -------------------------------------- */
+#tool_future h3 {
+  font-size: inherit;
+  font-weight: bold;
+}
+#tool_future .scenario {
+  display: block;
+  position: relative;
+  padding: 0.3em 0.1em 0.3em 2em;
+  margin: 0.2em 0;
+  font-size: 90%;
+  line-height: 1.1;
+}
+#tool_future .scenario input {
+  position: absolute;
+  height: 100%;
+  padding: 0;
+  left: 0.3em;
+}
+#tool_future .sliderbox {
+  position: relative;
+  height: 6em;
+}
+#year_label {
+  position: absolute;
+  padding: 0.2em 0.5em 0.3em;
+  top: 1em;
+  background: white;
+  border: 1px solid gray;
+  -webkit-border-top-left-radius: 0.75em;
+  -webkit-border-top-right-radius: 0.75em;
+  -webkit-border-bottom-right-radius: 0;
+  -webkit-border-bottom-left-radius: 0.75em;
+  -moz-border-radius-topleft: 0.75em;
+  -moz-border-radius-topright: 0.75em;
+  -moz-border-radius-bottomright: 0;
+  -moz-border-radius-bottomleft: 0.75em;
+  border-top-left-radius: 0.75em;
+  border-top-right-radius: 0.75em;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0.75em;
+  z-index: 1000;
+}
+#play_slider_button {
+  position: absolute;
+  top: 3.3em;
+  left: 0;
+  width: 2em;
+  height: 2em;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+  border: 3px solid #008000;
+}
+#year_slider {
+  position: absolute;
+  top: 3.5em;
+  left: 2.5em;
+  right: 0.5em;
+}
+/* mode switching panel content --------------------------------------- */
+#tool_modechanger h1 {
+  display: none;
+}
+#tool_modechanger.tool {
+  background: yellow;
+}
+#tool_modechanger.tool .toolcontent {
+  background: #ffc;
+}
+#tool_modechanger.tool {
+  font-weight: bold;
+  text-align: center;
+}
+#tool_modechanger .tip {
+  margin: 0;
+  padding: 0;
+}
+#tool_modechanger button {
+  display: inline-block;
+  font-weight: bold;
+  padding: 0.5em;
+  margin: 0.2em 0;
+  overflow: hidden;
+  width: 48%;
+}
+/* occurrence classification legend panel content --------------------- */
+#tool_classlegend p,
+#tool_simpleclasslegend p {
+  line-height: 1.2em;
+  padding-top: 0.5em;
+  margin-bottom: -0.1em;
+}
+#tool_simpleclasslegend .toolcontent .classnesting,
+#tool_simpleclasslegend .toolcontent .classlist,
+#tool_classlegend .toolcontent .classnesting,
+#tool_classlegend .toolcontent .classlist {
+  font-size: 90%;
+}
+#tool_simpleclasslegend .leftcol,
+#tool_classlegend .leftcol {
+  float: left;
+  width: 43%;
+}
+#tool_simpleclasslegend .rightcol,
+#tool_classlegend .rightcol {
+  float: right;
+  width: 56%;
+}
+#tool_simpleclasslegend .classnesting h2,
+#tool_simpleclasslegend .classlist h2,
+#tool_classlegend .classnesting h2,
+#tool_classlegend .classlist h2 {
+  margin: 0.7em 0.1em;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.1em;
+  position: relative;
+  background: transparent;
+  white-space: nowrap;
+}
+#tool_simpleclasslegend .dot,
+#tool_classlegend .dot {
+  opacity: 0.75;
+  position: absolute;
+  height: 1.5em;
+  width: 1.5em;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+}
+#toolspanel .leftcol h2 {
+  padding: 0 1.9em 0 0;
+  text-align: right;
+}
+#toolspanel .rightcol h2 {
+  padding: 0 0 0 1.9em;
+  text-align: left;
+}
+#toolspanel .leftcol .dot {
+  right: 0;
+}
+#toolspanel .rightcol .dot {
+  left: 0;
+}
+#tool_simpleclasslegend .classnesting h2,
+#tool_classlegend .classnesting h2 {
+  padding: 0 0 0 2.9em;
+  line-height: 1.1em;
+}
+#tool_classlegend .circle {
+  opacity: 0.75;
+  position: absolute;
+  left: 1em;
+  height: 0.5em;
+  width: 0.5em;
+  border: 0.5em solid white;
+  -webkit-border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  border-radius: 0.75em;
+}
+/* suitability legend panel content ----------------------------------- */
+#toolspanel .legend .toolcontent {
+  text-align: center;
+}
+/* download panel content --------------------------------------------- */
+#tool_specieslinks button {
+  display: block;
+  width: 100%;
+  padding: 0.3em 0;
+  margin: 0.3em 0;
+}
+#nodownloadables {
+  font-size: 90%;
+  line-height: 1.2;
+  opacity: 0.8;
+  padding: 0 1em 0.5em;
+}
+/* debug panel content ------------------------------------------------ */
+.clusteroptions {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  font-size: 80%;
+  background: #fff;
+  z-index: 1000000;
+}
+.clusteroptions legend {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background: #fff;
+  font-size: inherit;
+  font-weight: inherit;
+  color: #999;
+  padding: 0.1em 1em;
+}
+/* openlayers customisations ------------------------------------------ */
+/* TODO -> Dan, you should check over this.. */
+/* Default: floats to right, changed to float to the left. */
+.olControlEditingToolbar div {
+  float: left !important;
+}
+/* cake customisations ------------------------------------------ */
+/* sql log for the bottom */
+.cake-sql-log {
+  position: absolute;
+  bottom: 5%;
+  opacity: 0.5;
+  display: none;
+}
+/* vetting customisations ------------------------------------------ */
+#toolspanel ul.vetting_list li {
+  overflow: hidden;
+}
+#toolspanel ul.vetting_list li button {
+  float: right;
+  vertical-align: top;
+}
+#toolspanel ul.vetting_list li .classification {
+  font-weight: bold;
+}
+#toolspanel ul.vetting_list li .comment {
+  margin-top: 0.5em;
+  padding-top: 0.5em;
+  border-top: 1px solid silver;
+}
+#vetform {
+  margin: 0;
+  width: 100%;
+}
+#vetcomment,
+#vetclassification {
+  width: 100%;
+}
+/* popups ---------------------------------------------------------- */
+#featurePopup {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  background-color: transparent !important;
+}
+#featurePopup_contentDiv {
+  overflow: hidden;
+}
+#featurePopup ul.tab-strip {
+  background: #ccc !important;
+  background-color: rgba(100, 100, 100, 0.2) !important;
+}
+#featurePopup ul.tab-strip li {
+  opacity: 0.8;
+}
+#featurePopup .map-popup-wrapper {
+  background: white;
+}
+#featurePopup.tr .map-popup-tabs {
+  background: #ffffff;
+  background: -webkit-linear-gradient(45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(-45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -moz-linear-gradient(45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(-45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -o-linear-gradient(45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(-45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -ms-linear-gradient(45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(-45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: linear-gradient(45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(-45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  -moz-background-size: 200px 200px;
+  -webkit-background-size: 200px 200px;
+  -o-background-size: 200px 200px;
+  background-size: 200px 200px;
+  background-repeat: no-repeat;
+  background-position: bottom left;
+}
+#featurePopup.br .map-popup-tabs {
+  background: #ffffff;
+  background: -webkit-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -moz-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -o-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -ms-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  -moz-background-size: 200px 200px;
+  -webkit-background-size: 200px 200px;
+  -o-background-size: 200px 200px;
+  background-size: 200px 200px;
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+#featurePopup.bl .map-popup-tabs {
+  background: #ffffff;
+  background: -webkit-linear-gradient(-135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -moz-linear-gradient(-135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -o-linear-gradient(-135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -ms-linear-gradient(-135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: linear-gradient(-135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  -moz-background-size: 200px 200px;
+  -webkit-background-size: 200px 200px;
+  -o-background-size: 200px 200px;
+  background-size: 200px 200px;
+  background-repeat: no-repeat;
+  background-position: top right;
+}
+#featurePopup.tl .map-popup-tabs {
+  background: #ffffff;
+  background: -webkit-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -moz-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -o-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -ms-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  -moz-background-size: 200px 200px;
+  -webkit-background-size: 200px 200px;
+  -o-background-size: 200px 200px;
+  background-size: 200px 200px;
+  background-repeat: no-repeat;
+  background-position: bottom right;
+}
+#featurePopup .map-popup-tabs {
+  padding: 0;
+  font-size: small;
+  overflow: hidden;
+  position: relative;
+}
+#featurePopup .map-popup-tabs .close-button {
+  width: 17px;
+  height: 17px;
+  background: url(img/close.gif);
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  cursor: pointer;
+  cursor: hand;
+}
+#featurePopup .map-popup-tabs .ui-tabs-nav {
+  border-radius: 0;
+}
+#featurePopup .map-popup-tabs .ui-tabs-nav li a {
+  padding: 3px 7px;
+}
+#featurePopup .map-popup-tabs .ui-tabs-panel {
+  overflow: auto;
+  height: 191px;
+  /* hard coded, y'all */
+
+}
+#featurePopup .map-popup-tabs .loading {
+  text-align: center;
+  padding: 1em 0;
+}
+#featurePopup .map-popup-tabs .prev-page {
+  float: left;
+}
+#featurePopup .map-popup-tabs .page-nav {
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+#featurePopup .map-popup-tabs .next-page {
+  float: right;
+}
+#featurePopup .map-popup-tabs .curr-page {
+  text-align: center;
+  font-size: inherit;
+  color: inherit;
+}
+#featurePopup .map-popup-tabs .none-found {
+  text-align: center;
+  margin: 1em 0;
+}
+#featurePopup .map-popup-tabs .occurrence-list {
+  clear: both;
+  overflow: auto;
+  height: 149px;
+  /* hard coded, y'all */
+
+}
+#featurePopup .map-popup-tabs .occurrence-detail {
+  padding: 5px;
+  border-top: 1px solid silver;
+}
+#featurePopup .map-popup-tabs thead tr {
+  opacity: 0.8;
+  background-color: #ccf;
+}
+#featurePopup .map-popup-tabs tbody {
+  overflow: auto;
+  max-height: 12em;
+}
+#featurePopup .map-popup-tabs dt {
+  float: left;
+  width: 40%;
+  /* adjust the width; make sure the total of both is 100% */
+
+  margin: 0;
+  padding: 0;
+}
+#featurePopup .map-popup-tabs dd {
+  float: left;
+  width: 60%;
+  /* adjust the width; make sure the total of both is 100% */
+
+  margin: 0;
+  padding: 0;
+}
+table.classifications {
+  width: 90%;
+}
+table.classifications tr td {
+  padding: 0.5em;
+  border-bottom: 1px solid #ddd;
+}
+table.classifications tr td:nth-child(2) {
+  text-align: right;
+}
+table.classifications tr.contentious td {
+  border: none;
+  font-size: x-small;
+  text-align: right;
+  position: relative;
+  top: -0.5em;
+  padding-top: 0;
+}
+.classifications tr.none {
+  display: none;
+  color: #999;
+}
