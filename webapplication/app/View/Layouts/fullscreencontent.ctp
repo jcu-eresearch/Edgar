@@ -49,13 +49,11 @@ $user = AuthComponent::user();
         <?php endif ?>
     </script>
 
-    <link rel="stylesheet/less" type="text/css" href="<?php echo $this->Html->url('/'); ?>css/edgarfullscreen.less">
-
     <?php
         echo $this->Html->meta('icon');
         echo $this->Html->css('h5bp');  // html5boilerplate "sanity reset" css
         echo $this->Html->css('edgar');
-//        echo $this->Html->css('edgarfullscreen');
+        echo $this->Html->css('edgarfullscreen');
         echo $this->Html->css('../js/jquery-ui-1.8.18/css/smoothness/jquery-ui-1.8.18.custom');
         echo $this->Html->css('openlayers');
         echo $this->Html->css('openlayers_extended');
@@ -63,8 +61,6 @@ $user = AuthComponent::user();
 
         // include Modernizr for html5 shims and feature detection.  this needs to go early!
         $this->Html->script('modernizr/modernizr-2.5.3.min.js', array('block'=>'earlyscript', 'inline' => false));
-        $this->Html->script('less-1.3.0.min.js', array('inline' => false, 'block'=>'earlyscript'));
-
 
         // Include jQuery and jQueryUI
         $this->Html->script('jquery-ui-1.8.18/js/jquery-1.7.1.min.js', array('inline' => false, 'block'=>'libscript'));
@@ -86,16 +82,19 @@ $user = AuthComponent::user();
         echo $this->fetch('earlyscript');
     ?>
 
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-16452055-11']);
-      _gaq.push(['_trackPageview']);
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-16452055-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 
 </head>
 <body>
@@ -398,7 +397,7 @@ Most data available for download on Edgar is accurate, however some location obs
                 <dt>
 How do I report a bug/suggest a new feature for Edgar?
                 </dt><dd>
-Email <a href="mailto:jjvanderwal@gmail.com">Jeremy VanDerWal</a>.
+Email <a href="mailto:jeremy.vanderwal@jcu.edu.au">Jeremy VanDerWal</a>.
                 </dd>
 
                 <dt>
@@ -454,13 +453,13 @@ Edgar's content, including Edgar's documentation, is licenced using <a href="htt
             <a href="http://github.com/jcu-eresearch/Edgar">github</a>.
         </p><p>
             The principal researcher and project advisor is
-            <a href="http://www.jjvanderwal.com/">Dr Jeremy VanDerWal</a>.
+            <a href="mailto:jeremy.vanderwal@jcu.edu.au">Dr Jeremy VanDerWal</a>.
         </p><div class="additionalcontent">
             <span class="opener">Contact Dr VanDerWal</span>
             <div class="add">
                 <dl>
-                    <dt>on the web:</dt>
-                    <dd><a href="http://www.jjvanderwal.com/">http://www.jjvanderwal.com/</a></dd>
+                    <dt>via email:</dt>
+                    <dd><a href="mailto:jeremy.vanderwal@jcu.edu.au">jeremy.vanderwal@jcu.edu.au</a></dd>
 
                     <dt>by post:</dt>
                     <dd>
@@ -471,11 +470,6 @@ Edgar's content, including Edgar's documentation, is licenced using <a href="htt
                         Australia
                     </dd>
 
-                    <dt>via <a href="http://www.skype.com">Skype</a>:</dt>
-                    <dd><a href="skype:jjvanderwal?userinfo">jjvanderwal</a></dd>
-
-                    <dt>via email:</dt>
-                    <dd><a href="mailto:jjvanderwal@gmail.com">jjvanderwal@gmail.com</a></dd>
                 </dl>
             </div>
         </div>

@@ -23,6 +23,7 @@
     $this->Html->script('clustering_selector_setup', array('inline'=>false));
     $this->Html->script('tabpanel_setup', array('inline'=>false));
     $this->Html->script('toolspanel_setup', array('inline'=>false));
+    $this->Html->script('alertpanel_setup', array('inline'=>false));
     $this->Html->script('mapmodes', array('inline'=>false));
     $this->Html->script('future/yearslider', array('inline'=>false));
     $this->Html->script('future/future', array('inline'=>false));
@@ -305,6 +306,15 @@
     </div>
 
 </div>
+
+<div id="alertpanel" class="bottom panel float alertpanel clearfix"><div>
+    <button class="closebutton">&#x2716;</button>
+    <p>
+        <b style="color: #222">We apologise</b> but due to <a target="_blank" href="http://www.jcu.edu.au/archives/centralcomputing/msg02624.shtml">hardware failures</a> at James Cook University's High Performance Computing facility, current and future distribution maps are temporarily not available.  A resolution time <a target="_blank" href="http://www.jcu.edu.au/archives/centralcomputing/msg02625.shtml">has not been determined</a>.
+    </p><p>
+        This will prevent display of the suitability legend and Climate Suitability map in current mode, and future mode will appear blank.
+    </p>
+</div></div>
 
 <div id="map">
 </div>
