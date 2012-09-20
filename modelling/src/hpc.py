@@ -35,7 +35,7 @@ class HPCJobStatus:
     finishedSuccess = "FINISHED_SUCCESS"
     finishedFailure = "FINISHED_FAILURE"
 
-class HPCJob:
+class Job:
 
     # How long until a job should be considered failed
     # Note: Needs to take into consideration HPC may be full
@@ -340,6 +340,44 @@ class HPCJob:
         return ( self.jobStatus == HPCJobStatus.finishedSuccess or
         self.jobStatus == HPCJobStatus.finishedFailure )
 
+
+    # Send the job's status to the cake app.
+    # Returns true if we sent the status update correctly.
+    # Returns false if we failed to send the status update.
+    def reportStatusToCakeApp(self):
+        try:
+            url = HPCConfig.getSpeciesReportURL(self.speciesId)
+            log.debug("url: %s", url)
+            values = {
+                'job_status': self.jobStatus,
+                'job_status_message': self.jobStatusMsg,
+                'dirty_occurrences': self.dirtyOccurrences
+            }
+            data = urllib.urlencode(values)
+            req = urllib2.Request(url, data)
+            connection = urllib2.urlopen(req)
+            responseContent = connection.read()
+            responseCode = connection.getcode()
+
+            if responseCode == 200:
+                log.debug("Reported job status, response: %s", responseContent)
+                return True
+            else:
+                log.warn("Failed to report job status, response: %s", responseContent)
+                return False
+
+        except (urllib2.URLError, urllib2.HTTPError, socket.timeout) as e:
+            log.warn("Error reporting job status: %s", e)
+            return False
+
+        def queue(self):
+            raise NotImplementedError("queue not implemented")
+
+        def checkStatus(self):
+            raise NotImplementedError("checkStatus not implemented")
+
+class HPCJob(Job):
+
     # Queue this job on the HPC
     # Returns true if we queued the job
     # Returns false if we failed to queue the job
@@ -438,32 +476,3 @@ class HPCJob:
                     ), returnCode, stdout, stderr
                 )
                 return False;
-
-    # Send the job's status to the cake app.
-    # Returns true if we sent the status update correctly.
-    # Returns false if we failed to send the status update.
-    def reportStatusToCakeApp(self):
-        try:
-            url = HPCConfig.getSpeciesReportURL(self.speciesId)
-            log.debug("url: %s", url)
-            values = {
-                'job_status': self.jobStatus,
-                'job_status_message': self.jobStatusMsg,
-                'dirty_occurrences': self.dirtyOccurrences
-            }
-            data = urllib.urlencode(values)
-            req = urllib2.Request(url, data)
-            connection = urllib2.urlopen(req)
-            responseContent = connection.read()
-            responseCode = connection.getcode()
-
-            if responseCode == 200:
-                log.debug("Reported job status, response: %s", responseContent)
-                return True
-            else:
-                log.warn("Failed to report job status, response: %s", responseContent)
-                return False
-
-        except (urllib2.URLError, urllib2.HTTPError, socket.timeout) as e:
-            log.warn("Error reporting job status: %s", e)
-            return False
