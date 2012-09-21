@@ -34,6 +34,7 @@ class HPCJobStatus:
     queued          = "QUEUED"
     finishedSuccess = "FINISHED_SUCCESS"
     finishedFailure = "FINISHED_FAILURE"
+    running = "R"
 
 class Job:
 
@@ -375,6 +376,57 @@ class Job:
 
         def checkStatus(self):
             raise NotImplementedError("checkStatus not implemented")
+
+class LocalHPCJob(Job):
+    def __init__(self, speciesId):
+        Job.__init__(self, speciesId)
+        self.popen = None
+
+    # Queue this job on the HPC
+    # Returns true if we queued the job
+    # Returns false if we failed to queue the job
+    def queue(self):
+        log.debug("Queueing job for %s", self.speciesId)
+
+        try:
+            self.popen = subprocess.Popen([HPCConfig.queueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            self._recordQueuedJob(processPopen.pid)
+            log.debug("Succesfully queued job (job_id: %s)", self.jobId)
+            return True
+
+        except Exception as e:
+            log.error("Failed to queue job. Exception: %s", e)
+            return False;
+
+
+    # Check the status of this job.
+    # Returns true if we updated the status
+    # Returns false otherise
+    def checkStatus(self):
+        log.debug("Checking status of job %s (%s)", self.jobId, self.speciesId)
+
+        if self.isDone():
+            # The job is done, no need to check status
+            return True
+        elif self.isExpired():
+            # The job is too old, expire it
+            log.warn("Current job took too long to complete, expiring job.")
+            self._setJobExpired()
+            return True
+        else:
+            self.popen.poll()
+
+            returnCode = self.popen.returncode
+
+            if returnCode == None:
+                self._setJobStatus(HPCJobStatus.running)
+            elif returnCode == 0:
+                self._setJobStatus(HPCJobStatus.finishedSuccess)
+            else:
+                self._setJobStatus(HPCJobStatus.finishedFailure)
+
+            return True
 
 class HPCJob(Job):
 
