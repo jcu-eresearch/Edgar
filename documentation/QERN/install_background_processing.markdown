@@ -59,4 +59,47 @@ Start the supervisord service:
 The following is a general description of how to setup the modelling to work on a HPC.
 The modelling process will need to be customized to your specific needs.
 
+If you haven't already done so, fetch a copy of edgar, and put it in your
+home directory `~/Edgar`:
+
+    sudo yum install git
+    cd ~
+    git clone "git://github.com/jcu-eresearch/Edgar.git"
+
+The modelling process makes use of the existing importing db access code.
+This means that it is necessary to run the setup code for the importing:
+
+    cd ~/Edgar/importing
+    sudo yum install python-devel
+    sudo yum install postgresql-devel
+    sudo python setup.py install
+    python bootstrap.py
+
+Now install libraries specific to modelling:
+
+    sudo yum install python-devel
+    sudo easy_install supervisor
+    sudo easy_install paramiko
+
+Modify the hpc config file to reflect the location of your web server:
+    vim ~/Edgar/modelling/src/hpc_config.py
+
+Changes the line:
+
+    cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
+
+to accurately reflect the location of your web server.
+
+e.g.:
+
+    cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
+
+
+Note: You can ignore the ssh references, these are only used for remote modelling. This
+guide is for local modelling.
+
+You can now start the modelling process by running:
+
+    ~/Edgar/modelling/bin/local_modeld.py
+
 ## Setup Vetting
