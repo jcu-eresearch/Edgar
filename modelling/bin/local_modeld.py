@@ -2,16 +2,6 @@
 
 import pathfix
 import sys
-sys.path[0:0] = [
-    '/scratch/jc155857/EdgarMaster/importing',
-    '/scratch/jc155857/EdgarMaster/importing/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
-    '/scratch/jc155857/EdgarMaster/importing/eggs/psycopg2-2.4.5-py2.6-linux-x86_64.egg',
-    '/usr/lib/python2.6/site-packages/argparse-1.2.1-py2.6.egg',
-    '/scratch/jc155857/EdgarMaster/importing/eggs/SQLAlchemy-0.7.8-py2.6-linux-x86_64.egg',
-    '/scratch/jc155857/EdgarMaster/importing/eggs/GeoAlchemy-0.7.1-py2.6.egg',
-    '/scratch/jc155857/EdgarMaster/importing/eggs/Shapely-1.2.14-py2.6-linux-x86_64.egg',
-    '/scratch/jc155857/EdgarMaster/importing/eggs/pyshp-1.1.4-py2.6.egg',
-    ]
 import logging
 import logging.handlers
 import json
@@ -23,7 +13,8 @@ from hpc import Job, LocalHPCJob, HPCJobStatus
 import urllib2
 from datetime import datetime
 import traceback
-
+import subprocess
+import commands
 
 # Setup the logger
 log = logging.getLogger()
@@ -35,8 +26,8 @@ log.debug("Starting modeld.py")
 currentJob = None
 currentCycle = 0
 
-minSleepTime = (5 * 60)
-maxSleepTime = (6 * 60)
+minSleepTime = 10
+maxSleepTime = 10
 
 # The Main Loop
 while True:

@@ -348,6 +348,7 @@ class Job:
     def reportStatusToCakeApp(self):
         try:
             url = HPCConfig.getSpeciesReportURL(self.speciesId)
+
             log.debug("url: %s", url)
             values = {
                 'job_status': self.jobStatus,
@@ -361,7 +362,7 @@ class Job:
             responseCode = connection.getcode()
 
             if responseCode == 200:
-                log.debug("Reported job status, response: %s", responseContent)
+                log.debug("Reported job status (%s), response: %s", self.jobStatus, responseContent)
                 return True
             else:
                 log.warn("Failed to report job status, response: %s", responseContent)
@@ -389,9 +390,9 @@ class LocalHPCJob(Job):
         log.debug("Queueing job for %s", self.speciesId)
 
         try:
-            self.popen = subprocess.Popen([HPCConfig.queueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.popen = Popen([HPCConfig.queueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=PIPE, stderr=PIPE)
 
-            self._recordQueuedJob(processPopen.pid)
+            self._recordQueuedJob(self.popen.pid)
             log.debug("Succesfully queued job (job_id: %s)", self.jobId)
             return True
 
