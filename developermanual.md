@@ -306,7 +306,7 @@ Now install libraries specific to modelling:
 Modify the hpc config file to reflect the location of your web server:
     vim ~/Edgar/modelling/src/hpc_config.py
 
-Changes the line:
+Change the line:
 
     cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
 
@@ -336,6 +336,16 @@ Install java:
 
     sudo yum install java
 
+Change the environment settings to reflect the location of the appropriate maxent and bioclim files:
+
+    vim ~/Edgar/modelling/config/environment.cfg
+
+At a minimum, you'll likely need to update:
+
+* `MAXENT`
+* `TRAINCLIMATE`
+* `PROJECTCLIMATE`
+* `TDH_DIR`
 
 You can now start the modelling process by running:
 
