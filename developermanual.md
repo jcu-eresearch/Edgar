@@ -352,7 +352,7 @@ You can now start the modelling process by running:
 
     ~/Edgar/modelling/bin/local_modeld.py
 
-Once you've confirmed that your modelling process is running, you should update your
+Once you've confirmed that your modelling process runs as expected, you should update your
 supervisord config to run your modelling scripts for you:
 
     sudo vim /etc/supervisord.conf
