@@ -337,6 +337,10 @@ Install java:
 
     sudo yum install java
 
+Install zip:
+
+    sudo yum install zip
+
 Change the environment settings to reflect the location of the appropriate maxent and bioclim files:
 
     vim ~/Edgar/modelling/config/environment.cfg
