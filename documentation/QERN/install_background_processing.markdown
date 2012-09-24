@@ -125,6 +125,8 @@ Install R Libraries:
 Install java:
     sudo yum install java
 
+Install zip:
+    sudo yum install java
 
 You can now start the modelling process by running:
 
