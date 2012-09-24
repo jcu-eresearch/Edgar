@@ -498,8 +498,8 @@ firefox
 #alertpanel {
   /* UNCOMMENT the display:none BELOW to hide the alert panel. */
 
+  display: none;
   /*
-    display: none;
 */
 
   left: 1em;
