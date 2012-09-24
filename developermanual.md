@@ -304,6 +304,7 @@ Now install libraries specific to modelling:
     sudo easy_install paramiko
 
 Modify the hpc config file to reflect the location of your web server:
+
     vim ~/Edgar/modelling/src/hpc_config.py
 
 Change the line:
