@@ -264,7 +264,83 @@ Start the supervisord service:
 
 ## Setup Modelling
 
-The following is a general description of how to setup the modelling to work on a HPC.
-The modelling process will need to be customized to your specific needs.
+The following is a general description of how to setup the modelling to run on a local machine.
+The modelling process may need to be customized to your specific needs.
+
+If you haven't already done so, fetch a copy of edgar, and put it in your
+home directory `~/Edgar`:
+
+    sudo yum install git
+    cd ~
+    git clone "git://github.com/jcu-eresearch/Edgar.git"
+
+The modelling process makes use of the existing importing db access code.
+This means that it is necessary to run the setup code for the importing:
+
+    cd ~/Edgar/importing
+    sudo yum install python-devel
+    sudo yum install postgresql-devel
+    sudo python setup.py install
+    python bootstrap.py
+
+Copy the example importing config and change the settings:
+
+    cp ~/Edgar/importing/config.example.json ~/Edgar/importing/config.json
+    vim ~/Edgar/importing/config.json
+
+Note: You may need need to update the settings of your DB to permit the modelling machine to access
+the DB:
+
+    sudo vim /opt/pgsql/data/pg_hba.conf
+
+and add a line like:
+
+  host   edgar  edgar_backend   X.X.X.X/32  md5
+
+Now install libraries specific to modelling:
+
+    sudo yum install python-devel
+    sudo easy_install supervisor
+    sudo easy_install paramiko
+
+Modify the hpc config file to reflect the location of your web server:
+    vim ~/Edgar/modelling/src/hpc_config.py
+
+Changes the line:
+
+    cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
+
+to accurately reflect the location of your web server.
+
+e.g.:
+
+    cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
+
+
+Note: You can ignore the ssh references, these are only used for remote modelling. This
+guide is for local modelling.
+
+Install R:
+    sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+    sudo yum install R
+
+Install R Libraries:
+    sudo R
+    install.packages(c("SDMTools"))
+
+(Note, the second line is run at the R prompt)
+
+Install java:
+    sudo yum install java
+
+
+You can now start the modelling process by running:
+
+    ~/Edgar/modelling/bin/local_modeld.py
+
+Once you've confirmed that your modelling process is running, you should update your
+supervisord config to run your modelling scripts for you:
+
+    sudo vim /etc/supervisord.conf
 
 ## Setup Vetting
