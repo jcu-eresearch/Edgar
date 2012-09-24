@@ -295,7 +295,7 @@ the DB:
 
 and add a line like:
 
-  host   edgar  edgar_backend   X.X.X.X/32  md5
+    host   edgar  edgar_backend   X.X.X.X/32  md5
 
 Now install libraries specific to modelling:
 
