@@ -321,16 +321,19 @@ Note: You can ignore the ssh references, these are only used for remote modellin
 guide is for local modelling.
 
 Install R:
+
     sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
     sudo yum install R
 
 Install R Libraries:
+
     sudo R
     install.packages(c("SDMTools"))
 
 (Note, the second line is run at the R prompt)
 
 Install java:
+
     sudo yum install java
 
 
