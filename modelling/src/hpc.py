@@ -390,7 +390,7 @@ class LocalHPCJob(Job):
         log.debug("Queueing job for %s", self.speciesId)
 
         try:
-            self.popen = Popen([HPCConfig.queueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=PIPE, stderr=PIPE)
+            self.popen = Popen([HPCConfig.localQueueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=PIPE, stderr=PIPE)
 
             self._recordQueuedJob(self.popen.pid)
             log.debug("Succesfully queued job (job_id: %s)", self.jobId)
@@ -425,6 +425,14 @@ class LocalHPCJob(Job):
             elif returnCode == 0:
                 self._setJobStatus(HPCJobStatus.finishedSuccess)
             else:
+	        log.error(
+		    (
+		        "Job failed.\n\t" +
+		        "exit_code: %s\n\t" +
+		        "stdout: %s\n\t" +
+		        "stderr: %s"
+    	    	    ), returnCode, self.popen.stdout.readlines(), self.popen.stderr.readlines()
+	        )
                 self._setJobStatus(HPCJobStatus.finishedFailure)
 
             return True

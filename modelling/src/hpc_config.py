@@ -17,7 +17,7 @@ import ala
 import paramiko
 
 class HPCConfig:
-    cakeAppBaseURL = "http://tdh-tools-2.hpc.jcu.edu.au/Edgar/webapplication"
+    cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
     #cakeAppBaseURL = "http://localhost/~robert/ap03"
     nextSpeciesURL= cakeAppBaseURL + "/species/get_next_job_and_assume_queued"
     sshUser = "jc155857"
@@ -36,6 +36,7 @@ class HPCConfig:
     modelSppScriptPath    = os.path.join(binDir, 'modelspp.sh')
 
     queueJobScriptPath          = os.path.join(binDir, 'queueJob.sh')
+    localQueueJobScriptPath     = os.path.join(binDir, 'local_queueJob.sh')
     checkJobStatusScriptPath    = os.path.join(binDir, 'checkJobStatus.sh')
 
     @staticmethod

@@ -27,7 +27,7 @@ currentJob = None
 currentCycle = 0
 
 minSleepTime = 10
-maxSleepTime = 10
+maxSleepTime = 60
 
 # The Main Loop
 while True:
