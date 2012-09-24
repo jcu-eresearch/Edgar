@@ -96,6 +96,43 @@ $user = AuthComponent::user();
 
 </script>
 
+<!--[if lt IE 8]>
+<style>
+    .chromeFrameOverlayUnderlay {
+        position: absolute;
+        margin: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 10000001;
+    }
+
+    .chromeFrameOverlayContent {
+        position: absolute;
+        z-index: 10000002;
+        margin: 0 0 30px 0;
+        top: 30px;
+        left: 5%;
+        width: 90%;
+    }
+
+    .chromeFrameOverlayContent iframe {
+        width: 100%;
+        height: 900px;
+    }
+
+</style>
+<script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+<script>
+    window.attachEvent("onload",function(){
+        CFInstall.check({
+            mode: "overlay"
+        });
+    })
+</script>
+<![endif]-->
+
 </head>
 <body>
 
@@ -584,16 +621,15 @@ engage in improving our understanding of the species and the modelling of specie
     </div>
 
     <div id="sidebar">
+    </div>
 
-        <div id="flash">
-            <div class="wrapper">
-                <?php echo $this->Session->flash() ?>
-            </div>
+    <div id="flash">
+        <div class="wrapper">
+            <?php echo $this->Session->flash() ?>
         </div>
+    </div>
 
-        <div id="footer">
-        </div>
-    
+    <div id="footer">
     </div>
 
     <?php
