@@ -227,3 +227,5 @@ if [ ! -e "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
 fi
 
 finalise
+
+exit 0
