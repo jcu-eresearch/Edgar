@@ -34,7 +34,8 @@ while True:
 
     # Sleep a time, then go round again
     # Inject randomness into the sleep time to reduce likelihood of multiple
-    # scripts running against the same species.
+    # scripts running against the same species (no longer an issue, the web request 
+    # for next species will no longer return the same species multiple times, unless it needs remodelling).
     randSleepTime = random.randint(minSleepTime, maxSleepTime)
     log.debug("Sleeping %i seconds.", randSleepTime)
     sleep(randSleepTime)
