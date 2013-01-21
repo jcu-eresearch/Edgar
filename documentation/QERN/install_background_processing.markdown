@@ -122,6 +122,9 @@ Install R Libraries:
 
 (Note, the second line is run at the R prompt)
 
+Install gdal (The GDAL library provides support to handle multiple GIS file formats):
+    sudo yum install gdal
+
 Install java:
     sudo yum install java
 
