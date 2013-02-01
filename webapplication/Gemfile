@@ -36,3 +36,18 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'debugger'
+
+# Gems used for handling postgis support
+gem 'rgeo'
+gem 'rgeo-geojson'
+gem 'rgeo-shapefile'
+gem 'activerecord-postgis-adapter'
+
+# Gems used for handling lower level SQL queries
+gem 'squeel'
+
+# Gems used for authentication
+gem 'devise'
+
+# Gems providing additional generators
+gem 'nested_scaffold'
