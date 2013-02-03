@@ -113,22 +113,28 @@ Note: You can ignore the ssh references, these are only used for remote modellin
 guide is for local modelling.
 
 Install R:
+
     sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
     sudo yum install R
 
 Install R Libraries:
+
     sudo R
     install.packages(c("SDMTools"))
 
 (Note, the second line is run at the R prompt)
 
 Install gdal (The GDAL library provides support to handle multiple GIS file formats):
+
     sudo yum install gdal
+    sudo yum install gdal-python.x86_64
 
 Install java:
+
     sudo yum install java
 
 Install zip:
+
     sudo yum install java
 
 You can now start the modelling process by running:
