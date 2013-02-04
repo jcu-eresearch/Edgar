@@ -1,0 +1,39 @@
+# == Schema Information
+#
+# Table name: vettings
+#
+#  id             :integer          not null, primary key
+#  user_id        :integer          not null
+#  species_id     :integer          not null
+#  comment        :text             not null
+#  classification :classification   not null
+#  created        :datetime         not null
+#  modified       :datetime         not null
+#  deleted        :datetime
+#  ignored        :datetime
+#  last_ala_sync  :datetime
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  user_id: 1
+  species_id: 1
+  comment: MyText
+  classification: 
+  created: 2013-02-04 14:21:09
+  modified: 2013-02-04 14:21:09
+  deleted: 2013-02-04 14:21:09
+  ignore: 2013-02-04 14:21:09
+  last_ala_sync: 2013-02-04 14:21:09
+
+two:
+  user_id: 1
+  species_id: 1
+  comment: MyText
+  classification: 
+  created: 2013-02-04 14:21:09
+  modified: 2013-02-04 14:21:09
+  deleted: 2013-02-04 14:21:09
+  ignore: 2013-02-04 14:21:09
+  last_ala_sync: 2013-02-04 14:21:09

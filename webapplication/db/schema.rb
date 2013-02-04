@@ -11,10 +11,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130204033511) do
+ActiveRecord::Schema.define(:version => 20130204042109) do
 
 # Could not dump table "occurrences" because of following StandardError
 #   Unknown type 'classification' for column 'classification'
+
+  create_table "sensitive_occurrences", :force => true do |t|
+    t.integer  "occurrence_id",                                               :null => false
+    t.datetime "created_at",                                                  :null => false
+    t.datetime "updated_at",                                                  :null => false
+    t.spatial  "sensitive_location", :limit => {:srid=>4326, :type=>"point"}
+  end
+
+  add_index "sensitive_occurrences", ["occurrence_id"], :name => "index_sensitive_occurrences_on_occurrence_id"
+  add_index "sensitive_occurrences", ["sensitive_location"], :name => "index_sensitive_occurrences_on_sensitive_location", :spatial => true
 
   create_table "sources", :force => true do |t|
     t.string   "name",                             :null => false
@@ -47,5 +57,19 @@ ActiveRecord::Schema.define(:version => 20130204033511) do
     t.datetime "created_at",                                                       :null => false
     t.datetime "updated_at",                                                       :null => false
   end
+
+  create_table "users", :force => true do |t|
+    t.string   "email"
+    t.string   "fname",                         :null => false
+    t.string   "lname",                         :null => false
+    t.boolean  "can_vet",    :default => true,  :null => false
+    t.boolean  "is_admin",   :default => false, :null => false
+    t.integer  "authority",  :default => 1000,  :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+  end
+
+# Could not dump table "vettings" because of following StandardError
+#   Unknown type 'classification' for column 'classification'
 
 end

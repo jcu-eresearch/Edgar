@@ -19,6 +19,7 @@ class CreateOccurrences < ActiveRecord::Migration
 
     change_table :occurrences do |t|
       t.index :location, spatial: true
+      t.index :species_id
     end
   end
 end
