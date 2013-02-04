@@ -51,3 +51,6 @@ gem 'devise'
 
 # Gems providing additional generators
 gem 'nested_scaffold'
+
+# Annotate model's with schema information
+gem 'annotate', ">=2.5.0"
