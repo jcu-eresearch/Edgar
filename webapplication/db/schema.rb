@@ -11,7 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130204015233) do
+ActiveRecord::Schema.define(:version => 20130204031319) do
+
+  create_table "sources", :force => true do |t|
+    t.string   "name",                             :null => false
+    t.string   "url",              :default => "", :null => false
+    t.datetime "last_import_time"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
 
   create_table "species", :force => true do |t|
     t.string   "scientific_name",                                                  :null => false

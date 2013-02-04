@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  url: MyString
+  last_import_time: 2013-02-04 13:13:19
+
+two:
+  name: MyString
+  url: MyString
+  last_import_time: 2013-02-04 13:13:19
