@@ -10,12 +10,15 @@ class CreateVettings < ActiveRecord::Migration
       t.timestamp :deleted
       t.timestamp :ignored
       t.timestamp :last_ala_sync
+
+      t.multipolygon :area, srid: 4326
     end
 
-    # Add foreign key indices
+    # Add foreign key and spatial indices
     change_table :vettings do |t|
       t.index :user_id
       t.index :species_id
+      t.index :area, spatial: true
     end
 
     execute <<-SQL
