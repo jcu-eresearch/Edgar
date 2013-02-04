@@ -20,20 +20,20 @@ one:
   user_id: 1
   species_id: 1
   comment: MyText
-  classification: 
+  classification: 'unknown'
   created: 2013-02-04 14:21:09
   modified: 2013-02-04 14:21:09
   deleted: 2013-02-04 14:21:09
-  ignore: 2013-02-04 14:21:09
+  ignored: 2013-02-04 14:21:09
   last_ala_sync: 2013-02-04 14:21:09
 
 two:
   user_id: 1
   species_id: 1
   comment: MyText
-  classification: 
+  classification: 'core'
   created: 2013-02-04 14:21:09
   modified: 2013-02-04 14:21:09
   deleted: 2013-02-04 14:21:09
-  ignore: 2013-02-04 14:21:09
+  ignored: 2013-02-04 14:21:09
   last_ala_sync: 2013-02-04 14:21:09

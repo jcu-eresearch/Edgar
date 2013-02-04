@@ -22,11 +22,10 @@
 one:
   uncertainty: 1
   date: 2013-02-04
-  classification: 
-  basis: MyString
-  occurrence_basis: MyString
+  classification: irruptive
+  basis: Human observation 
   contentious: false
-  source_classification: 
+  source_classification: invalid
   source_record_id: 
   species_id: 1
   source_id: 1
@@ -35,11 +34,10 @@ one:
 two:
   uncertainty: 1
   date: 2013-02-04
-  classification: 
-  basis: MyString
-  occurrence_basis: MyString
+  classification: historic
+  basis: Preserved specimen
   contentious: false
-  source_classification: 
+  source_classification: historic
   source_record_id: 
   species_id: 1
   source_id: 1
