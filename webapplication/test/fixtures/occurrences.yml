@@ -1,0 +1,46 @@
+# == Schema Information
+#
+# Table name: occurrences
+#
+#  id                    :integer          not null, primary key
+#  uncertainty           :integer
+#  date                  :date
+#  classification        :classification   not null
+#  basis                 :occurrence_basis
+#  contentious           :boolean          default(FALSE), not null
+#  source_classification :classification
+#  source_record_id      :binary
+#  species_id            :integer          not null
+#  source_id             :integer          not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  location              :spatial({:srid=>
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  uncertainty: 1
+  date: 2013-02-04
+  classification: 
+  basis: MyString
+  occurrence_basis: MyString
+  contentious: false
+  source_classification: 
+  source_record_id: 
+  species_id: 1
+  source_id: 1
+  location: 
+
+two:
+  uncertainty: 1
+  date: 2013-02-04
+  classification: 
+  basis: MyString
+  occurrence_basis: MyString
+  contentious: false
+  source_classification: 
+  source_record_id: 
+  species_id: 1
+  source_id: 1
+  location: 

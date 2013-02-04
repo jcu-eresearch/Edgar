@@ -11,7 +11,10 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130204031319) do
+ActiveRecord::Schema.define(:version => 20130204033511) do
+
+# Could not dump table "occurrences" because of following StandardError
+#   Unknown type 'classification' for column 'classification'
 
   create_table "sources", :force => true do |t|
     t.string   "name",                             :null => false
