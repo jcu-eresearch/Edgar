@@ -11,7 +11,7 @@ class CreateVettings < ActiveRecord::Migration
       t.timestamp :ignored
       t.timestamp :last_ala_sync
 
-      t.multipolygon :area, srid: 4326
+      t.geometry :area, type: "multipolygon", srid: 4326
     end
 
     # Add foreign key and spatial indices
