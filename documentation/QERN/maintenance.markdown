@@ -10,7 +10,7 @@ managed via [supervisord](http://supervisord.org/).
 Signs that there's a problem
 ------------------------------
 
-* Many of the species's appear to have a modelling status of "not yet modelled".
+* Many of the species' appear to have a modelling status of "not yet modelled".
 * The modelling status of "not yet modelled" isn't changing to "up to date" within
     a reasonable time frame.
 * The modelling machine has low load, yet there are many species to be modelled.
