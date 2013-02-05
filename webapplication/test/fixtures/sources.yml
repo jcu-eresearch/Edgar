@@ -12,12 +12,12 @@
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
-one:
-  name: MyString
-  url: MyString
+ala:
+  name: ALA
+  url: www.ala.org.au/
   last_import_time: 2013-02-04 13:13:19
 
-two:
-  name: MyString
-  url: MyString
+jcu:
+  name: JCU
+  url: www.jcu.edu.au/
   last_import_time: 2013-02-04 13:13:19

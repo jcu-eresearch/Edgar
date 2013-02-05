@@ -15,5 +15,18 @@
 #
 
 class Vetting < ActiveRecord::Base
-  attr_accessible :classification, :comment, :created, :deleted, :ignored, :last_ala_sync, :modified, :species_id, :user_id
+  attr_accessible :classification, :comment
+  attr_readonly :classification, :comment, :last_ala_sync, :species_id, :user_id
+
+  belongs_to :species
+  belongs_to :user
+
+  before_destroy :prevent_destroy
+
+  private
+
+  def prevent_destroy
+    errors.add(:base, "Can't destroy a vetting")
+    false
+  end
 end

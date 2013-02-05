@@ -30,4 +30,18 @@ class Species < ActiveRecord::Base
   # These attributes are readonly
   attr_readonly :common_name, :scientific_name, :last_applied_vettings, :needs_vetting_since
   # All other attributes will default to attr_protected (non mass assignable)
+
+  has_many :occurrences
+  has_many :vettings
+
+  before_destroy :check_for_occurrences_or_vettings
+
+  private
+
+  def check_for_occurrences_or_vettings
+    if occurrences.count > 0 or vettings.count > 0
+      errors.add(:base, "Can't destroy a species with occurrences or vettings")
+      false
+    end
+  end
 end

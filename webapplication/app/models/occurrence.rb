@@ -19,4 +19,16 @@
 
 class Occurrence < ActiveRecord::Base
   attr_readonly :basis, :classification, :contentious, :date, :location, :occurrence_basis, :source_classification, :source_id, :source_record_id, :species_id, :uncertainty
+
+  belongs_to :species
+  belongs_to :source
+
+  before_destroy :prevent_destroy
+
+  private
+
+  def prevent_destroy
+    errors.add(:base, "Can't destroy an occurrence")
+    false
+  end
 end

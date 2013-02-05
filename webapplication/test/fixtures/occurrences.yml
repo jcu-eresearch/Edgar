@@ -27,8 +27,8 @@ one:
   contentious: false
   source_classification: invalid
   source_record_id: 
-  species_id: 1
-  source_id: 1
+  species: emu
+  source: ala
   location: 
 
 two:
@@ -39,6 +39,6 @@ two:
   contentious: false
   source_classification: historic
   source_record_id: 
-  species_id: 1
-  source_id: 1
+  species: emu
+  source: ala
   location: 

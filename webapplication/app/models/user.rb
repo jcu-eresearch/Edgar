@@ -14,5 +14,18 @@
 #
 
 class User < ActiveRecord::Base
-  attr_accessible :authority, :can_vet, :email, :fname, :is_admin, :lname
+  attr_readonly :authority, :can_vet, :email, :fname, :is_admin, :lname
+
+  has_many :vettings
+
+  before_destroy :check_for_vettings
+
+  private
+
+  def prevent_destroy
+    if vettings.count > 0
+      errors.add_to_base("Can't destroy a user with vettings")
+      false
+    end
+  end
 end
