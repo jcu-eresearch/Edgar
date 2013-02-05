@@ -18,5 +18,5 @@
 #
 
 class Occurrence < ActiveRecord::Base
-  attr_accessible :basis, :classification, :contentious, :date, :location, :occurrence_basis, :source_classification, :source_id, :source_record_id, :species_id, :uncertainty
+  attr_readonly :basis, :classification, :contentious, :date, :location, :occurrence_basis, :source_classification, :source_id, :source_record_id, :species_id, :uncertainty
 end
