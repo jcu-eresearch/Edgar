@@ -27,5 +27,7 @@
 #
 
 class Species < ActiveRecord::Base
-  attr_accessible :common_name, :current_model_importance, :current_model_queued_time, :current_model_status, :first_requested_remodel, :has_occurrences, :last_applied_vettings, :last_completed_model_finish_time, :last_completed_model_importance, :last_completed_model_queued_time, :last_completed_model_status, :last_completed_model_status_reason, :last_successfully_completed_model_finish_time, :last_successfully_completed_model_importance, :last_successfully_completed_model_queued_time, :needs_vetting_since, :num_contentious_occurrences, :num_dirty_occurrences, :scientific_name
+  # These attributes are readonly
+  attr_readonly :common_name, :scientific_name, :last_applied_vettings, :needs_vetting_since
+  # All other attributes will default to attr_protected (non mass assignable)
 end

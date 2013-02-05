@@ -29,7 +29,42 @@
 require 'test_helper'
 
 class SpeciesTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+
+  setup do
+    @emu = species(:emu)
+    @rock_parrot = species(:rock_parrot)
+  end
+
+  test "Common name is read only" do
+    original_common_name = @emu.common_name
+    @emu.common_name = "Big Bird"
+    @emu.save
+    @emu.reload
+
+    assert_equal(original_common_name, @emu.common_name)
+    assert_not_equal("Big Bird", @emu.common_name)
+  end
+
+  test "Scientific Name is read only" do
+    original_scientific_name = @emu.scientific_name
+    @emu.scientific_name = "Jimmy"
+    @emu.save
+    @emu.reload
+
+    assert_equal(original_scientific_name, @emu.scientific_name)
+    assert_not_equal("Jimmy", @emu.scientific_name)
+  end
+
+  test "Can't mass assign common name" do
+    assert_raise(ActiveModel::MassAssignmentSecurity::Error) do
+      @emu.update_attributes(:common_name => "Big Bird")
+    end
+  end
+
+  test "Can't mass assign last_applied_vettings" do
+    assert_raise(ActiveModel::MassAssignmentSecurity::Error) do
+      @emu.update_attributes(:last_applied_vettings => Time.now)
+    end
+  end
+
 end
