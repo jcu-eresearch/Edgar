@@ -27,6 +27,10 @@
 #
 
 class Species < ActiveRecord::Base
+
+  # The maximum number of features to return from a query
+  FEATURES_QUERY_LIMIT = 1000
+
   # These attributes are readonly
   attr_readonly :common_name, :scientific_name, :last_applied_vettings, :needs_vetting_since
   # All other attributes will default to attr_protected (non mass assignable)
@@ -36,7 +40,80 @@ class Species < ActiveRecord::Base
 
   before_destroy :check_for_occurrences_or_vettings
 
+  # Returns an array of GeoJSON::Feature for this species.
+  # Uses +options+ to define how to build a custom array of features.
+  # +options+ include:
+  #
+  # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}"
+  # [+:cluster+] +!nil+ if you want the features to be clustered
+  # [+:grid_size+] a Float representing the size of the clusters (lat/lng degrees decimal)
+  #
+  # The size of the array returned is limited by +FEATURES_QUERY_LIMIT+
+  # regardless of options
+  #
+  # Note: The GeoJSON::Feature object type is used as a convenience wrapper to
+  # allow the location to be provided with additional information (properties and feature_id).
+  # The underlying location can be attained via the GeoJSON::Feature instance
+  # function location().
+  #
+  # *Important*: The GeoJSON::Feature is a wrapper. It isn't the same as RGeo::Feature::Geometry.
+  # You should _peel back_ the wrapper if you intend to use the feature for anything
+  # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
+  # instance function +location()+.
+
+  def get_features(options)
+    features = []
+    occurrences_relation = nil
+    if options[:bbox]
+      occurrences_relation = occurrences.in_rect(options[:bbox].split(','))
+    else
+      occurrences_relation = occurrences
+    end
+
+    if options[:cluster]
+      cluster_result = nil
+      cluster_result = occurrences_relation.cluster(options)
+      cluster_result.limit(FEATURES_QUERY_LIMIT).each do |cluster|
+        geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_centroid)
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, { cluster_size: cluster.cluster_location_count.to_i })
+
+        features << feature
+      end
+    else
+      occurrences_relation.limit(FEATURES_QUERY_LIMIT).each do |occurrence|
+        geom_feature = occurrence.location
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, { cluster_size: 1 })
+        features << feature
+      end
+    end
+
+    features
+  end
+
+  # Returns the species' +occurrences+ as a GeometryCollection
+  # in *GeoJSON* (+String+)
+
+  def get_geo_json(options={})
+    features = get_features(options)
+    feature_collection = RGeo::GeoJSON::FeatureCollection.new(features)
+    RGeo::GeoJSON.encode(feature_collection)
+  end
+
+  # Returns the species' +occurrences+ as a GeometryCollection in *WKT* (+String+)
+
+  def get_wkt(options={})
+    features = get_features(options)
+    geoms = features.map { |feature| feature.location() }
+    feature_collection = Occurrence.rgeo_factory_for_column(:location).collection(geoms)
+    feature_collection.as_text
+  end
+
   private
+
+  # Acts as a validation callback.
+  #
+  # Returns +false+ and adds an appropriate error to base
+  # if the species has any occurrences.
 
   def check_for_occurrences_or_vettings
     if occurrences.count > 0 or vettings.count > 0

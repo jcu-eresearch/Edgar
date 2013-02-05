@@ -26,10 +26,10 @@ one:
   basis: Human observation 
   contentious: false
   source_classification: invalid
-  source_record_id: 
+  source_record_id:
   species: emu
   source: ala
-  location: 
+  location: SRID=4326;POINT(151.2086 -33.8683) # Sydney
 
 two:
   uncertainty: 1
@@ -38,7 +38,19 @@ two:
   basis: Preserved specimen
   contentious: false
   source_classification: historic
-  source_record_id: 
+  source_record_id:
+  species: emu
+  source: jcu
+  location: SRID=4326;POINT(153.0333 -27.4667) # Brisbane
+
+three:
+  uncertainty: 1
+  date: 2013-02-04
+  classification: historic
+  basis: Preserved specimen
+  contentious: true
+  source_classification: historic
+  source_record_id:
   species: emu
   source: ala
-  location: 
+  location: SRID=4326;POINT(138.5833 -34.9333) # Adelaide
