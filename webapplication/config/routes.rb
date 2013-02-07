@@ -1,6 +1,14 @@
 Webapplication::Application.routes.draw do
   resources :species, :only => [:index, :show] do
-    get 'map'
+
+    collection do
+      get 'map'
+    end
+
+    member do
+      get 'map'
+    end
+
   end
 
   # The priority is based upon order of creation:

@@ -10,4 +10,8 @@
  *
  *= require_self
  *= require_tree .
+ *
+ * Require OpenLayers from our vendor assets
+ *= require OpenLayers
+ *
  */

@@ -2,9 +2,26 @@
 <html>
 <head>
   <title>Webapplication</title>
+
   <%= stylesheet_link_tag    "application", :media => "all" %>
+
+  <%= javascript_include_tag "http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{Rails.application.config.google_api_key}" %>
+  <%= javascript_tag do %>
+      window.Edgar = window.Edgar || {};
+      Edgar.baseUrl = "<%= "#{request.protocol}#{request.host_with_port}/" %>";
+
+      <% if false # user_signed_in? %>
+        Edgar.user = "<%= current_user.to_json %>";
+      <% else %>
+        Edgar.user = null;
+      <% end %>
+  <% end %>
+
+  <%= yield :head %>
+
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
+
 </head>
 <body>
 

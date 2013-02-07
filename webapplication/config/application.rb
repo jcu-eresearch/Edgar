@@ -59,5 +59,11 @@ module Webapplication
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # Which google api key to use for the maps
+    config.google_api_key = ""
+
+    raise "Need to set a google_api_key in config" if config.google_api_key.empty?
+
   end
 end
