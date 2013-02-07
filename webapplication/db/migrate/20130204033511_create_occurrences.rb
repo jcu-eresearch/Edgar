@@ -14,7 +14,6 @@ class CreateOccurrences < ActiveRecord::Migration
 
       t.point :location, srid: 4326
 
-      t.timestamps
     end
 
     change_table :occurrences do |t|

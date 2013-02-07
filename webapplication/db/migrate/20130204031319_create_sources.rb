@@ -5,7 +5,6 @@ class CreateSources < ActiveRecord::Migration
       t.string :url,  default: '',  null: false
       t.timestamp :last_import_time
 
-      t.timestamps
     end
   end
 end

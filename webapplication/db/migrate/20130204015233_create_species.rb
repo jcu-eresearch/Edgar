@@ -27,7 +27,6 @@ class CreateSpecies < ActiveRecord::Migration
       t.integer :last_successfully_completed_model_importance
       t.timestamp :last_applied_vettings
 
-      t.timestamps
     end
   end
 end

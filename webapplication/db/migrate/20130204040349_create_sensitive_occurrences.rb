@@ -4,7 +4,6 @@ class CreateSensitiveOccurrences < ActiveRecord::Migration
       t.integer :occurrence_id, null: false
       t.point :sensitive_location, srid: 4326
 
-      t.timestamps
     end
 
     change_table :sensitive_occurrences do |t|

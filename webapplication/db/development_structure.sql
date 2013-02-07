@@ -9844,8 +9844,6 @@ CREATE TABLE occurrences (
     source_record_id bytea,
     species_id integer NOT NULL,
     source_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
     location geometry,
     CONSTRAINT enforce_dims_location CHECK ((st_ndims(location) = 2)),
     CONSTRAINT enforce_geotype_location CHECK (((geometrytype(location) = 'POINT'::text) OR (location IS NULL))),
@@ -9888,8 +9886,6 @@ CREATE TABLE schema_migrations (
 CREATE TABLE sensitive_occurrences (
     id integer NOT NULL,
     occurrence_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
     sensitive_location geometry,
     CONSTRAINT enforce_dims_sensitive_location CHECK ((st_ndims(sensitive_location) = 2)),
     CONSTRAINT enforce_geotype_sensitive_location CHECK (((geometrytype(sensitive_location) = 'POINT'::text) OR (sensitive_location IS NULL))),
@@ -9924,9 +9920,7 @@ CREATE TABLE sources (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     url character varying(255) DEFAULT ''::character varying NOT NULL,
-    last_import_time timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    last_import_time timestamp without time zone
 );
 
 
@@ -9986,9 +9980,7 @@ CREATE TABLE species (
     last_successfully_completed_model_queued_time timestamp without time zone,
     last_successfully_completed_model_finish_time timestamp without time zone,
     last_successfully_completed_model_importance integer,
-    last_applied_vettings timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    last_applied_vettings timestamp without time zone
 );
 
 
@@ -10022,9 +10014,7 @@ CREATE TABLE users (
     lname character varying(255) NOT NULL,
     can_vet boolean DEFAULT true NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
-    authority integer DEFAULT 1000 NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    authority integer DEFAULT 1000 NOT NULL
 );
 
 
