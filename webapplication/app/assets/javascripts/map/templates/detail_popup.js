@@ -43,6 +43,6 @@ Edgar.templates.mapPopupDetailsPanel = function(opt_data, opt_sb) {
 
 Edgar.templates.mapPopupLoading = function(opt_data, opt_sb) {
   var output = opt_sb || new soy.StringBuilder();
-  output.append('<div class="loading"><img src="', soy.$$escapeHtml(opt_data.baseUrl), 'img/loading-bar.gif" /></div>');
+  output.append('<div class="loading"><img src="', soy.$$escapeHtml(opt_data.baseUrl), 'assets/loading-bar.gif" /></div>');
   return opt_sb ? '' : output.toString();
 };

@@ -384,7 +384,7 @@ function handleBlankTile() {
 
 
     //    this.src = "";
-    this.src = Edgar.baseUrl + "img/blank.png";
+    this.src = Edgar.baseUrl + "assets/blank.png";
 }
 
 // ------------------------------------------------------------------
