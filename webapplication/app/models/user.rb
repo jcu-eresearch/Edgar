@@ -19,7 +19,8 @@ class User < ActiveRecord::Base
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :username
-  attr_readonly :authority, :can_vet, :email, :fname, :is_admin, :lname
+
+  attr_readonly :authority, :can_vet, :username, :email, :fname, :is_admin, :lname
 
   has_many :vettings
 
@@ -40,7 +41,7 @@ class User < ActiveRecord::Base
 
   private
 
-  def prevent_destroy
+  def check_for_vettings
     if vettings.count > 0
       errors.add_to_base("Can't destroy a user with vettings")
       false
