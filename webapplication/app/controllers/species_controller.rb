@@ -38,7 +38,7 @@ class SpeciesController < ApplicationController
     end
 
     respond_to do |format|
-      format.html # map.html.erb
+      format.html { render :layout => 'full_screen_map' }
     end
   end
 
