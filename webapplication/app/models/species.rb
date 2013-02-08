@@ -90,14 +90,14 @@ class Species < ActiveRecord::Base
       cluster_result.limit(FEATURES_QUERY_LIMIT).each do |cluster|
         geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_centroid)
 
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_feature_properties(cluster))
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_feature_properties(cluster, geom_feature, options))
 
         features << feature
       end
     else
       occurrences_relation.limit(FEATURES_QUERY_LIMIT).each do |occurrence|
         geom_feature = occurrence.location
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_feature_properties(occurrence))
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_feature_properties(occurrence, geom_feature, options))
         features << feature
       end
     end
@@ -126,8 +126,8 @@ class Species < ActiveRecord::Base
   # Merge the original Cake Attributes into the Rails attributes.
   # This provides backwards compatibility with existing Cake PHP javascript files.
 
-  def attributes
-    attrs = super()
+  def serializable_hash(*args) 
+    attrs = super(*args)
     attrs.merge({
       scientificName: scientific_name,
       commonName: common_name,
@@ -165,23 +165,41 @@ class Species < ActiveRecord::Base
   # This method is leaking View code into the Model.
   # The point radius logic should be in the javascript.
 
-  def get_feature_properties cluster
+  def get_feature_properties cluster, geom_feature, options
+    bbox = options[:bbox]
+
+    # When looking at vetting,
+    # create a box around the 
+    grid_size = Occurrence::get_cluster_grid_size(bbox) || Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
+
+    common = {
+      description: "",
+      occurrence_type: "dotgrid",
+      minlon: geom_feature.x - grid_size,
+      maxlon: geom_feature.x + grid_size,
+      minlat: geom_feature.y - grid_size,
+      maxlat: geom_feature.y + grid_size,
+    }
+
     if cluster.attributes.has_key? "cluster_location_count"
-      {
+      common.merge({
         point_radius: Math::log2(cluster.cluster_location_count.to_i).floor + MIN_FEATURE_RADIUS,
         cluster_size: cluster.cluster_location_count.to_i,
-        description: "",
         title: "#{cluster.cluster_location_count} points here",
-        occurrence_type: "dotgrid"
-      }
+        gridBounds: {
+          minlon: geom_feature.x - grid_size,
+          maxlon: geom_feature.x + grid_size,
+          minlat: geom_feature.y - grid_size,
+          maxlat: geom_feature.y + grid_size,
+        }
+      })
     else
-      {
+      common.merge({
         point_radius: MIN_FEATURE_RADIUS,
         cluster_size: 1,
-        description: "",
         title: "1 point here",
-        occurrence_type: "dotgrid"
-      }
+        occurrenceCoord: { lat: geom_feature.y, lon: geom_feature.x },
+      })
     end
   end
 

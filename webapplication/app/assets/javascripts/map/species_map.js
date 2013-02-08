@@ -370,11 +370,11 @@ function flattenScientificName(name) {
 }
 // ------------------------------------------------------------------
 function updateWindowHistory() {
-    if(window.History.enabled) {
+    if(window.History && window.History.enabled) {
         window.History.replaceState(
             Edgar.mapdata.species,
             '',
-            Edgar.baseUrl + 'species/map/' + Edgar.mapdata.species.id
+            Edgar.baseUrl + 'species/' + Edgar.mapdata.species.id + '/map'
         );
     }
 }

@@ -49,7 +49,7 @@ class SpeciesController < ApplicationController
     search_result = Species.search_by_common_name_or_scientific_name(term)
 
     respond_to do |format|
-      format.json { render json: search_result.map { |el| el.attributes } }
+      format.json { render json: search_result }
     end
   end
 

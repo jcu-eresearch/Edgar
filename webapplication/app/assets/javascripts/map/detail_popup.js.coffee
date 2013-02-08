@@ -83,14 +83,15 @@ class DetailPopup
         bbox = @feature.data.gridBounds
         self = this
         $.ajax({
-            url: "#{Edgar.baseUrl}species/geo_json_occurrences/#{Edgar.mapdata.species.id}.json",
+            url: "#{Edgar.baseUrl}species/#{Edgar.mapdata.species.id}.json",
             dataType: 'json',
             data: {
                 bound: true,
                 clustered: 'none',
                 limit: DETAIL_PAGE_SIZE,
                 offset: DETAIL_PAGE_SIZE*self.detailsPageIdx,
-                bbox: "#{bbox.minlon},#{bbox.minlat},#{bbox.maxlon},#{bbox.maxlat}"
+                bbox: "#{bbox.minlon},#{bbox.minlat},#{bbox.maxlon},#{bbox.maxlat}",
+                as_geo_json: true
             }
             success: ((data, status, xhr) -> self.showDetails(data)),
             error: (data, status, xhr) ->

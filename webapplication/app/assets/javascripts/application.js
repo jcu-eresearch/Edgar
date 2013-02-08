@@ -16,6 +16,8 @@
 //= require jquery-ui
 //= require jquery_ujs
 //
+//= require history
+//
 //= require OpenLayers
 //
 //= require init_setup
