@@ -43,8 +43,13 @@ class Occurrence < ActiveRecord::Base
     sw =  self.rgeo_factory_for_column(:location).point(w, s)
     ne =  self.rgeo_factory_for_column(:location).point(e, n)
 
-    box = RGeo::Cartesian::BoundingBox.create_from_points(sw, ne)
-    where{location.op('&&', box)}
+# Weird bug with the RGeo's BoundingBox. It appears that if
+# lat, lng is at min or max (-90/90, -180/180 respectively), the bounding
+# box is inverted (or something)..
+# Do it the old fashion way for now.
+#    box = RGeo::Cartesian::BoundingBox.create_from_points(sw, ne)
+#    where{location.op('&&', )}
+    where("location && SetSRID('BOX(? ?,? ?)'::box2d,4326)",w.to_f,s.to_f,e.to_f,n.to_f)
   end
 
   # Given a bbox, determine the appropriate grid size

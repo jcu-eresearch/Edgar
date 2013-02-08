@@ -1,3 +1,5 @@
+<%= content_for :title do %>Species Map<% end %>
+
 <%= content_for :head do %>
   <%= javascript_tag do %>
     mapSpecies = <%= @species ? @species.to_json : "null" %>;

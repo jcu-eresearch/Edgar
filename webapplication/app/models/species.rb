@@ -31,6 +31,7 @@ class Species < ActiveRecord::Base
   # The maximum number of features to return from a query
   FEATURES_QUERY_LIMIT = 1000
   SEARCH_QUERY_LIMIT = 100
+  MIN_FEATURE_RADIUS = 3
 
   # These attributes are readonly
   attr_readonly :common_name, :scientific_name, :last_applied_vettings, :needs_vetting_since
@@ -88,14 +89,15 @@ class Species < ActiveRecord::Base
       cluster_result = occurrences_relation.cluster(options)
       cluster_result.limit(FEATURES_QUERY_LIMIT).each do |cluster|
         geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_centroid)
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, { cluster_size: cluster.cluster_location_count.to_i })
+
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_feature_properties(cluster))
 
         features << feature
       end
     else
       occurrences_relation.limit(FEATURES_QUERY_LIMIT).each do |occurrence|
         geom_feature = occurrence.location
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, { cluster_size: 1 })
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_feature_properties(occurrence))
         features << feature
       end
     end
@@ -137,8 +139,51 @@ class Species < ActiveRecord::Base
     })
   end
 
+  # Get the next_job to model
+
+  def self.next_job
+    Species.
+      select('*, first_requested_remodel IS NULL as is_null').
+      order("is_null ASC, first_requested_remodel ASC, num_dirty_occurrences DESC").
+      where(
+        "num_dirty_occurrences > 0 AND current_model_status IS NULL " +
+        "OR num_dirty_occurrences > 0 AND current_model_queued_time < ? " +
+        "OR current_model_status <> NULL AND current_model_queued_time IS NULL",
+        1.day.ago
+      ).first
+  end
 
   private
+
+  # Returns a Hash of properties that descrive the cluster.
+  # The cluster argument can be either a cluster, as returned by 
+  # #Occurrence::cluster or a single #Occurrence.
+  #
+  # Note
+  # -----
+  #
+  # This method is leaking View code into the Model.
+  # The point radius logic should be in the javascript.
+
+  def get_feature_properties cluster
+    if cluster.attributes.has_key? "cluster_location_count"
+      {
+        point_radius: Math::log2(cluster.cluster_location_count.to_i).floor + MIN_FEATURE_RADIUS,
+        cluster_size: cluster.cluster_location_count.to_i,
+        description: "",
+        title: "#{cluster.cluster_location_count} points here",
+        occurrence_type: "dotgrid"
+      }
+    else
+      {
+        point_radius: MIN_FEATURE_RADIUS,
+        cluster_size: 1,
+        description: "",
+        title: "1 point here",
+        occurrence_type: "dotgrid"
+      }
+    end
+  end
 
   # Acts as a validation callback.
   #

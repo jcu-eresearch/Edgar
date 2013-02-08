@@ -276,9 +276,10 @@ function addOccurrencesLayer() {
                     url: speciesGeoJSONURL(),
                     params: {
                         // Place addition custom request params here..
-                        bound:      true,                   // do bound the request
-                        clustered:  cluster_strategy,       // use whatever clustering
-                        as_geo_json:  true                  // use the GeoJSON interface
+                        bound:      true,                       // do bound the request
+                        cluster:    true,
+                        cluster_strategy:  cluster_strategy,    // use whatever clustering
+                        as_geo_json:  true                      // use the GeoJSON interface
                     },
 
                     // The data format

@@ -6,10 +6,12 @@ Webapplication::Application.routes.draw do
     collection do
       get 'map'
       get 'autocomplete'
+      post 'get_next_job_and_assume_queued'
     end
 
     member do
       get 'map'
+      post 'job_status'
     end
 
   end
