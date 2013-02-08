@@ -17,6 +17,7 @@
 
 one:
   email: MyString
+  username: MyString
   fname: MyString
   lname: MyString
   can_vet: false
@@ -24,9 +25,10 @@ one:
   authority: 1
 
 two:
-  email: MyString
-  fname: MyString
-  lname: MyString
+  email: MyString2
+  username: MyString2
+  fname: MyString2
+  lname: MyString2
   can_vet: false
   is_admin: false
   authority: 1

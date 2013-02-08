@@ -1,4 +1,6 @@
 Webapplication::Application.routes.draw do
+  devise_for :users
+
   resources :species, :only => [:index, :show] do
 
     collection do

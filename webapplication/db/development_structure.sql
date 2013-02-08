@@ -10014,7 +10014,8 @@ CREATE TABLE users (
     lname character varying(255) NOT NULL,
     can_vet boolean DEFAULT true NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
-    authority integer DEFAULT 1000 NOT NULL
+    authority integer DEFAULT 1000 NOT NULL,
+    username character varying(255) NOT NULL
 );
 
 
@@ -10210,6 +10211,13 @@ CREATE INDEX index_sensitive_occurrences_on_occurrence_id ON sensitive_occurrenc
 --
 
 CREATE INDEX index_sensitive_occurrences_on_sensitive_location ON sensitive_occurrences USING gist (sensitive_location);
+
+
+--
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_users_on_username ON users USING btree (username);
 
 
 --

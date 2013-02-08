@@ -14,11 +14,29 @@
 #
 
 class User < ActiveRecord::Base
+  # Include devise modules for cas authentication
+  devise :cas_authenticatable
+
+  # Setup accessible (or protected) attributes for your model
+  attr_accessible :username
   attr_readonly :authority, :can_vet, :email, :fname, :is_admin, :lname
 
   has_many :vettings
 
   before_destroy :check_for_vettings
+
+  def cas_extra_attributes=(extra_attributes)
+    extra_attributes.each do |name, value|
+      case name.to_sym
+      when :firstname
+        self.fname = value
+      when :lastname
+        self.lname = value
+      when :email
+        self.email = value
+      end
+    end
+  end
 
   private
 
