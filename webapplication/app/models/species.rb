@@ -30,6 +30,7 @@ class Species < ActiveRecord::Base
 
   # The maximum number of features to return from a query
   FEATURES_QUERY_LIMIT = 1000
+  SEARCH_QUERY_LIMIT = 100
 
   # These attributes are readonly
   attr_readonly :common_name, :scientific_name, :last_applied_vettings, :needs_vetting_since
@@ -39,6 +40,18 @@ class Species < ActiveRecord::Base
   has_many :vettings
 
   before_destroy :check_for_occurrences_or_vettings
+
+  # A case insensitive search of species.
+  #
+  # [+term+] the search term can exist at any position in either the common_name or the scientific_name.
+  # [+order_by+] is what the search result will be ordered by (default +:common_name+).
+
+  def self.search_by_common_name_or_scientific_name term, order_by=:common_name
+    Species.
+      order(order_by).
+      where("common_name ILIKE ? or scientific_name ILIKE ?", "%#{term}%", "%#{term}%").
+      limit(SEARCH_QUERY_LIMIT)
+  end
 
   # Returns an array of GeoJSON::Feature for this species.
   # Uses +options+ to define how to build a custom array of features.
@@ -108,6 +121,23 @@ class Species < ActiveRecord::Base
     feature_collection.as_text
   end
 
+  # Merge the original Cake Attributes into the Rails attributes.
+  # This provides backwards compatibility with existing Cake PHP javascript files.
+
+  def attributes
+    attrs = super()
+    attrs.merge({
+      scientificName: scientific_name,
+      commonName: common_name,
+      numDirtyOccurrences: num_dirty_occurrences,
+      canRequestRemodel: ( num_dirty_occurrences > 0 and first_requested_remodel.nil? ),
+      remodelStatus: remodel_status_message,
+      hasDownloadables: ( not last_successfully_completed_model_finish_time.nil? ),
+      label: "#{common_name} - #{scientific_name}"
+    })
+  end
+
+
   private
 
   # Acts as a validation callback.
@@ -119,6 +149,20 @@ class Species < ActiveRecord::Base
     if occurrences.count > 0 or vettings.count > 0
       errors.add(:base, "Can't destroy a species with occurrences or vettings")
       false
+    end
+  end
+
+  # A human readable string representing the modelling status of this species.
+
+  def remodel_status_message
+    if num_dirty_occurrences <= 0
+      "Up to date"
+    elsif not current_model_status.nil?
+      "Remodelling running with status: #{current_model_status}"
+    elsif not first_requested_remodel.nil?
+      "Priority queued for remodelling"
+    else
+      "Automatically queued for remodelling"
     end
   end
 end

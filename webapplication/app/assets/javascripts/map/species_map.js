@@ -42,7 +42,7 @@ zoom_bounds = australia_bounds;
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 // ------------------------------------------------------------------
 function speciesGeoJSONURL() {
-    return (Edgar.baseUrl + "species/geo_json_occurrences/" + Edgar.mapdata.species.id + ".json");
+    return (Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + ".json");
 }
 // ------------------------------------------------------------------
 function legendURL() {
@@ -276,8 +276,9 @@ function addOccurrencesLayer() {
                     url: speciesGeoJSONURL(),
                     params: {
                         // Place addition custom request params here..
-                        bound:      true,                    // do bound the request
-                        clustered:  cluster_strategy         // use whatever clustering
+                        bound:      true,                   // do bound the request
+                        clustered:  cluster_strategy,       // use whatever clustering
+                        as_geo_json:  true                  // use the GeoJSON interface
                     },
 
                     // The data format

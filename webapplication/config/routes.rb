@@ -3,6 +3,7 @@ Webapplication::Application.routes.draw do
 
     collection do
       get 'map'
+      get 'autocomplete'
     end
 
     member do
