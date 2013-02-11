@@ -83,7 +83,7 @@ class DetailPopup
         bbox = @feature.data.gridBounds
         self = this
         $.ajax({
-            url: "#{Edgar.baseUrl}species/#{Edgar.mapdata.species.id}.json",
+            url: "#{Edgar.baseUrl}species/#{Edgar.mapdata.species.id}/occurrences.json",
             dataType: 'json',
             data: {
                 bound: true,

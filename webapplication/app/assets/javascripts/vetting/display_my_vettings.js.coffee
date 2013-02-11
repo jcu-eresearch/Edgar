@@ -24,7 +24,7 @@ Edgar.vetting.myHabitatClassifications = {
             projection: Edgar.util.projections.geographic
             strategies: [new OpenLayers.Strategy.Fixed()]
             protocol: new OpenLayers.Protocol.HTTP({
-                url: (Edgar.baseUrl + "species/vetting_geo_json/" + Edgar.mapdata.species.id + ".json")
+                url: (Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + "/vettings.json")
                 format: new OpenLayers.Format.GeoJSON({})
                 params: {
                     by_user_id: Edgar.user.id

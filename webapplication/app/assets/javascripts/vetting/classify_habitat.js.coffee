@@ -69,7 +69,7 @@ Edgar.vetting.classifyHabitat = {
             true
 
     ###
-    # Code to add button click even handlers to DOM
+    # Code to add button click event handlers to DOM
     ###
     _addButtonHandlers: () ->
 
@@ -224,10 +224,10 @@ Edgar.vetting.classifyHabitat = {
             addPolygonIfWithinBounds = (clusterFeature, bounds, arrayToAppendTo) =>
                 featureCentroid = clusterFeature.geometry.getCentroid()
 
-                min_latitude_range  = feature.attributes['min_latitude_range']
-                max_latitude_range  = feature.attributes['max_latitude_range']
-                min_longitude_range = feature.attributes['min_longitude_range']
-                max_longitude_range = feature.attributes['max_longitude_range']
+                min_latitude_range  = feature.attributes['vettingBounds']['minlat']
+                max_latitude_range  = feature.attributes['vettingBounds']['maxlat']
+                min_longitude_range = feature.attributes['vettingBounds']['minlon']
+                max_longitude_range = feature.attributes['vettingBounds']['maxlon']
 
                 min = (new OpenLayers.Geometry.Point(min_longitude_range, min_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
                 max = (new OpenLayers.Geometry.Point(max_longitude_range, max_latitude_range)).transform(Edgar.util.projections.geographic, Edgar.util.projections.mercator)
@@ -244,10 +244,12 @@ Edgar.vetting.classifyHabitat = {
             for feature in featuresWithinBounds
                 consolelog featureOccurrence
 
-                min_latitude_range  = feature.attributes['min_latitude_range']
-                max_latitude_range  = feature.attributes['max_latitude_range']
-                min_longitude_range = feature.attributes['min_longitude_range']
-                max_longitude_range = feature.attributes['max_longitude_range']
+                min_latitude_range  = feature.attributes['vettingBounds']['minlat']
+                max_latitude_range  = feature.attributes['vettingBounds']['maxlat']
+                min_longitude_range = feature.attributes['vettingBounds']['minlon']
+                max_longitude_range = feature.attributes['vettingBounds']['maxlon']
+
+                console.log(min_longitude_range, min_latitude_range, max_longitude_range, max_latitude_range)
 
 
                 points = [

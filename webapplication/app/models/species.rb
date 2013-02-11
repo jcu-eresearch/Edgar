@@ -54,7 +54,7 @@ class Species < ActiveRecord::Base
       limit(SEARCH_QUERY_LIMIT)
   end
 
-  # Returns an array of GeoJSON::Feature for this species.
+  # Returns an array of GeoJSON::Feature for this species' occurrences.
   # Uses +options+ to define how to build a custom array of features.
   # +options+ include:
   #
@@ -77,7 +77,7 @@ class Species < ActiveRecord::Base
   # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
   # instance function +location()+.
 
-  def get_features(options)
+  def get_occurrence_features(options)
 
     # Don't permit the user to exceed our max features query limit
     options[:limit] ||= FEATURES_QUERY_LIMIT
@@ -96,7 +96,7 @@ class Species < ActiveRecord::Base
     end
 
     unless options[:show_invalid]
-      occurrences_relation = occurrences_relation.where_valid
+      occurrences_relation = occurrences_relation.where_not_invalid
     end
 
     occurrences_relation = occurrences_relation.limit(options[:limit])
@@ -107,15 +107,13 @@ class Species < ActiveRecord::Base
       cluster_result = occurrences_relation.cluster(options).select_classification_totals
       cluster_result.each do |cluster|
         geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_centroid)
-
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_feature_properties(cluster, geom_feature, options))
-
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_occurrence_feature_properties(cluster, geom_feature, options))
         features << feature
       end
     else
       occurrences_relation.each do |occurrence|
         geom_feature = occurrence.location
-        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_feature_properties(occurrence, geom_feature, options))
+        feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_occurrence_feature_properties(occurrence, geom_feature, options))
         features << feature
       end
     end
@@ -126,18 +124,101 @@ class Species < ActiveRecord::Base
   # Returns the species' +occurrences+ as a GeometryCollection
   # in *GeoJSON* (+String+)
 
-  def get_geo_json(options={})
-    features = get_features(options)
+  def get_occurrences_geo_json(options={})
+    features = get_occurrence_features(options)
     feature_collection = RGeo::GeoJSON::FeatureCollection.new(features)
     RGeo::GeoJSON.encode(feature_collection)
   end
 
   # Returns the species' +occurrences+ as a GeometryCollection in *WKT* (+String+)
 
-  def get_wkt(options={})
-    features = get_features(options)
+  def get_occurrences_wkt(options={})
+    features = get_occurrence_features(options)
     geoms = features.map { |feature| feature.location() }
     feature_collection = Occurrence.rgeo_factory_for_column(:location).collection(geoms)
+    feature_collection.as_text
+  end
+
+  # Returns an array of GeoJSON::Feature for this species' vettings.
+  # Uses +options+ to define how to build a custom array of features.
+  # +options+ include:
+  #
+  # [+:bbox+] a String representing a bbox "#{w}, #{s}, #{e}, #{n}"
+  # [+:limit+] the max number of features to return. Can't exceed +FEATURES_QUERY_LIMIT+
+  # [+:offset+] when used in conjunction with +:limit+ allows for pagination
+  # [+:by_user_id+] show vettings made by this user.
+  # [+:inverse_user_id_filter+] if set, then invert the by_user_id filter, i.e. show
+  #     vettings made by users other than the +:by_user_id user+.
+  #
+  # The size of the array returned is limited to +FEATURES_QUERY_LIMIT+
+  # regardless of options
+  #
+  # Note: The GeoJSON::Feature object type is used as a convenience wrapper to
+  # allow the vetting area to be provided with additional information (properties and feature_id).
+  # The underlying location can be attained via the GeoJSON::Feature instance
+  # function location().
+  #
+  # *Important*: The GeoJSON::Feature is a wrapper. It isn't the same as RGeo::Feature::Geometry.
+  # You should _peel back_ the wrapper if you intend to use the feature for anything
+  # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
+  # instance function +location()+.
+
+  def get_vetting_features(options)
+
+    # Don't permit the user to exceed our max features query limit
+    options[:limit] ||= FEATURES_QUERY_LIMIT
+    options[:limit] = options[:limit].to_i
+    options[:limit] = FEATURES_QUERY_LIMIT if options[:limit] > FEATURES_QUERY_LIMIT
+
+    options[:offset] ||= 0
+    options[:offset] = options[:offset].to_i
+
+    features = []
+    vettings_relation = nil
+
+    if options[:bbox]
+      vettings_relation = vettings.in_rect(options[:bbox].split(','))
+    else
+      vettings_relation = vettings
+    end
+
+    if filter_by_user_id = options[:by_user_id]
+      if options[:inverse_user_id_filter]
+        vettings_relation = vettings_relation.where_user_is_not(filter_by_user_id)
+      else
+        vettings_relation = vettings_relation.where_user_is(filter_by_user_id)
+      end
+    end
+
+    vettings_relation = vettings_relation.limit(options[:limit])
+    vettings_relation = vettings_relation.offset(options[:offset])
+
+    vettings_relation.joins(:users)
+
+    vettings_relation.each do |vetting|
+      geom_feature = vetting.area
+      feature = RGeo::GeoJSON::Feature.new(geom_feature, vetting.id, vetting.serializable_hash)
+      features << feature
+    end
+
+    features
+  end
+
+  # Returns the species' +vettings+ as a GeometryCollection
+  # in *GeoJSON* (+String+)
+
+  def get_vettings_geo_json(options={})
+    features = get_vetting_features(options)
+    feature_collection = RGeo::GeoJSON::FeatureCollection.new(features)
+    RGeo::GeoJSON.encode(feature_collection)
+  end
+
+  # Returns the species' +vettings+ as a GeometryCollection in *WKT* (+String+)
+
+  def get_vettings_wkt(options={})
+    features = get_vetting_features(options)
+    geoms = features.map { |feature| feature.area() }
+    feature_collection = Vetting.rgeo_factory_for_column(:area).collection(geoms)
     feature_collection.as_text
   end
 
@@ -183,7 +264,7 @@ class Species < ActiveRecord::Base
   # This method is leaking View code into the Model.
   # The point radius logic should be in the javascript.
 
-  def get_feature_properties cluster, geom_feature, options
+  def get_occurrence_feature_properties cluster, geom_feature, options
     bbox = options[:bbox]
 
     # When looking at vetting,
@@ -192,11 +273,7 @@ class Species < ActiveRecord::Base
 
     common = {
       description: "",
-      occurrence_type: "dotgriddetail",
-      minlon: geom_feature.x - grid_size,
-      maxlon: geom_feature.x + grid_size,
-      minlat: geom_feature.y - grid_size,
-      maxlat: geom_feature.y + grid_size,
+      occurrence_type: "dotgriddetail"
     }
 
     output = {}
@@ -206,17 +283,33 @@ class Species < ActiveRecord::Base
 
     if cluster.attributes.has_key? "cluster_location_count"
 
+      # get our envelope for this cluster...
+      cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_envelope)
+      cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence.rgeo_factory_for_column(:location))
+      cluster_envelope_bbox.add(cluster_envelope_geom)
+
+      # get our buffered envelope for this cluster...
+      buffered_cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.buffered_cluster_envelope)
+      buffered_cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence.rgeo_factory_for_column(:location))
+      buffered_cluster_envelope_bbox.add(buffered_cluster_envelope_geom)
+
       output.merge!({
         classificationTotals: [],
         point_radius: Math::log2(cluster.cluster_location_count.to_i).floor + MIN_FEATURE_RADIUS,
         stroke_width: Math::log2(cluster.cluster_location_count.to_i).floor + MIN_FEATURE_RADIUS,
         cluster_size: cluster.cluster_location_count.to_i,
         title: "#{cluster.cluster_location_count} points here",
+        vettingBounds: {
+          minlon: buffered_cluster_envelope_bbox.min_x,
+          maxlon: buffered_cluster_envelope_bbox.max_x,
+          minlat: buffered_cluster_envelope_bbox.min_y,
+          maxlat: buffered_cluster_envelope_bbox.max_y,
+        },
         gridBounds: {
-          minlon: geom_feature.x - grid_size,
-          maxlon: geom_feature.x + grid_size,
-          minlat: geom_feature.y - grid_size,
-          maxlat: geom_feature.y + grid_size,
+          minlon: cluster_envelope_bbox.min_x,
+          maxlon: cluster_envelope_bbox.max_x,
+          minlat: cluster_envelope_bbox.min_y,
+          maxlat: cluster_envelope_bbox.max_y,
         }
       })
 

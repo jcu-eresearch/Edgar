@@ -17,11 +17,7 @@ class SpeciesController < ApplicationController
     respond_to do |format|
       format.text { render :text => @species.get_wkt(params) }
       format.json {
-        if params[:as_geo_json]
-          render :json => @species.get_geo_json(params)
-        else
-          render :json => @species
-        end
+        render :json => @species
       }
     end
   end
@@ -76,6 +72,127 @@ class SpeciesController < ApplicationController
       render text: "No species modelling required.", status: 204
     end
   end
+
+  def occurrences
+    @species = Species.find(params[:id])
+
+    respond_to do |format|
+      format.text { render :text => @species.get_occurrences_wkt(params) }
+      format.json {
+        render :json => @species.get_occurrences_geo_json(params)
+      }
+    end
+
+  end
+
+  def vettings
+    @species = Species.find(params[:id])
+
+    respond_to do |format|
+      format.text { render :text => @species.get_vettings_wkt(params) }
+      format.json {
+        render :json => @species.get_vettings_geo_json(params)
+      }
+    end
+  end
+=begin
+    /*
+        Get the vetting geojson for the given species.
+
+        By default, gets all vettings for given species id.
+
+        Can be filtered to only include vettings by a specific user.
+        Filter can be inversed (i.e. all vettings NOT by specific user).
+
+        TODO: Remove magic numbers from the SQL LIMIT
+
+        params:
+        * species_id: the species to get the vettings for
+        * by_user_id: get vettings by a specific user_id
+        * inverse_user_id_filter: if set, will get vettings NOT by by_user_id
+    */
+    public function vetting_geo_json($species_id = null) {
+
+        $this->Species->id = $species_id;
+        if (!$this->Species->exists()) {
+            throw new NotFoundException(__('Invalid species'));
+        }
+
+        // Process any filter variables
+        $by_user_id = false;
+        $inverse_user_id_filter = false;
+
+        if (array_key_exists('by_user_id', $this->request->query)) {
+            $by_user_id = (int)$this->request->query['by_user_id'];
+        }
+
+        if(array_key_exists('inverse_user_id_filter', $this->request->query)) {
+            $inverse_user_id_filter = $this->request->query['inverse_user_id_filter'];
+        }
+
+        $results = null;
+
+        if ($by_user_id and $inverse_user_id_filter) {
+            $results = $this->Species->getDataSource()->execute(
+                'SELECT vettings.id, ST_AsGeoJSON(area), classification, comment, fname, lname '.
+                'FROM vettings INNER JOIN users ON user_id = users.id '.
+                'WHERE species_id = ? AND user_id <> ? AND deleted is NULL '.
+                'LIMIT 1000',
+                array(),
+                array($species_id, $by_user_id)
+            );
+        } elseif ($by_user_id) {
+            $results = $this->Species->getDataSource()->execute(
+                'SELECT vettings.id, ST_AsGeoJSON(area), classification, comment, fname, lname '.
+                'FROM vettings INNER JOIN users ON user_id = users.id '.
+                'WHERE species_id = ? AND user_id = ? AND deleted is NULL '.
+                'LIMIT 1000',
+                array(),
+                array($species_id, $by_user_id)
+            );
+        } else {
+            $results = $this->Species->getDataSource()->execute(
+                'SELECT vettings.id, ST_AsGeoJSON(area), classification, comment, fname, lname '.
+                'FROM vettings INNER JOIN users ON user_id = users.id '.
+                'WHERE species_id = ? AND deleted is NULL '.
+                'LIMIT 1000',
+                array(),
+                array($species_id)
+            );
+        }
+
+
+        // Convert the received vettings into a geometry collection.
+        $geo_json_features_array = array();
+
+        if($results) {
+            while ($row = $results->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
+                $vetting_id = $row[0];
+                $area_json  = $row[1];
+                $classification = $row[2];
+                $comment = $row[3];
+                $user = $row[4] . ' ' . $row[5];
+
+                $properties_json_array = Vetting::getPropertiesJSONObject($classification);
+                $properties_json_array['classification'] = $classification;
+                $properties_json_array['vetting_id'] = $vetting_id;
+                $properties_json_array['comment'] = $comment;
+                $properties_json_array['user'] = $user;
+
+                // decode the json
+                array_push($geo_json_features_array, array('type' => 'Fetaure', 'geometry' => json_decode($area_json), 'properties' => $properties_json_array));
+            }
+        }
+
+        $geo_json_object = array( 
+                    'type' => 'FeatureCollection',
+                    'features' => $geo_json_features_array
+        );
+
+        $geo_json = json_encode($geo_json_object);
+        $this->set('geo_json', $geo_json_object);
+        $this->set('_serialize', 'geo_json');
+    }
 
 =begin
   # POST /species/get_next_job_and_assume_queued

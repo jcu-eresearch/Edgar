@@ -12,6 +12,8 @@ Webapplication::Application.routes.draw do
     member do
       get 'map'
       post 'job_status'
+      get 'occurrences'
+      get 'vettings'
     end
 
   end

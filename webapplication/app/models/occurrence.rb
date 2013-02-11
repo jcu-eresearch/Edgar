@@ -18,15 +18,24 @@
 #
 
 class Occurrence < ActiveRecord::Base
+
   # The smallest grid size for which clustering is enabled.
   # Below this value, grid size is set to nil (no clustering).
-  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.025
+
+  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.015
 
   # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
+
   GRID_SIZE_WINDOW_FRACTION = 10
 
-  SRID = 4326
+  # Develop the buffered_cluster_envelope by increasing buffering the cluster's
+  # centroid by grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION.
 
+  CLUSTER_GRID_SIZE_BUFFER_FRACTION = 4
+
+  # The SRID (projection format) this model uses
+
+  SRID = 4326
 
   attr_readonly :basis, :classification, :contentious, :date, :location, :occurrence_basis, :source_classification, :source_id, :source_record_id, :species_id, :uncertainty
 
@@ -83,7 +92,9 @@ class Occurrence < ActiveRecord::Base
 
   end
 
-  def self.where_valid
+  # Where the classification of the occurrence isn't invalid.
+
+  def self.where_not_invalid
     where('classification != ?', :invalid)
   end
 
@@ -127,10 +138,36 @@ class Occurrence < ActiveRecord::Base
     if grid_size.nil?
       qry = qry.
         select{st_astext(location).as("cluster_centroid")}.
+        select{st_astext(st_envelope(st_collect(location))).as("cluster_envelope")}.
+        select{
+          st_astext(
+            st_expand(st_envelope(location), MIN_GRID_SIZE_BEFORE_NO_CLUSTERING)
+          ).as("buffered_cluster_envelope")
+        }.
         group{location}
     else
       qry = qry.
         select{st_astext(st_centroid(st_collect(location))).as("cluster_centroid")}.
+        select{st_astext(st_envelope(st_collect(location))).as("cluster_envelope")}.
+        # explanation of this next select:
+        # select the envelope (bbox) of the union of 2 things:
+        # 1. the collection of locations that this cluster represents
+        # 2. a geom that is the centroid of the cluster buffered in all directions by a third of
+        #    the grid size.
+        # The idea is, we always want the range of the cluster to at least represent
+        # what is in it.
+        # But in addition, we also want the vetting polygons created based on this
+        # cluster to at least cover a reasonable area (and not be too small).
+        select{
+          st_astext(
+            st_envelope(
+              st_collect(
+                st_buffer(st_centroid(st_collect(location)), grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION),
+                st_envelope(st_collect(location))
+              )
+            )
+          ).as("buffered_cluster_envelope")
+        }.
         group{st_snaptogrid(location, grid_size)}
     end
 

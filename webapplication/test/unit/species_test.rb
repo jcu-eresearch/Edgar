@@ -68,7 +68,7 @@ class SpeciesTest < ActiveSupport::TestCase
   end
 
   test "GeoJSON output for clustered points includes cluster_size property" do
-    json = @emu.get_geo_json()
+    json = @emu.get_occurrences_geo_json()
 
     feature_hash = json["features"].first
     cluster_size = feature_hash["properties"]["cluster_size"]

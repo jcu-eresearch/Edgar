@@ -42,7 +42,7 @@ zoom_bounds = australia_bounds;
 var bing_api_key = "AkQSoOVJQm3w4z5uZeg1cPgJVUKqZypthn5_Y47NTFC6EZAGnO9rwAWBQORHqf4l";
 // ------------------------------------------------------------------
 function speciesGeoJSONURL() {
-    return (Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + ".json");
+    return (Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + "/occurrences.json");
 }
 // ------------------------------------------------------------------
 function legendURL() {
