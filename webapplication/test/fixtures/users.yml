@@ -32,3 +32,12 @@ two:
   can_vet: false
   is_admin: false
   authority: 1
+
+robert:
+  email: rob@example.com
+  username: rob@example.com
+  fname: MyString2
+  lname: MyString2
+  can_vet: false
+  is_admin: false
+  authority: 1

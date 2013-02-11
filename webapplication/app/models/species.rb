@@ -70,12 +70,12 @@ class Species < ActiveRecord::Base
   # Note: The GeoJSON::Feature object type is used as a convenience wrapper to
   # allow the location to be provided with additional information (properties and feature_id).
   # The underlying location can be attained via the GeoJSON::Feature instance
-  # function location().
+  # function geometry().
   #
   # *Important*: The GeoJSON::Feature is a wrapper. It isn't the same as RGeo::Feature::Geometry.
   # You should _peel back_ the wrapper if you intend to use the feature for anything
   # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
-  # instance function +location()+.
+  # instance function +geometry()+.
 
   def get_occurrence_features(options)
 
@@ -134,7 +134,7 @@ class Species < ActiveRecord::Base
 
   def get_occurrences_wkt(options={})
     features = get_occurrence_features(options)
-    geoms = features.map { |feature| feature.location() }
+    geoms = features.map { |feature| feature.geometry() }
     feature_collection = Occurrence.rgeo_factory_for_column(:location).collection(geoms)
     feature_collection.as_text
   end
@@ -155,13 +155,13 @@ class Species < ActiveRecord::Base
   #
   # Note: The GeoJSON::Feature object type is used as a convenience wrapper to
   # allow the vetting area to be provided with additional information (properties and feature_id).
-  # The underlying location can be attained via the GeoJSON::Feature instance
-  # function location().
+  # The underlying area can be attained via the GeoJSON::Feature instance
+  # function geometry().
   #
   # *Important*: The GeoJSON::Feature is a wrapper. It isn't the same as RGeo::Feature::Geometry.
   # You should _peel back_ the wrapper if you intend to use the feature for anything
   # other than GeoJSON encoding. You can _peel back_ the wrapper via the GeoJSON::Feature
-  # instance function +location()+.
+  # instance function +geometry()+.
 
   def get_vetting_features(options)
 
@@ -177,9 +177,9 @@ class Species < ActiveRecord::Base
     vettings_relation = nil
 
     if options[:bbox]
-      vettings_relation = vettings.in_rect(options[:bbox].split(','))
+      vettings_relation = vettings.where_not_deleted.in_rect(options[:bbox].split(','))
     else
-      vettings_relation = vettings
+      vettings_relation = vettings.where_not_deleted
     end
 
     if filter_by_user_id = options[:by_user_id]
@@ -217,7 +217,7 @@ class Species < ActiveRecord::Base
 
   def get_vettings_wkt(options={})
     features = get_vetting_features(options)
-    geoms = features.map { |feature| feature.area() }
+    geoms = features.map { |feature| feature.geometry() }
     feature_collection = Vetting.rgeo_factory_for_column(:area).collection(geoms)
     feature_collection.as_text
   end

@@ -17,23 +17,37 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  user_id: 1
-  species_id: 1
+  user: robert
+  species: emu
   comment: MyText
   classification: 'unknown'
   created: 2013-02-04 14:21:09
   modified: 2013-02-04 14:21:09
-  deleted: 2013-02-04 14:21:09
-  ignored: 2013-02-04 14:21:09
+  deleted: null
+  ignored: null
   last_ala_sync: 2013-02-04 14:21:09
+  area: SRID=4326;MULTIPOLYGON(((30 10, 10 20, 20 40, 40 40, 30 10)))
 
 two:
-  user_id: 1
-  species_id: 1
+  user: robert
+  species: emu
   comment: MyText
   classification: 'core'
   created: 2013-02-04 14:21:09
   modified: 2013-02-04 14:21:09
-  deleted: 2013-02-04 14:21:09
-  ignored: 2013-02-04 14:21:09
+  deleted: null
+  ignored: null
   last_ala_sync: 2013-02-04 14:21:09
+  area: SRID=4326;MULTIPOLYGON(((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576)))
+
+deleted:
+  user: robert
+  species: only_has_one_deleted_vetting
+  comment: TisDeleted
+  classification: 'core'
+  created: 2013-02-04 14:21:09
+  modified: 2013-02-04 14:21:09
+  deleted: 2013-02-04 14:21:09
+  ignored: null
+  last_ala_sync: 2013-02-04 14:21:09
+  area: SRID=4326;MULTIPOLYGON(((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576)))

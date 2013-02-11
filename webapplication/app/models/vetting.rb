@@ -50,6 +50,12 @@ class Vetting < ActiveRecord::Base
     where('user_id != ?', user_id)
   end
 
+  # Get the vettings that aren't deleted
+
+  def self.where_not_deleted()
+    where('deleted is NULL')
+  end
+
   # Add user information into the vetting's json
 
   def serializable_hash(*args) 
