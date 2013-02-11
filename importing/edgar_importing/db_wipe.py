@@ -69,6 +69,10 @@ def main():
             common_name='Blue-winged Kookaburra')
 
         db.species.insert().execute(
+            scientific_name='Dromaius novaehollandiae',
+            common_name='Emu')
+
+        db.species.insert().execute(
             scientific_name='Tyto (Megastrix) novaehollandiae',
             common_name='Masked Owl')
 

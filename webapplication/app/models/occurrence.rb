@@ -20,10 +20,13 @@
 class Occurrence < ActiveRecord::Base
   # The smallest grid size for which clustering is enabled.
   # Below this value, grid size is set to nil (no clustering).
-  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.01
+  MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.025
 
   # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
-  GRID_SIZE_WINDOW_FRACTION = 40
+  GRID_SIZE_WINDOW_FRACTION = 10
+
+  SRID = 4326
+
 
   attr_readonly :basis, :classification, :contentious, :date, :location, :occurrence_basis, :source_classification, :source_id, :source_record_id, :species_id, :uncertainty
 
@@ -33,23 +36,15 @@ class Occurrence < ActiveRecord::Base
   before_destroy :prevent_destroy
 
   self.rgeo_factory_generator = RGeo::Geos.factory_generator
-  set_rgeo_factory_for_column(:location, RGeo::Geographic.spherical_factory(srid: 4326))
+  set_rgeo_factory_for_column(:location, RGeo::Geographic.spherical_factory(srid: SRID))
 
   # Get the occurrences that fall inside the bbox
   # [+bbox] an Array of floats (lat/lng degrees decimal) [w, s, e, n]
 
   def self.in_rect(bbox)
-    w, s, e, n = *bbox
-    sw =  self.rgeo_factory_for_column(:location).point(w, s)
-    ne =  self.rgeo_factory_for_column(:location).point(e, n)
+    w, s, e, n = *bbox.map { |v| v.to_f }
 
-# Weird bug with the RGeo's BoundingBox. It appears that if
-# lat, lng is at min or max (-90/90, -180/180 respectively), the bounding
-# box is inverted (or something)..
-# Do it the old fashion way for now.
-#    box = RGeo::Cartesian::BoundingBox.create_from_points(sw, ne)
-#    where{location.op('&&', )}
-    where("location && SetSRID('BOX(? ?,? ?)'::box2d,4326)",w.to_f,s.to_f,e.to_f,n.to_f)
+    where("location && ST_MakeEnvelope(?, ?, ?, ?, ?)", w, s, e, n, SRID)
   end
 
   # Given a bbox, determine the appropriate grid size
@@ -75,6 +70,22 @@ class Occurrence < ActiveRecord::Base
     grid_size
   end
 
+  def self.select_classification_totals
+    qry = self
+
+    Classification::ALL_CLASSIFICATIONS.each do |classification|
+      qry = qry.
+        select("sum(case when classification = '#{classification}' then 1 else 0 end) AS #{classification}_count").
+        select("sum(case when classification = '#{classification}' and contentious = true then 1 else 0 end) as contentious_#{classification}_count")
+    end
+
+    qry.select("sum(case when contentious = true then 1 else 0 end) as contentious_count")
+
+  end
+
+  def self.where_valid
+    where('classification != ?', :invalid)
+  end
 
   # Use the ST_SnapToGrid PostGIS function to cluster the occurrences.
   #
@@ -109,16 +120,21 @@ class Occurrence < ActiveRecord::Base
     bbox      = options[:bbox]
     grid_size = options[:grid_size] || get_cluster_grid_size(bbox)
 
+    qry = self
+
+    qry = qry.select{count(location).as("cluster_location_count")}
+
     if grid_size.nil?
-      select{count(location).as("cluster_location_count")}.
-      select{st_astext(location).as("cluster_centroid")}.
-      group{location}
+      qry = qry.
+        select{st_astext(location).as("cluster_centroid")}.
+        group{location}
     else
-      select{count(location).as("cluster_location_count")}.
-      select{st_astext(st_centroid(st_collect(location))).as("cluster_centroid")}.
-#      select{st_astext(st_minimumboundingcircle(st_collect(location))).as("location_minimum_bounding_circle")}.
-      group{st_snaptogrid(location, grid_size)}
+      qry = qry.
+        select{st_astext(st_centroid(st_collect(location))).as("cluster_centroid")}.
+        group{st_snaptogrid(location, grid_size)}
     end
+
+    return qry
   end
 
   private

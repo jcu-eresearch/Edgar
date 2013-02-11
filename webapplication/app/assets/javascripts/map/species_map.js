@@ -268,7 +268,8 @@ function addOccurrencesLayer() {
 //                strategies: [new OpenLayers.Strategy.BBOX({resFactor: 1.1})],
                 strategies: [
                     new OpenLayers.Strategy.BBOX({
-                        resFactor: 1.1
+                        resFactor: 1.1,
+                        ratio: 1.2
                     })
                 ],
                 protocol: new OpenLayers.Protocol.HTTP({
@@ -407,6 +408,7 @@ $(function() {
         controls: [
             new OpenLayers.Control.ArgParser(),
             new OpenLayers.Control.Attribution(),
+            new OpenLayers.Control.Graticule(),
             new OpenLayers.Control.Navigation()
         ]
 
