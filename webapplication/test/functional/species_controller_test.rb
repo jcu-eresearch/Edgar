@@ -95,4 +95,37 @@ class SpeciesControllerTest < ActionController::TestCase
     assert_kind_of(RGeo::Feature::GeometryCollection, features)
   end
 
+  test "shouldn't add vetting as not logged in" do
+    area = "MULTIPOLYGON(((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576)))"
+    assert_no_difference('Vetting.count') do
+      raw_post(:add_vetting, {id: @emu, format: :json}, {area: area, classification: "historic", comment: "comment"}.to_json)
+    end
+
+    assert_response :unauthorized
+  end
+
+  test "should add vettings as WKT via post add_vetting" do
+    sign_in users(:robert)
+
+    area = "MULTIPOLYGON(((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576)))"
+
+    assert_difference('Vetting.count') do
+      raw_post(:add_vetting, {id: @emu, format: :json}, {area: area, classification: "historic", comment: "comment"}.to_json)
+    end
+
+    assert_response :success
+  end
+
+  test "should not add vettings as user not permitted (can_vet false)" do
+    sign_in users(:no_can_vet)
+
+    area = "MULTIPOLYGON(((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576)))"
+
+    assert_no_difference('Vetting.count') do
+      raw_post(:add_vetting, {id: @emu, format: :json}, {area: area, classification: "historic", comment: "comment"}.to_json)
+    end
+
+    assert_response :unauthorized
+  end
+
 end

@@ -599,7 +599,7 @@ Edgar.vetting.classifyHabitat = {
         consolelog "Post Data", newVetData
         vetDataAsJSONString = JSON.stringify newVetData
         consolelog "Post Data as JSON", vetDataAsJSONString
-        url = ( Edgar.baseUrl + "species/add_vetting/" + speciesId + ".json" )
+        url = ( Edgar.baseUrl + "species/" + speciesId + "/add_vetting.json" )
 
         # TODO
         # disable save button

@@ -29,9 +29,9 @@ class Occurrence < ActiveRecord::Base
   GRID_SIZE_WINDOW_FRACTION = 10
 
   # Develop the buffered_cluster_envelope by increasing buffering the cluster's
-  # centroid by grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION.
+  # envelope by grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION.
 
-  CLUSTER_GRID_SIZE_BUFFER_FRACTION = 4
+  CLUSTER_GRID_SIZE_BUFFER_FRACTION = 3
 
   # The SRID (projection format) this model uses
 
@@ -153,23 +153,9 @@ class Occurrence < ActiveRecord::Base
       qry = qry.
         select{st_astext(st_centroid(st_collect(location))).as("cluster_centroid")}.
         select{st_astext(st_envelope(st_collect(location))).as("cluster_envelope")}.
-        # explanation of this next select:
-        # select the envelope (bbox) of the union of 2 things:
-        # 1. the collection of locations that this cluster represents
-        # 2. a geom that is the centroid of the cluster buffered in all directions by a third of
-        #    the grid size.
-        # The idea is, we always want the range of the cluster to at least represent
-        # what is in it.
-        # But in addition, we also want the vetting polygons created based on this
-        # cluster to at least cover a reasonable area (and not be too small).
         select{
           st_astext(
-            st_envelope(
-              st_collect(
-                st_buffer(st_centroid(st_collect(location)), grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION),
-                st_envelope(st_collect(location))
-              )
-            )
+              st_expand(st_envelope(st_collect(location)), grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION)
           ).as("buffered_cluster_envelope")
         }.
         group{st_snaptogrid(location, grid_size)}

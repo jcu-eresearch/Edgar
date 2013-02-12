@@ -1,5 +1,20 @@
 class SpeciesController < ApplicationController
 
+  # Ensure the user is logged in before allowing them to add vettings
+
+  before_filter :authenticate_user!, :only => [:add_vetting]
+  before_filter :user_can_vet, :only => [:add_vetting]
+
+
+  def user_can_vet
+    if current_user.can_vet
+      return true
+    else
+      render text: "User can't vet", status: 401
+      return false
+    end
+  end
+
   # GET /species
 
   def index
@@ -117,6 +132,21 @@ class SpeciesController < ApplicationController
     @species.update_job_status!(params[:job_status], params[:job_status_message], params[:dirty_occurrences])
 
     render text: @species.id, status: 200
+  end
+
+  def add_vetting
+    @species = Species.find(params[:id])
+    json_data =  ActiveSupport::JSON.decode(request.body)
+    classification = json_data["classification"]
+    comment = json_data["comment"]
+    area = json_data["area"]
+
+    @species.add_vetting!(current_user, classification, comment, area)
+
+    respond_to do |format|
+      format.text { render text: "success" }
+      format.json { render json: { result: "success"} }
+    end
   end
 
 end

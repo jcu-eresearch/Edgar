@@ -56,13 +56,24 @@ class Vetting < ActiveRecord::Base
     where('deleted is NULL')
   end
 
+  # Simplify an area, removing overlaps
+  # Also ensures that result is a multipolygon
+
+  def self.select_simplified_area(area_wkt)
+    Vetting.select(sanitize_sql_array(
+      ["ST_AsText(ST_MULTI(ST_Buffer('%s', 0))) as simplified_area", area_wkt]
+    )).first.simplified_area
+  end
+
   # Add user information into the vetting's json
 
   def serializable_hash(*args) 
     attrs = super(*args)
-    attrs.merge({
-      user: "#{user.fname} #{user.lname}"
-    })
+    attrs.
+      merge({
+        user: "#{user.fname} #{user.lname}"
+      }).
+      merge(Classification::serializable_hash(self.classification))
   end
 
   private

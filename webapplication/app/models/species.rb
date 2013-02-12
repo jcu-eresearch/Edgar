@@ -79,6 +79,21 @@ class Species < ActiveRecord::Base
       limit(SEARCH_QUERY_LIMIT)
   end
 
+  def add_vetting!(user, vetting_classification, comment, area_wkt)
+    now = Time.now
+
+    vetting = vettings.new()
+
+    vetting.classification = vetting_classification
+    vetting.user = user
+    vetting.comment = comment
+    vetting.area = Vetting.select_simplified_area(area_wkt)
+    vetting.created =  now
+    vetting.modified = now
+
+    vetting.save()
+  end
+
   # Update's the status of a job
   #
   # [new_job_status] is the new job status

@@ -38,6 +38,15 @@ robert:
   username: rob@example.com
   fname: MyString2
   lname: MyString2
+  can_vet: true
+  is_admin: false
+  authority: 1
+
+no_can_vet:
+  email: no_can_vet@example.com
+  username: no_can_vet@example.com
+  fname: MyString2
+  lname: MyString2
   can_vet: false
   is_admin: false
   authority: 1
