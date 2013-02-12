@@ -3,6 +3,7 @@ require 'test_helper'
 class SpeciesControllerTest < ActionController::TestCase
   setup do
     @emu = species(:emu)
+    @queued_for_modelling = species(:queued_for_modelling)
     @only_has_one_deleted_vetting = species(:only_has_one_deleted_vetting)
     @occurrence_factory = Occurrence.rgeo_factory_for_column(:location)
     @vetting_factory = Vetting.rgeo_factory_for_column(:area)
@@ -25,6 +26,19 @@ class SpeciesControllerTest < ActionController::TestCase
     geom = RGeo::GeoJSON.decode(@response.body, :json_parser => :json)
     assert_kind_of(RGeo::GeoJSON::FeatureCollection, geom)
 
+  end
+
+  test "should update job status" do
+    post(:job_status, id: @queued_for_modelling,
+      job_status: Species::JOB_STATUS_LIST[:finished_successfully],
+      job_status_message: "all good",
+      dirty_occurrences: @queued_for_modelling.num_dirty_occurrences
+    )
+    assert_response :success
+
+    @queued_for_modelling.reload
+    assert_equal(nil, @queued_for_modelling.current_model_status)
+    assert_equal(0, @queued_for_modelling.num_dirty_occurrences)
   end
 
   test "should get occurrences as WKT" do

@@ -112,7 +112,7 @@ class SpeciesController < ApplicationController
   # [:dirty_occurrences]  How many dirty occurrences existed when this job was queued.
 
   def job_status
-    @species = find(params[:id])
+    @species = Species.find(params[:id])
 
     @species.update_job_status!(params[:job_status], params[:job_status_message], params[:dirty_occurrences])
 

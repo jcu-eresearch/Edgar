@@ -89,6 +89,7 @@ class Species < ActiveRecord::Base
 
   def update_job_status!(new_job_status, new_job_status_message=nil, dirty_occurrences=nil)
     new_job_status_message ||= ""
+    dirty_occurrences = dirty_occurrences.to_i
 
     if current_model_status != new_job_status
       if new_job_status == Species::JOB_STATUS_LIST[:queued]
