@@ -84,4 +84,34 @@ class SpeciesTest < ActiveSupport::TestCase
     )
   end
 
+  test "GeoJSON output for clustered occurrences contains the correct historic classification counts" do
+    options = {}
+    options[:limit] = 1
+    options[:cluster] = true
+    options[:grid_size] = 360
+    results = @emu.get_occurrences_geo_json(options)
+    feature = results["features"].first()
+    properties = feature["properties"]
+    classification_totals = properties["classificationTotals"]
+    assert_equal(1, results["features"].length, "With a grid size of 360 degrees (covering the earth), there should only be 1 cluster returned")
+
+    Classification::STANDARD_CLASSIFICATIONS.each do |classification|
+      expected_count = @emu.occurrences.count(conditions: ["classification = ?", classification])
+
+      actual_count = 0
+      classification_hash = classification_totals.select { |el|
+        el[:label] == classification
+      }.first
+
+      if classification_hash
+        actual_count = classification_hash[:total]
+      else
+        actual_count = 0
+      end
+
+      assert_equal(expected_count, actual_count, "There should be #{expected_count} records with a classification of #{classification}")
+    end
+
+  end
+
 end

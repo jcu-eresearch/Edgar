@@ -76,6 +76,6 @@ class OccurrenceTest < ActiveSupport::TestCase
         "Clustering produced an invalud cluster_centroid. cluster_centroid isn't valid WKT"
       )
     end
-
   end
+
 end

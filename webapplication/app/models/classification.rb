@@ -1,6 +1,4 @@
 module Classification
-  # XXX
-  # NOTE: Ensure that these are always SQL safe. Don't make these dynamic.
 
   ALL_CLASSIFICATIONS = [:unknown, :invalid, :historic, :vagrant, :irruptive, :core, :introduced]
   STANDARD_CLASSIFICATIONS = [:unknown, :historic, :vagrant, :irruptive, :core, :introduced]

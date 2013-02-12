@@ -84,8 +84,12 @@ class Occurrence < ActiveRecord::Base
 
     Classification::ALL_CLASSIFICATIONS.each do |classification|
       qry = qry.
-        select("sum(case when classification = '#{classification}' then 1 else 0 end) AS #{classification}_count").
-        select("sum(case when classification = '#{classification}' and contentious = true then 1 else 0 end) as contentious_#{classification}_count")
+        select(sanitize_sql_array(
+          ["sum(case when classification = '%s' then 1 else 0 end) as %s", classification, "#{classification}_count"]
+        )).
+        select(sanitize_sql_array(
+          ["sum(case when classification = '%s' and contentious = true then 1 else 0 end) as %s", classification, "contentious_#{classification}_count"]
+        ))
     end
 
     qry.select("sum(case when contentious = true then 1 else 0 end) as contentious_count")
