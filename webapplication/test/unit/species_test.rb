@@ -84,7 +84,7 @@ class SpeciesTest < ActiveSupport::TestCase
     )
   end
 
-  test "GeoJSON output for clustered occurrences contains the correct historic classification counts" do
+  test "GeoJSON output for clustered occurrences contains the correct classification counts" do
     options = {}
     options[:limit] = 1
     options[:cluster] = true
