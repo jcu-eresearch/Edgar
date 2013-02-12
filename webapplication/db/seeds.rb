@@ -9,3 +9,8 @@
 ala_source = Source.new()
 ala_source.name = "ALA"
 ala_source.save()
+
+cockatoo = Species.new()
+cockatoo.common_name = "Palm Cockatoo"
+cockatoo.scientific_name = "Probosciger aterrimus"
+cockatoo.save()

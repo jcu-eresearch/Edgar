@@ -29,9 +29,34 @@
 class Species < ActiveRecord::Base
 
   # The maximum number of features to return from a query
+
   FEATURES_QUERY_LIMIT = 5000
+
+  # The max number of results to return from an autocomplete search
+
   SEARCH_QUERY_LIMIT = 20
+
+  # The minimum radius a point feature should have
+
   MIN_FEATURE_RADIUS = 3
+
+  # The list of actionable statuses a job can have.
+  # A job can have other statuses, but they aren't acted upon.
+
+  JOB_STATUS_LIST = {
+    queued:                   "QUEUED",
+    finished_successfully:    "FINISHED_SUCCESS",
+    finished_due_to_failure:  "FINISHED_FAILURE"
+  }
+
+  # The importance a job can have
+
+  JOB_IMPORTANCE = {
+    background:     0,
+    normal:         1,
+    user_initiated: 2,
+    urgent:         3
+  }
 
   # These attributes are readonly
   attr_readonly :common_name, :scientific_name, :last_applied_vettings, :needs_vetting_since
@@ -52,6 +77,70 @@ class Species < ActiveRecord::Base
       order(order_by).
       where("common_name ILIKE ? or scientific_name ILIKE ?", "%#{term}%", "%#{term}%").
       limit(SEARCH_QUERY_LIMIT)
+  end
+
+  # Update's the status of a job
+  #
+  # [new_job_status] is the new job status
+  # [new_job_status_message] is a human readable description of the job status,
+  #                          useful to explain why something has gone wrong.
+  # [dirty_occurrences] is the number of dirty_occurrences that existed when
+  #                     the current job was started
+
+  def update_job_status!(new_job_status, new_job_status_message=nil, dirty_occurrences=nil)
+    new_job_status_message ||= ""
+
+    if current_model_status != new_job_status
+      if new_job_status == Species::JOB_STATUS_LIST[:queued]
+        # Update current model info for species
+        self.current_model_status = new_job_status
+
+        # Record when the job started
+        self.current_model_queued_time = Time.now
+
+        if first_requested_remodel.nil?
+          self.current_model_importance = Species::JOB_IMPORTANCE[:normal]
+        else
+          self.current_model_importance = Species::JOB_IMPORTANCE[:user_initiated]
+        end
+
+      elsif (
+          new_job_status == Species::JOB_STATUS_LIST[:finished_successfully] or
+          new_job_status == Species::JOB_STATUS_LIST[:finished_due_to_failure]
+        )
+
+        self.last_completed_model_queued_time   = self.current_model_queued_time
+        self.last_completed_model_finish_time   = Time.now()
+        self.last_completed_model_importance    = self.current_model_importance
+        self.last_completed_model_status        = new_job_status
+        self.last_completed_model_status_reason = new_job_status_message
+
+        if new_job_status == Species::JOB_STATUS_LIST[:finished_successfully]
+          self.last_successfully_completed_model_queued_time = self.last_completed_model_queued_time
+          self.last_successfully_completed_model_finish_time = self.last_completed_model_finish_time
+          self.last_successfully_completed_model_importance  = self.last_completed_model_importance
+
+          # If we cleared all the dirty occurrences
+          if self.num_dirty_occurrences == dirty_occurrences
+            self.num_dirty_occurrences = 0
+          end
+        end
+
+        self.current_model_status       =  nil
+        self.current_model_importance   =  nil
+        self.current_model_queued_time  =  nil
+        self.first_requested_remodel    =  nil
+
+      else
+        # A non-actionable status. Assume the job is running fine,
+        # and store the job status
+        self.current_model_status = new_job_status
+      end
+
+      save()
+    end
+
+    self
   end
 
   # Returns an array of GeoJSON::Feature for this species' occurrences.
@@ -148,7 +237,7 @@ class Species < ActiveRecord::Base
   # [+:offset+] when used in conjunction with +:limit+ allows for pagination
   # [+:by_user_id+] show vettings made by this user.
   # [+:inverse_user_id_filter+] if set, then invert the by_user_id filter, i.e. show
-  #     vettings made by users other than the +:by_user_id user+.
+  #                             vettings made by users other than the +:by_user_id user+.
   #
   # The size of the array returned is limited to +FEATURES_QUERY_LIMIT+
   # regardless of options

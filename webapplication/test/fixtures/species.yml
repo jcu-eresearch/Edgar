@@ -90,3 +90,24 @@ only_has_one_deleted_vetting:
   last_successfully_completed_model_finish_time: 
   last_successfully_completed_model_importance: 
   last_applied_vettings: 2013-02-04 11:52:33
+
+queued_for_modelling:
+  scientific_name: Largium Nordisum
+  common_name: Big Foot
+  num_dirty_occurrences: 10
+  num_contentious_occurrences: 1
+  needs_vetting_since: 
+  has_occurrences: true
+  first_requested_remodel:
+  current_model_status: <%= Species::JOB_STATUS_LIST[:queued] %>
+  current_model_queued_time: 2013-02-04 11:52:33
+  current_model_importance: 1
+  last_completed_model_queued_time: 
+  last_completed_model_finish_time: 
+  last_completed_model_importance: 
+  last_completed_model_status: 
+  last_completed_model_status_reason: 
+  last_successfully_completed_model_queued_time: 
+  last_successfully_completed_model_finish_time: 
+  last_successfully_completed_model_importance: 
+  last_applied_vettings: 2013-02-04 11:52:33

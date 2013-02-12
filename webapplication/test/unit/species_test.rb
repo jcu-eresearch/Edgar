@@ -33,6 +33,7 @@ class SpeciesTest < ActiveSupport::TestCase
   setup do
     @emu = species(:emu)
     @rock_parrot = species(:rock_parrot)
+    @queued_for_modelling_species = species(:queued_for_modelling)
   end
 
   test "Common name is read only" do
@@ -114,4 +115,36 @@ class SpeciesTest < ActiveSupport::TestCase
 
   end
 
+  test "Updating the status of a job to finished should update species correctly (with same dirty occurrence counts)" do
+    dirty_occurrences = @queued_for_modelling_species.num_dirty_occurrences
+    assert(dirty_occurrences > 0, "species needs some dirty occurrences in the first place, else test is pointless")
+    @queued_for_modelling_species.update_job_status!(Species::JOB_STATUS_LIST[:finished_successfully], "success is great", dirty_occurrences)
+    @queued_for_modelling_species.reload
+
+    assert_equal(0, @queued_for_modelling_species.num_dirty_occurrences, "should not be anymore dirty occurrences")
+    assert_nil(@queued_for_modelling_species.current_model_status)
+    assert_nil(@queued_for_modelling_species.current_model_importance)
+    assert_nil(@queued_for_modelling_species.current_model_queued_time)
+    assert_nil(@queued_for_modelling_species.first_requested_remodel)
+
+    assert_equal("success is great", @queued_for_modelling_species.last_completed_model_status_reason)
+
+  end
+
+  test "Updating the status of a job to finished should update species correctly (with different dirty occurrence counts)" do
+    dirty_occurrences = @queued_for_modelling_species.num_dirty_occurrences
+    assert(dirty_occurrences > 0, "species needs some dirty occurrences in the first place, else test is pointless")
+    @queued_for_modelling_species.update_job_status!(Species::JOB_STATUS_LIST[:finished_successfully], "success is golden", 1)
+    @queued_for_modelling_species.reload
+
+    assert_equal(dirty_occurrences, @queued_for_modelling_species.num_dirty_occurrences, "dirty occurrences should remain unchanged")
+
+    assert_nil(@queued_for_modelling_species.current_model_status)
+    assert_nil(@queued_for_modelling_species.current_model_importance)
+    assert_nil(@queued_for_modelling_species.current_model_queued_time)
+    assert_nil(@queued_for_modelling_species.first_requested_remodel)
+
+    assert_equal("success is golden", @queued_for_modelling_species.last_completed_model_status_reason)
+
+  end
 end
