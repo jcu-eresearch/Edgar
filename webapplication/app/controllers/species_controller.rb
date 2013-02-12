@@ -38,7 +38,7 @@ class SpeciesController < ApplicationController
     end
   end
 
-  # GET /species/autocomplete?term=:my_search_term
+  # GET /species/autocomplete?term=:term
 
   def autocomplete
     term = params[:term]
@@ -106,14 +106,17 @@ class SpeciesController < ApplicationController
   end
 
   # POST /species/job_status/:id
+  #
+  # [:job_status] The new job status for this species
+  # [:job_status_message] A human readable description of the current job status.
+  # [:dirty_occurrences]  How many dirty occurrences existed when this job was queued.
 
   def job_status
     @species = find(params[:id])
 
-    @species.update_job_status!(params[:job_status], params[:new_job_status], params[:dirty_occurrences])
+    @species.update_job_status!(params[:job_status], params[:job_status_message], params[:dirty_occurrences])
 
     render text: @species.id, status: 200
   end
-
 
 end
