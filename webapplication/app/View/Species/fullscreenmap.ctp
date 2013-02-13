@@ -307,12 +307,12 @@
 
 </div>
 
-<div id="alertpanel" class="bottom panel float alertpanel clearfix"><div>
+<div id="alertpanel" class="bottom panel float alertpanel clearfix" style="display: block; display: none;"><div>
     <button class="closebutton">&#x2716;</button>
     <p>
-        <b style="color: #222">We apologise</b> but due to <a target="_blank" href="http://www.jcu.edu.au/archives/centralcomputing/msg02624.shtml">hardware failures</a> at James Cook University's High Performance Computing facility, current and future distribution maps are temporarily not available.  A resolution time <a target="_blank" href="http://www.jcu.edu.au/archives/centralcomputing/msg02625.shtml">has not been determined</a>.
+        Edgar's mapping service is currently having file storage issues, so suitability maps are probably unavailable.
     </p><p>
-        This will prevent display of the suitability legend and Climate Suitability map in current mode, and future mode will appear blank.
+        <b style="color: #222">We apologise</b> for this, and are working to rectify the fault.
     </p>
 </div></div>
 
