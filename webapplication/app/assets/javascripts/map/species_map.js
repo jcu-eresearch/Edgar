@@ -1,7 +1,7 @@
 // Author: Robert Pyke
 //
 // Assumes that the var mapSpecies, mapToolBaseUrl have already been set.
-// Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v2) are all available.
+// Assumes that OpenLayer, jQuery, jQueryUI and Google Maps (v3) are all available.
 //
 
 // convenient debug method
@@ -520,8 +520,6 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
 
     // Google Maps Layers
     // --------------------
-    //
-    // requires google maps v2 (with valid API key)
 
     // Google Physical layer
     var gphy = new OpenLayers.Layer.Google(
