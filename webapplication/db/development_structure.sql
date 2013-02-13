@@ -10214,6 +10214,13 @@ CREATE INDEX index_sensitive_occurrences_on_sensitive_location ON sensitive_occu
 
 
 --
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_users_on_username ON users USING btree (username);
+
+
+--
 -- Name: index_vettings_on_area; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 

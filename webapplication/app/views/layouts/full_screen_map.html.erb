@@ -11,7 +11,7 @@
 
   <%= stylesheet_link_tag    "application", :media => "all" %>
 
-  <%= javascript_include_tag "http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{Rails.application.config.google_api_key}" %>
+  <%= javascript_include_tag "http://maps.google.com/maps/api/js?sensor=false" %>
   <%= javascript_tag do %>
       window.Edgar = window.Edgar || {};
       Edgar.baseUrl = "<%= "#{request.protocol}#{request.host_with_port}/" %>";

@@ -60,9 +60,9 @@ class Vetting < ActiveRecord::Base
   # Also ensures that result is a multipolygon
 
   def self.select_simplified_area(area_wkt)
-    Vetting.select(sanitize_sql_array(
-      ["ST_AsText(ST_MULTI(ST_Buffer('%s', 0))) as simplified_area", area_wkt]
-    )).first.simplified_area
+    self.connection.execute(sanitize_sql_array(
+      ["SELECT ST_AsText(ST_MULTI(ST_Buffer('%s', 0))) AS simplified_area", area_wkt]
+    )).first["simplified_area"]
   end
 
   # Add user information into the vetting's json

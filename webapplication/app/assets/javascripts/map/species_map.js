@@ -527,7 +527,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     var gphy = new OpenLayers.Layer.Google(
             "Google Physical",
             {
-                type: G_PHYSICAL_MAP,
+                type: google.maps.MapTypeId.TERRAIN,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
             }
@@ -537,6 +537,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     var gmap = new OpenLayers.Layer.Google(
             "Google Streets",
             {
+                type: google.maps.MapTypeId.ROADMAP,
                 numZoomLevels:20,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
@@ -547,7 +548,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     var ghyb = new OpenLayers.Layer.Google(
             "Google Hybrid",
             {
-                type: G_HYBRID_MAP,
+                type: google.maps.MapTypeId.HYBRID,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
             }
@@ -557,7 +558,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     var gsat = new OpenLayers.Layer.Google(
             "Google Satellite",
             {
-                type: G_SATELLITE_MAP,
+                type: google.maps.MapTypeId.SATELLITE,
                 numZoomLevels: 22,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
