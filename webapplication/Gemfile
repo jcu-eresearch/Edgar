@@ -43,7 +43,7 @@ gem 'jquery-rails'
 gem 'rgeo'
 gem 'rgeo-geojson'
 gem 'rgeo-shapefile'
-gem 'activerecord-postgis-adapter'
+# gem 'activerecord-postgis-adapter'
 
 # Gems used for handling lower level SQL queries
 gem 'squeel'

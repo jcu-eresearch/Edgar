@@ -44,8 +44,9 @@ class Occurrence < ActiveRecord::Base
 
   before_destroy :prevent_destroy
 
-  self.rgeo_factory_generator = RGeo::Geos.factory_generator
-  set_rgeo_factory_for_column(:location, RGeo::Geographic.spherical_factory(srid: SRID))
+#  self.rgeo_factory_generator = RGeo::Geos.factory_generator
+#  set_rgeo_factory_for_column(:location, RGeo::Geographic.spherical_factory(srid: SRID))
+  FACTORY = RGeo::Geographic.spherical_factory(srid: SRID)
 
   # Get the occurrences that fall inside the bbox
   # [+bbox] an Array of floats (lat/lng degrees decimal) [w, s, e, n]

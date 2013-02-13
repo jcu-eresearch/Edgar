@@ -211,13 +211,14 @@ class Species < ActiveRecord::Base
       cluster_result = nil
       cluster_result = occurrences_relation.cluster(options).select_classification_totals
       cluster_result.each do |cluster|
-        geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_centroid)
+        geom_feature = Occurrence::FACTORY.parse_wkt(cluster.cluster_centroid)
         feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_occurrence_feature_properties(cluster, geom_feature, options))
         features << feature
       end
     else
       occurrences_relation.each do |occurrence|
-        geom_feature = occurrence.location
+        parser = RGeo::WKRep::WKBParser.new(Occurrence::FACTORY, support_ewkb: true)
+        geom_feature = parser.parse(occurrence.location)
         feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_occurrence_feature_properties(occurrence, geom_feature, options))
         features << feature
       end
@@ -240,7 +241,7 @@ class Species < ActiveRecord::Base
   def get_occurrences_wkt(options={})
     features = get_occurrence_features(options)
     geoms = features.map { |feature| feature.geometry() }
-    feature_collection = Occurrence.rgeo_factory_for_column(:location).collection(geoms)
+    feature_collection = Occurrence::FACTORY.collection(geoms)
     feature_collection.as_text
   end
 
@@ -323,7 +324,7 @@ class Species < ActiveRecord::Base
   def get_vettings_wkt(options={})
     features = get_vetting_features(options)
     geoms = features.map { |feature| feature.geometry() }
-    feature_collection = Vetting.rgeo_factory_for_column(:area).collection(geoms)
+    feature_collection = Vetting::FACTORY.collection(geoms)
     feature_collection.as_text
   end
 
@@ -389,13 +390,13 @@ class Species < ActiveRecord::Base
     if cluster.attributes.has_key? "cluster_location_count"
 
       # get our envelope for this cluster...
-      cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_envelope)
-      cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence.rgeo_factory_for_column(:location))
+      cluster_envelope_geom = Occurrence::FACTORY.parse_wkt(cluster.cluster_envelope)
+      cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence::FACTORY)
       cluster_envelope_bbox.add(cluster_envelope_geom)
 
       # get our buffered envelope for this cluster...
-      buffered_cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.buffered_cluster_envelope)
-      buffered_cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence.rgeo_factory_for_column(:location))
+      buffered_cluster_envelope_geom = Occurrence::FACTORY.parse_wkt(cluster.buffered_cluster_envelope)
+      buffered_cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence::FACTORY)
       buffered_cluster_envelope_bbox.add(buffered_cluster_envelope_geom)
 
       output.merge!({

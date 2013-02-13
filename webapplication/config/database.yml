@@ -1,23 +1,20 @@
 defaults: &defaults
-  adapter: postgis
+  adapter: postgresql
   encoding: unicode
-  username: edgar_on_rails
-  password: password
+  username: edgar_user
+  password: edgar_password
   pool: 5
   host: localhost
   port: 5432
 
-  # Should point to your postgis scripts folder
-  script_dir: /usr/share/postgresql/9.1/contrib/postgis-1.5/
-
 development:
   <<: *defaults
-  database: edgar_on_rails_dev_db
+  database: edgar_dev
 
 test:
   <<: *defaults
-  database: edgar_on_rails_test_db
+  database: edgar_test
 
 production:
   <<: *defaults
-  database: edgar_on_rails_prod_db
+  database: edgar
