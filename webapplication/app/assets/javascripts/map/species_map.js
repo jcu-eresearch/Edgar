@@ -12,6 +12,8 @@ function consolelog(arg1, arg2, arg3) { if (window.console) {
 }}
 // ------------------------------------------------------------------
 
+OpenLayers.ImgPath = Edgar.baseUrl + "assets/img/";
+
 // Projections
 // ----------
 

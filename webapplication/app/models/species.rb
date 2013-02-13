@@ -79,6 +79,10 @@ class Species < ActiveRecord::Base
       limit(SEARCH_QUERY_LIMIT)
   end
 
+  def self.has_occurrences
+    where("has_occurrences")
+  end
+
   def add_vetting!(user, vetting_classification, comment, area_wkt)
     now = Time.now
 
