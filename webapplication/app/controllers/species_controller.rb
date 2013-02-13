@@ -57,7 +57,7 @@ class SpeciesController < ApplicationController
 
   def autocomplete
     term = params[:term]
-    search_result = Species.search_by_common_name_or_scientific_name(term)
+    search_result = Species.search_by_common_name_or_scientific_name(term).has_occurrences()
 
     respond_to do |format|
       format.json { render json: search_result }
