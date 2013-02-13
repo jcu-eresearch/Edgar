@@ -68,9 +68,7 @@ $user = AuthComponent::user();
         $this->Html->script('history.js/scripts/bundled/html4+html5/jquery.history.js', array('inline' => false, 'block'=>'libscript'));
         $this->Html->script('json2.js', array('inline' => false));
         $this->append('libscript');
-            // Include Google API
-            // Note: API Key is Robert's.
-            echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAo3TVBlAHxH57sROb2cV_7-Tar7bKnIcY'></script>";
+            echo "<script src='http://maps.google.com/maps/api?v=3.11&amp;sensor=false'></script>";
         $this->end();
         // Include OpenLayers
         $this->Html->script('OpenLayers.js', array('inline' => false, 'block'=>'libscript'));

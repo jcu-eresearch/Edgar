@@ -517,13 +517,13 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     // Google Maps Layers
     // --------------------
     //
-    // requires google maps v2 (with valid API key)
+    // requires google maps v3
 
     // Google Physical layer
     var gphy = new OpenLayers.Layer.Google(
             "Google Physical",
             {
-                type: G_PHYSICAL_MAP,
+                type: google.maps.MapTypeId.TERRAIN,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
             }
@@ -543,7 +543,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     var ghyb = new OpenLayers.Layer.Google(
             "Google Hybrid",
             {
-                type: G_HYBRID_MAP,
+                type: google.maps.MapTypeId.HYBRID,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
             }
@@ -553,7 +553,7 @@ consolelog('layer visibility changed (' + event.layer.visibility + ') ' + event.
     var gsat = new OpenLayers.Layer.Google(
             "Google Satellite",
             {
-                type: G_SATELLITE_MAP,
+                type: google.maps.MapTypeId.SATELLITE,
                 numZoomLevels: 22,
                 'sphericalMercator': true,
                 'maxExtent': world_bounds
