@@ -7,8 +7,12 @@ defaults: &defaults
   host: localhost
   port: 5432
 
-  # Should point to your postgis scripts folder
-  script_dir: /usr/share/postgresql/9.1/contrib/postgis-1.5/
+  # PostGIS 1.5: Should point to your postgis scripts folder
+  # script_dir: /usr/share/postgresql/9.1/contrib/postgis-1.5/
+  
+  # PostGIS 2:
+  postgis_extension: postgis
+  schema_search_path: public, postgis
 
 development:
   <<: *defaults
