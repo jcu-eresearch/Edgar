@@ -53,10 +53,6 @@ start the DB
 
     sudo service postgresql-9.2 start
 
-autostart the DB
-
-    sudo chkconfig postgresql-9.2 on
-
 Create the Edgar database:
 
     sudo -u postgres createdb edgar
@@ -81,12 +77,26 @@ Initialise the database:
 
 Edit the `pg\_hba.conf` file in the Postgresql data directory. The
 default data directory is `/var/lib/pgsql/9.2/data/` on CentOS. The
-following config will allow access from `localhost` only.
+following config will allow access from `localhost` only. 
+Note: If you changed the PGDATA path above, then this config file's location
+will move relative to the path you specified.
 
     local  edgar  edgar_frontend                md5
     local  edgar  edgar_backend                 md5
     host   edgar  edgar_frontend  127.0.0.1/32  md5
     host   edgar  edgar_backend   127.0.0.1/32  md5
+
+Edit the `postgresql.conf` file in the Postgresql data directory. The
+default data directory is `/var/lib/pgsql/9.2/data/` on CentOS.
+Note: If you changed the PGDATA path above, then this config file's location
+will move relative to the path you specified.
+Find the line:
+
+    #listen_addresses = 'localhost'
+
+and change it to:
+
+    listen_addresses = '*'
 
 Restart Postgres:
 
