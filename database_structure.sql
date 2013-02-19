@@ -136,6 +136,7 @@ CREATE UNIQUE INDEX sensitive_occurrences_occurrence_id_idx ON sensitive_occurre
 CREATE TABLE users (
     id SERIAL NOT NULL PRIMARY KEY,
     email VARCHAR(256) NULL, -- NULL indicates that this user doesn't come from ALA (e.g. birdlife australia vettings)
+    username VARCHAR(256) NULL, -- NULL indicates that this user doesn't come from ALA (e.g. birdlife australia vettings) (req'd by Rails CAS user authentication)
     fname VARCHAR(256) NOT NULL,
     lname VARCHAR(256) NOT NULL,
     can_vet BOOLEAN DEFAULT TRUE NOT NULL,

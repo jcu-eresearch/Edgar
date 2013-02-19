@@ -30,7 +30,7 @@ Install PostgreSQL 9.2 with contrib modules:
 
 
 (Optional) Change the Postgres data directory by creating/editing the
-file `/etc/sysconfig/pgsql/postgresql` to contain this:
+file `/etc/sysconfig/pgsql/postgresql-9.2` to contain this:
 
     PGDATA=/opt/pgsql/data
     PGLOG=/opt/pgsql/pgstartup.log
