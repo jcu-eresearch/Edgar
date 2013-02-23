@@ -1,4 +1,4 @@
-Postgres Database - climatebird1.qern.qcif.edu.au (postgres 9.2 preferred with postgis 2)
+Postgres Database - climatebird1.qern.qcif.edu.au (preferred - postgres 9.2 with postgis 2)
 ==============================================================
 
 This install guide is for <code>yum</code>, tested with CentOS 6.2. Installation also confirmed working with Ubuntu <code>apt-get</code> packages.
