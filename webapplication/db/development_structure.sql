@@ -125,7 +125,7 @@ CREATE TABLE occurrences (
     source_record_id bytea,
     species_id integer NOT NULL,
     source_id integer NOT NULL,
-    location postgis.geometry(Point,4326)
+    location geometry(Point,4326)
 );
 
 
@@ -164,7 +164,7 @@ CREATE TABLE schema_migrations (
 CREATE TABLE sensitive_occurrences (
     id integer NOT NULL,
     occurrence_id integer NOT NULL,
-    sensitive_location postgis.geometry(Point,4326)
+    sensitive_location geometry(Point,4326)
 );
 
 
@@ -315,7 +315,7 @@ CREATE TABLE vettings (
     deleted timestamp without time zone,
     ignored timestamp without time zone,
     last_ala_sync timestamp without time zone,
-    area postgis.geometry(MultiPolygon,4326)
+    area geometry(MultiPolygon,4326)
 );
 
 
@@ -489,6 +489,27 @@ CREATE INDEX index_vettings_on_user_id ON vettings USING btree (user_id);
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- Name: geometry_columns_delete; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE geometry_columns_delete AS ON DELETE TO geometry_columns DO INSTEAD NOTHING;
+
+
+--
+-- Name: geometry_columns_insert; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE geometry_columns_insert AS ON INSERT TO geometry_columns DO INSTEAD NOTHING;
+
+
+--
+-- Name: geometry_columns_update; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE geometry_columns_update AS ON UPDATE TO geometry_columns DO INSTEAD NOTHING;
 
 
 --
