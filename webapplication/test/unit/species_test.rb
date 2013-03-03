@@ -85,6 +85,23 @@ class SpeciesTest < ActiveSupport::TestCase
     )
   end
 
+  test "GeoJSON output for clustered (with grid_size and bbox defined) points includes cluster_size property" do
+    json = @emu.get_occurrences_geo_json(cluster: true, grid_size: 10, bbox: "-180,-90,180,90")
+
+    feature_hash = json["features"].first
+    cluster_size = feature_hash["properties"]["cluster_size"]
+    assert_kind_of(
+      Integer,
+      cluster_size,
+      "cluster_size property should have " +
+      "been a kind of Integer. Instead it is: #{cluster_size.inspect}"
+    )
+    assert(
+      (cluster_size >= 0),
+      "cluster_size property should have been greater than 0"
+    )
+  end
+
   test "GeoJSON output for clustered occurrences contains the correct classification counts" do
     options = {}
     options[:limit] = 1

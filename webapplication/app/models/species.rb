@@ -40,6 +40,11 @@ class Species < ActiveRecord::Base
 
   MIN_FEATURE_RADIUS = 3
 
+  # Cache the species occurrence clusters if we have more than
+  # CACHE_OCCURRENCE_CLUSTERS_THRESHOLD occurrences for the species
+
+  CACHE_OCCURRENCE_CLUSTERS_THRESHOLD = 10000
+
   # The list of actionable statuses a job can have.
   # A job can have other statuses, but they aren't acted upon.
 
@@ -199,34 +204,44 @@ class Species < ActiveRecord::Base
 
     features = []
     occurrences_relation = nil
-    if options[:bbox]
-      occurrences_relation = occurrences.in_rect(options[:bbox].split(','))
-    else
-      occurrences_relation = occurrences
-    end
 
-    unless options[:show_invalid]
-      occurrences_relation = occurrences_relation.where_not_invalid
-    end
+    if options[:cluster] and options[:show_invalid]
+      raise ArgumentError, "Invalid options (#{options.inspect}. The cluster interface uses caching, and we don't cache the invalid occurrence records"
+    elsif options[:cluster]
+      grid_size = Occurrence::get_cluster_grid_size(options[:bbox])
+      grid_size = Occurrence::normalise_grid_size(grid_size)
 
-    occurrences_relation = occurrences_relation.limit(options[:limit])
-    occurrences_relation = occurrences_relation.offset(options[:offset])
+      cluster_result = get_or_generate_cached_clusters(grid_size)
+      cluster_result = cluster_result.in_rect(options[:bbox].split(','))
+      cluster_result = cluster_result.limit(options[:limit])
+      cluster_result = cluster_result.offset(options[:offset])
 
-    if options[:cluster]
-      cluster_result = nil
-      cluster_result = occurrences_relation.cluster(options).select_classification_totals
       cluster_result.each do |cluster|
-        geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_centroid)
+        geom_feature = cluster.cluster_centroid
         feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_occurrence_feature_properties(cluster, geom_feature, options))
         features << feature
       end
     else
+      if options[:bbox]
+        occurrences_relation = occurrences.in_rect(options[:bbox].split(','))
+      else
+        occurrences_relation = occurrences
+      end
+
+      unless options[:show_invalid]
+        occurrences_relation = occurrences_relation.where_not_invalid
+      end
+
+      occurrences_relation = occurrences_relation.limit(options[:limit])
+      occurrences_relation = occurrences_relation.offset(options[:offset])
+
       occurrences_relation.each do |occurrence|
         geom_feature = occurrence.location
         feature = RGeo::GeoJSON::Feature.new(geom_feature, occurrence.id, get_occurrence_feature_properties(occurrence, geom_feature, options))
         features << feature
       end
     end
+
 
     features
   end
@@ -362,6 +377,34 @@ class Species < ActiveRecord::Base
       ).first
   end
 
+  # Get the clusters at a fixes grid size.
+  #
+  # Use an existing in date cache if we have one,
+  # else generate a cache.
+
+  def get_or_generate_cached_clusters(grid_size)
+    # Get a cache record that isn't nil
+    cache_record = species_cache_records.find_by_grid_size(grid_size)
+
+    if cache_record and cache_record.out_of_date_since.nil?
+      # We have an in date cache record
+    else
+      # Remove the old out-of-date cache if we had one
+      cache_record.destroy if cache_record
+
+      # Generate the new cache
+      cache_record = generate_cache_clusters(grid_size)
+
+      # Only save this record if we feel we get some benefit from caching it.
+
+      cache_record.save() if occurrences.count() > CACHE_OCCURRENCES_THRESHOLD
+
+    end
+
+    return cache_record.cached_occurrence_clusters
+
+  end
+
   private
 
   # Returns a Hash of properties that descrive the cluster.
@@ -377,8 +420,6 @@ class Species < ActiveRecord::Base
   def get_occurrence_feature_properties cluster, geom_feature, options
     bbox = options[:bbox]
 
-    grid_size = Occurrence::get_cluster_grid_size(bbox) || Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
-
     common = {
       description: "",
       occurrence_type: "dotgriddetail"
@@ -389,24 +430,35 @@ class Species < ActiveRecord::Base
     output.merge!(common)
 
 
-    if cluster.attributes.has_key? "cluster_location_count"
+    if cluster.attributes.has_key? "cluster_size"
 
       # get our envelope for this cluster...
-      cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_envelope)
+      cluster_envelope_geom = nil
+      if cluster.cluster_envelope.is_a? String
+        cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.cluster_envelope)
+      else
+        cluster_envelope_geom = cluster.cluster_envelope
+      end
+
       cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence.rgeo_factory_for_column(:location))
       cluster_envelope_bbox.add(cluster_envelope_geom)
 
       # get our buffered envelope for this cluster...
-      buffered_cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.buffered_cluster_envelope)
+      buffered_cluster_envelope_geom = nil
+      if cluster.buffered_cluster_envelope.is_a? String
+        buffered_cluster_envelope_geom = Occurrence.rgeo_factory_for_column(:location).parse_wkt(cluster.buffered_cluster_envelope)
+      else
+        buffered_cluster_envelope_geom = cluster.buffered_cluster_envelope
+      end
       buffered_cluster_envelope_bbox = RGeo::Cartesian::BoundingBox.new(Occurrence.rgeo_factory_for_column(:location))
       buffered_cluster_envelope_bbox.add(buffered_cluster_envelope_geom)
 
       output.merge!({
         classificationTotals: [],
-        point_radius: Math::log2(cluster.cluster_location_count.to_i).floor + MIN_FEATURE_RADIUS,
-        stroke_width: Math::log2(cluster.cluster_location_count.to_i).floor + MIN_FEATURE_RADIUS,
-        cluster_size: cluster.cluster_location_count.to_i,
-        title: "#{cluster.cluster_location_count} points here",
+        point_radius: Math::log2(cluster.cluster_size.to_i).floor + MIN_FEATURE_RADIUS,
+        stroke_width: Math::log2(cluster.cluster_size.to_i).floor + MIN_FEATURE_RADIUS,
+        cluster_size: cluster.cluster_size.to_i,
+        title: "#{cluster.cluster_size} points here",
         vettingBounds: {
           minlon: buffered_cluster_envelope_bbox.min_x,
           maxlon: buffered_cluster_envelope_bbox.max_x,
@@ -447,7 +499,7 @@ class Species < ActiveRecord::Base
       if output[:classificationTotals].length > 1
         output[:classificationTotals] << {
           label: "TOTAL",
-          total: cluster.cluster_location_count.to_i,
+          total: cluster.cluster_size.to_i,
           contentious: cluster.contentious_count.to_i,
           isGrandTotal: true,
         }
@@ -497,4 +549,43 @@ class Species < ActiveRecord::Base
       "Automatically queued for remodelling"
     end
   end
+
+  # Generates the cache record for the given grid size.
+  # Returns the generated cache record
+
+  def generate_cache_clusters(grid_size)
+
+    cluster_result = occurrences.where_not_invalid.cluster(grid_size: grid_size).select_classification_totals
+
+    # Create a cache record for this species
+
+    cache_record = self.species_cache_records.new()
+    cache_record.grid_size = grid_size
+    cache_record.cache_generated_at = Time.now
+
+    cluster_result.each do |cluster|
+      rec = cache_record.cached_occurrence_clusters.new()
+      rec.cluster_size              = cluster.attributes['cluster_size']
+      rec.cluster_centroid          = cluster.attributes['cluster_centroid']
+      rec.cluster_envelope          = cluster.attributes['cluster_envelope']
+      rec.buffered_cluster_envelope = cluster.attributes['buffered_cluster_envelope']
+
+      Classification::ALL_CLASSIFICATIONS.each do |classification|
+        classification_count = "#{classification}_count"
+        method = "#{classification}_count=".to_sym
+        val = cluster.attributes[classification_count]
+        rec.send(method, val)
+
+        cont_classification_count = "contentious_#{classification}_count"
+        method = "contentious_#{classification}_count=".to_sym
+        val = cluster.attributes[cont_classification_count]
+        rec.send(method, val)
+      end
+
+    end
+
+    cache_record
+
+  end
+
 end

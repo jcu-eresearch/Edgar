@@ -56,6 +56,39 @@ class Occurrence < ActiveRecord::Base
     where("location && ST_MakeEnvelope(?, ?, ?, ?, ?)", w, s, e, n, SRID)
   end
 
+  # The result is normalised such that there is only a fixed number of
+  # possible grid sizes. This should be used for the cache interfaces to ensure
+  # that we don't cache to excess.
+
+  def self.normalise_grid_size(grid_size)
+    return nil if grid_size.nil?
+
+    case
+    when grid_size >= 10
+      10
+    when grid_size >= 5
+      5
+    when grid_size >= 1
+      1
+    when grid_size >= 0.5
+      0.5
+    when grid_size >= 0.25
+      0.25
+    when grid_size >= 0.1
+      0.1
+    when grid_size >= 0.75
+      0.75
+    when grid_size >= 0.05
+      0.05
+    when grid_size >= 0.025
+      0.025
+    when grid_size >= MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
+      MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
+    else
+      nil
+    end
+  end
+
   # Given a bbox, determine the appropriate grid size
   # for clustering.
   # If bbox is nil, returns a grid_size of nil.
@@ -118,13 +151,13 @@ class Occurrence < ActiveRecord::Base
   # Returns an ActiveRecord::Relation which when executed will result in
   # rows. Each row will have the following instance variables:
   #
-  # [+cluster_location_count+] the number of geometries in the cluster
+  # [+cluster_size+] the number of geometries in the cluster
   # [+cluster_centroid+] the middle point of the cluster
   #
   # The following is an example of the SQL that this will produce:
   #
   #   select
-  #     count(location) as cluster_location_count,
+  #     count(location) as cluster_size,
   #     ST_AsText(ST_Centroid(ST_Collect( location ))) AS cluster_centroid
   #   from "occurrences"
   #   group by
@@ -137,7 +170,7 @@ class Occurrence < ActiveRecord::Base
 
     qry = self
 
-    qry = qry.select{count(location).as("cluster_location_count")}
+    qry = qry.select{count(location).as("cluster_size")}
 
     if grid_size.nil?
       qry = qry.

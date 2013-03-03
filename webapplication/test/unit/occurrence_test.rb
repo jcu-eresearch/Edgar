@@ -59,23 +59,57 @@ class OccurrenceTest < ActiveSupport::TestCase
     )
   end
 
-  test "Clustering produces rows with +cluster_location_count+ and +cluster_centroid+" do
+  test "Clustering produces rows with +cluster_size+ and +cluster_centroid+" do
     options = {}
     options[:grid_size] = 10.0
     results = Occurrence.cluster(options)
 
     results.each do |el|
       assert(
-        ( el.cluster_location_count.to_i > 0 ),
-        "Clustering should have resulted in a cluster_location_count which is " +
+        ( el.cluster_size.to_i > 0 ),
+        "Clustering should have resulted in a cluster_size which is " +
         " a valid Integer greater than 0. Cluster location count " +
-        "is: #{el.cluster_location_count.inspect}"
+        "is: #{el.cluster_size.inspect}"
       )
       assert_not_nil(
         Occurrence.rgeo_factory_for_column(:location).parse_wkt(el.cluster_centroid),
         "Clustering produced an invalud cluster_centroid. cluster_centroid isn't valid WKT"
       )
     end
+  end
+
+  test "Clustering with grid_size and bbox produces rows with +cluster_size+ and +cluster_centroid+" do
+    options = {}
+    options[:grid_size] = 10.0
+    options[:bbox] = "-180,-90,180,90"
+    results = Occurrence.cluster(options)
+
+    results.each do |el|
+      assert(
+        ( el.cluster_size.to_i > 0 ),
+        "Clustering should have resulted in a cluster_size which is " +
+        " a valid Integer greater than 0. Cluster location count " +
+        "is: #{el.cluster_size.inspect}"
+      )
+      assert_not_nil(
+        Occurrence.rgeo_factory_for_column(:location).parse_wkt(el.cluster_centroid),
+        "Clustering produced an invalud cluster_centroid. cluster_centroid isn't valid WKT"
+      )
+    end
+  end
+
+  test "Normalise grid_size does what we expect" do
+    assert_equal(10, Occurrence::normalise_grid_size(12))
+    assert_equal(5, Occurrence::normalise_grid_size(6))
+    assert_equal(1, Occurrence::normalise_grid_size(4.9))
+    assert_equal(0.5, Occurrence::normalise_grid_size(0.5))
+    assert_equal(0.5, Occurrence::normalise_grid_size(0.55))
+    assert_equal(0.25, Occurrence::normalise_grid_size(0.3))
+    assert_equal(0.1, Occurrence::normalise_grid_size(0.12))
+    assert_equal(0.05, Occurrence::normalise_grid_size(0.06))
+    assert_equal(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING, Occurrence::normalise_grid_size(0.016))
+    assert_equal(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING, Occurrence::normalise_grid_size(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING))
+    assert_equal(nil, Occurrence::normalise_grid_size(0.0001))
   end
 
 end

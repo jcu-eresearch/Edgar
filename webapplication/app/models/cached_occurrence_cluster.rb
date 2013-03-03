@@ -11,5 +11,19 @@ class CachedOccurrenceCluster < ActiveRecord::Base
 
   belongs_to :species_cache_record
 
+  SRID = 4326
+
+  self.rgeo_factory_generator = RGeo::Geos.factory_generator
+
+  set_rgeo_factory_for_column(:cluster_centroid, RGeo::Geographic.spherical_factory(srid: SRID))
+  set_rgeo_factory_for_column(:cluster_envelope, RGeo::Geographic.spherical_factory(srid: SRID))
+  set_rgeo_factory_for_column(:buffered_cluster_envelope, RGeo::Geographic.spherical_factory(srid: SRID))
+
+  def self.in_rect(bbox)
+    w, s, e, n = *bbox.map { |v| v.to_f }
+
+    where("cluster_centroid && ST_MakeEnvelope(?, ?, ?, ?, ?)", w, s, e, n, SRID)
+  end
+
 end
 

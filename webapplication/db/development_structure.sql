@@ -133,8 +133,8 @@ CREATE TABLE cached_occurrence_clusters (
     introduced_count integer,
     contentious_introduced_count integer,
     cluster_centroid geometry(Point,4326),
-    cluster_envelope geometry(Polygon,4326),
-    buffered_cluster_envelope geometry(Polygon,4326)
+    cluster_envelope geometry(Geometry,4326),
+    buffered_cluster_envelope geometry(Geometry,4326)
 );
 
 
@@ -300,7 +300,7 @@ CREATE TABLE species (
 CREATE TABLE species_cache_records (
     id integer NOT NULL,
     species_id integer NOT NULL,
-    grid_size double precision NOT NULL,
+    grid_size double precision,
     cache_generated_at timestamp without time zone NOT NULL,
     out_of_date_since timestamp without time zone
 );
@@ -535,6 +535,13 @@ ALTER TABLE ONLY users
 
 ALTER TABLE ONLY vettings
     ADD CONSTRAINT vettings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_cached_occurrence_clusters_on_cluster_centroid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_cached_occurrence_clusters_on_cluster_centroid ON cached_occurrence_clusters USING btree (cluster_centroid);
 
 
 --
