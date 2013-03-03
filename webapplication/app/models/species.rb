@@ -64,6 +64,7 @@ class Species < ActiveRecord::Base
 
   has_many :occurrences
   has_many :vettings
+  has_many :species_cache_records, dependent: :destroy
 
   before_destroy :check_for_occurrences_or_vettings
 
@@ -376,8 +377,6 @@ class Species < ActiveRecord::Base
   def get_occurrence_feature_properties cluster, geom_feature, options
     bbox = options[:bbox]
 
-    # When looking at vetting,
-    # create a box around the 
     grid_size = Occurrence::get_cluster_grid_size(bbox) || Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
 
     common = {

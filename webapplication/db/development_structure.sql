@@ -111,6 +111,53 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: cached_occurrence_clusters; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE cached_occurrence_clusters (
+    id integer NOT NULL,
+    species_cache_record_id integer NOT NULL,
+    cluster_size integer NOT NULL,
+    unknown_count integer,
+    contentious_unknown_count integer,
+    invalid_count integer,
+    contentious_invalid_count integer,
+    historic_count integer,
+    contentious_historic_count integer,
+    vagrant_count integer,
+    contentious_vagrant_count integer,
+    irruptive_count integer,
+    contentious_irruptive_count integer,
+    core_count integer,
+    contentious_core_count integer,
+    introduced_count integer,
+    contentious_introduced_count integer,
+    cluster_centroid geometry(Point,4326),
+    cluster_envelope geometry(Polygon,4326),
+    buffered_cluster_envelope geometry(Polygon,4326)
+);
+
+
+--
+-- Name: cached_occurrence_clusters_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE cached_occurrence_clusters_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: cached_occurrence_clusters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE cached_occurrence_clusters_id_seq OWNED BY cached_occurrence_clusters.id;
+
+
+--
 -- Name: occurrences; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -247,6 +294,38 @@ CREATE TABLE species (
 
 
 --
+-- Name: species_cache_records; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE species_cache_records (
+    id integer NOT NULL,
+    species_id integer NOT NULL,
+    grid_size double precision NOT NULL,
+    cache_generated_at timestamp without time zone NOT NULL,
+    out_of_date_since timestamp without time zone
+);
+
+
+--
+-- Name: species_cache_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE species_cache_records_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: species_cache_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE species_cache_records_id_seq OWNED BY species_cache_records.id;
+
+
+--
 -- Name: species_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -342,6 +421,13 @@ ALTER SEQUENCE vettings_id_seq OWNED BY vettings.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY cached_occurrence_clusters ALTER COLUMN id SET DEFAULT nextval('cached_occurrence_clusters_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY occurrences ALTER COLUMN id SET DEFAULT nextval('occurrences_id_seq'::regclass);
 
 
@@ -370,6 +456,13 @@ ALTER TABLE ONLY species ALTER COLUMN id SET DEFAULT nextval('species_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY species_cache_records ALTER COLUMN id SET DEFAULT nextval('species_cache_records_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -378,6 +471,14 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 --
 
 ALTER TABLE ONLY vettings ALTER COLUMN id SET DEFAULT nextval('vettings_id_seq'::regclass);
+
+
+--
+-- Name: cached_occurrence_clusters_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY cached_occurrence_clusters
+    ADD CONSTRAINT cached_occurrence_clusters_pkey PRIMARY KEY (id);
 
 
 --
@@ -405,6 +506,14 @@ ALTER TABLE ONLY sources
 
 
 --
+-- Name: species_cache_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY species_cache_records
+    ADD CONSTRAINT species_cache_records_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: species_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -426,6 +535,13 @@ ALTER TABLE ONLY users
 
 ALTER TABLE ONLY vettings
     ADD CONSTRAINT vettings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_cached_occurrence_clusters_on_species_cache_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_cached_occurrence_clusters_on_species_cache_record_id ON cached_occurrence_clusters USING btree (species_cache_record_id);
 
 
 --
@@ -454,6 +570,27 @@ CREATE INDEX index_sensitive_occurrences_on_occurrence_id ON sensitive_occurrenc
 --
 
 CREATE INDEX index_sensitive_occurrences_on_sensitive_location ON sensitive_occurrences USING gist (sensitive_location);
+
+
+--
+-- Name: index_species_cache_records_on_grid_size; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_species_cache_records_on_grid_size ON species_cache_records USING btree (grid_size);
+
+
+--
+-- Name: index_species_cache_records_on_out_of_date_since; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_species_cache_records_on_out_of_date_since ON species_cache_records USING btree (out_of_date_since);
+
+
+--
+-- Name: index_species_cache_records_on_species_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_species_cache_records_on_species_id ON species_cache_records USING btree (species_id);
 
 
 --
