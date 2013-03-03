@@ -59,7 +59,7 @@ Create the Edgar database:
 
 Setup the DB
 
-    sudo -u postgres psql edgar
+    sudo -u postgres psql -d edgar
 
     CREATE EXTENSION postgis;
     create role edgar_backend with login password 'make_up_password_here';
