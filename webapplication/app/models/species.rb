@@ -397,7 +397,7 @@ class Species < ActiveRecord::Base
 
       # Only save this record if we feel we get some benefit from caching it.
 
-      cache_record.save() if occurrences.count() > CACHE_OCCURRENCES_THRESHOLD
+      cache_record.save() if occurrences.count() > CACHE_OCCURRENCE_CLUSTERS_THRESHOLD
 
     end
 
@@ -569,6 +569,7 @@ class Species < ActiveRecord::Base
       rec.cluster_centroid          = cluster.attributes['cluster_centroid']
       rec.cluster_envelope          = cluster.attributes['cluster_envelope']
       rec.buffered_cluster_envelope = cluster.attributes['buffered_cluster_envelope']
+      rec.contentious_count         = cluster.attributes['contentious_count']
 
       Classification::ALL_CLASSIFICATIONS.each do |classification|
         classification_count = "#{classification}_count"

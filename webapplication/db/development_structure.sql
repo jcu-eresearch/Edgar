@@ -118,6 +118,7 @@ CREATE TABLE cached_occurrence_clusters (
     id integer NOT NULL,
     species_cache_record_id integer NOT NULL,
     cluster_size integer NOT NULL,
+    contentious_count integer NOT NULL,
     unknown_count integer,
     contentious_unknown_count integer,
     invalid_count integer,

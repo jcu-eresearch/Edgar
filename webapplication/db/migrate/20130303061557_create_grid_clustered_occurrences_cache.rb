@@ -31,6 +31,8 @@ class CreateGridClusteredOccurrencesCache < ActiveRecord::Migration
       t.geometry :cluster_envelope, srid: 4326
       t.geometry :buffered_cluster_envelope, srid: 4326
 
+      t.integer :contentious_count, null: false
+
       Classification::ALL_CLASSIFICATIONS.each do |classification|
         t.integer "#{classification}_count".to_sym
         t.integer "contentious_#{classification}_count".to_sym
