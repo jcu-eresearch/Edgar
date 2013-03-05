@@ -64,26 +64,24 @@ class Occurrence < ActiveRecord::Base
     return nil if grid_size.nil?
 
     case
-    when grid_size >= 25
-      25
-    when grid_size >= 10
-      10
-    when grid_size >= 5
-      5
+    when grid_size >= 8
+      8
+    when grid_size >= 4
+      4
+    when grid_size >= 2
+      2
     when grid_size >= 1
       1
     when grid_size >= 0.5
       0.5
     when grid_size >= 0.25
       0.25
-    when grid_size >= 0.1
-      0.1
-    when grid_size >= 0.75
-      0.75
-    when grid_size >= 0.05
-      0.05
-    when grid_size >= 0.025
-      0.025
+    when grid_size >= 0.125
+      0.125
+    when grid_size >= 0.0625
+      0.0625
+    when grid_size >= 0.03125
+      0.03125
     when grid_size >= MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
       MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
     else
