@@ -1,3 +1,5 @@
+(If on Ubuntu, use this to install postgis: http://trac.osgeo.org/postgis/wiki/UsersWikiPostGIS20Ubuntu1210)
+
 Postgres Database - climatebird1.qern.qcif.edu.au (preferred - postgres 9.2 with postgis 2)
 ==============================================================
 
