@@ -46,7 +46,7 @@ gem 'rgeo-shapefile'
 gem 'activerecord-postgis-adapter'
 
 # Gem to provide our postgis clustering extensions
-gem 'rp_clustering-rgeo-activerecord', :path => "~/Documents/Git/rp_clustering-rgeo-activerecord"
+gem 'rp_clustering-rgeo-activerecord' #, :path => "~/Documents/Git/rp_clustering-rgeo-activerecord"
 
 # Gems used for handling lower level SQL queries
 gem 'squeel'

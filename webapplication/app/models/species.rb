@@ -208,11 +208,15 @@ class Species < ActiveRecord::Base
     if options[:cluster] and options[:show_invalid]
       raise ArgumentError, "Invalid options (#{options.inspect}. The cluster interface uses caching, and we don't cache the invalid occurrence records"
     elsif options[:cluster]
-      grid_size = Occurrence::get_cluster_grid_size(options[:bbox])
+      grid_size = options[:grid_size] || Occurrence::get_cluster_grid_size(options[:bbox])
       grid_size = Occurrence::normalise_grid_size(grid_size)
 
       cluster_result = get_or_generate_cached_clusters(grid_size)
-      cluster_result = cluster_result.in_rect(options[:bbox].split(','))
+
+      if options[:bbox]
+        cluster_result = cluster_result.in_rect(options[:bbox].split(','))
+      end
+
       cluster_result = cluster_result.limit(options[:limit])
       cluster_result = cluster_result.offset(options[:offset])
 
@@ -395,9 +399,7 @@ class Species < ActiveRecord::Base
       # Generate the new cache
       cache_record = generate_cache_clusters(grid_size)
 
-      # Only save this record if we feel we get some benefit from caching it.
-
-      cache_record.save() if occurrences.count() > CACHE_OCCURRENCE_CLUSTERS_THRESHOLD
+      cache_record.save()
 
     end
 

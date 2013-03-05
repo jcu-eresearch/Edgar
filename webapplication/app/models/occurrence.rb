@@ -64,6 +64,8 @@ class Occurrence < ActiveRecord::Base
     return nil if grid_size.nil?
 
     case
+    when grid_size >= 25
+      25
     when grid_size >= 10
       10
     when grid_size >= 5

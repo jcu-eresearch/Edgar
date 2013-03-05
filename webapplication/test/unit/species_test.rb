@@ -87,6 +87,7 @@ class SpeciesTest < ActiveSupport::TestCase
 
   test "GeoJSON output for clustered (with grid_size and bbox defined) points includes cluster_size property" do
     json = @emu.get_occurrences_geo_json(cluster: true, grid_size: 10, bbox: "-180,-90,180,90")
+#    json = @emu.get_occurrences_geo_json(grid_size: 10, bbox: "-180,-90,180,90")
 
     feature_hash = json["features"].first
     cluster_size = feature_hash["properties"]["cluster_size"]
@@ -104,28 +105,22 @@ class SpeciesTest < ActiveSupport::TestCase
 
   test "GeoJSON output for clustered occurrences contains the correct classification counts" do
     options = {}
-    options[:limit] = 1
     options[:cluster] = true
-    options[:grid_size] = 360
+    options[:grid_size] = 25
     results = @emu.get_occurrences_geo_json(options)
     feature = results["features"].first()
     properties = feature["properties"]
     classification_totals = properties["classificationTotals"]
-    assert_equal(1, results["features"].length, "With a grid size of 360 degrees (covering the earth), there should only be 1 cluster returned")
+    assert_equal(1, results["features"].length, "With a grid size of 25 degrees (covering all of Australia), we would only expect a few clusters")
 
     Classification::STANDARD_CLASSIFICATIONS.each do |classification|
       expected_count = @emu.occurrences.count(conditions: ["classification = ?", classification])
 
       actual_count = 0
-      classification_hash = classification_totals.select { |el|
-        el[:label] == classification
-      }.first
 
-      if classification_hash
-        actual_count = classification_hash[:total]
-      else
-        actual_count = 0
-      end
+      classification_hashes = classification_totals.each { |el|
+        actual_count += el[:total] if el[:label] == classification
+      }
 
       assert_equal(expected_count, actual_count, "There should be #{expected_count} records with a classification of #{classification}")
     end
