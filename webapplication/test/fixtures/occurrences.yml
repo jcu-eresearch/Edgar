@@ -54,3 +54,39 @@ three:
   species: emu
   source: ala
   location: SRID=4326;POINT(138.5833 -34.9333) # Adelaide
+
+four:
+  uncertainty: 1
+  date: 2013-02-04
+  classification: historic
+  basis: Preserved specimen
+  contentious: true
+  source_classification: historic
+  source_record_id:
+  species: rock_parrot
+  source: ala
+  location: SRID=4326;POINT(115.8585 -31.9554) # Perth
+
+five:
+  uncertainty: 1
+  date: 2013-02-04
+  classification: historic
+  basis: Preserved specimen
+  contentious: true
+  source_classification: historic
+  source_record_id:
+  species: rock_parrot
+  source: ala
+  location: SRID=4326;POINT(130.8333 -12.4667) # Darwin
+
+six:
+  uncertainty: 1
+  date: 2013-02-04
+  classification: historic
+  basis: Preserved specimen
+  contentious: true
+  source_classification: historic
+  source_record_id:
+  species: emu
+  source: ala
+  location: SRID=4326;POINT(137.4833 -34.9333) # Near Adelaide

@@ -19,10 +19,15 @@
 
 class Occurrence < ActiveRecord::Base
 
+
   # The smallest grid size for which clustering is enabled.
   # Below this value, grid size is set to nil (no clustering).
 
   MIN_GRID_SIZE_BEFORE_NO_CLUSTERING = 0.015
+
+  # The possible grid sizes that should be used (the normalised grid sizes)
+
+  GRID_SIZES = [0, MIN_GRID_SIZE_BEFORE_NO_CLUSTERING, 0.03125, 0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8]
 
   # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
 
@@ -63,30 +68,16 @@ class Occurrence < ActiveRecord::Base
   def self.normalise_grid_size(grid_size)
     return nil if grid_size.nil?
 
-    case
-    when grid_size >= 8
-      8
-    when grid_size >= 4
-      4
-    when grid_size >= 2
-      2
-    when grid_size >= 1
-      1
-    when grid_size >= 0.5
-      0.5
-    when grid_size >= 0.25
-      0.25
-    when grid_size >= 0.125
-      0.125
-    when grid_size >= 0.0625
-      0.0625
-    when grid_size >= 0.03125
-      0.03125
-    when grid_size >= MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
-      MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
-    else
-      nil
+    return_grid_size = nil
+
+    # Sort the grid sizes such that the smallest candidate grid sizes are first
+    GRID_SIZES.sort.each do |candidate_grid_size|
+      # If we are larger (or equal) to this grid size, normalise to it.
+      return_grid_size = candidate_grid_size if grid_size >= candidate_grid_size
     end
+
+    # This will be the last grid size we found that we were larger than (or equal to).
+    return return_grid_size
   end
 
   # Given a bbox, determine the appropriate grid size
@@ -107,7 +98,7 @@ class Occurrence < ActiveRecord::Base
     lat_lng_range_avg = lat_lng_range_avg.abs
 
     grid_size = ( lat_lng_range_avg / GRID_SIZE_WINDOW_FRACTION.to_f ).round(3)
-    grid_size = nil if grid_size < MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
+    grid_size = 0 if grid_size < MIN_GRID_SIZE_BEFORE_NO_CLUSTERING
 
     grid_size
   end
@@ -145,7 +136,7 @@ class Occurrence < ActiveRecord::Base
   #                Will be used to calculate a +grid_size+ if no +grid_size+
   #                option is provided.
   #
-  # If grid_size is determined to be nil, clusters will simply be the result of a group by location.
+  # If grid_size is determined to be 0, clusters will simply be the result of a group by location.
   # i.e. Clusters of exact geometries (e.g. the same point)
   #
   # Returns an ActiveRecord::Relation which when executed will result in
@@ -172,7 +163,7 @@ class Occurrence < ActiveRecord::Base
 
     qry = qry.select{count(location).as("cluster_size")}
 
-    if grid_size.nil?
+    if grid_size == 0
       qry = qry.
         select{st_astext(location).as("cluster_centroid")}.
         select{st_astext(st_envelope(st_collect(location))).as("cluster_envelope")}.

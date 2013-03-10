@@ -99,17 +99,21 @@ class OccurrenceTest < ActiveSupport::TestCase
   end
 
   test "Normalise grid_size does what we expect" do
-    assert_equal(10, Occurrence::normalise_grid_size(12))
-    assert_equal(5, Occurrence::normalise_grid_size(6))
-    assert_equal(1, Occurrence::normalise_grid_size(4.9))
+    assert_equal(8, Occurrence::normalise_grid_size(12))
+    assert_equal(4, Occurrence::normalise_grid_size(6))
+    assert_equal(2, Occurrence::normalise_grid_size(2.9))
+    assert_equal(1, Occurrence::normalise_grid_size(1.9))
     assert_equal(0.5, Occurrence::normalise_grid_size(0.5))
     assert_equal(0.5, Occurrence::normalise_grid_size(0.55))
     assert_equal(0.25, Occurrence::normalise_grid_size(0.3))
-    assert_equal(0.1, Occurrence::normalise_grid_size(0.12))
-    assert_equal(0.05, Occurrence::normalise_grid_size(0.06))
+    assert_equal(0.125, Occurrence::normalise_grid_size(0.126))
+    assert_equal(0.0625, Occurrence::normalise_grid_size(0.063))
+    assert_equal(0.03125, Occurrence::normalise_grid_size(0.032))
+    assert_equal(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING, Occurrence::normalise_grid_size(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING))
     assert_equal(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING, Occurrence::normalise_grid_size(0.016))
     assert_equal(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING, Occurrence::normalise_grid_size(Occurrence::MIN_GRID_SIZE_BEFORE_NO_CLUSTERING))
-    assert_equal(nil, Occurrence::normalise_grid_size(0.0001))
+    assert_equal(0, Occurrence::normalise_grid_size(0.0001))
+    assert_equal(0, Occurrence::normalise_grid_size(0))
   end
 
 end

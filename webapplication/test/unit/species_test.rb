@@ -106,23 +106,28 @@ class SpeciesTest < ActiveSupport::TestCase
   test "GeoJSON output for clustered occurrences contains the correct classification counts" do
     options = {}
     options[:cluster] = true
-    options[:grid_size] = 25
+    options[:grid_size] = 8
     results = @emu.get_occurrences_geo_json(options)
-    feature = results["features"].first()
-    properties = feature["properties"]
-    classification_totals = properties["classificationTotals"]
-    assert_equal(1, results["features"].length, "With a grid size of 25 degrees (covering all of Australia), we would only expect a few clusters")
+    features = results["features"]
+    assert_equal(4, @emu.occurrences.count, "We would should have 4 occurrences")
+    assert_equal(3, results["features"].length, "With a grid size of 8 degrees, we would should have 3 clusters. #{features.inspect}")
 
     Classification::STANDARD_CLASSIFICATIONS.each do |classification|
+
       expected_count = @emu.occurrences.count(conditions: ["classification = ?", classification])
 
       actual_count = 0
 
-      classification_hashes = classification_totals.each { |el|
-        actual_count += el[:total] if el[:label] == classification
-      }
+      features.each do |feature|
+        properties = feature["properties"]
+        classification_totals = properties["classificationTotals"]
 
-      assert_equal(expected_count, actual_count, "There should be #{expected_count} records with a classification of #{classification}")
+        classification_totals.each { |el|
+          actual_count += el[:total] if el[:label] == classification
+        }
+      end
+
+      assert_equal(expected_count, actual_count, "There should be #{expected_count} records with a classification of #{classification}.")
     end
 
   end
@@ -157,6 +162,21 @@ class SpeciesTest < ActiveSupport::TestCase
     assert_nil(@queued_for_modelling_species.first_requested_remodel)
 
     assert_equal("success is golden", @queued_for_modelling_species.last_completed_model_status_reason)
+
+  end
+
+  test "Check that self.generate_cache_for_all_species works and respects +cache_occurrence_clusters_threshold+" do
+    assert_equal(2, @rock_parrot.occurrences.count, "Should have 2 occurrences to start with")
+    assert(@emu.occurrences.count >= 3, "Should have at least 3 occurrences to start with")
+    assert_equal(0, @emu.species_cache_records.count, "Should have no cache to start with")
+    assert_equal(0, @rock_parrot.species_cache_records.count, "Should have no cache to start with")
+
+    Species.generate_cache_for_all_species(3)
+
+    # 1 for each grid size, and 1 for nil
+    assert_equal(Occurrence::GRID_SIZES.size, @emu.species_cache_records.count, "Should now have a cache for each grid_size")
+
+    assert_equal(0, @rock_parrot.species_cache_records.count, "Should have no cache as didn't meet threshold")
 
   end
 end

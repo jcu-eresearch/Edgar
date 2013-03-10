@@ -404,7 +404,30 @@ class Species < ActiveRecord::Base
     end
 
     return cache_record.cached_occurrence_clusters
+  end
 
+  # Generate the cache for all species, at all grid levels, that have out-of-date caches
+  # and have a total of equal to or more than cache_occurrence_clusters_threshold records.
+
+  def self.generate_cache_for_all_species cache_occurrence_clusters_threshold
+
+    logger.info "Generating cache for all #{Species.count} of our species (as necessary)"
+
+    # Update the cache if necessary for all species with total occurrences > CACHE_OCCURRENCE_CLUSTERS_THRESHOLD
+    Species.all.each do |sp|
+      if sp.occurrences.count >= cache_occurrence_clusters_threshold
+        logger.info "Generating cache for: #{sp.common_name}"
+        Occurrence::GRID_SIZES.each do |grid_size|
+          sp.get_or_generate_cached_clusters(grid_size)
+        end
+      else
+        logger.info "Skipping species #{sp.common_name}"
+      end
+    end
+
+    logger.info "Finished generating cache for all species"
+
+    nil
   end
 
   private
