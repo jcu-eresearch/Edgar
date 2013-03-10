@@ -392,7 +392,11 @@ class Species < ActiveRecord::Base
 
     if cache_record and cache_record.out_of_date_since.nil?
       # We have an in date cache record
+      Rails.logger.info "Cache for #{self.common_name} already exists and is in date"
     else
+      # Cache is either out of date, or doesn't exist
+      Rails.logger.info "No in date cache exists for #{self.common_name}"
+
       # Remove the old out-of-date cache if we had one
       cache_record.destroy if cache_record
 

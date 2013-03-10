@@ -12,6 +12,7 @@ end
 
 module Webapplication
   class Application < Rails::Application
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -46,6 +47,10 @@ module Webapplication
     # Use SQL instead of Active Record's schema dumper when creating the database.
     # This is necessary if your schema can't be completely dumped by the schema dumper,
     # like if you have constraints or database-specific column types
+    #
+    # The postgis extension doesn't handle this well. Basically, for the time being
+    # we can't use the active record schema dumper.
+    #
     config.active_record.schema_format = :sql
 
     # Enforce whitelist mode for mass assignment.
@@ -59,6 +64,10 @@ module Webapplication
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # The path to the importer bin folder.
+    # Assuming you checked this out of Git, you won't need to change this.
+    config.path_to_importer = File.join(Rails.root, "..","importing")
 
   end
 end
