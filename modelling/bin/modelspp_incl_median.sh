@@ -69,8 +69,9 @@ else
     exit 2
 fi
 
-# Load the java module for the HPC
+# Load the java and R modules for the HPC
 module load java
+module load R
 
 # Move to the species directory
 cd "$WORKING_DIR/inputs/$SPP"
