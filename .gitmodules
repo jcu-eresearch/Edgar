@@ -1,0 +1,3 @@
+[submodule "salt/roots/salt/jcu"]
+	path = salt/roots/salt/jcu
+	url = git@github.com:jcu-eresearch/shared-salt-states.git
