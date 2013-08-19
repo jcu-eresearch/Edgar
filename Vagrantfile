@@ -21,6 +21,7 @@ Vagrant.configure("2") do |config|
   ##########################
   config.vm.define :compute do |compute|
       compute.vm.network :private_network, ip: "192.168.100.100"
+      compute.vm.hostname = "compute"
 
       # Overide default virtualbox config options
       compute.vm.provider :virtualbox do |vb|
@@ -28,7 +29,6 @@ Vagrant.configure("2") do |config|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
       end
 
-      compute.vm.hostname = "compute"
 
       compute.vm.provision :salt do |salt|
         salt.minion_config = "salt/compute_minion"
