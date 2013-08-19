@@ -6,5 +6,4 @@ base:
   'compute':
     - jcu
   'map-server':
-    - jcu.apache
-    - jcu.mapserver
+    - edgar.map_server
