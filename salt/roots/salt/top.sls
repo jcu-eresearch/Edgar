@@ -1,8 +1,7 @@
 # 'base' is an environment, don't worry about it for now.
 base:
   'applications':
-    - jcu.apache
-    - jcu.postgis
+    - edgar.applications
   'compute':
     - jcu
   'map-server':
