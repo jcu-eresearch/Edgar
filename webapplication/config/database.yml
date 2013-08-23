@@ -4,7 +4,7 @@ defaults: &defaults
   username: edgar_on_rails
   password: password
   pool: 5
-  host: localhost
+  host: 127.0.0.1
   port: 5432
 
   # PostGIS 1.5: Should point to your postgis scripts folder
