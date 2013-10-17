@@ -1,6 +1,6 @@
 include:
-  - jcu.postgresql
-  - jcu.postgis
+  - jcu.postgresql.postgresql92
+  - jcu.postgis.postgis2_92
   - jcu.git
   - jcu.ruby.rvm.ruby_1_9_3.passenger
 
@@ -67,6 +67,14 @@ bundle install --deployment:
     - require:
       - user: applications
 
+/home/applications/Edgar/webapplication/db/development_structure.sql:
+  file.managed:
+    - user: applications
+    - group: applications
+    - mode: 744
+    - require:
+      - git: applications clone edgar
+
 /home/applications/webapplications/edgar:
   file.symlink:
     - target: /home/applications/Edgar/webapplication/public
@@ -78,8 +86,9 @@ edgar_on_rails:
     - runas: postgres
     - password: password
     - require:
-      - pkg: Install PostGIS Packages
-      - service: PostgreSQL Service
+      - pkg: Install PostGIS2_92 Packages
+      - cmd: PostgreSQL92 Init DB
+      - service: postgresql-9.2
 
 {% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
 
@@ -94,25 +103,28 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis;":
   cmd.wait:
     - user: postgres
     - watch:
-      - pkg: Install PostGIS Packages
+      - cmd: PostgreSQL92 Init DB
     - require:
+      - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
 
 psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
   cmd.wait:
     - user: postgres
     - watch:
-      - pkg: Install PostGIS Packages
+      - cmd: PostgreSQL92 Init DB
     - require:
+      - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
 
-psql -d {{ db }} < /home/applications/webapplication/Edgar/db/development_structure.sql:
+psql -d {{ db }} < /home/applications/Edgar/webapplication/db/development_structure.sql:
   cmd.wait:
-    - user: applications
+    - user: postgres
     - cwd: /home/applications/Edgar/webapplication
     - watch:
-      - pkg: Install PostGIS Packages
+      - cmd: PostgreSQL92 Init DB
     - require:
+      - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
       - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
       - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"

@@ -280,7 +280,8 @@ file_client: local
 # The state_output setting changes if the output is the full multi line
 # output for each changed state if set to 'full', but if set to 'terse'
 # the output will be shortened to a single line.
-#state_output: full
+state_output: mixed
+
 #
 # Fingerprint of the master public key to double verify the master is valid,
 # the master fingerprint can be found by running "salt-key -F master" on the
