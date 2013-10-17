@@ -67,14 +67,6 @@ bundle install --deployment:
     - require:
       - user: applications
 
-/home/applications/Edgar/webapplication/db/development_structure.sql:
-  file.managed:
-    - user: applications
-    - group: applications
-    - mode: 744
-    - require:
-      - git: applications clone edgar
-
 /home/applications/webapplications/edgar:
   file.symlink:
     - target: /home/applications/Edgar/webapplication/public
@@ -129,5 +121,6 @@ psql -d {{ db }} < /home/applications/Edgar/webapplication/db/development_struct
       - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
       - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
       - git: applications clone edgar
+      - file: /home/applications
 
 {% endfor %}
