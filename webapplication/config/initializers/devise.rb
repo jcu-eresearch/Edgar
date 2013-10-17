@@ -9,6 +9,12 @@ Devise.setup do |config|
   # Configure the class responsible to send e-mails.
   # config.mailer = "Devise::Mailer"
 
+  # ==> Devise secret key
+  # This should be CHANGED when deployed
+  # example_secret_key = 'ebc50afe3752d31b247643375dc4547325aeef2742745b6784ce7b589812e709c4103e63984f21f354799b5c35584550e90536147de59a56b4f6233002080d7c'
+  config.secret_key = ''
+  raise "Need to set config.secret_key" if config.secret_key.empty?
+
   # ==> ORM configuration
   # Load and configure the ORM. Supports :active_record (default) and
   # :mongoid (bson_ext recommended) by default. Other ORMs may be
@@ -258,4 +264,5 @@ Devise.setup do |config|
   # require user records to already exist locally before they can authenticate via
   # CAS, uncomment the following line.
   # config.cas_create_user = false  
+
 end
