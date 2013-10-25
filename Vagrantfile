@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
         salt.verbose = true
 
         salt.install_type = 'git'
-        salt.install_args = 'v0.16.0'
+        salt.install_args = 'v0.17.1'
       end
   end
 
@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
         salt.verbose = true
 
         salt.install_type = 'git'
-        salt.install_args = 'v0.16.0'
+        salt.install_args = 'v0.17.1'
       end
   end
 
@@ -72,7 +72,7 @@ Vagrant.configure("2") do |config|
         salt.verbose = true
 
         salt.install_type = 'git'
-        salt.install_args = 'v0.16.0'
+        salt.install_args = 'v0.17.1'
       end
   end
 
