@@ -1,15 +1,35 @@
 include:
-  - jcu.postgresql.postgresql92
-  - jcu.postgis.postgis2_92
   - jcu.git
   - jcu.ruby.rvm.ruby_1_9_3.passenger
+  - jcu.postgresql.postgresql92.client
+
+rvm_applications:
+  group.present
+
+extend:
+  rvm:
+    user:
+      - groups:
+        - rvm_applications
+        - wheel
+        - rvm
+      - require:
+        - group: rvm_applications
 
 applications:
+  group:
+    - present
   user.present:
     - fullname: Applications
     - shell: /bin/bash
     - createhome: true
     - gid_from_name: true
+    - groups:
+      - applications
+      - rvm_applications
+    - require:
+      - group: applications
+      - group: rvm_applications
 
 applications clone edgar:
   git.latest:
@@ -25,8 +45,8 @@ applications clone edgar:
   file.directory:
     - user: applications
     - group: applications
-    - dir_mode: 755
-    - file_mode: 644
+    - dir_mode: 751
+    - file_mode: 640
     - recurse:
       - user
       - group
@@ -45,6 +65,7 @@ bundle install --deployment:
       - gem: bundler
       - git: applications clone edgar
       - file: /home/applications
+      - pkg: Install PostgreSQL92 Client Packages
 
 /usr/local/nginx/conf/conf.d/edgar.conf:
   file.managed:
@@ -62,65 +83,15 @@ bundle install --deployment:
   file.directory:
     - user: applications
     - group: applications
-    - dir_mode: 755
-    - file_mode: 644
+    - dir_mode: 751
+    - file_mode: 640
     - require:
       - user: applications
 
 /home/applications/webapplications/edgar:
   file.symlink:
+    - user: applications
+    - group: rvm_applications
     - target: /home/applications/Edgar/webapplication/public
     - require:
       - file: /home/applications/webapplications
-
-edgar_on_rails:
-  postgres_user.present:
-    - runas: postgres
-    - password: password
-    - require:
-      - pkg: Install PostGIS2_92 Packages
-      - cmd: PostgreSQL92 Init DB
-      - service: postgresql-9.2
-
-{% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
-
-{{ db }}:
-  postgres_database.present:
-    - runas: postgres
-    - owner: edgar_on_rails
-    - require:
-      - postgres_user: edgar_on_rails
-
-psql -d {{ db }} -c "CREATE EXTENSION postgis;":
-  cmd.wait:
-    - user: postgres
-    - watch:
-      - cmd: PostgreSQL92 Init DB
-    - require:
-      - pkg: Install PostGIS2_92 Packages
-      - postgres_database: {{ db }}
-
-psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
-  cmd.wait:
-    - user: postgres
-    - watch:
-      - cmd: PostgreSQL92 Init DB
-    - require:
-      - pkg: Install PostGIS2_92 Packages
-      - postgres_database: {{ db }}
-
-psql -d {{ db }} < /home/applications/Edgar/webapplication/db/development_structure.sql:
-  cmd.wait:
-    - user: postgres
-    - cwd: /home/applications/Edgar/webapplication
-    - watch:
-      - cmd: PostgreSQL92 Init DB
-    - require:
-      - pkg: Install PostGIS2_92 Packages
-      - postgres_database: {{ db }}
-      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
-      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
-      - git: applications clone edgar
-      - file: /home/applications
-
-{% endfor %}
