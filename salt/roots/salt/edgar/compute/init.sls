@@ -2,6 +2,7 @@ include:
   - jcu.git
   - jcu.supervisord
   - jcu.python.python_2_7
+  - jcu.postgresql.postgresql92.client
 
 compute requirements:
   pkg.installed:
@@ -80,12 +81,21 @@ compute setup.py install:
       - git: compute clone edgar
 
 compute bootstrap:
-  cmd.wait:
+  cmd.run:
     - cwd: /home/compute/Edgar/importing
     - user: compute
     - name: ../env/bin/python bootstrap.py
     - watch:
-      - cmd: compute setup.py install
+      - git: compute clone edgar
+
+compute buildout:
+  cmd.run:
+    - cwd: /home/compute/Edgar/importing
+    - user: compute
+    - name: ./bin/buildout
+    - require:
+      - cmd: compute bootstrap
+      - git: compute clone edgar
 
 /etc/supervisord.conf:
   file.symlink:
