@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   #   COMPUTE VM CONFIG    #
   ##########################
   config.vm.define :compute do |compute|
-      compute.vm.network :private_network, ip: "192.168.100.100"
+      compute.vm.network :private_network, ip: "192.168.100.110"
       compute.vm.hostname = "compute"
 
       # Overide default virtualbox config options
@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
   # Applications VM CONFIG  #
   ##########################
   config.vm.define :applications do |applications|
-      applications.vm.network :private_network, ip: "192.168.100.101"
+      applications.vm.network :private_network, ip: "192.168.100.111"
       applications.vm.hostname = "applications"
 
       applications.vm.provision :salt do |salt|
@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
   #  Map Server VM CONFIG  #
   ##########################
   config.vm.define :map_server do |map_server|
-      map_server.vm.network :private_network, ip: "192.168.100.102"
+      map_server.vm.network :private_network, ip: "192.168.100.112"
       map_server.vm.hostname = "map-server"
 
       map_server.vm.provision :salt do |salt|

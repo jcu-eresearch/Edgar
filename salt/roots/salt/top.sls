@@ -3,6 +3,6 @@ base:
   'applications':
     - edgar.applications
   'compute':
-    - jcu
+    - edgar.compute
   'map-server':
     - edgar.map_server
