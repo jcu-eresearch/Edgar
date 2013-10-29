@@ -93,6 +93,7 @@ bundle install --deployment:
     - mode: 644
     - user: applications
     - group: applications
+    - require:
       - user: applications
       - git: applications clone edgar
 
