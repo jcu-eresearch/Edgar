@@ -19,7 +19,7 @@ extend:
 applications requirements:
   pkg.installed:
     - pkgs:
-      - rgeo-devel
+      - geos-devel
       - v8-devel
 
 applications:
