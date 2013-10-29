@@ -6,6 +6,11 @@ include:
   - jcu.postgresql.postgresql92
   - jcu.postgis.postgis2_92
 
+extend:
+  PostgreSQL92 Init DB:
+    cmd.wait:
+      - name: service postgresql-9.2 initdb -D /tmp/pg_data_directory
+
 map_server:
   user.present:
     - fullname: Map Server
