@@ -16,6 +16,12 @@ extend:
       - require:
         - group: rvm_applications
 
+applications requirements:
+  pkg.installed:
+    - pkgs:
+      - rgeo-devel
+      - v8-devel
+
 applications:
   group:
     - present
@@ -30,6 +36,7 @@ applications:
     - require:
       - group: applications
       - group: rvm_applications
+      - pkg: applications requirements
 
 applications clone edgar:
   git.latest:
@@ -55,17 +62,22 @@ applications clone edgar:
       - user: applications
       - git: applications clone edgar
 
+sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config:
+  cmd.run:
+    - require:
+      - gem: bundler
+      - pkg: Install PostgreSQL92 Client Packages
+
 bundle install --deployment:
-  module.run:
-    - name: rvm.do
-    - ruby: ruby-1.9.3
-    - runas: rvm
-    - command: bundle install --gemfile=/home/applications/Edgar/webapplication/Gemfile
+  cmd.run:
+    - name: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do bundle install --gemfile=/home/applications/Edgar/webapplication/Gemfile
     - require:
       - gem: bundler
       - git: applications clone edgar
       - file: /home/applications
       - pkg: Install PostgreSQL92 Client Packages
+      - pkg: applications requirements
+      - cmd: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config
 
 /usr/local/nginx/conf/conf.d/edgar.conf:
   file.managed:
