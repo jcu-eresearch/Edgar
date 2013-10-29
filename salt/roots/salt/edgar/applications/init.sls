@@ -88,6 +88,14 @@ bundle install --deployment:
     - require:
       - user: applications
 
+/home/applications/Edgar/webapplication/Gemfile:
+  file.managed:
+    - mode: 644
+    - user: applications
+    - group: applications
+      - user: applications
+      - git: applications clone edgar
+
 /home/applications/webapplications/edgar:
   file.symlink:
     - user: applications
