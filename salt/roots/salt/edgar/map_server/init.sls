@@ -6,10 +6,15 @@ include:
   - jcu.postgresql.postgresql92
   - jcu.postgis.postgis2_92
 
-extend:
-  PostgreSQL92 Init DB:
-    cmd.wait:
-      - name: service postgresql-9.2 initdb -D /tmp/pg_data_directory
+/etc/sysconfig/pgsql/postgresql:
+  file.managed:
+    - source:
+      - salt://edgar/map_server/postgresql.conf
+    - user: root
+    - group: root
+    - mode: 744
+    - require_in:
+      - cmd: PostgreSQL92 Init DB
 
 map_server:
   user.present:
