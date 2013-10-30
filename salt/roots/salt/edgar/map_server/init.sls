@@ -6,6 +6,12 @@ include:
   - jcu.postgresql.postgresql92
   - jcu.postgis.postgis2_92
 
+extend:
+  /var/lib/pgsql/9.2/data/pg_hba.conf:
+    file.managed:
+      - source:
+        - salt://edgar/map_server/pg_hba.conf
+
 /etc/sysconfig/pgsql/postgresql-9.2:
   file.managed:
     - source:
@@ -104,3 +110,18 @@ psql -d {{ db }} < /home/map_server/Edgar/webapplication/db/development_structur
       - file: /home/map_server
 
 {% endfor %}
+
+postgres add to firewall:
+  module.wait:
+    - name: iptables.insert
+    - table: filter
+    - chain: INPUT
+    - position: 3
+    - rule: -p tcp --dport 5432 -j ACCEPT
+    - watch_in:
+      - module: save postgres iptables
+
+save postgres iptables:
+  module.run:
+    - name: iptables.save
+    - filename: /etc/sysconfig/iptables
