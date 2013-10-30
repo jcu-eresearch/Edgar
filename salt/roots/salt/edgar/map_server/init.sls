@@ -9,7 +9,7 @@ include:
 extend:
   /var/lib/pgsql/9.2/data/pg_hba.conf:
     file.managed:
-      - name: /tmp/pg_data/pg_hba.conf:
+      - name: /tmp/pg_data/pg_hba.conf
       - source:
         - salt://edgar/map_server/pg_hba.conf
 
