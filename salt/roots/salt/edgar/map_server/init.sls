@@ -126,3 +126,9 @@ save postgres iptables:
   module.run:
     - name: iptables.save
     - filename: /etc/sysconfig/iptables
+
+/tmp/pg_data/postgresql.conf:
+  file.append:
+    - text: "listen_addresses='*'"
+    - watch_in:
+      - service: postgresql-9.2
