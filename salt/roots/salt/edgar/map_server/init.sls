@@ -34,7 +34,7 @@ map_server clone edgar:
   git.latest:
     - name: https://github.com/jcu-eresearch/Edgar.git
     - target: /home/map_server/Edgar
-    - runas: map_server
+    - user: map_server
     - rev: Edgar_On_Rails
     - require:
       - user: map_server
@@ -62,7 +62,7 @@ map_server clone edgar:
 
 edgar_on_rails:
   postgres_user.present:
-    - runas: postgres
+    - user: postgres
     - password: password
     - require:
       - pkg: Install PostGIS2_92 Packages
@@ -73,7 +73,7 @@ edgar_on_rails:
 
 {{ db }}:
   postgres_database.present:
-    - runas: postgres
+    - user: postgres
     - owner: edgar_on_rails
     - require:
       - postgres_user: edgar_on_rails
