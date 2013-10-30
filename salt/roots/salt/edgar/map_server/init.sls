@@ -6,10 +6,10 @@ include:
   - jcu.postgresql.postgresql92
   - jcu.postgis.postgis2_92
 
-/etc/sysconfig/pgsql/postgresql:
+/etc/sysconfig/pgsql/postgresql-9.2:
   file.managed:
     - source:
-      - salt://edgar/map_server/postgresql.conf
+      - salt://edgar/map_server/postgresql-9.2.conf
     - user: root
     - group: root
     - mode: 744
