@@ -113,7 +113,7 @@ psql -d {{ db }} < /home/map_server/Edgar/webapplication/db/development_structur
 {% endfor %}
 
 postgres add to firewall:
-  module.wait:
+  module.run:
     - name: iptables.insert
     - table: filter
     - chain: INPUT
