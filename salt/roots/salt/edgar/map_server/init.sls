@@ -95,7 +95,7 @@ touch /var/lib/pgsql/.pgpass {{db}}:
       - postgres_user: edgar_on_rails
       - file: /var/lib/pgsql/.pgpass {{db}}
 
-psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis;":
+psql -d {{ db }} -c "CREATE EXTENSION postgis;":
   cmd.wait:
     - user: postgres
     - watch:
@@ -104,7 +104,7 @@ psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis;":
       - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
 
-psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
+psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
   cmd.wait:
     - user: postgres
     - watch:
@@ -122,8 +122,8 @@ psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} < /home/map_server/Edgar/webappl
     - require:
       - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
-      - cmd: psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
-      - cmd: psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis;"
+      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
+      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
       - git: map_server clone edgar
       - file: /home/map_server
 
