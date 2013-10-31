@@ -74,18 +74,18 @@ edgar_on_rails:
 
 {% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
 
-touch /home/postgres/.pgpass {{db}}:
+touch ~postgres/.pgpass {{db}}:
   file.managed:
-      - name: /home/postgres/.pgpass
+      - name: ~postgres/.pgpass
       - owner: postgres
       - mode: 600
 
-/home/postgres/.pgpass {{db}}:
+~postgres/.pgpass {{db}}:
   file.append:
-      - name: /home/postgres/.pgpass
+      - name: ~postgres/.pgpass
       - text: 127.0.0.1:5432:{{db}}:edgar_on_rails::{{edgar_db_password}}
       - require:
-        - file: touch /home/postgres/.pgpass {{db}}
+        - file: touch ~postgres/.pgpass {{db}}
 
 {{ db }}:
   postgres_database.present:
@@ -93,7 +93,7 @@ touch /home/postgres/.pgpass {{db}}:
     - owner: edgar_on_rails
     - require:
       - postgres_user: edgar_on_rails
-      - file: /home/postgres/.pgpass {{db}}
+      - file: ~postgres/.pgpass {{db}}
 
 psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis;":
   cmd.wait:
