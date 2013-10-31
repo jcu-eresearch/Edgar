@@ -122,8 +122,8 @@ psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} < /home/map_server/Edgar/webappl
     - require:
       - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
-      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
-      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
+      - cmd: psql -U edgar_on_rails -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
+      - cmd: psql -U edgar_on_rails -d {{ db }} -c "CREATE EXTENSION postgis;"
       - git: map_server clone edgar
       - file: /home/map_server
 
