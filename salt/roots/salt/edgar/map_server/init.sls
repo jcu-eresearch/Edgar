@@ -76,7 +76,7 @@ edgar_on_rails:
 
 touch /home/postgres/.pgpass {{db}}:
   file.managed:
-      - name: /home/postgres.pgpass
+      - name: /home/postgres/.pgpass
       - owner: postgres
       - mode: 600
 
