@@ -1,3 +1,5 @@
+{% set edgar_db_password = 'password' %}
+
 include:
   - jcu.apache
   - jcu.php
@@ -22,6 +24,7 @@ extend:
     - mode: 744
     - require_in:
       - cmd: PostgreSQL92 Init DB
+
 
 map_server:
   user.present:
@@ -63,7 +66,7 @@ map_server clone edgar:
 edgar_on_rails:
   postgres_user.present:
     - user: postgres
-    - password: password
+    - password: {{edgar_db_password}}
     - require:
       - pkg: Install PostGIS2_92 Packages
       - cmd: PostgreSQL92 Init DB
@@ -71,14 +74,22 @@ edgar_on_rails:
 
 {% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
 
+/home/postgres/.pgpass {{db}}:
+  file.append:
+      - name: /home/postgres/.pgpass
+      - text: 127.0.0.1:5432:{{db}}:edgar_on_rails::{{edgar_db_password}}
+      - owner: postgres
+      - mode: 600
+
 {{ db }}:
   postgres_database.present:
     - user: postgres
     - owner: edgar_on_rails
     - require:
       - postgres_user: edgar_on_rails
+      - file: /home/postgres/.pgpass {{db}}
 
-psql -d {{ db }} -c "CREATE EXTENSION postgis;":
+psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis;":
   cmd.wait:
     - user: postgres
     - watch:
@@ -87,7 +98,7 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis;":
       - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
 
-psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
+psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
   cmd.wait:
     - user: postgres
     - watch:
@@ -96,7 +107,7 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
       - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
 
-psql -d {{ db }} < /home/map_server/Edgar/webapplication/db/development_structure.sql:
+psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} < /home/map_server/Edgar/webapplication/db/development_structure.sql:
   cmd.wait:
     - user: postgres
     - cwd: /home/map_server/Edgar/webapplication
