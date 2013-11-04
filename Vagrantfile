@@ -76,4 +76,118 @@ Vagrant.configure("2") do |config|
       end
   end
 
+  ############################
+  # NECTAR COMPUTE VM CONFIG #
+  ############################
+  config.vm.define :nectar_compute do |nectar_compute|
+
+    # The box isn't used (hence it's just a dummy box)
+    nectar_compute.vm.box     = "dummy"
+    nectar_compute.vm.box_url = "https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box"
+
+    nectar_compute.ssh.private_key_path = "~/.ssh/id_rsa"
+
+    nectar_compute.vm.provider :openstack do |os|
+      # Change these...
+      os.username     = ""
+      os.api_key      = ""
+      os.keypair_name = ""
+      os.tenant       = ""
+
+      os.flavor       = /m1.xxlarge/
+      #os.image        = "0debdc10-1eeb-4239-8177-3e756c2758c9"
+      os.image        = "442a1921-1759-4d60-b899-378b0943c405"
+      os.endpoint     = "https://keystone.rc.nectar.org.au:5000/v2.0/tokens"
+      os.ssh_username = "ec2-user"
+
+      os.security_groups   = ['ssh', 'http', 'icmp', 'rsync']
+      os.availability_zone = "qld"
+    end
+
+    nectar_compute.vm.provision :salt do |salt|
+      salt.minion_config = "salt/compute_minion"
+      salt.run_highstate = true
+      salt.verbose = true
+
+      salt.install_type = 'git'
+      salt.install_args = 'v0.17.1'
+    end
+  end
+
+  #################################
+  # NECTAR APPLICATIONS VM CONFIG #
+  #################################
+  config.vm.define :nectar_applications do |nectar_applications|
+
+    # The box isn't used (hence it's just a dummy box)
+    nectar_applications.vm.box     = "dummy"
+    nectar_applications.vm.box_url = "https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box"
+
+    nectar_applications.ssh.private_key_path = "~/.ssh/id_rsa"
+
+    nectar_applications.vm.provider :openstack do |os|
+      # Change these...
+      os.username     = ""
+      os.api_key      = ""
+      os.keypair_name = ""
+      os.tenant       = ""
+
+      os.flavor       = /m1.small/
+      #os.image        = "0debdc10-1eeb-4239-8177-3e756c2758c9"
+      os.image        = "442a1921-1759-4d60-b899-378b0943c405"
+      os.endpoint     = "https://keystone.rc.nectar.org.au:5000/v2.0/tokens"
+      os.ssh_username = "ec2-user"
+
+      os.security_groups   = ['ssh', 'http', 'icmp', 'rsync']
+      os.availability_zone = "qld"
+    end
+
+    nectar_applications.vm.provision :salt do |salt|
+      salt.minion_config = "salt/applications_minion"
+      salt.run_highstate = true
+      salt.verbose = true
+
+      salt.install_type = 'git'
+      salt.install_args = 'v0.17.1'
+    end
+  end
+
+  ###############################
+  # NECTAR MAP SERVER VM CONFIG #
+  ###############################
+  config.vm.define :nectar_map_server do |nectar_map_server|
+
+    # The box isn't used (hence it's just a dummy box)
+    nectar_map_server.vm.box     = "dummy"
+    nectar_map_server.vm.box_url = "https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box"
+
+    nectar_map_server.ssh.private_key_path = "~/.ssh/id_rsa"
+
+    nectar_map_server.vm.provider :openstack do |os|
+      # Change these...
+      os.username     = ""
+      os.api_key      = ""
+      os.keypair_name = ""
+      os.tenant       = ""
+
+      os.flavor       = /m1.small/
+      #os.image        = "0debdc10-1eeb-4239-8177-3e756c2758c9"
+      os.image        = "442a1921-1759-4d60-b899-378b0943c405"
+      os.endpoint     = "https://keystone.rc.nectar.org.au:5000/v2.0/tokens"
+      os.ssh_username = "ec2-user"
+
+      os.security_groups   = ['ssh', 'http', 'icmp', 'rsync']
+      os.availability_zone = "qld"
+    end
+
+    nectar_map_server.vm.provision :salt do |salt|
+      salt.minion_config = "salt/map_server_minion"
+      salt.run_highstate = true
+      salt.verbose = true
+
+      salt.install_type = 'git'
+      salt.install_args = 'v0.17.1'
+    end
+  end
+
 end
