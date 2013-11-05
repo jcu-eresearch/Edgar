@@ -72,6 +72,10 @@ edgar_on_rails:
       - cmd: PostgreSQL92 Init DB
       - service: postgresql-9.2
 
+yum update -y:
+  cmd.run:
+    - user: root
+
 {% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
 
 touch /var/lib/pgsql/.pgpass {{db}}:
@@ -79,6 +83,10 @@ touch /var/lib/pgsql/.pgpass {{db}}:
       - name: /var/lib/pgsql/.pgpass
       - owner: postgres
       - mode: 600
+      - prereq:
+        - cmd: yum update -y
+      - require:
+        - service: postgresql-9.2
 
 /var/lib/pgsql/.pgpass {{db}}:
   file.append:
