@@ -89,18 +89,17 @@ Vagrant.configure("2") do |config|
 
     nectar_compute.vm.provider :openstack do |os|
       # Change these...
-      os.username     = ""
-      os.api_key      = ""
-      os.keypair_name = ""
-      os.tenant       = ""
+      os.username     = "#{ENV['NECTAR_USERNAME']}"
+      os.api_key      = "#{ENV['NECTAR_API_KEY']}"
+      os.keypair_name = "#{ENV['NECTAR_KEYPAIR']}"
+      os.tenant       = "#{ENV['NECTAR_CLIMAS_COMPUTE_TENANT']}"
 
       os.flavor       = /m1.xxlarge/
-      #os.image        = "0debdc10-1eeb-4239-8177-3e756c2758c9"
-      os.image        = "442a1921-1759-4d60-b899-378b0943c405"
+      os.image        = "e84371d5-cda5-4e53-9851-08a4150b13a7"
       os.endpoint     = "https://keystone.rc.nectar.org.au:5000/v2.0/tokens"
       os.ssh_username = "ec2-user"
 
-      os.security_groups   = ['ssh', 'http', 'icmp', 'rsync']
+      os.security_groups   = ['ssh', 'rsync']
       os.availability_zone = "qld"
     end
 
@@ -127,18 +126,17 @@ Vagrant.configure("2") do |config|
 
     nectar_applications.vm.provider :openstack do |os|
       # Change these...
-      os.username     = ""
-      os.api_key      = ""
-      os.keypair_name = ""
-      os.tenant       = ""
+      os.username     = "#{ENV['NECTAR_USERNAME']}"
+      os.api_key      = "#{ENV['NECTAR_API_KEY']}"
+      os.keypair_name = "#{ENV['NECTAR_KEYPAIR']}"
+      os.tenant       = "#{ENV['NECTAR_CLIMAS_APPLICATIONS_TENANT']}"
 
-      os.flavor       = /m1.small/
-      #os.image        = "0debdc10-1eeb-4239-8177-3e756c2758c9"
-      os.image        = "442a1921-1759-4d60-b899-378b0943c405"
+      os.flavor       = /m1.medium/
+      os.image        = "e84371d5-cda5-4e53-9851-08a4150b13a7"
       os.endpoint     = "https://keystone.rc.nectar.org.au:5000/v2.0/tokens"
       os.ssh_username = "ec2-user"
 
-      os.security_groups   = ['ssh', 'http', 'icmp', 'rsync']
+      os.security_groups   = ['ssh', 'web', 'rsync']
       os.availability_zone = "qld"
     end
 
@@ -165,18 +163,17 @@ Vagrant.configure("2") do |config|
 
     nectar_map_server.vm.provider :openstack do |os|
       # Change these...
-      os.username     = ""
-      os.api_key      = ""
-      os.keypair_name = ""
-      os.tenant       = ""
+      os.username     = "#{ENV['NECTAR_USERNAME']}"
+      os.api_key      = "#{ENV['NECTAR_API_KEY']}"
+      os.keypair_name = "#{ENV['NECTAR_KEYPAIR']}"
+      os.tenant       = "#{ENV['NECTAR_CLIMAS_MAP_SERVER_TENANT']}"
 
-      os.flavor       = /m1.small/
-      #os.image        = "0debdc10-1eeb-4239-8177-3e756c2758c9"
-      os.image        = "442a1921-1759-4d60-b899-378b0943c405"
+      os.flavor       = /m1.medium/
+      os.image        = "e84371d5-cda5-4e53-9851-08a4150b13a7"
       os.endpoint     = "https://keystone.rc.nectar.org.au:5000/v2.0/tokens"
       os.ssh_username = "ec2-user"
 
-      os.security_groups   = ['ssh', 'http', 'icmp', 'rsync']
+      os.security_groups   = ['ssh', 'web', 'postgres', 'rsync']
       os.availability_zone = "qld"
     end
 
