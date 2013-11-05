@@ -67,6 +67,7 @@ install compute virtual env:
     - user: compute
     - require:
       - git: compute clone edgar
+      - cmd: python_2_7 make && make altinstall
     - watch:
       - cmd: compute extract virtual env
 
@@ -87,6 +88,8 @@ compute bootstrap:
     - name: ../env/bin/python bootstrap.py
     - watch:
       - git: compute clone edgar
+    - require:
+      - cmd: install compute virtual env
 
 compute buildout:
   cmd.run:
@@ -96,6 +99,14 @@ compute buildout:
     - require:
       - cmd: compute bootstrap
       - git: compute clone edgar
+
+yum install supervisor -y:
+  cmd.run:
+    - user: root
+    - require_in:
+      - pkg: supervisor
+    - require:
+      - pkgrepo: jcu-eresearch
 
 /etc/supervisord.conf:
   file.symlink:
