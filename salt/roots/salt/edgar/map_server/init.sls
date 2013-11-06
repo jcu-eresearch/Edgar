@@ -64,7 +64,7 @@ map_server clone edgar:
 edgar_on_rails:
   postgres_user.present:
     - user: postgres
-    - password: {{grains['database.password']}}
+    - password: {{pillar['database']['password']}}
     - require:
       - pkg: Install PostGIS2_92 Packages
       - cmd: PostgreSQL92 Init DB
@@ -89,7 +89,7 @@ touch /var/lib/pgsql/.pgpass {{db}}:
 /var/lib/pgsql/.pgpass {{db}}:
   file.append:
       - name: /var/lib/pgsql/.pgpass
-      - text: 127.0.0.1:5432:{{db}}:edgar_on_rails:{{edgar_db_password}}
+      - text: 127.0.0.1:5432:{{db}}:edgar_on_rails:{{pillar['database']['password']}}
       - require:
         - file: touch /var/lib/pgsql/.pgpass {{db}}
 

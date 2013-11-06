@@ -51,7 +51,7 @@ applications clone edgar:
 /home/applications/Edgar/webapplication/config/initializers/devise.rb:
   file.replace:
     - pattern: "config.secret_key = ''"
-    - repl: "config.secret_key = '{{grains['applications.edgar_devise_secret_key']}}'"
+    - repl: "config.secret_key = '{{pillar['applications']['edgar_devise_secret_key']}}'"
     - require:
       - git: applications clone edgar
 
@@ -59,7 +59,7 @@ update database password:
   file.replace:
     - name: /home/applications/Edgar/webapplication/config/database.yml
     - pattern: "password: password"
-    - repl: "password: '{{grains['database.password']}}'"
+    - repl: "password: '{{pillar['edgar_database']['password']}}'"
     - require:
       - git: applications clone edgar
 
@@ -67,7 +67,7 @@ update database host:
   file.replace:
     - name: /home/applications/Edgar/webapplication/config/database.yml
     - pattern: "host: 127.0.0.1"
-    - repl: "host: '{{grains['database.host']}}'"
+    - repl: "host: '{{pillar['database']['host']}}'"
     - require:
       - git: applications clone edgar
 
