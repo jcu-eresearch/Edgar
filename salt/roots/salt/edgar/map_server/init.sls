@@ -1,5 +1,3 @@
-{% set edgar_db_password = 'password' %}
-
 include:
   - jcu.apache
   - jcu.php
@@ -66,7 +64,7 @@ map_server clone edgar:
 edgar_on_rails:
   postgres_user.present:
     - user: postgres
-    - password: {{edgar_db_password}}
+    - password: {{grains['database.password']}}
     - require:
       - pkg: Install PostGIS2_92 Packages
       - cmd: PostgreSQL92 Init DB
