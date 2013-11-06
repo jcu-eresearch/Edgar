@@ -59,7 +59,7 @@ update database password:
   file.replace:
     - name: /home/applications/Edgar/webapplication/config/database.yml
     - pattern: "password: password"
-    - repl: "password: '{{pillar['edgar_database']['password']}}'"
+    - repl: "password: '{{pillar['database']['password']}}'"
     - require:
       - git: applications clone edgar
 
