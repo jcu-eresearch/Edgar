@@ -9,6 +9,10 @@ for root, dirs, files in os.walk("/home/compute/Edgar/importing/eggs"):
     for idir in dirs:
         sys.path.insert(0, os.path.join(root, idir))
 
+for root, dirs, files in os.walk("/home/compute/Edgar/env/lib/python2.7/site-packages"):
+    for idir in dirs:
+        sys.path.insert(0, os.path.join(root, idir))
+
 sys.path[0:0] = [
     '/home/compute/Edgar/importing',
 ]
