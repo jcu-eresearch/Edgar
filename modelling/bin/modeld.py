@@ -2,16 +2,17 @@
 
 import pathfix
 import sys
+import os
+
+# Add all the nearby eggs (this really needs to be re-written...)
+for root, dirs, files in os.walk("/home/compute/Edgar/importing/eggs"):
+    for idir in dirs:
+        sys.path.insert(0, os.path.join(root, idir))
+
 sys.path[0:0] = [
     '/home/compute/Edgar/importing',
-    '/home/compute/Edgar/importing/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
-    '/home/compute/Edgar/importing/eggs/psycopg2-2.4.5-py2.6-linux-x86_64.egg',
-    '/home/compute/Edgar/importing/eggs/argparse-1.2.1-py2.6.egg',
-    '/home/compute/Edgar/importing/eggs/SQLAlchemy-0.7.8-py2.6-linux-x86_64.egg',
-    '/home/compute/Edgar/importing/eggs/GeoAlchemy-0.7.1-py2.6.egg',
-    '/home/compute/Edgar/importing/eggs/Shapely-1.2.14-py2.6-linux-x86_64.egg',
-    '/home/compute/Edgar/importing/eggs/pyshp-1.1.4-py2.6.egg',
-    ]
+]
+
 import logging
 import logging.handlers
 import json
