@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name='edgar_importing',
-    install_requires=['pyshp', 'shapely', 'GeoAlchemy', 'sqlalchemy', 'argparse', 'psycopg2', 'setuptools'],
+    install_requires=['pyshp', 'shapely', 'GeoAlchemy', 'sqlalchemy', 'argparse', 'psycopg2', 'setuptools', 'paramiko'],
     entry_points=('''
         [console_scripts]
         ala_db_update = edgar_importing.ala_db_update:main
