@@ -12,9 +12,9 @@ sys.path.append(importingsrcpath)
 for root, dirs, files in os.walk(os.path.realpath(os.path.dirname(__file__) + '/../../importing')):
     for f in files:
         fullpath = os.path.join(root, f)
-	sys.path.append(fullpath)
+        sys.path.append(fullpath)
 
 for root, dirs, files in os.walk(os.path.realpath('/usr/lib/python2.6/site-packages/')):
     for f in files:
         fullpath = os.path.join(root, f)
-	sys.path.append(fullpath)
+        sys.path.append(fullpath)
