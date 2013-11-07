@@ -3,16 +3,6 @@
 import pathfix
 import sys
 import os
-
-# Add all the nearby eggs (this really needs to be re-written...)
-for root, dirs, files in os.walk("/home/compute/Edgar/importing/eggs"):
-    for idir in dirs:
-        sys.path.insert(0, os.path.join(root, idir))
-
-sys.path[0:0] = [
-    '/home/compute/Edgar/importing',
-]
-
 import logging
 import logging.handlers
 import json
