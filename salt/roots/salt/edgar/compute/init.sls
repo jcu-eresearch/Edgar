@@ -4,11 +4,19 @@ include:
   - jcu.python.python_2_7
   - jcu.postgresql.postgresql92.client
 
+kill supervisord:
+  service:
+    - name: supervisord
+    - dead
+    - require:
+      - pkg: supervisor
+
 compute requirements:
   pkg.installed:
     - pkgs:
       - git
       - wget
+      - geos
   require:
     - cmd: python_2_7 make && make altinstall
 
@@ -70,6 +78,8 @@ install compute virtual env:
       - cmd: python_2_7 make && make altinstall
     - watch:
       - cmd: compute extract virtual env
+    - require:
+      - service: kill supervisord
 
 compute setup.py install:
   cmd.wait:
@@ -99,6 +109,7 @@ compute buildout:
     - require:
       - cmd: compute bootstrap
       - git: compute clone edgar
+      - file: /etc/supervisord.conf
     - watch_in:
       - service: supervisord
 
@@ -118,8 +129,6 @@ yum install supervisor -y:
       - git: compute clone edgar
       - cmd: compute bootstrap
       - file: /var/log/supervisord
-    - watch_in:
-      - service: supervisord
 
 save iptables:
   module.run:
@@ -143,3 +152,45 @@ update hpc_config base url:
     - repl: cakeAppBaseURL = "{{pillar['applications']['edgar_base_url']}}"
     - require:
       - git: compute clone edgar
+    - watch_in:
+      - service: supervisord
+
+copy importing config:
+  file.copy:
+    - name: /home/compute/Edgar/importing/config.json
+    - source: /home/compute/Edgar/importing/config.example.json
+    - user: compute
+    - group: compute
+    - mode: 640
+    - require:
+      - git: compute clone edgar
+
+update importing database:
+  file.replace:
+    - name: /home/compute/Edgar/importing/config.json
+    - pattern: '"db.url": "postgresql\+psycopg2://edgar_backend:backend_password_here@/edgar"'
+    - repl: '"db.url": "postgresql+psycopg2://edgar_on_rails:{{pillar['database']['password']}}@{{pillar['database']['host']}}:5432/edgar_on_rails_prod_db"'
+    - require:
+      - file: copy importing config
+    - watch_in:
+      - service: supervisord
+
+update importing api_key:
+  file.replace:
+    - name: /home/compute/Edgar/importing/config.json
+    - pattern: '"alaApiKey": null'
+    - repl: '"alaApiKey": "{{pillar['ala']['api_key']}}"'
+    - require:
+      - file: copy importing config
+    - watch_in:
+      - service: supervisord
+
+update importing ala_sync_url:
+  file.replace:
+    - name: /home/compute/Edgar/importing/config.json
+    - pattern: '"alaVettingSyncUrl": null'
+    - repl: '"alaVettingSyncUrl": "{{pillar['ala']['vetting_sync_url']}}"'
+    - require:
+      - file: copy importing config
+    - watch_in:
+      - service: supervisord
