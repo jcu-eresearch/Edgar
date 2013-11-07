@@ -99,6 +99,8 @@ compute buildout:
     - require:
       - cmd: compute bootstrap
       - git: compute clone edgar
+    - watch_in:
+      - service: supervisord
 
 yum install supervisor -y:
   cmd.run:
