@@ -1,8 +1,11 @@
 base:
+  '*':
+    - edgar.ala
   'applications':
     - edgar.applications
     - edgar.database
   'compute':
+    - edgar.applications
     - edgar.python
     - edgar.virtualenv
     - edgar.compute

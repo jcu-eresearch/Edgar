@@ -1,0 +1,2 @@
+ala:
+  api_key: ''
