@@ -7,8 +7,9 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 # If we can't find the ALA source
-unless Source.find_by name: 'ALA'
-    ala_source = Source.new()
-    ala_source.name = "ALA"
-    ala_source.save()
-end
+Source.find_or_create_by(name: 'ALA')
+#Source.find_by name: 'ALA'
+#    ala_source = Source.new()
+#    ala_source.name = "ALA"
+#    ala_source.save()
+#end
