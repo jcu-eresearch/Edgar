@@ -6,11 +6,9 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-ala_source = Source.new()
-ala_source.name = "ALA"
-ala_source.save()
-
-cockatoo = Species.new()
-cockatoo.common_name = "Palm Cockatoo"
-cockatoo.scientific_name = "Probosciger aterrimus"
-cockatoo.save()
+# If we can't find the ALA source
+unless Source.find_by name: 'ALA'
+    ala_source = Source.new()
+    ala_source.name = "ALA"
+    ala_source.save()
+end
