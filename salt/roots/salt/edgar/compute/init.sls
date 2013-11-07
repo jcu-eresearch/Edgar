@@ -135,3 +135,11 @@ iptables 9001:
     - rule: -p tcp -m state --state NEW -m tcp --dport 9001 -j ACCEPT
     - require_in:
       - module: save iptables
+
+update hpc_config base url:
+  file.replace:
+    - name: /home/compute/Edgar/modelling/src/hpc_config.py
+    - pattern: cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
+    - repl: cakeAppBaseURL = "{{pillar['applications']['edgar_base_url']}}"
+    - require:
+      - git: compute clone edgar
