@@ -102,6 +102,24 @@ bundle install --deployment:
       - pkg: applications requirements
       - cmd: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config
 
+db migrate:
+  cmd.wait:
+    - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:migrate RAILS_ENV=production"
+    - cwd: /home/applications/Edgar/webapplication/
+    - watch:
+      - git: applications clone edgar
+    - require:
+      - cmd: bundle install --deployment
+
+seed db:
+  cmd.wait:
+    - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:seed RAILS_ENV=production"
+    - cwd: /home/applications/Edgar/webapplication/
+    - watch:
+      - git: applications clone edgar
+    - require:
+      - cmd: db migrate
+
 /usr/local/nginx/conf/conf.d/edgar.conf:
   file.managed:
     - source:

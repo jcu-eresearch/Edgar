@@ -194,3 +194,26 @@ update importing ala_sync_url:
       - file: copy importing config
     - watch_in:
       - service: supervisord
+
+update importing cron:
+  file.replace:
+    - name: /home/compute/Edgar/importing/bin/ala_cron.sh
+    - pattern: 'IMPORTER_DIR="/home/jc171154/Edgar/importing"'
+    - repl: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
+    - require:
+      - git: compute clone edgar
+
+/home/compute/Edgar/importing/bin/ala_cron.sh:
+  file.replace:
+    - name: /home/compute/Edgar/importing/bin/ala_cron.sh
+    - pattern: 'IMPORTER_DIR="/home/jc171154/Edgar/importing"'
+    - repl: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
+    - require:
+      - git: compute clone edgar
+  cron.present:
+    - user: compute
+    # daily
+    - minute: 0
+    - hour: 0
+    - require:
+      - file: /home/compute/Edgar/importing/bin/ala_cron.sh

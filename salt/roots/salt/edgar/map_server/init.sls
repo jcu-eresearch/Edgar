@@ -119,19 +119,19 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
       - pkg: Install PostGIS2_92 Packages
       - postgres_database: {{ db }}
 
-psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} < /home/map_server/Edgar/webapplication/db/development_structure.sql:
-  cmd.wait:
-    - user: postgres
-    - cwd: /home/map_server/Edgar/webapplication
-    - watch:
-      - cmd: PostgreSQL92 Init DB
-    - require:
-      - pkg: Install PostGIS2_92 Packages
-      - postgres_database: {{ db }}
-      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
-      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
-      - git: map_server clone edgar
-      - file: /home/map_server
+#psql -U edgar_on_rails -h 127.0.0.1 -d {{ db }} < /home/map_server/Edgar/webapplication/db/development_structure.sql:
+#  cmd.wait:
+#    - user: postgres
+#    - cwd: /home/map_server/Edgar/webapplication
+#    - watch:
+#      - cmd: PostgreSQL92 Init DB
+#    - require:
+#      - pkg: Install PostGIS2_92 Packages
+#      - postgres_database: {{ db }}
+#      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
+#      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
+#      - git: map_server clone edgar
+#      - file: /home/map_server
 
 {% endfor %}
 
