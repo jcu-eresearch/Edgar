@@ -71,6 +71,22 @@ update database host:
     - require:
       - git: applications clone edgar
 
+update action_mailer host:
+  file.replace:
+    - name: /home/applications/Edgar/webapplication/config/environments/production.rb
+    - pattern: config.action_mailer.default_url_options.*''.*}
+    - repl: config.action_mailer.default_url_options = { :host => '{{pillar['applications']['edgar_ip']}}' }
+    - require:
+      - git: applications clone edgar
+
+update assets compile:
+  file.replace:
+    - name: /home/applications/Edgar/webapplication/config/environments/production.rb
+    - pattern: config.assets.compile = false
+    - repl: config.assets.compile = true
+    - require:
+      - git: applications clone edgar
+
 /home/applications:
   file.directory:
     - user: applications

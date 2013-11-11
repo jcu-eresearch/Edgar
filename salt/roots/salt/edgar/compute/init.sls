@@ -76,10 +76,9 @@ install compute virtual env:
     - require:
       - git: compute clone edgar
       - cmd: python_2_7 make && make altinstall
+      - service: kill supervisord
     - watch:
       - cmd: compute extract virtual env
-    - require:
-      - service: kill supervisord
 
 compute setup.py install:
   cmd.wait:
@@ -110,6 +109,7 @@ compute buildout:
       - cmd: compute bootstrap
       - git: compute clone edgar
       - file: /etc/supervisord.conf
+      - pkg: Install PostgreSQL92 Client Packages
     - watch_in:
       - service: supervisord
 
@@ -175,25 +175,25 @@ update importing database:
     - watch_in:
       - service: supervisord
 
-update importing api_key:
-  file.replace:
-    - name: /home/compute/Edgar/importing/config.json
-    - pattern: '"alaApiKey": null'
-    - repl: '"alaApiKey": "{{pillar['ala']['api_key']}}"'
-    - require:
-      - file: copy importing config
-    - watch_in:
-      - service: supervisord
+#update importing api_key:
+#  file.replace:
+#    - name: /home/compute/Edgar/importing/config.json
+#    - pattern: '"alaApiKey": null'
+#    - repl: '"alaApiKey": "{{pillar['ala']['api_key']}}"'
+#    - require:
+#      - file: copy importing config
+#    - watch_in:
+#      - service: supervisord
 
-update importing ala_sync_url:
-  file.replace:
-    - name: /home/compute/Edgar/importing/config.json
-    - pattern: '"alaVettingSyncUrl": null'
-    - repl: '"alaVettingSyncUrl": "{{pillar['ala']['vetting_sync_url']}}"'
-    - require:
-      - file: copy importing config
-    - watch_in:
-      - service: supervisord
+#update importing ala_sync_url:
+#  file.replace:
+#    - name: /home/compute/Edgar/importing/config.json
+#    - pattern: '"alaVettingSyncUrl": null'
+#    - repl: '"alaVettingSyncUrl": "{{pillar['ala']['vetting_sync_url']}}"'
+#    - require:
+#      - file: copy importing config
+#    - watch_in:
+#      - service: supervisord
 
 update importing cron:
   file.replace:
