@@ -13,10 +13,10 @@
 
   <%= javascript_tag do %>
       window.Edgar = window.Edgar || {};
-      Edgar.baseUrl = "<%= "#{request.protocol}#{request.host_with_port}/" %>";
+      Edgar.baseUrl = "<%= root_url %>";
 
       <% if user_signed_in? %>
-        Edgar.user = "<%= current_user.to_json %>";
+        Edgar.user = <%= current_user.to_json.html_safe %>;
       <% else %>
         Edgar.user = null;
       <% end %>
@@ -45,7 +45,7 @@
 <body>
 
     <div id="header">
-        <a href="<%= url_for('/')%>">
+        <a href="<%= root_url %>">
             <%= image_tag "edgarlogo41.png", id: "edgar-logo" %>
         </a>
 

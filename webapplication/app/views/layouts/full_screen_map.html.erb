@@ -14,10 +14,10 @@
   <%= javascript_include_tag "http://maps.google.com/maps/api/js?sensor=false" %>
   <%= javascript_tag do %>
       window.Edgar = window.Edgar || {};
-      Edgar.baseUrl = "<%= "#{request.protocol}#{request.host_with_port}/" %>";
+      Edgar.baseUrl = "<%= root_url %>";
 
       <% if user_signed_in? %>
-        Edgar.user = "<%= current_user.to_json %>";
+        Edgar.user = <%= current_user.to_json.html_safe %>;
       <% else %>
         Edgar.user = null;
       <% end %>
