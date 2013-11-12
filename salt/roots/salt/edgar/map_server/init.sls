@@ -5,13 +5,47 @@ include:
   - jcu.git
   - jcu.postgresql.postgresql92
   - jcu.postgis.postgis2_92
+  - edgar.mount
 
 extend:
   /var/lib/pgsql/9.2/data/pg_hba.conf:
     file.managed:
-      - name: /tmp/pg_data/pg_hba.conf
+      - name: /mnt/edgar_data/Edgar/pg_data/pg_hba.conf
+      - user: map_server
+      - group: nectar_mount_user
       - source:
         - salt://edgar/map_server/pg_hba.conf
+      - require:
+        - file: /mnt/edgar_data/Edgar/pg_data
+
+postgres:
+  group:
+    - present
+  user.present:
+    - groups:
+      - nectar_mount_user
+      - postgres
+    - require:
+      - group: nectar_mount_user
+      - group: postgres
+    - require_in:
+      - pkg: Install PostgreSQL92 Server Packages
+
+/mnt/edgar_data/Edgar/pg_data:
+  file.directory:
+    - user: postgres
+    - group: postgres
+    - dir_mode: 751
+    - file_mode: 640
+    - require_in:
+      - cmd: PostgreSQL92 Init DB
+    - require:
+      - pkg: Install PostgreSQL92 Server Packages
+      - file: map_server /mnt/edgar_data/Edgar
+    - recurse:
+      - user
+      - group
+      - mode
 
 /etc/sysconfig/pgsql/postgresql-9.2:
   file.managed:
@@ -22,24 +56,53 @@ extend:
     - mode: 744
     - require_in:
       - cmd: PostgreSQL92 Init DB
+    - require:
+      - service: autofs
 
-
-map_server:
-  user.present:
-    - fullname: Map Server
-    - shell: /bin/bash
-    - createhome: true
-    - gid_from_name: true
+map_server /mnt/edgar_data/Edgar:
+  file.directory:
+    - name: /mnt/edgar_data/Edgar
+    - user: map_server
+    - group: map_server
+    - mode: 771
+    - require:
+      - service: autofs
+      - user: map_server
+#      - file: root /mnt/edgar_data/Edgar
 
 map_server clone edgar:
   git.latest:
     - name: https://github.com/jcu-eresearch/Edgar.git
-    - target: /home/map_server/Edgar
-    - user: map_server
     - rev: Edgar_On_Rails
+    - target: /mnt/edgar_data/Edgar/repo
+    - runas: map_server
     - require:
       - user: map_server
       - pkg: git
+      - file: map_server /mnt/edgar_data/Edgar
+
+/home/map_server/Edgar:
+  file.symlink:
+    - target: /mnt/edgar_data/Edgar/repo
+    - require:
+      - service: autofs
+      - git: applications clone edgar
+
+map_server:
+  group:
+    - present
+    - gid: {{ pillar['map_server']['uid_gid'] }}
+  user.present:
+    - fullname: Map Server
+    - shell: /bin/bash
+    - createhome: true
+    - uid: {{ pillar['map_server']['uid_gid'] }}
+    - groups:
+      - map_server
+      - nectar_mount_user
+    - require:
+      - group: map_server
+      - group: nectar_mount_user
 
 /home/map_server:
   file.directory:
@@ -53,13 +116,15 @@ map_server clone edgar:
       - mode
     - require:
       - user: map_server
-      - git: map_server clone edgar
+      - file: /home/map_server/Edgar
+      - git: applications clone edgar
 
 /var/www/html/Edgar:
   file.symlink:
     - target: /home/map_server/Edgar/mapping
     - require:
-      - git: map_server clone edgar
+      - file: /home/map_server/Edgar
+      - git: applications clone edgar
 
 edgar_on_rails:
   postgres_user.present:
@@ -130,7 +195,8 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
 #      - postgres_database: {{ db }}
 #      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
 #      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
-#      - git: map_server clone edgar
+#      - file: /home/map_server/Edgar
+#      - git: applications clone edgar
 #      - file: /home/map_server
 
 {% endfor %}
@@ -150,8 +216,10 @@ save postgres iptables:
     - name: iptables.save
     - filename: /etc/sysconfig/iptables
 
-/tmp/pg_data/postgresql.conf:
+/mnt/edgar_data/Edgar/pg_data/postgresql.conf:
   file.append:
     - text: "listen_addresses='*'"
     - watch_in:
       - service: postgresql-9.2
+    - require:
+      - file: /mnt/edgar_data/Edgar/pg_data

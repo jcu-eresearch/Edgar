@@ -3,6 +3,7 @@ include:
   - jcu.supervisord
   - jcu.python.python_2_7
   - jcu.postgresql.postgresql92.client
+  - edgar.mount
 
 kill supervisord:
   service:
@@ -10,6 +11,27 @@ kill supervisord:
     - dead
     - require:
       - pkg: supervisor
+
+compute clone edgar:
+  git.latest:
+    - name: https://github.com/jcu-eresearch/Edgar.git
+    - rev: Edgar_On_Rails
+    - target: /mnt/edgar_data/Edgar/repo
+    - runas: compute
+    - require:
+      - user: compute
+      - pkg: git
+      - file: compute /mnt/edgar_data/Edgar
+
+compute /mnt/edgar_data/Edgar:
+  file.directory:
+    - name: /mnt/edgar_data/Edgar
+    - user: compute
+    - group: compute
+    - require:
+      - service: autofs
+      - user: compute
+#      - file: root /mnt/edgar_data/Edgar
 
 compute requirements:
   pkg.installed:
@@ -20,12 +42,29 @@ compute requirements:
   require:
     - cmd: python_2_7 make && make altinstall
 
+/home/compute/Edgar:
+  file.symlink:
+    - target: /mnt/edgar_data/Edgar/repo
+    - makedirs: True
+    - require:
+      - service: autofs
+      - git: applications clone edgar
+
 compute:
+  group:
+    - present
+    - gid: {{ pillar['compute']['uid_gid'] }}
   user.present:
     - fullname: Compute
     - shell: /bin/bash
     - createhome: true
-    - gid_from_name: true
+    - uid: {{ pillar['compute']['uid_gid'] }}
+    - groups:
+      - compute
+      - nectar_mount_user
+    - require:
+      - group: compute
+      - group: nectar_mount_user
 
 /home/compute/tmp:
   file.directory:
@@ -37,16 +76,6 @@ compute:
 
 /var/log/supervisord:
   file.directory
-
-compute clone edgar:
-  git.latest:
-    - name: https://github.com/jcu-eresearch/Edgar.git
-    - target: /home/compute/Edgar
-    - runas: compute
-    - rev: Edgar_On_Rails
-    - require:
-      - user: compute
-      - pkg: git
 
 compute get virtual env:
   cmd.run:
@@ -74,9 +103,10 @@ install compute virtual env:
     - cwd: /home/compute/Edgar
     - user: compute
     - require:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
       - cmd: python_2_7 make && make altinstall
       - service: kill supervisord
+      - git: applications clone edgar
     - watch:
       - cmd: compute extract virtual env
 
@@ -87,18 +117,18 @@ compute setup.py install:
     - user: compute
     - require:
       - cmd: install compute virtual env
-    - watch:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
+      - git: applications clone edgar
 
 compute bootstrap:
   cmd.run:
     - cwd: /home/compute/Edgar/importing
     - user: compute
     - name: ../env/bin/python bootstrap.py
-    - watch:
-      - git: compute clone edgar
     - require:
       - cmd: install compute virtual env
+      - file: /home/compute/Edgar
+      - git: applications clone edgar
 
 compute buildout:
   cmd.run:
@@ -107,9 +137,10 @@ compute buildout:
     - name: ./bin/buildout
     - require:
       - cmd: compute bootstrap
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
       - file: /etc/supervisord.conf
       - pkg: Install PostgreSQL92 Client Packages
+      - git: applications clone edgar
     - watch_in:
       - service: supervisord
 
@@ -126,9 +157,10 @@ yum install supervisor -y:
     - target: /home/compute/Edgar/modelling/supervisord/supervisord.conf
     - force: true
     - require:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
       - cmd: compute bootstrap
       - file: /var/log/supervisord
+      - git: applications clone edgar
 
 save iptables:
   module.run:
@@ -151,7 +183,8 @@ update hpc_config base url:
     - pattern: cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
     - repl: cakeAppBaseURL = "{{pillar['applications']['edgar_base_url']}}"
     - require:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
+      - git: applications clone edgar
     - watch_in:
       - service: supervisord
 
@@ -163,7 +196,8 @@ copy importing config:
     - group: compute
     - mode: 640
     - require:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
+      - git: applications clone edgar
 
 update importing database:
   file.replace:
@@ -201,7 +235,8 @@ update importing cron:
     - pattern: 'IMPORTER_DIR="/home/jc171154/Edgar/importing"'
     - repl: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
     - require:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
+      - git: applications clone edgar
 
 /home/compute/Edgar/importing/bin/ala_cron.sh:
   file.replace:
@@ -209,7 +244,8 @@ update importing cron:
     - pattern: 'IMPORTER_DIR="/home/jc171154/Edgar/importing"'
     - repl: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
     - require:
-      - git: compute clone edgar
+      - file: /home/compute/Edgar
+      - git: applications clone edgar
   cron.present:
     - user: compute
     # daily

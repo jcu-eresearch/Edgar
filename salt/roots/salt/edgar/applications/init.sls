@@ -2,6 +2,7 @@ include:
   - jcu.git
   - jcu.ruby.rvm.ruby_1_9_3.passenger
   - jcu.postgresql.postgresql92.client
+  - edgar.mount
 
 rvm_applications:
   group.present
@@ -22,31 +23,60 @@ applications requirements:
       - geos-devel
       - v8-devel
 
+/home/applications/Edgar:
+  file.symlink:
+    - target: /mnt/edgar_data/Edgar/repo
+    - require:
+      - git: applications clone edgar
+      - service: autofs
+
 applications:
   group:
     - present
+    - gid: {{ pillar['applications']['uid_gid'] }}
   user.present:
     - fullname: Applications
     - shell: /bin/bash
     - createhome: true
-    - gid_from_name: true
+    - uid: {{ pillar['applications']['uid_gid'] }}
     - groups:
       - applications
       - rvm_applications
+      - nectar_mount_user
     - require:
       - group: applications
       - group: rvm_applications
+      - group: nectar_mount_user
       - pkg: applications requirements
+
+#root /mnt/edgar_data/Edgar:
+#  file.directory:
+#    - name: /mnt/edgar_data/Edgar
+#    - user: root
+#    - group: root
+#    - require:
+#      - service: autofs
+
+applications /mnt/edgar_data/Edgar:
+  file.directory:
+    - name: /mnt/edgar_data/Edgar
+    - user: applications
+    - group: rvm_applications
+    - require:
+      - service: autofs
+      - user: applications
+#      - file: root /mnt/edgar_data/Edgar
 
 applications clone edgar:
   git.latest:
     - name: https://github.com/jcu-eresearch/Edgar.git
     - rev: Edgar_On_Rails
-    - target: /home/applications/Edgar
+    - target: /mnt/edgar_data/Edgar/repo
     - runas: applications
     - require:
       - user: applications
       - pkg: git
+      - file: applications /mnt/edgar_data/Edgar
 
 /home/applications/Edgar/webapplication/config/initializers/devise.rb:
   file.replace:
@@ -54,6 +84,7 @@ applications clone edgar:
     - repl: "config.secret_key = '{{pillar['applications']['edgar_devise_secret_key']}}'"
     - require:
       - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 update database password:
   file.replace:
@@ -62,6 +93,7 @@ update database password:
     - repl: "password: '{{pillar['database']['password']}}'"
     - require:
       - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 update database host:
   file.replace:
@@ -70,6 +102,7 @@ update database host:
     - repl: "host: '{{pillar['database']['host']}}'"
     - require:
       - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 update action_mailer host:
   file.replace:
@@ -78,6 +111,7 @@ update action_mailer host:
     - repl: config.action_mailer.default_url_options = { :host => '{{pillar['applications']['edgar_ip']}}' }
     - require:
       - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 update assets compile:
   file.replace:
@@ -86,20 +120,7 @@ update assets compile:
     - repl: config.assets.compile = true
     - require:
       - git: applications clone edgar
-
-/home/applications:
-  file.directory:
-    - user: applications
-    - group: applications
-    - dir_mode: 751
-    - file_mode: 640
-    - recurse:
-      - user
-      - group
-      - mode
-    - require:
-      - user: applications
-      - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config:
   cmd.run:
@@ -113,7 +134,7 @@ bundle install --deployment:
     - require:
       - gem: bundler
       - git: applications clone edgar
-      - file: /home/applications
+      - file: /home/applications/Edgar
       - pkg: Install PostgreSQL92 Client Packages
       - pkg: applications requirements
       - cmd: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config
@@ -122,19 +143,19 @@ db migrate:
   cmd.wait:
     - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:migrate RAILS_ENV=production"
     - cwd: /home/applications/Edgar/webapplication/
-    - watch:
-      - git: applications clone edgar
     - require:
       - cmd: bundle install --deployment
+      - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 seed db:
   cmd.wait:
     - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:seed RAILS_ENV=production"
     - cwd: /home/applications/Edgar/webapplication/
-    - watch:
-      - git: applications clone edgar
     - require:
+      - git: applications clone edgar
       - cmd: db migrate
+      - file: /home/applications/Edgar
 
 /usr/local/nginx/conf/conf.d/edgar.conf:
   file.managed:
@@ -165,6 +186,7 @@ seed db:
     - require:
       - user: applications
       - git: applications clone edgar
+      - file: /home/applications/Edgar
 
 /home/applications/webapplications/edgar:
   file.symlink:
@@ -173,3 +195,19 @@ seed db:
     - target: /home/applications/Edgar/webapplication/public
     - require:
       - file: /home/applications/webapplications
+
+/home/applications:
+  file.directory:
+    - user: applications
+    - group: applications
+    - dir_mode: 751
+    - file_mode: 640
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - user: applications
+      - git: applications clone edgar
+    - watch_in:
+      - service: nginx
