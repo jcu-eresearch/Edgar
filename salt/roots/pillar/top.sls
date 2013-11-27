@@ -1,6 +1,7 @@
 base:
   '*':
     - edgar.ala
+    - edgar.mount
   'applications':
     - edgar.applications
     - edgar.database

@@ -47,6 +47,7 @@ autofs:
       - file: /etc/auto.master
       - file: /etc/auto.rdsi
       - cmd: ifup eth1
+      - service: rpcbind
 
 rpcbind:
   service:

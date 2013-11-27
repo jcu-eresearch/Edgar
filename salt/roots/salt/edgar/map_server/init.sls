@@ -11,12 +11,13 @@ extend:
   /var/lib/pgsql/9.2/data/pg_hba.conf:
     file.managed:
       - name: /mnt/edgar_data/Edgar/pg_data/pg_hba.conf
-      - user: map_server
-      - group: nectar_mount_user
+      - user: postgres
+      - group: postgres
       - source:
         - salt://edgar/map_server/pg_hba.conf
       - require:
         - file: /mnt/edgar_data/Edgar/pg_data
+        - user: postgres
 
 postgres:
   group:
@@ -75,7 +76,7 @@ map_server clone edgar:
     - name: https://github.com/jcu-eresearch/Edgar.git
     - rev: Edgar_On_Rails
     - target: /mnt/edgar_data/Edgar/repo
-    - runas: map_server
+    - user: map_server
     - require:
       - user: map_server
       - pkg: git
@@ -84,9 +85,11 @@ map_server clone edgar:
 /home/map_server/Edgar:
   file.symlink:
     - target: /mnt/edgar_data/Edgar/repo
+    - user: map_server
+    - group: map_server
     - require:
       - service: autofs
-      - git: applications clone edgar
+      - git: map_server clone edgar
 
 map_server:
   group:
@@ -117,14 +120,14 @@ map_server:
     - require:
       - user: map_server
       - file: /home/map_server/Edgar
-      - git: applications clone edgar
+      - git: map_server clone edgar
 
 /var/www/html/Edgar:
   file.symlink:
     - target: /home/map_server/Edgar/mapping
     - require:
       - file: /home/map_server/Edgar
-      - git: applications clone edgar
+      - git: map_server clone edgar
 
 edgar_on_rails:
   postgres_user.present:
@@ -196,7 +199,7 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
 #      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;"
 #      - cmd: psql -d {{ db }} -c "CREATE EXTENSION postgis;"
 #      - file: /home/map_server/Edgar
-#      - git: applications clone edgar
+#      - git: map_server clone edgar
 #      - file: /home/map_server
 
 {% endfor %}

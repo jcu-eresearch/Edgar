@@ -4,18 +4,17 @@ include:
   - jcu.postgresql.postgresql92.client
   - edgar.mount
 
-rvm_applications:
-  group.present
-
 extend:
   rvm:
     user:
       - groups:
-        - rvm_applications
+        - applications
+        - nectar_mount_user
         - wheel
         - rvm
       - require:
-        - group: rvm_applications
+        - group: applications
+        - group: nectar_mount_user
 
 applications requirements:
   pkg.installed:
@@ -26,6 +25,8 @@ applications requirements:
 /home/applications/Edgar:
   file.symlink:
     - target: /mnt/edgar_data/Edgar/repo
+    - user: applications
+    - group: applications
     - require:
       - git: applications clone edgar
       - service: autofs
@@ -41,11 +42,9 @@ applications:
     - uid: {{ pillar['applications']['uid_gid'] }}
     - groups:
       - applications
-      - rvm_applications
       - nectar_mount_user
     - require:
       - group: applications
-      - group: rvm_applications
       - group: nectar_mount_user
       - pkg: applications requirements
 
@@ -61,7 +60,7 @@ applications /mnt/edgar_data/Edgar:
   file.directory:
     - name: /mnt/edgar_data/Edgar
     - user: applications
-    - group: rvm_applications
+    - group: applications
     - require:
       - service: autofs
       - user: applications
@@ -72,7 +71,7 @@ applications clone edgar:
     - name: https://github.com/jcu-eresearch/Edgar.git
     - rev: Edgar_On_Rails
     - target: /mnt/edgar_data/Edgar/repo
-    - runas: applications
+    - user: applications
     - require:
       - user: applications
       - pkg: git
@@ -140,7 +139,7 @@ bundle install --deployment:
       - cmd: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config
 
 db migrate:
-  cmd.wait:
+  cmd.run:
     - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:migrate RAILS_ENV=production"
     - cwd: /home/applications/Edgar/webapplication/
     - require:
@@ -149,7 +148,7 @@ db migrate:
       - file: /home/applications/Edgar
 
 seed db:
-  cmd.wait:
+  cmd.run:
     - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:seed RAILS_ENV=production"
     - cwd: /home/applications/Edgar/webapplication/
     - require:
@@ -191,7 +190,7 @@ seed db:
 /home/applications/webapplications/edgar:
   file.symlink:
     - user: applications
-    - group: rvm_applications
+    - group: applications
     - target: /home/applications/Edgar/webapplication/public
     - require:
       - file: /home/applications/webapplications
