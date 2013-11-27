@@ -64,7 +64,25 @@ applications /mnt/edgar_data/Edgar:
     - require:
       - service: autofs
       - user: applications
-#      - file: root /mnt/edgar_data/Edgar
+
+climas_www /mnt/edgar_data/climas:
+  file.directory:
+    - name: /mnt/edgar_data/climas
+    - user: applications
+    - group: applications
+    - require:
+      - service: autofs
+      - user: applications
+
+{% for dir in 'sdm','data','reportdata','reportdata/regions', 'tmp', 'tmp/MapserverImages' %}
+/mnt/edgar_data/climas/{{dir}}:
+  file.directory:
+    - user: applications
+    - group: applications
+    - require:
+      - service: autofs
+      - user: applications
+{% endfor %}
 
 applications clone edgar:
   git.latest:
@@ -76,6 +94,28 @@ applications clone edgar:
       - user: applications
       - pkg: git
       - file: applications /mnt/edgar_data/Edgar
+
+# Clone TDH-Tools
+climas_www clone tdh-tools:
+  git.latest:
+    - name: https://github.com/jcu-eresearch/TDH-Tools.git
+    - target: /mnt/edgar_data/climas/source
+    - user: applications
+    - require:
+      - user: applications
+      - pkg: git
+      - file: climas_www /mnt/edgar_data/climas
+
+# Clone CliMAS Reports
+climas_www clone climas-reports:
+  git.latest:
+    - name: https://github.com/jcu-eresearch/CliMAS-Reports.git
+    - target: /mnt/edgar_data/climas/reports
+    - user: applications
+    - require:
+      - user: applications
+      - pkg: git
+      - file: climas_www /mnt/edgar_data/climas
 
 /home/applications/Edgar/webapplication/config/initializers/devise.rb:
   file.replace:
@@ -210,3 +250,5 @@ seed db:
       - git: applications clone edgar
     - watch_in:
       - service: nginx
+
+
