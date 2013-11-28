@@ -106,6 +106,23 @@ climas_www clone tdh-tools:
       - pkg: git
       - file: climas_www /mnt/edgar_data/climas
 
+# Update the databse information
+update climas database password:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/DB/ToolsData.configuration.class.php
+    - pattern: return "asdf"
+    - repl: return "{{pillar['database']['climas_password']}}"
+    - require:
+      - git: climas_www clone tdh-tools
+
+update climas database hostname:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/DB/ToolsData.configuration.class.php
+    - pattern: return "localhost"
+    - repl: return "{{pillar['database']['host']}}"
+    - require:
+      - git: climas_www clone tdh-tools
+
 # Clone CliMAS Reports
 climas_www clone climas-reports:
   git.latest:
