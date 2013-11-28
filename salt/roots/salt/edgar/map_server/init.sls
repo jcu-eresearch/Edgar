@@ -21,6 +21,10 @@ extend:
 
 climas_www /mnt/edgar_data/climas:
   file.directory:
+    - recurse:
+      - mode
+    - dir_mode: 751
+    - file_mode: 640
     - name: /mnt/edgar_data/climas
     - user: map_server
     - group: map_server
@@ -45,10 +49,10 @@ postgres:
   file.directory:
     - user: postgres
     - group: postgres
-    - dir_mode: 751
-    - file_mode: 640
+    - mode: 700
     - require_in:
       - cmd: PostgreSQL92 Init DB
+      - service: postgresql-9.2
     - require:
       - pkg: Install PostgreSQL92 Server Packages
       - file: map_server /mnt/edgar_data/Edgar
@@ -252,18 +256,33 @@ climas_www clone tdh-tools:
       - pkg: git
       - file: climas_www /mnt/edgar_data/climas
 
+copy /tmp/init_climas_db_file:
+  file.copy:
+    - name: /tmp/init_climas_db_file
+    - source: /mnt/edgar_data/climas/source/applications/DB/init_db.sql
+    - force: true
+    - require:
+      - pkg: Install PostGIS2_92 Packages
+      - git: climas_www clone tdh-tools
+
+/tmp/init_climas_db_file:
+  file.managed:
+    - owner: postgres
+    - mode: 700
+    - required:
+      - file: copy /tmp/init_climas_db_file
+
 # Init the climas_production databse
 # Only do this when we first init the postgresql db
-psql climas_production < /mnt/edgar_data/climas/source/applications/DB/init_db.sql:
+psql climas_production < /tmp/init_climas_db_file:
   cmd.wait:
     - user: postgres
     - watch:
       - cmd: PostgreSQL92 Init DB
     - require:
-      - pkg: Install PostGIS2_92 Packages
       - postgres_user: climas
       - postgres_database: climas_production
-      - git: climas_www clone tdh-tools
+      - file: /tmp/init_climas_db_file
 
 postgres add to firewall:
   module.run:
@@ -287,3 +306,4 @@ save postgres iptables:
       - service: postgresql-9.2
     - require:
       - file: /mnt/edgar_data/Edgar/pg_data
+      - cmd: PostgreSQL92 Init DB
