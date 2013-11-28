@@ -19,6 +19,15 @@ extend:
         - file: /mnt/edgar_data/Edgar/pg_data
         - user: postgres
 
+climas_www /mnt/edgar_data/climas:
+  file.directory:
+    - name: /mnt/edgar_data/climas
+    - user: map_server
+    - group: map_server
+    - require:
+      - service: autofs
+      - user: map_server
+
 postgres:
   group:
     - present
@@ -231,6 +240,30 @@ climas_production:
       - text: 127.0.0.1:5432:climas_production:climas:{{pillar['database']['climas_password']}}
       - require:
         - file: touch /var/lib/pgsql/.pgpass
+
+# Clone TDH-Tools
+climas_www clone tdh-tools:
+  git.latest:
+    - name: https://github.com/jcu-eresearch/TDH-Tools.git
+    - target: /mnt/edgar_data/climas/source
+    - user: map_server
+    - require:
+      - user: map_server
+      - pkg: git
+      - file: climas_www /mnt/edgar_data/climas
+
+# Init the climas_production databse
+# Only do this when we first init the postgresql db
+psql climas_production < /mnt/edgar_data/climas/source/applications/DB/init_db.sql:
+  cmd.wait:
+    - user: postgres
+    - watch:
+      - cmd: PostgreSQL92 Init DB
+    - require:
+      - pkg: Install PostGIS2_92 Packages
+      - postgres_user: climas
+      - postgres_database: climas_production
+      - git: climas_www clone tdh-tools
 
 postgres add to firewall:
   module.run:
