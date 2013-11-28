@@ -31,6 +31,15 @@ applications requirements:
       - git: applications clone edgar
       - service: autofs
 
+/home/applications/climas:
+  file.symlink:
+    - target: /mnt/edgar_data/climas
+    - user: applications
+    - group: applications
+    - require:
+      - file: climas_www /mnt/edgar_data/climas
+      - service: autofs
+
 applications:
   group:
     - present
@@ -61,15 +70,36 @@ applications /mnt/edgar_data/Edgar:
     - name: /mnt/edgar_data/Edgar
     - user: applications
     - group: applications
+    - mode: 751
     - require:
       - service: autofs
       - user: applications
+
+applications /mnt/edgar_data/Edgar/repo:
+  file.directory:
+    - name: /mnt/edgar_data/Edgar/repo
+    - user: applications
+    - group: applications
+    - dir_mode: 751
+    - file_mode: 640
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: applications /mnt/edgar_data/Edgar
 
 climas_www /mnt/edgar_data/climas:
   file.directory:
     - name: /mnt/edgar_data/climas
     - user: applications
     - group: applications
+    - dir_mode: 751
+    - file_mode: 640
+    - recurse:
+      - user
+      - group
+      - mode
     - require:
       - service: autofs
       - user: applications
@@ -122,6 +152,8 @@ update climas database hostname:
     - repl: return "{{pillar['database']['host']}}"
     - require:
       - git: climas_www clone tdh-tools
+
+# Update the climas config file
 
 # Clone CliMAS Reports
 climas_www clone climas-reports:
@@ -184,7 +216,7 @@ sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/us
       - gem: bundler
       - pkg: Install PostgreSQL92 Client Packages
 
-bundle install --deployment:
+bundle install edgar:
   cmd.run:
     - name: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do bundle install --gemfile=/home/applications/Edgar/webapplication/Gemfile
     - require:
@@ -195,12 +227,20 @@ bundle install --deployment:
       - pkg: applications requirements
       - cmd: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config
 
+bundle install climas:
+  cmd.run:
+    - name: sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do bundle install --gemfile=/mnt/edgar_data/climas/reports/webapplication/Gemfile
+    - require:
+      - gem: bundler
+      - git: climas_www clone tdh-tools
+      - pkg: applications requirements
+
 db migrate:
   cmd.run:
     - name: "sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do rake db:migrate RAILS_ENV=production"
     - cwd: /home/applications/Edgar/webapplication/
     - require:
-      - cmd: bundle install --deployment
+      - cmd: bundle install edgar
       - git: applications clone edgar
       - file: /home/applications/Edgar
 
@@ -213,10 +253,28 @@ seed db:
       - cmd: db migrate
       - file: /home/applications/Edgar
 
-/usr/local/nginx/conf/conf.d/edgar.conf:
+copy /mnt/edgar_data/climas/reports/webapplication/settings.rb:
+  file.copy:
+    - name: /mnt/edgar_data/climas/reports/webapplication/settings.rb
+    - source: /mnt/edgar_data/climas/reports/webapplication/settings.rb.example
+    - force: true
+    - require:
+      - git: climas_www clone tdh-tools
+
+/mnt/edgar_data/climas/reports/webapplication/settings.rb:
+  file.managed:
+    - user: applications
+    - group: applications
+    - mode: 660
+    - require:
+      - file: copy /mnt/edgar_data/climas/reports/webapplication/settings.rb
+    - watch_in:
+      - service: nginx
+
+/usr/local/nginx/conf/conf.d/edgar_and_climas.conf:
   file.managed:
     - source:
-      - salt://edgar/applications/edgar_nginx_config.conf
+      - salt://edgar/applications/edgar_and_climas_nginx_config.conf
     - user: rvm
     - group: rvm
     - mode: 740
