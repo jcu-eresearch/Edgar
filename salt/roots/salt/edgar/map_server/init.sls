@@ -132,7 +132,7 @@ map_server:
 edgar_on_rails:
   postgres_user.present:
     - user: postgres
-    - password: {{pillar['database']['password']}}
+    - password: {{pillar['database']['edgar_password']}}
     - require:
       - pkg: Install PostGIS2_92 Packages
       - cmd: PostgreSQL92 Init DB
@@ -142,9 +142,7 @@ yum update -y:
   cmd.run:
     - user: root
 
-{% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
-
-touch /var/lib/pgsql/.pgpass {{db}}:
+touch /var/lib/pgsql/.pgpass:
   file.managed:
       - name: /var/lib/pgsql/.pgpass
       - owner: postgres
@@ -154,12 +152,14 @@ touch /var/lib/pgsql/.pgpass {{db}}:
       - require:
         - service: postgresql-9.2
 
+{% for db in 'edgar_on_rails_dev_db','edgar_on_rails_test_db','edgar_on_rails_prod_db' %}
+
 /var/lib/pgsql/.pgpass {{db}}:
   file.append:
       - name: /var/lib/pgsql/.pgpass
-      - text: 127.0.0.1:5432:{{db}}:edgar_on_rails:{{pillar['database']['password']}}
+      - text: 127.0.0.1:5432:{{db}}:edgar_on_rails:{{pillar['database']['edgar_password']}}
       - require:
-        - file: touch /var/lib/pgsql/.pgpass {{db}}
+        - file: touch /var/lib/pgsql/.pgpass
 
 {{ db }}:
   postgres_database.present:
@@ -203,6 +203,34 @@ psql -d {{ db }} -c "CREATE EXTENSION postgis_topology;":
 #      - file: /home/map_server
 
 {% endfor %}
+
+# Add climas to postgres
+climas:
+  postgres_user.present:
+    - user: postgres
+    - password: {{pillar['database']['climas_password']}}
+    - require:
+      - pkg: Install PostGIS2_92 Packages
+      - cmd: PostgreSQL92 Init DB
+      - service: postgresql-9.2
+
+
+# Add climas database to postgres
+climas_production:
+  postgres_database.present:
+    - user: postgres
+    - owner: climas
+    - require:
+      - postgres_user: climas
+      - file: /var/lib/pgsql/.pgpass climas_production
+
+# Add password for climas database to pgpass
+/var/lib/pgsql/.pgpass climas_production:
+  file.append:
+      - name: /var/lib/pgsql/.pgpass
+      - text: 127.0.0.1:5432:climas_production:climas:{{pillar['database']['climas_password']}}
+      - require:
+        - file: touch /var/lib/pgsql/.pgpass
 
 postgres add to firewall:
   module.run:
