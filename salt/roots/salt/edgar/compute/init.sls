@@ -205,7 +205,7 @@ update importing database:
   file.replace:
     - name: /home/compute/Edgar/importing/config.json
     - pattern: '"db.url": "postgresql\+psycopg2://edgar_backend:backend_password_here@/edgar"'
-    - repl: '"db.url": "postgresql+psycopg2://edgar_on_rails:{{pillar['database']['password']}}@{{pillar['database']['host']}}:5432/edgar_on_rails_prod_db"'
+    - repl: '"db.url": "postgresql+psycopg2://edgar_on_rails:{{pillar['database']['edgar_password']}}@{{pillar['database']['host']}}:5432/edgar_on_rails_prod_db"'
     - require:
       - file: copy importing config
     - watch_in:
