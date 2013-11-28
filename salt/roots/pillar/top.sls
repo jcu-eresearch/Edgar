@@ -2,6 +2,7 @@ base:
   '*':
     - edgar.ala
     - edgar.mount
+    - edgar.ssh
   'applications':
     - edgar.applications
     - edgar.database
