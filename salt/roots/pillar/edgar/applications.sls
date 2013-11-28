@@ -4,3 +4,4 @@ applications:
   edgar_base_url: http://192.168.100.111/edgar
   edgar_ip: 192.168.100.111
   edgar_ssh_username: vagrant
+  uid_gid: 34645

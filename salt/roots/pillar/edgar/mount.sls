@@ -1,3 +1,3 @@
 mount:
   collection_path:
-  uid_gid:
+  uid_gid: 34645
