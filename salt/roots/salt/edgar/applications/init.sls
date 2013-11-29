@@ -136,7 +136,7 @@ climas_www clone tdh-tools:
       - pkg: git
       - file: climas_www /mnt/edgar_data/climas
 
-# Update the databse information
+# Update the database information
 update climas database password:
   file.replace:
     - name: /mnt/edgar_data/climas/source/applications/DB/ToolsData.configuration.class.php
@@ -166,13 +166,22 @@ climas_www clone climas-reports:
       - pkg: git
       - file: climas_www /mnt/edgar_data/climas
 
-/home/applications/Edgar/webapplication/config/initializers/devise.rb:
+update /home/applications/Edgar/webapplication/config/initializers/devise.rb:
   file.replace:
+    - name: /home/applications/Edgar/webapplication/config/initializers/devise.rb
     - pattern: "config.secret_key = ''"
     - repl: "config.secret_key = '{{pillar['applications']['edgar_devise_secret_key']}}'"
     - require:
       - git: applications clone edgar
       - file: /home/applications/Edgar
+
+/home/applications/Edgar/webapplication/config/initializers/devise.rb:
+  file.managed:
+    - user: applications
+    - group: applications
+    - mode: 640
+    - require:
+      - file: update /home/applications/Edgar/webapplication/config/initializers/devise.rb
 
 update database password:
   file.replace:
@@ -192,6 +201,15 @@ update database host:
       - git: applications clone edgar
       - file: /home/applications/Edgar
 
+/home/applications/Edgar/webapplication/config/database.yml:
+  file.managed:
+    - user: applications
+    - group: applications
+    - mode: 640
+    - require:
+      - file: update database host
+      - file: update database password
+
 update action_mailer host:
   file.replace:
     - name: /home/applications/Edgar/webapplication/config/environments/production.rb
@@ -209,6 +227,15 @@ update assets compile:
     - require:
       - git: applications clone edgar
       - file: /home/applications/Edgar
+
+/home/applications/Edgar/webapplication/config/environments/production.rb:
+  file.managed:
+    - user: applications
+    - group: applications
+    - mode: 640
+    - require:
+      - file: update action_mailer host
+      - file: update assets compile
 
 sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config:
   cmd.run:

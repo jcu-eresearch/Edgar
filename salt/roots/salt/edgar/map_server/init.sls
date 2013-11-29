@@ -307,3 +307,43 @@ save postgres iptables:
     - require:
       - file: /mnt/edgar_data/Edgar/pg_data
       - cmd: PostgreSQL92 Init DB
+
+
+/var/www/climas:
+  file.symlink:
+    - target: /mnt/edgar_data/climas/source/applications
+    - require:
+      - git: climas_www clone tdh-tools
+
+/var/www/data:
+  file.symlink:
+    - target: /mnt/edgar_data/climas/data
+    - require:
+      - git: climas_www clone tdh-tools
+      - service: httpd
+
+/var/www/images:
+  file.symlink:
+    - target: /mnt/edgar_data/climas/source/images
+    - require:
+      - git: climas_www clone tdh-tools
+      - service: httpd
+
+remove /var/www/icons:
+  file.absent:
+    - name: /var/www/icons
+
+/var/www/icons:
+  file.symlink:
+    - target: /mnt/edgar_data/climas/source/Resources/icons
+    - require:
+      - file: remove /var/www/icons
+      - git: climas_www clone tdh-tools
+      - service: httpd
+
+/var/www/climas/MapserverImages:
+  file.symlink:
+    - target: /mnt/edgar_data/climas/tmp/MapserverImages
+    - require:
+      - git: climas_www clone tdh-tools
+      - service: httpd
