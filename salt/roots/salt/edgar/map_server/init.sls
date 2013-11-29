@@ -309,20 +309,20 @@ save postgres iptables:
       - cmd: PostgreSQL92 Init DB
 
 
-/var/www/climas:
+/var/www/html/climas:
   file.symlink:
     - target: /mnt/edgar_data/climas/source/applications
     - require:
       - git: climas_www clone tdh-tools
 
-/var/www/data:
+/var/www/html/data:
   file.symlink:
     - target: /mnt/edgar_data/climas/data
     - require:
       - git: climas_www clone tdh-tools
       - service: httpd
 
-/var/www/images:
+/var/www/html/images:
   file.symlink:
     - target: /mnt/edgar_data/climas/source/images
     - require:
@@ -341,9 +341,50 @@ remove /var/www/icons:
       - git: climas_www clone tdh-tools
       - service: httpd
 
-/var/www/climas/MapserverImages:
+/var/www/html/climas/MapserverImages:
   file.symlink:
     - target: /mnt/edgar_data/climas/tmp/MapserverImages
     - require:
       - git: climas_www clone tdh-tools
       - service: httpd
+
+copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.copy:
+    - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+    - source: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg.default
+    - force: true
+    - require:
+      - git: climas_www clone tdh-tools
+
+update urls /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+    - pattern: '"/climas/'
+    - repl: '"/mnt/edgar_data/climas/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+
+update hostname /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+    - pattern: localhost
+    - repl: {{ pillar['applications']['edgar_ip'] }}
+    - require:
+      - file: copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+
+update reports url /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+    - pattern: bifocal
+    - repl: climas/reports
+    - require:
+      - file: copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+
+/mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.managed:
+    - owner: map_server
+    - mode: 640
+    - required:
+      - file: update urls /climas/source/applications/CONFIGURATION.cfg
+      - file: update hostname /climas/source/applications/CONFIGURATION.cfg
+      - file: update reports url /climas/source/applications/CONFIGURATION.cfg
