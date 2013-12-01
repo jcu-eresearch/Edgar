@@ -4,7 +4,8 @@
 ##
 ## Expects 1 arg, the path to the occurrences file to be tested.
 
-library(SDMTools);
+# I don't think this lib is actually necessary for this file...
+# library(SDMTools);
 
 args=commandArgs(TRUE);
 
