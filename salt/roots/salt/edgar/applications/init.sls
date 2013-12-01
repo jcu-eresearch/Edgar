@@ -104,7 +104,7 @@ climas_www /mnt/edgar_data/climas:
       - service: autofs
       - user: applications
 
-{% for dir in 'sdm','data','reportdata','reportdata/regions', 'tmp', 'tmp/MapserverImages' %}
+{% for dir in 'sdm','data', 'tmp', 'tmp/MapserverImages' %}
 /mnt/edgar_data/climas/{{dir}}:
   file.directory:
     - user: applications
@@ -196,7 +196,7 @@ update database host:
   file.replace:
     - name: /home/applications/Edgar/webapplication/config/database.yml
     - pattern: "host: 127.0.0.1"
-    - repl: "host: '{{pillar['database']['host']}}'"
+    - repl: "host: '{{pillar['applications']['edgar_ip']}}'"
     - require:
       - git: applications clone edgar
       - file: /home/applications/Edgar
@@ -288,13 +288,47 @@ copy /mnt/edgar_data/climas/reports/webapplication/settings.rb:
     - require:
       - git: climas_www clone tdh-tools
 
+update DataFilePrefix /mnt/edgar_data/climas/reports/webapplication/settings.rb:
+  file.replace:
+    - name: /mnt/edgar_data/climas/reports/webapplication/settings.rb
+    - pattern: DataFilePrefix = '/climas/reportdata/'
+    - repl: DataFilePrefix = '/mnt/edgar_data/sync_dir/reports/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/reports/webapplication/settings.rb
+
+update DataUrlPrefix /mnt/edgar_data/climas/reports/webapplication/settings.rb:
+  file.replace:
+    - name: /mnt/edgar_data/climas/reports/webapplication/settings.rb
+    - pattern: DataUrlPrefix = '/climas/reportdata/'
+    - repl: DataUrlPrefix = 'http://{{pillar['applications']['edgar_ip']}}/climas/reportdata/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/reports/webapplication/settings.rb
+
+update SiteUrlPrefix /mnt/edgar_data/climas/reports/webapplication/settings.rb:
+  file.replace:
+    - name: /mnt/edgar_data/climas/reports/webapplication/settings.rb
+    - pattern: SiteUrlPrefix = '/climas/reports/'
+    - repl: SiteUrlPrefix = 'http://{{pillar['applications']['edgar_ip']}}/climas/reports/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/reports/webapplication/settings.rb
+
+update ParentSiteUrl /mnt/edgar_data/climas/reports/webapplication/settings.rb:
+  file.replace:
+    - name: /mnt/edgar_data/climas/reports/webapplication/settings.rb
+    - pattern: ParentSiteUrl = '/climas/'
+    - repl: ParentSiteUrl = 'http://{{pillar['applications']['edgar_ip']}}/climas/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/reports/webapplication/settings.rb
+
 /mnt/edgar_data/climas/reports/webapplication/settings.rb:
   file.managed:
     - user: applications
     - group: applications
     - mode: 660
     - require:
-      - file: copy /mnt/edgar_data/climas/reports/webapplication/settings.rb
+      - file: update DataFilePrefix /mnt/edgar_data/climas/reports/webapplication/settings.rb
+      - file: update SiteUrlPrefix /mnt/edgar_data/climas/reports/webapplication/settings.rb
+      - file: update ParentSiteUrl /mnt/edgar_data/climas/reports/webapplication/settings.rb
     - watch_in:
       - service: nginx
 
@@ -305,6 +339,9 @@ copy /mnt/edgar_data/climas/reports/webapplication/settings.rb:
     - user: rvm
     - group: rvm
     - mode: 740
+    - template: jinja
+    - defaults:
+        map_server_ip: {{ pillar['database']['host'] }}
     - require:
       - file: /usr/local/nginx/conf/conf.d
     - watch_in:

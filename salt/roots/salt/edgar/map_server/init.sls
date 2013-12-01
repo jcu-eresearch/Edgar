@@ -308,6 +308,12 @@ save postgres iptables:
       - file: /mnt/edgar_data/Edgar/pg_data
       - cmd: PostgreSQL92 Init DB
 
+/var/www/html/climas/reportdata:
+  file.symlink:
+    - target: /mnt/edgar_data/sync_dir/reports
+    - require:
+      - git: climas_www clone tdh-tools
+      - file: /var/www/html/climas
 
 /var/www/html/climas:
   file.symlink:
