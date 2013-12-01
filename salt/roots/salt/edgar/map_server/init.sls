@@ -492,3 +492,18 @@ update reports url /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
     - require:
       - file: /home/map_server
       - file: /home/map_server/Edgar
+
+/home/map_server/Edgar/modelling/bin/:
+  file.directory:
+    - user: map_server
+    - group: map_server
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: /home/map_server
+      - file: /home/map_server/Edgar
+

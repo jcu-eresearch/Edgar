@@ -5,6 +5,13 @@ include:
   - jcu.postgresql.postgresql92.client
   - edgar.mount
 
+compute packages:
+  pkg.installed:
+    - pkgs:
+      - R
+    - watch_in:
+      - service: supervisord
+
 kill supervisord:
   service:
     - name: supervisord
@@ -296,6 +303,20 @@ update importing cron:
       - file: /home/compute/Edgar
 
 /home/compute/Edgar/importing/bin/:
+  file.directory:
+    - user: compute
+    - group: compute
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: /home/compute
+      - file: /home/compute/Edgar
+
+/home/compute/Edgar/modelling/bin/:
   file.directory:
     - user: compute
     - group: compute
