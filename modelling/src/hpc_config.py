@@ -41,7 +41,7 @@ class HPCConfig:
 
     @staticmethod
     def getSpeciesReportURL(speciesId):
-        return HPCConfig.cakeAppBaseURL + "/species/job_status/" + speciesId
+        return HPCConfig.cakeAppBaseURL + "/species/" + speciesId + "/job_status"
 
     @staticmethod
     def connectDB():
