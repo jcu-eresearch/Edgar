@@ -70,7 +70,7 @@ else
 fi
 
 # Load the java module for the HPC
-module load java
+# module load java
 
 # Move to the species directory
 cd "$WORKING_DIR/inputs/$SPP"
