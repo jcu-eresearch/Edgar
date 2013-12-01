@@ -99,12 +99,11 @@ climas_www /mnt/edgar_data/climas:
     - recurse:
       - user
       - group
-      - mode
     - require:
       - service: autofs
       - user: applications
 
-{% for dir in 'sdm','data', 'tmp', 'tmp/MapserverImages' %}
+{% for dir in 'sdm','data' %}
 /mnt/edgar_data/climas/{{dir}}:
   file.directory:
     - user: applications
@@ -112,6 +111,27 @@ climas_www /mnt/edgar_data/climas:
     - require:
       - service: autofs
       - user: applications
+      - file: climas_www /mnt/edgar_data/climas
+    - recurse:
+      - user
+      - group
+{% endfor %}
+
+{% for dir in 'tmp', 'tmp/MapserverImages' %}
+/mnt/edgar_data/climas/{{dir}}:
+  file.directory:
+    - user: applications
+    - group: applications
+    - dir_mode: 777
+    - file_mode: 666
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - service: autofs
+      - user: applications
+      - file: climas_www /mnt/edgar_data/climas
 {% endfor %}
 
 applications clone edgar:
@@ -390,4 +410,34 @@ update ParentSiteUrl /mnt/edgar_data/climas/reports/webapplication/settings.rb:
     - watch_in:
       - service: nginx
 
+/home/applications/Edgar/env/bin:
+  file.directory:
+    - user: applications
+    - group: applications
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - user: applications
+      - git: applications clone edgar
+      - file: /home/applications
+      - file: /home/applications/Edgar
 
+/home/applications/Edgar/importing/bin/:
+  file.directory:
+    - user: applications
+    - group: applications
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - user: applications
+      - git: applications clone edgar
+      - file: /home/applications
+      - file: /home/applications/Edgar

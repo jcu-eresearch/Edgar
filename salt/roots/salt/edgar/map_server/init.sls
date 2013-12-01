@@ -323,7 +323,7 @@ save postgres iptables:
 
 /var/www/html/data:
   file.symlink:
-    - target: /mnt/edgar_data/climas/data
+    - target: /mnt/edgar_data/sync_dir
     - require:
       - git: climas_www clone tdh-tools
       - service: httpd
@@ -362,11 +362,27 @@ copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
     - require:
       - git: climas_www clone tdh-tools
 
-update urls /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+update file_paths /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
   file.replace:
     - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
     - pattern: '"/climas/'
     - repl: '"/mnt/edgar_data/climas/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+
+update source_data_path /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+    - pattern: '"/mnt/edgar_data/climas/data/'
+    - repl: '"/mnt/edgar_data/sync_dir/'
+    - require:
+      - file: copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+
+update sdm_path /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
+  file.replace:
+    - name: /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+    - pattern: '"/mnt/edgar_data/climas/sdm/'
+    - repl: '"/mnt/edgar_data/SDM_sync_dir/SDM/'
     - require:
       - file: copy /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
 
@@ -391,6 +407,88 @@ update reports url /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg:
     - owner: map_server
     - mode: 640
     - required:
-      - file: update urls /climas/source/applications/CONFIGURATION.cfg
+      - file: update file_paths /climas/source/applications/CONFIGURATION.cfg
+      - file: update source_data_path /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
       - file: update hostname /climas/source/applications/CONFIGURATION.cfg
       - file: update reports url /climas/source/applications/CONFIGURATION.cfg
+      - file: update sdm_path /mnt/edgar_data/climas/source/applications/CONFIGURATION.cfg
+
+/var/www/cgi-bin/mapserv:
+  file.copy:
+    - source: /usr/libexec/mapserver
+    - force: true
+    - require:
+      - pkg: mapserver
+
+/mnt/edgar_data/climas/source/output/MapserverImages:
+  file.directory:
+    - makedirs: true
+    - recurse:
+      - mode
+      - user
+      - group
+    - dir_mode: 777
+    - file_mode: 666
+    - user: map_server
+    - group: map_server
+    - require:
+      - service: autofs
+      - git: map_server clone edgar
+
+/var/www/html/climas/output:
+  file.symlink:
+    - target: /mnt/edgar_data/climas/source/output
+    - require:
+      - service: autofs
+      - git: climas_www clone tdh-tools
+      - file: /var/www/html/climas
+      - file: /mnt/edgar_data/climas/source/output/MapserverImages
+
+/home/TDH/data:
+  file.directory:
+    - makedirs: true
+    - recurse:
+      - mode
+      - user
+      - group
+    - dir_mode: 751
+    - file_mode: 640
+    - user: map_server
+    - group: map_server
+
+/home/TDH/data/SDM:
+  file.symlink:
+    - target: /mnt/edgar_data/SDM_sync_dir/SDM
+    - user: map_server
+    - group: map_server
+    - require:
+      - service: autofs
+      - file: /home/TDH/data
+
+/home/map_server/Edgar/env/bin:
+  file.directory:
+    - user: map_server
+    - group: map_server
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: /home/map_server
+      - file: /home/map_server/Edgar
+
+/home/map_server/Edgar/importing/bin/:
+  file.directory:
+    - user: map_server
+    - group: map_server
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: /home/map_server
+      - file: /home/map_server/Edgar

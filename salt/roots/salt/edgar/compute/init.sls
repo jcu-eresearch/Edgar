@@ -132,6 +132,27 @@ compute bootstrap:
       - file: /home/compute/Edgar
       - git: compute clone edgar
 
+compute install GeoAlchemy:
+  cmd.run:
+    - cwd: /home/compute/Edgar/importing
+    - user: compute
+    - name: ../env/bin/pip install GeoAlchemy
+    - require:
+      - cmd: install compute virtual env
+      - file: /home/compute/Edgar
+      - git: compute clone edgar
+
+compute install psycopg2:
+  cmd.run:
+    - cwd: /home/compute/Edgar/importing
+    - user: compute
+    - name: ../env/bin/pip install psycopg2
+    - require:
+      - cmd: install compute virtual env
+      - file: /home/compute/Edgar
+      - git: compute clone edgar
+      - pkg: Install PostgreSQL92 Client Packages
+
 compute buildout:
   cmd.run:
     - cwd: /home/compute/Edgar/importing
@@ -143,8 +164,11 @@ compute buildout:
       - file: /etc/supervisord.conf
       - pkg: Install PostgreSQL92 Client Packages
       - git: compute clone edgar
+      - cmd: compute install GeoAlchemy
+      - cmd: compute install psycopg2
     - watch_in:
       - service: supervisord
+
 
 yum install supervisor -y:
   cmd.run:
@@ -250,8 +274,37 @@ update importing cron:
       - git: compute clone edgar
   cron.present:
     - user: compute
-    # daily
+    # weekly
+    - dayweek: 0
     - minute: 0
     - hour: 0
     - require:
       - file: /home/compute/Edgar/importing/bin/ala_cron.sh
+
+/home/compute/Edgar/env/bin:
+  file.directory:
+    - user: compute
+    - group: compute
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: /home/compute
+      - file: /home/compute/Edgar
+
+/home/compute/Edgar/importing/bin/:
+  file.directory:
+    - user: compute
+    - group: compute
+    - dir_mode: 751
+    - file_mode: 751
+    - recurse:
+      - user
+      - group
+      - mode
+    - require:
+      - file: /home/compute
+      - file: /home/compute/Edgar
