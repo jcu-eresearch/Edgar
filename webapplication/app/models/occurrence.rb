@@ -91,7 +91,7 @@ class Occurrence < ActiveRecord::Base
     bbox = bbox.split(',').map { |el| el.to_f }
     w, s, e, n = *bbox
 
-    lat_range = w - e
+    lat_range = e - w
     lng_range = n - s
 
     lat_lng_range_avg = (lat_range + lng_range) / 2
