@@ -138,7 +138,7 @@ function model_and_median {
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
 
 # Run the pre-check
-R --no-save < "$WORKING_DIR/bin/model_pre_check.r" --args "$OCCUR"
+Rscript --vanilla "$WORKING_DIR/bin/model_pre_check.r" "$OCCUR"
 
 status=$?
 
