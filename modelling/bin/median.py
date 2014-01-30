@@ -92,6 +92,7 @@ def doit(opts, args):
                 myBands.append(1)
             myAlphaList.append(myI)
             myDataType.append(gdal.GetDataTypeName(myFiles[i].GetRasterBand(myBands[i]).DataType))
+
             myDataTypeNum.append(myFiles[i].GetRasterBand(myBands[i]).DataType)
             myNDV.append(myFiles[i].GetRasterBand(myBands[i]).GetNoDataValue())
             # check that the dimensions of each layer are the same

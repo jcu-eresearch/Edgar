@@ -109,12 +109,12 @@ function model_and_median {
     # where model is anything except an underscore (or /)
     local FILTER_PROJECTION_PATH=".*/${SCENARIO}_[^_/]+_${YEAR}"
 
-    local MEDIAN_SCRIPT_TO_RUN="$WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif --calc='A' --overwrite "
+    local MEDIAN_SCRIPT_TO_RUN="$PYTHON_BIN $WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif --calc='A' --overwrite "
     local I_INT=0
 
     # Cycle through the projections and project the maps
     for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_PROJECTION_PATH"`; do
-
+	
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
         local letter="${LETTERS[$I_INT]}"
@@ -138,7 +138,7 @@ function model_and_median {
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
 
 # Run the pre-check
-R --no-save < "$WORKING_DIR/bin/model_pre_check.r" --args "$OCCUR"
+Rscript --vanilla "$WORKING_DIR/bin/model_pre_check.r" "$OCCUR"
 
 status=$?
 
