@@ -375,7 +375,7 @@ class Species < ActiveRecord::Base
       order("is_null ASC, first_requested_remodel ASC, num_dirty_occurrences DESC").
       where(
         "num_dirty_occurrences > 0 AND current_model_status IS NULL " +
-        "OR num_dirty_occurrences > 0 AND current_model_queued_time < ? " +
+        "OR num_dirty_occurrences > 0 AND DATE(current_model_queued_time) < ? " +
         "OR current_model_status <> NULL AND current_model_queued_time IS NULL",
         1.day.ago
       ).first
