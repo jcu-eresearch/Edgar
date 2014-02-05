@@ -28,6 +28,11 @@
 
 class Species < ActiveRecord::Base
 
+  # TODO - Should be in env. config
+  # This base URL for the SWIFT (S3) edgar 'backups' location
+
+  SWIFT_BASE_URL = "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh_public/edgar_backups"
+
   # The maximum number of features to return from a query
 
   FEATURES_QUERY_LIMIT = 5000
@@ -433,6 +438,15 @@ class Species < ActiveRecord::Base
 
     nil
   end
+  
+  def latest_occurrences_download_url()
+    "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh/edgar_backups/occurrences/#{common_name} (#{scientific_name})/latest-occurrences.zip"
+  end
+
+  def latest_climate_download_url()
+    "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh/edgar_backups/projected-distributions/#{common_name} (#{scientific_name})/latest-projected-distributions.zip"
+  end
+
 
   private
 
