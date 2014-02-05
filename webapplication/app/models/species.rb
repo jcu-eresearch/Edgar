@@ -440,11 +440,11 @@ class Species < ActiveRecord::Base
   end
   
   def latest_occurrences_download_url()
-    "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh/edgar_backups/occurrences/#{common_name} (#{scientific_name})/latest-occurrences.zip"
+    "#{SWIFT_BASE_URL}/occurrences/#{common_name} (#{scientific_name})/latest-occurrences.zip"
   end
 
   def latest_climate_download_url()
-    "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh/edgar_backups/projected-distributions/#{common_name} (#{scientific_name})/latest-projected-distributions.zip"
+    "#{SWIFT_BASE_URL}/projected-distributions/#{common_name} (#{scientific_name})/latest-projected-distributions.zip"
   end
 
 
