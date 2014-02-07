@@ -168,13 +168,12 @@ java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$T
 # Model all models for each scenario year combo
 for SCENARIO in "${SCENARIOS_TO_MODEL[@]}"; do
     for YEAR in "${YEARS_TO_MODEL[@]}"; do
-        NUM_RUNNING=`jobs -p | wc -l`
+        NUM_RUNNING=`jobs | wc -l`
 
-        while [ "$NUM_RUNNING" -ge "$MAX_NUM_PROCS" ]; do
+        while [ "$NUM_RUNNING" -ge "$MAX_NUM_JOBS" ]; do
             # I have hit the maximum number of simultaneous jobs running
-            # Sleep periodically, and recheck.
-            sleep 1
-            NUM_RUNNING=`jobs -p | wc -l`
+            sleep 5
+            NUM_RUNNING=`jobs | wc -l`
         done
 
         model_and_median "$SCENARIO" "$YEAR" &
@@ -205,26 +204,69 @@ mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 CLIM_ZIP_FILE_NAME="latest-projected-distributions.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-projected-distributions.zip"
 
+echo "processing projected-distributions for tdh"
 pushd $TMP_OUTPUT_DIR
 zip -r "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" *
 mv "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME"
 popd
 
+pushd  "$TDH_DIR/$SPP_NAME/projected-distributions/"
+echo "Now uploading latest projected-distributions to our object-store"
+swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/projected-distributions/$SPP_NAME" "$CLIM_ZIP_FILE_NAME"
+popd
+
 # if we don't have a copy for the month, make a copy
 if [ ! -e "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME"
+
+  pushd  "$TDH_DIR/$SPP_NAME/projected-distributions/"
+  echo "Now uploading monthly projected-distributions snapshot to our object-store"
+  swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/projected-distributions/$SPP_NAME" "$CLIM_MONTH_ZIP_FILE_NAME"
+  popd
 fi
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
 OCCUR_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-occurrences.zip"
 
+echo "processing occurrences for tdh"
 zip -j "$TDH_DIR/$SPP_NAME/occurrences/tmp_$OCCUR_ZIP_FILE_NAME" "$PUBLIC_OCCUR"
 mv "$TDH_DIR/$SPP_NAME/occurrences/tmp_$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME"
+
+
+pushd "$TDH_DIR/$SPP_NAME/occurrences/"
+echo "Now uploading latest occurrences to our object-store"
+swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/occurrences/$SPP_NAME" "$OCCUR_ZIP_FILE_NAME"
+popd
 
 # if we don't have a copy for the month, make a copy
 if [ ! -e "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME"
+
+  pushd  "$TDH_DIR/$SPP_NAME/occurrences/"
+  echo "Now uploading monthly occurrences snapshot to our object-store"
+  swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/occurrences/$SPP_NAME" "$OCCUR_MONTH_ZIP_FILE_NAME"
+  popd
 fi
+
+echo "converting .asc files to .tif"
+# convert all .asc to tif
+for f in "$TMP_OUTPUT_DIR"/*.asc
+do
+  my_dir_name=$(dirname "$f")
+  my_base_name=$(basename "$f")
+  my_base_name_no_ext="${my_base_name%.*}"
+    
+  # convert each .asc to a .tif
+  gdal_translate "$f" "${my_dir_name}/${my_base_name_no_ext}.tif" -co "COMPRESS=lzw" -co "PREDICTOR=2" -of GTiff &
+done
+
+echo "waiting for conversions to complete"
+
+# wait for all the conversions to complete
+wait
+
+# delete all .asc files
+rm -f "$TMP_OUTPUT_DIR"/*.asc
 
 finalise
 
