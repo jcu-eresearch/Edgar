@@ -48,7 +48,7 @@
     background-position: bottom left;
 }
 
-.cornerpointer(tl, @arrowcolor: #fe8, @background: white) {
+.cornerpointer(br, @arrowcolor: #fe8, @background: white) {
     background: @background;
     background: -webkit-linear-gradient(-45deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
               , -webkit-linear-gradient(-135deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
@@ -65,7 +65,7 @@
     -o-background-size: 200px 200px;
     background-size: 200px 200px;
     background-repeat: no-repeat;
-    background-position: top left;
+    background-position: bottom right;
 }
 
 .cornerpointer(tr, @arrowcolor: #fe8, @background: white) {
@@ -88,7 +88,7 @@
     background-position: top right;
 }
 
-.cornerpointer(br, @arrowcolor: #fe8, @background: white) {
+.cornerpointer(tl, @arrowcolor: #fe8, @background: white) {
     background: @background;
     background: -webkit-linear-gradient(135deg, @arrowcolor 85px, transparent 85px, transparent 160px, @background 160px)
               , -webkit-linear-gradient(45deg, @background 100px, @arrowcolor 100px, @arrowcolor 183px, @background 183px);
@@ -105,7 +105,7 @@
     -o-background-size: 200px 200px;
     background-size: 200px 200px;
     background-repeat: no-repeat;
-    background-position: bottom right;
+    background-position: top left;
 }
 
 
