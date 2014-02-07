@@ -37,6 +37,34 @@ class SpeciesController < ApplicationController
     end
   end
 
+  # GET /species/1/download_occurrences
+
+  def download_occurrences
+    @species = nil
+
+    # Get the species provided if one was set
+    if params[:id]
+      @species = Species.find(params[:id])
+    end
+
+    # redirect to swift
+    redirect_to(@species.latest_occurrences_download_url)
+  end
+  
+  # GET /species/1/download_climate
+
+  def download_climate
+    @species = nil
+
+    # Get the species provided if one was set
+    if params[:id]
+      @species = Species.find(params[:id])
+    end
+
+    # redirect to swift
+    redirect_to(@species.latest_climate_download_url)
+  end
+
   # GET /species/map
   # GET /species/1/map
 

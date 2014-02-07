@@ -143,13 +143,13 @@ function updateDownloadButtons() {
         $occur.off('click');
         $occur.attr("disabled", false);
         $occur.click( function() {
-            window.open(Edgar.baseUrl + "species/download_occurrences/" + Edgar.mapdata.species.id ,'_blank');
+            window.open(Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + "/download_occurrences" ,'_blank');
         });
 
         $clim.off('click');
         $clim.attr("disabled", false);
         $clim.click( function() {
-            window.open(Edgar.baseUrl + "species/download_climate/" + Edgar.mapdata.species.id ,'_blank');
+            window.open(Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + "/download_climate" ,'_blank');
         });
 
     } else {

@@ -14,6 +14,8 @@ Webapplication::Application.routes.draw do
       post 'job_status'
       get 'occurrences'
       get 'vettings'
+      get 'download_occurrences'
+      get 'download_climate'
       post 'add_vetting'
     end
 

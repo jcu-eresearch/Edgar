@@ -28,6 +28,11 @@
 
 class Species < ActiveRecord::Base
 
+  # TODO - Should be in env. config
+  # This base URL for the SWIFT (S3) edgar 'backups' location
+
+  SWIFT_BASE_URL = "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh_public/edgar_backups"
+
   # The maximum number of features to return from a query
 
   FEATURES_QUERY_LIMIT = 5000
@@ -374,10 +379,10 @@ class Species < ActiveRecord::Base
       select('*, first_requested_remodel IS NULL as is_null').
       order("is_null ASC, first_requested_remodel ASC, num_dirty_occurrences DESC").
       where(
-        "num_dirty_occurrences > 0 AND current_model_status IS NULL " +
-        "OR num_dirty_occurrences > 0 AND DATE(current_model_queued_time) < ? " +
-        "OR current_model_status <> NULL AND current_model_queued_time IS NULL",
-        1.day.ago
+        "(num_dirty_occurrences > 0 AND current_model_status IS NULL) " +
+        "OR (num_dirty_occurrences > 0 AND current_model_queued_time < ?) " +
+        "OR (current_model_status IS NOT NULL AND current_model_queued_time IS NULL)",
+        1.days.ago
       ).first
   end
 
@@ -433,6 +438,15 @@ class Species < ActiveRecord::Base
 
     nil
   end
+  
+  def latest_occurrences_download_url()
+    "#{SWIFT_BASE_URL}/occurrences/#{common_name} (#{scientific_name})/latest-occurrences.zip"
+  end
+
+  def latest_climate_download_url()
+    "#{SWIFT_BASE_URL}/projected-distributions/#{common_name} (#{scientific_name})/latest-projected-distributions.zip"
+  end
+
 
   private
 
