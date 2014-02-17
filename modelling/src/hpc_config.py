@@ -17,7 +17,7 @@ import ala
 import paramiko
 
 class HPCConfig:
-    cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
+    cakeAppBaseURL = "http://130.102.155.18/edgar"
     #cakeAppBaseURL = "http://localhost/~robert/ap03"
     nextSpeciesURL= cakeAppBaseURL + "/species/get_next_job_and_assume_queued"
     sshUser = "jc155857"

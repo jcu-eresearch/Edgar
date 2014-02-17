@@ -35,8 +35,10 @@ ENVIRONMENT_CFG="$CONFIG_DIR/environment.cfg"
 #   MAXENT
 #   TRAINCLIMATE
 #   PROJECTCLIMATE
+echo "sourceing the environment file: $ENVIRONMENT_CFG"
 source "$ENVIRONMENT_CFG"
 
+echo "creating the working dir: $WORKING_DIR"
 mkdir -p $WORKING_DIR
 
 # Define the species
@@ -61,8 +63,10 @@ METADATA_JSON_FILE="$WORKING_DIR/inputs/$SPP/metadata.json"
 OCCUR=""
 
 if [ -f "$PRIVATE_OCCUR" ]; then
+    echo "Using the private occurrences file: $PRIVATE_OCCUR"
     OCCUR=$PRIVATE_OCCUR
 elif [ -f "$PUBLIC_OCCUR" ]; then
+    echo "Using the public occurrences file: $PUBLIC_OCCUR"
     OCCUR=$PUBLIC_OCCUR
 else
     echo "No occurrences file found for $SPP" 1>&2
@@ -91,6 +95,8 @@ declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
 declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
 function finalise {
+    echo "Finalising..."
+
     # Remove any existing final output
     rm -rfd "$FINAL_OUTPUT_DIR"
 
@@ -114,6 +120,7 @@ function model_and_median {
 
     # Cycle through the projections and project the maps
     for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_PROJECTION_PATH"`; do
+        echo "Running model_and_median for SCENARIO: $SCENARIO, YEAR: $YEAR and PROJ: $PROJ"
 	
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
@@ -127,8 +134,11 @@ function model_and_median {
 
     # Now calc the median
 
+    echo "Caclulating median"
     # Execute the py script.
     $MEDIAN_SCRIPT_TO_RUN
+    
+    echo "Translating median to Ascii Grid"
     # Translate output to ascii grid
     gdal_translate "$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif" "$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.asc" -of AAIGrid
 
