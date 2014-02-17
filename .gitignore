@@ -13,3 +13,5 @@ modelling/outputs
 modelling/tmp_outputs
 modelling/config/environment.cfg
 .vagrant
+env
+*.bak
