@@ -82,7 +82,7 @@ Edgar.util.mappath = (species, year, scenario) ->
 
     if typeof year == 'string' and year.toLowerCase() == 'current'
         # find the current map for the species
-        "#{speciesid}/1990.asc"
+        "#{speciesid}/1990.tif"
     else
-        "#{speciesid}/#{scenario}_median_#{year}.asc"
+        "#{speciesid}/#{scenario}_median_#{year}.tif"
 
