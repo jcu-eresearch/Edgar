@@ -11,4 +11,5 @@ modelling/tmp
 modelling/inputs
 modelling/outputs
 modelling/tmp_outputs
+modelling/config/environment.cfg
 .vagrant
