@@ -30,13 +30,13 @@ socket.setdefaulttimeout(socketTimeout)
 
 # A container for our HPC Job Statuses
 # Any job status not defined here is a qstat status
-class HPCJobStatus:
+class HPCJobStatus(object):
     queued          = "QUEUED"
     finishedSuccess = "FINISHED_SUCCESS"
     finishedFailure = "FINISHED_FAILURE"
     running = "R"
 
-class Job:
+class Job(object):
 
     # How long until a job should be considered failed
     # Note: Needs to take into consideration HPC may be full
@@ -311,6 +311,8 @@ class Job:
 
     # If we had tempfile/s, delete it
     def cleanup(self):
+        log.debug("Cleaning up after a Job")
+
         if self.publicTempfile:
             try:
                 os.unlink(self.publicTempfile)
@@ -383,6 +385,46 @@ class LocalHPCJob(Job):
         Job.__init__(self, speciesId)
         self.popen = None
 
+        self.stdout_log_file = tempfile.NamedTemporaryFile(delete=False, suffix=".stdout.log", prefix="edgar_modelling_stdout_" + speciesId + "_")
+        self.stderr_log_file = tempfile.NamedTemporaryFile(delete=False, suffix=".stderr.log", prefix="edgar_modelling_stderr_" + speciesId + "_")
+
+        self.stdout_read_log_file = open(self.stdout_log_file.name, 'rb')
+        self.stderr_read_log_file = open(self.stderr_log_file.name, 'rb')
+
+    def cleanup(self):
+        super(LocalHPCJob, self).cleanup()
+
+        try:
+            self.stdout_log_file.close()
+        except Exception as e:
+            log.warn("Exception while closing stdout_log_file tmpfile handle (%s) for job. Exception: %s", self.stdout_log_file.name, e)
+
+        try:
+            self.stderr_log_file.close()
+        except Exception as e:
+            log.warn("Exception while closing stderr_log_file tmpfile handle (%s) for job. Exception: %s", self.stderr_log_file.name, e)
+
+        try:
+            self.stdout_read_log_file.close()
+        except Exception as e:
+            log.warn("Exception while closing stdout_read_log_file tmpfile handle (%s) for job. Exception: %s", self.stdout_read_log_file.name, e)
+
+        try:
+            self.stderr_read_log_file.close()
+        except Exception as e:
+            log.warn("Exception while closing stderr_read_log_file tmpfile handle (%s) for job. Exception: %s", self.stderr_read_log_file.name, e)
+
+        try:
+            os.unlink(self.stdout_log_file.name)
+        except Exception as e:
+            log.warn("Exception while unlinking (deleting) stdout_log_file tmpfile (%s) for job. Exception: %s", self.stdout_log_file.name, e)
+
+        try:
+            os.unlink(self.stderr_log_file.name)
+        except Exception as e:
+            log.warn("Exception while unlinking (deleting) stderr_log_file tmpfile (%s) for job. Exception: %s", self.stdout_log_file.name, e)
+
+
     # Queue this job on the HPC
     # Returns true if we queued the job
     # Returns false if we failed to queue the job
@@ -390,7 +432,7 @@ class LocalHPCJob(Job):
         log.debug("Queueing job for %s", self.speciesId)
 
         try:
-            self.popen = Popen([HPCConfig.localQueueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=PIPE, stderr=PIPE)
+            self.popen = Popen([HPCConfig.localQueueJobScriptPath, self.speciesId, self.getSafeSpeciesName(), HPCConfig.workingDir, self.privateTempfile, self.publicTempfile, self.metaDataTempfile], stdout=self.stdout_log_file, stderr=self.stderr_log_file, close_fds=True)
 
             self._recordQueuedJob(self.popen.pid)
             log.debug("Succesfully queued job (job_id: %s)", self.jobId)
@@ -406,6 +448,12 @@ class LocalHPCJob(Job):
     # Returns false otherise
     def checkStatus(self):
         log.debug("Checking status of job %s (%s)", self.jobId, self.speciesId)
+
+        if not self.stdout_read_log_file.closed:
+            log.info("stdout:\n%s", self.stdout_read_log_file.read())
+
+        if not self.stderr_read_log_file.closed:
+            log.warn("stderr:\n%s", self.stderr_read_log_file.read())
 
         if self.isDone():
             # The job is done, no need to check status
@@ -425,14 +473,7 @@ class LocalHPCJob(Job):
             elif returnCode == 0:
                 self._setJobStatus(HPCJobStatus.finishedSuccess)
             else:
-	        log.error(
-		    (
-		        "Job failed.\n\t" +
-		        "exit_code: %s\n\t" +
-		        "stdout: %s\n\t" +
-		        "stderr: %s"
-    	    	    ), returnCode, self.popen.stdout.readlines(), self.popen.stderr.readlines()
-	        )
+                log.error("Job failed.\n\texit_code: %s", returnCode)
                 self._setJobStatus(HPCJobStatus.finishedFailure)
 
             return True
