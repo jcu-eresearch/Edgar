@@ -5,6 +5,7 @@ Webapplication::Application.routes.draw do
 
     collection do
       get 'map'
+      get 'job_list'
       get 'autocomplete'
       post 'get_next_job_and_assume_queued'
     end
@@ -16,6 +17,7 @@ Webapplication::Application.routes.draw do
       get 'vettings'
       get 'download_occurrences'
       get 'download_climate'
+      get 'request_model_rerun'
       post 'add_vetting'
     end
 
