@@ -23,7 +23,7 @@ TDH_DIR=/mnt/edgar_modelling_mount/TDH/
 
 PYTHON_BIN=/home/compute/Edgar/env/bin/python
 
-SWIFT_PUBLIC_COLLECTION="https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab"
+SWIFT_PUBLIC_COLLECTION="https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh_public"
 
 # NECTAR OS (open stack) config
 # ==============================
