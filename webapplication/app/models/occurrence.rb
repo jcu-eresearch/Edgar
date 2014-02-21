@@ -31,7 +31,7 @@ class Occurrence < ActiveRecord::Base
 
   # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
 
-  GRID_SIZE_WINDOW_FRACTION = 10
+  GRID_SIZE_WINDOW_FRACTION = 20
 
   # Develop the buffered_cluster_envelope by increasing buffering the cluster's
   # envelope by grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION.
@@ -91,8 +91,8 @@ class Occurrence < ActiveRecord::Base
     bbox = bbox.split(',').map { |el| el.to_f }
     w, s, e, n = *bbox
 
-    lat_range = w - e
-    lng_range = n - s
+    lat_range = (e - w).abs
+    lng_range = (n - s).abs
 
     lat_lng_range_avg = (lat_range + lng_range) / 2
     lat_lng_range_avg = lat_lng_range_avg.abs

@@ -49,7 +49,7 @@ function speciesGeoJSONURL() {
 // ------------------------------------------------------------------
 function legendURL() {
     var speciesId = Edgar.mapdata.species.id;
-    var data = speciesId + '/1990.asc';
+    var data = speciesId + '/1990.tif';
     return mapToolBaseUrl + 'wms_with_auto_determined_threshold.php' +
         '?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&MAP=edgar_master.map&DATA=' + data;
 }

@@ -147,7 +147,9 @@ def occurrences_for_species(species_lsid, changed_since=None, sensitive_only=Fal
         if _api_key is None:
             raise RuntimeError("Can't fetch sensitive coords without API key")
 
+    _log.debug('Fetching occurrences_for_species via url : %s', url)
     for page in _json_pages(url, params, ('totalRecords',), 'startIndex', use_api_key=True):
+        _log.debug('occurrences_for_species Page: %s', page)
         for occ in page['occurrences']:
 
             uncertainty = None
@@ -510,6 +512,7 @@ def _json_pages_params_filter(params, offset_key):
 
 def _json_pages(url, params, total_key_path, offset_key, use_api_key=False):
     assert len(total_key_path) > 0
+    _log.debug('_json_pages called for url : %s, with params: %s', url, params)
 
     params, page_size = _json_pages_params_filter(params, offset_key)
 

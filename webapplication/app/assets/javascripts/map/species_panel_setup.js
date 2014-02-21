@@ -31,7 +31,7 @@ $(function() {
 
     // set up the remodel button
     $('#button_remodel').click(function() {
-        $.ajax({ url: Edgar.baseUrl + 'species/request_model_rerun/' + Edgar.mapdata.species.id });
+        $.ajax({ url: Edgar.baseUrl + 'species/' + Edgar.mapdata.species.id + '/request_model_rerun' });
         $(this).fadeOut('fast', function() {
             Edgar.mapdata.species.remodelStatus = "Priority queued";
             updateSpeciesStatus(Edgar.mapdata.species);
@@ -143,13 +143,13 @@ function updateDownloadButtons() {
         $occur.off('click');
         $occur.attr("disabled", false);
         $occur.click( function() {
-            window.open(Edgar.baseUrl + "species/download_occurrences/" + Edgar.mapdata.species.id ,'_blank');
+            window.open(Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + "/download_occurrences" ,'_blank');
         });
 
         $clim.off('click');
         $clim.attr("disabled", false);
         $clim.click( function() {
-            window.open(Edgar.baseUrl + "species/download_climate/" + Edgar.mapdata.species.id ,'_blank');
+            window.open(Edgar.baseUrl + "species/" + Edgar.mapdata.species.id + "/download_climate" ,'_blank');
         });
 
     } else {

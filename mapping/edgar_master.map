@@ -5,7 +5,7 @@ MAP
     SIZE 256 256
 
     PROJECTION
-        "init=epsg:900913"
+        "init=epsg:3857"
     END
 
     #define the image type
@@ -19,7 +19,7 @@ MAP
     #    SIZE 256 256
 
     #define the working folder of this map file
-    SHAPEPATH "/scratch/jc155857/EdgarMaster/modelling/outputs/"
+    SHAPEPATH "/mnt/edgar_modelling_mount/outputs/"
 
     #define the background color
     TRANSPARENT ON

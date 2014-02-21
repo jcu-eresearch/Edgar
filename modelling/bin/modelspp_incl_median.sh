@@ -35,8 +35,10 @@ ENVIRONMENT_CFG="$CONFIG_DIR/environment.cfg"
 #   MAXENT
 #   TRAINCLIMATE
 #   PROJECTCLIMATE
+echo "sourceing the environment file: $ENVIRONMENT_CFG"
 source "$ENVIRONMENT_CFG"
 
+echo "creating the working dir: $WORKING_DIR"
 mkdir -p $WORKING_DIR
 
 # Define the species
@@ -61,8 +63,10 @@ METADATA_JSON_FILE="$WORKING_DIR/inputs/$SPP/metadata.json"
 OCCUR=""
 
 if [ -f "$PRIVATE_OCCUR" ]; then
+    echo "Using the private occurrences file: $PRIVATE_OCCUR"
     OCCUR=$PRIVATE_OCCUR
 elif [ -f "$PUBLIC_OCCUR" ]; then
+    echo "Using the public occurrences file: $PUBLIC_OCCUR"
     OCCUR=$PUBLIC_OCCUR
 else
     echo "No occurrences file found for $SPP" 1>&2
@@ -91,6 +95,8 @@ declare -a SCENARIOS_TO_MODEL=('RCP3PD' 'RCP45' 'RCP6' 'RCP85')
 declare -a LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 
 function finalise {
+    echo "Finalising..."
+
     # Remove any existing final output
     rm -rfd "$FINAL_OUTPUT_DIR"
 
@@ -109,12 +115,13 @@ function model_and_median {
     # where model is anything except an underscore (or /)
     local FILTER_PROJECTION_PATH=".*/${SCENARIO}_[^_/]+_${YEAR}"
 
-    local MEDIAN_SCRIPT_TO_RUN="$WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif --calc='A' --overwrite "
+    local MEDIAN_SCRIPT_TO_RUN="$PYTHON_BIN $WORKING_DIR/bin/median.py --outfile=$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif --calc='A' --overwrite "
     local I_INT=0
 
     # Cycle through the projections and project the maps
     for PROJ in `find "$PROJECTCLIMATE" -mindepth 1 -type d -regex "$FILTER_PROJECTION_PATH"`; do
-
+        echo "Running model_and_median for SCENARIO: $SCENARIO, YEAR: $YEAR and PROJ: $PROJ"
+	
         java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$PROJ" "$TMP_OUTPUT_DIR/"`basename "$PROJ"`.asc fadebyclamping nowriteclampgrid nowritemess -x
 
         local letter="${LETTERS[$I_INT]}"
@@ -127,8 +134,11 @@ function model_and_median {
 
     # Now calc the median
 
+    echo "Caclulating median"
     # Execute the py script.
     $MEDIAN_SCRIPT_TO_RUN
+    
+    echo "Translating median to Ascii Grid"
     # Translate output to ascii grid
     gdal_translate "$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.tif" "$TMP_OUTPUT_DIR/${SCENARIO}_median_${YEAR}.asc" -of AAIGrid
 
@@ -138,7 +148,7 @@ function model_and_median {
 `printenv > "$TMP_OUTPUT_DIR/JOB_ENV_VARS.txt"`
 
 # Run the pre-check
-R --no-save < "$WORKING_DIR/bin/model_pre_check.r" --args "$OCCUR"
+Rscript --vanilla "$WORKING_DIR/bin/model_pre_check.r" "$OCCUR"
 
 status=$?
 
@@ -168,13 +178,12 @@ java -mx2048m -cp "$MAXENT" density.Project "$TMP_OUTPUT_DIR/${SPP}.lambdas" "$T
 # Model all models for each scenario year combo
 for SCENARIO in "${SCENARIOS_TO_MODEL[@]}"; do
     for YEAR in "${YEARS_TO_MODEL[@]}"; do
-        NUM_RUNNING=`jobs -p | wc -l`
+        NUM_RUNNING=`jobs | wc -l`
 
-        while [ "$NUM_RUNNING" -ge "$MAX_NUM_PROCS" ]; do
+        while [ "$NUM_RUNNING" -ge "$MAX_NUM_JOBS" ]; do
             # I have hit the maximum number of simultaneous jobs running
-            # Sleep periodically, and recheck.
-            sleep 1
-            NUM_RUNNING=`jobs -p | wc -l`
+            sleep 5
+            NUM_RUNNING=`jobs | wc -l`
         done
 
         model_and_median "$SCENARIO" "$YEAR" &
@@ -205,26 +214,69 @@ mkdir -p "$TDH_DIR/$SPP_NAME/occurrences"
 CLIM_ZIP_FILE_NAME="latest-projected-distributions.zip"
 CLIM_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-projected-distributions.zip"
 
+echo "processing projected-distributions for tdh"
 pushd $TMP_OUTPUT_DIR
 zip -r "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" *
 mv "$TDH_DIR/$SPP_NAME/projected-distributions/tmp_$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME"
 popd
 
+pushd  "$TDH_DIR/$SPP_NAME/projected-distributions/"
+echo "Now uploading latest projected-distributions to our object-store"
+swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/projected-distributions/$SPP_NAME" "$CLIM_ZIP_FILE_NAME"
+popd
+
 # if we don't have a copy for the month, make a copy
 if [ ! -e "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/projected-distributions/$CLIM_MONTH_ZIP_FILE_NAME"
+
+  pushd  "$TDH_DIR/$SPP_NAME/projected-distributions/"
+  echo "Now uploading monthly projected-distributions snapshot to our object-store"
+  swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/projected-distributions/$SPP_NAME" "$CLIM_MONTH_ZIP_FILE_NAME"
+  popd
 fi
 
 OCCUR_ZIP_FILE_NAME="latest-occurrences.zip"
 OCCUR_MONTH_ZIP_FILE_NAME="`date +%Y-%m`-occurrences.zip"
 
+echo "processing occurrences for tdh"
 zip -j "$TDH_DIR/$SPP_NAME/occurrences/tmp_$OCCUR_ZIP_FILE_NAME" "$PUBLIC_OCCUR"
 mv "$TDH_DIR/$SPP_NAME/occurrences/tmp_$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME"
+
+
+pushd "$TDH_DIR/$SPP_NAME/occurrences/"
+echo "Now uploading latest occurrences to our object-store"
+swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/occurrences/$SPP_NAME" "$OCCUR_ZIP_FILE_NAME"
+popd
 
 # if we don't have a copy for the month, make a copy
 if [ ! -e "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME" ]; then
   cp "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_ZIP_FILE_NAME" "$TDH_DIR/$SPP_NAME/occurrences/$OCCUR_MONTH_ZIP_FILE_NAME"
+
+  pushd  "$TDH_DIR/$SPP_NAME/occurrences/"
+  echo "Now uploading monthly occurrences snapshot to our object-store"
+  swift upload "$SWIFT_PUBLIC_COLLECTION/edgar_backups/occurrences/$SPP_NAME" "$OCCUR_MONTH_ZIP_FILE_NAME"
+  popd
 fi
+
+echo "converting .asc files to .tif"
+# convert all .asc to tif
+for f in "$TMP_OUTPUT_DIR"/*.asc
+do
+  my_dir_name=$(dirname "$f")
+  my_base_name=$(basename "$f")
+  my_base_name_no_ext="${my_base_name%.*}"
+    
+  # convert each .asc to a .tif
+  gdal_translate "$f" "${my_dir_name}/${my_base_name_no_ext}.tif" -co "COMPRESS=lzw" -co "PREDICTOR=2" -of GTiff &
+done
+
+echo "waiting for conversions to complete"
+
+# wait for all the conversions to complete
+wait
+
+# delete all .asc files
+rm -f "$TMP_OUTPUT_DIR"/*.asc
 
 finalise
 
