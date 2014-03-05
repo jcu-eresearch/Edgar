@@ -37,6 +37,8 @@ Vagrant.configure("2") do |config|
 
         salt.install_type = 'git'
         salt.install_args = 'v0.17.1'
+
+        salt.bootstrap_script = "salt/bootstrap-salt.sh"
       end
   end
 
@@ -55,6 +57,8 @@ Vagrant.configure("2") do |config|
 
         salt.install_type = 'git'
         salt.install_args = 'v0.17.1'
+
+        salt.bootstrap_script = "salt/bootstrap-salt.sh"
       end
   end
 
@@ -73,6 +77,8 @@ Vagrant.configure("2") do |config|
 
         salt.install_type = 'git'
         salt.install_args = 'v0.17.1'
+
+        salt.bootstrap_script = "salt/bootstrap-salt.sh"
       end
   end
 
@@ -110,6 +116,8 @@ Vagrant.configure("2") do |config|
 
       salt.install_type = 'git'
       salt.install_args = 'v0.17.1'
+
+      salt.bootstrap_script = "salt/bootstrap-salt.sh"
     end
   end
 
@@ -147,6 +155,8 @@ Vagrant.configure("2") do |config|
 
       salt.install_type = 'git'
       salt.install_args = 'v0.17.1'
+
+      salt.bootstrap_script = "salt/bootstrap-salt.sh"
     end
   end
 
@@ -184,6 +194,8 @@ Vagrant.configure("2") do |config|
 
       salt.install_type = 'git'
       salt.install_args = 'v0.17.1'
+
+      salt.bootstrap_script = "salt/bootstrap-salt.sh"
     end
   end
 
