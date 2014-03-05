@@ -26,19 +26,14 @@ log.debug("Starting modeld.py")
 currentJob = None
 currentCycle = 0
 
-minSleepTime = 10
-maxSleepTime = 60
+sleepTime = 10
 
 # The Main Loop
 while True:
 
     # Sleep a time, then go round again
-    # Inject randomness into the sleep time to reduce likelihood of multiple
-    # scripts running against the same species (no longer an issue, the web request 
-    # for next species will no longer return the same species multiple times, unless it needs remodelling).
-    randSleepTime = random.randint(minSleepTime, maxSleepTime)
-    log.debug("Sleeping %i seconds.", randSleepTime)
-    sleep(randSleepTime)
+    log.debug("Sleeping %i seconds.", sleepTime)
+    sleep(sleepTime)
 
     currentCycle += 1
     log.debug("Loop %i (%s). Current Job: %s", currentCycle, datetime.today(), currentJob)

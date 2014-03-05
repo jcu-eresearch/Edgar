@@ -37,6 +37,34 @@ class SpeciesController < ApplicationController
     end
   end
 
+  # GET /species/1/download_occurrences
+
+  def download_occurrences
+    @species = nil
+
+    # Get the species provided if one was set
+    if params[:id]
+      @species = Species.find(params[:id])
+    end
+
+    # redirect to swift
+    redirect_to(@species.latest_occurrences_download_url)
+  end
+  
+  # GET /species/1/download_climate
+
+  def download_climate
+    @species = nil
+
+    # Get the species provided if one was set
+    if params[:id]
+      @species = Species.find(params[:id])
+    end
+
+    # redirect to swift
+    redirect_to(@species.latest_climate_download_url)
+  end
+
   # GET /species/map
   # GET /species/1/map
 
@@ -61,6 +89,35 @@ class SpeciesController < ApplicationController
 
     respond_to do |format|
       format.json { render json: search_result }
+    end
+  end
+
+  # GET /species/1/request_model_rerun
+  def request_model_rerun
+    @species = nil
+
+    # Get the species provided if one was set
+    if params[:id]
+      @species = Species.find(params[:id])
+      if @species.first_requested_remodel != nil
+        render json: { response: "Modelling already requested previously" }
+      else
+        @species.first_requested_remodel = Time.now
+        @species.save()
+        render json: { response: "Request processed" }
+      end
+    end
+  end 
+  
+  # GET /species/job_list
+  #
+  # Get the list of jobs in highest priority to model.
+
+  def job_list
+    @species = Species.jobs_in_order()
+
+    respond_to do |format|
+      format.json { render json: @species }
     end
   end
 

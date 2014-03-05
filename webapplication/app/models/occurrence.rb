@@ -31,7 +31,7 @@ class Occurrence < ActiveRecord::Base
 
   # The grid size is the span of window divided by GRID_SIZE_WINDOW_FRACTION
 
-  GRID_SIZE_WINDOW_FRACTION = 10
+  GRID_SIZE_WINDOW_FRACTION = 20
 
   # Develop the buffered_cluster_envelope by increasing buffering the cluster's
   # envelope by grid_size/CLUSTER_GRID_SIZE_BUFFER_FRACTION.

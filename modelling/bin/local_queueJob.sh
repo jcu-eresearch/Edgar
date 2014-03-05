@@ -47,5 +47,6 @@ export AP03_SPP
 export AP03_SPP_CLEAN_NAME
 export WORKING_DIR
 
-# Then run the qsub
-`$MODELS_SPP_SH`
+# Then run modelling
+$MODELS_SPP_SH
+exit $?

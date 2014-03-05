@@ -3,7 +3,7 @@
 <%= content_for :head do %>
   <%= javascript_tag do %>
     mapSpecies = <%= @species ? @species.to_json.html_safe : "null" %>;
-    mapToolBaseUrl = "http://www.hpc.jcu.edu.au/tdh-tools-2:80/Edgar/mapping/";
+    mapToolBaseUrl = "http://130.102.155.33/Edgar/";
   <% end %>
 <% end %>
 

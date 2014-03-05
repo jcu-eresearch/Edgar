@@ -28,6 +28,15 @@
 
 class Species < ActiveRecord::Base
 
+  # TODO - Should be in env. config
+  # This base URL for the SWIFT (S3) edgar 'backups' location
+
+  SWIFT_BASE_URL = "https://swift.rc.nectar.org.au:8888/v1/AUTH_132f5445e3124435b8b4ad30081dfaab/tdh_public/edgar_backups"
+
+  # set this to true to use the cache cluster table
+
+  USE_CACHE = false
+
   # The maximum number of features to return from a query
 
   FEATURES_QUERY_LIMIT = 5000
@@ -209,9 +218,14 @@ class Species < ActiveRecord::Base
       raise ArgumentError, "Invalid options (#{options.inspect}. The cluster interface uses caching, and we don't cache the invalid occurrence records"
     elsif options[:cluster]
       grid_size = options[:grid_size] || Occurrence::get_cluster_grid_size(options[:bbox])
-      grid_size = Occurrence::normalise_grid_size(grid_size)
 
-      cluster_result = get_or_generate_cached_clusters(grid_size)
+      cluster_result = nil
+      if USE_CACHE
+        grid_size = Occurrence::normalise_grid_size(grid_size)
+        cluster_result = get_or_generate_cached_clusters(grid_size)
+      else
+        cluster_result = get_clusters(grid_size)
+      end
 
       if options[:bbox]
         cluster_result = cluster_result.in_rect(options[:bbox].split(','))
@@ -222,6 +236,11 @@ class Species < ActiveRecord::Base
 
       cluster_result.each do |cluster|
         geom_feature = cluster.cluster_centroid
+
+        if geom_feature.is_a?(String)
+          geom_feature = Occurrence.rgeo_factory_for_column(:location).parse_wkt(geom_feature)
+        end
+
         feature = RGeo::GeoJSON::Feature.new(geom_feature, nil, get_occurrence_feature_properties(cluster, geom_feature, options))
         features << feature
       end
@@ -354,7 +373,7 @@ class Species < ActiveRecord::Base
   # Merge the original Cake Attributes into the Rails attributes.
   # This provides backwards compatibility with existing Cake PHP javascript files.
 
-  def serializable_hash(*args) 
+  def serializable_hash(*args)
     attrs = super(*args)
     attrs.merge({
       scientificName: scientific_name,
@@ -367,18 +386,29 @@ class Species < ActiveRecord::Base
     })
   end
 
+  # Get the list of next jobs (as a query)
+
+  def self.jobs_in_order
+    Species.
+      select('*, first_requested_remodel IS NULL as first_requested_remodel_is_null, last_completed_model_queued_time IS NULL as last_completed_model_queued_time_is_null').
+      order("first_requested_remodel_is_null ASC, first_requested_remodel ASC, last_completed_model_queued_time_is_null DESC, last_completed_model_queued_time ASC, num_dirty_occurrences DESC").
+      where(
+        "(num_dirty_occurrences > 0 AND current_model_status IS NULL) " +
+        "OR (num_dirty_occurrences > 0 AND current_model_queued_time < ?) " +
+        "OR (current_model_status IS NOT NULL AND current_model_queued_time IS NULL)",
+        1.days.ago
+      )
+  end
+
   # Get the next_job to model
 
   def self.next_job
-    Species.
-      select('*, first_requested_remodel IS NULL as is_null').
-      order("is_null ASC, first_requested_remodel ASC, num_dirty_occurrences DESC").
-      where(
-        "num_dirty_occurrences > 0 AND current_model_status IS NULL " +
-        "OR num_dirty_occurrences > 0 AND current_model_queued_time < ? " +
-        "OR current_model_status <> NULL AND current_model_queued_time IS NULL",
-        1.day.ago
-      ).first
+    self.jobs_in_order.first
+  end
+
+  def get_clusters(grid_size)
+    cluster_result = occurrences.where_not_invalid.cluster(grid_size: grid_size).select_classification_totals
+    return cluster_result
   end
 
   # Get the clusters at a fixes grid size.
@@ -433,6 +463,15 @@ class Species < ActiveRecord::Base
 
     nil
   end
+  
+  def latest_occurrences_download_url()
+    "#{SWIFT_BASE_URL}/occurrences/#{common_name} (#{scientific_name})/latest-occurrences.zip"
+  end
+
+  def latest_climate_download_url()
+    "#{SWIFT_BASE_URL}/projected-distributions/#{common_name} (#{scientific_name})/latest-projected-distributions.zip"
+  end
+
 
   private
 
@@ -584,7 +623,7 @@ class Species < ActiveRecord::Base
 
   def generate_cache_clusters(grid_size)
 
-    cluster_result = occurrences.where_not_invalid.cluster(grid_size: grid_size).select_classification_totals
+    cluster_result = get_clusters(grid_size)
 
     # Create a cache record for this species
 

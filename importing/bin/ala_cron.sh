@@ -4,7 +4,7 @@
 # min hr  dom mth dow cmd
 # 0   1   *   *   *   /home/jc171154/Edgar/importing/bin/ala_cron.sh
 
-IMPORTER_DIR="/home/jc171154/Edgar/importing"
+IMPORTER_DIR="/home/compute/Edgar/importing"
 LOG_DIR="$IMPORTER_DIR/logs"
 SYNC_SCRIPT="$IMPORTER_DIR/bin/ala_db_update"
 CONFIG_FILE="$IMPORTER_DIR/config.json"
