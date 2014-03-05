@@ -26,15 +26,19 @@ nectar_mount_user:
       - group: nectar_mount_user
       - pkg: mount requirements
 
+# Note the file contents are COMMENTED OUT
+#
+# i.e. this file DOES NOTHING
 /etc/auto.master:
   file.managed:
-    - contents: "/mnt\tfile:/etc/auto.rdsi"
+    - contents: "#Set the timeout to 10 minutes for the auto.rdsi mount point\n#/mnt\tfile:/etc/auto.rdsi\t--timeout=600"
     - require:
       - pkg: mount requirements
 
+# This file is ignored, as the file contents above are commented out
 /etc/auto.rdsi:
   file.managed:
-    - contents: "edgar_data\t-rw,nfsvers=3,hard,intr,nosuid,nodev,timeo=15,retrans=5\t{{pillar['mount']['collection_path']}}"
+    - contents: "edgar_and_climas\t-rw,nfsvers=3,hard,intr,nosuid,nodev,timeo=100,retrans=5\t{{pillar['mount']['collection_path']}}"
     - require:
       - pkg: mount requirements
 

@@ -1,10 +1,11 @@
 # 'base' is an environment, don't worry about it for now.
 base:
-  '*':
-    - edgar.ssh
+# Uncomment this to put keys onto Nectar
+#  '*':
+#    - edgar_and_climas.ssh
   'applications':
-    - edgar.applications
+    - edgar_and_climas.applications
   'compute':
-    - edgar.compute
+    - edgar_and_climas.compute
   'map-server':
-    - edgar.map_server
+    - edgar_and_climas.map_server

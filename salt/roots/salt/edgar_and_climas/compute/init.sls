@@ -1,44 +1,13 @@
 include:
   - jcu.git
   - jcu.supervisord
-  - jcu.python.python_2_7
   - jcu.postgresql.postgresql92.client
-  - edgar.mount
+  - jcu.repositories.pgdg.pgdg92
+  - jcu.repositories.epel
 
-compute packages:
-  pkg.installed:
-    - pkgs:
-      - R
-    - watch_in:
-      - service: supervisord
-
-kill supervisord:
-  service:
-    - name: supervisord
-    - dead
-    - require:
-      - pkg: supervisor
-
-compute clone edgar:
-  git.latest:
-    - name: https://github.com/jcu-eresearch/Edgar.git
-    - rev: Edgar_On_Rails
-    - target: /mnt/edgar_data/Edgar/repo
-    - user: compute
-    - require:
-      - user: compute
-      - pkg: git
-      - file: compute /mnt/edgar_data/Edgar
-
-compute /mnt/edgar_data/Edgar:
-  file.directory:
-    - name: /mnt/edgar_data/Edgar
-    - user: compute
-    - group: compute
-    - require:
-      - service: autofs
-      - user: compute
-#      - file: root /mnt/edgar_data/Edgar
+#########################
+# Dependencies
+#########################
 
 compute requirements:
   pkg.installed:
@@ -46,18 +15,17 @@ compute requirements:
       - git
       - wget
       - geos
-  require:
-    - cmd: python_2_7 make && make altinstall
-
-/home/compute/Edgar:
-  file.symlink:
-    - target: /mnt/edgar_data/Edgar/repo
-    - makedirs: True
-    - user: compute
-    - group: compute
+      - gdal
+      - python
+      - python-devel
+      - postgresql-libs
     - require:
-      - service: autofs
-      - git: compute clone edgar
+      - pkg: epel
+      - pkg: pgdg-92
+
+#########################
+# Users / Groups
+#########################
 
 compute:
   group:
@@ -70,10 +38,12 @@ compute:
     - uid: {{ pillar['compute']['uid_gid'] }}
     - groups:
       - compute
-      - nectar_mount_user
     - require:
       - group: compute
-      - group: nectar_mount_user
+
+#########################
+# Set up Directories
+#########################
 
 /home/compute/tmp:
   file.directory:
@@ -85,6 +55,24 @@ compute:
 
 /var/log/supervisord:
   file.directory
+
+#########################
+# Get the Code
+#########################
+
+/home/compute/Edgar:
+  git.latest:
+    - name: https://github.com/jcu-eresearch/Edgar.git
+    - rev: Edgar_On_Rails
+    - target: /home/compute/Edgar
+    - user: compute
+    - require:
+      - user: compute
+      - pkg: git
+
+#########################
+# Set up the Virt. Env.
+#########################
 
 compute get virtual env:
   cmd.run:
@@ -108,16 +96,18 @@ compute extract virtual env:
 
 install compute virtual env:
   cmd.wait:
-    - name: python2.7 /home/compute/tmp/virtualenv-{{ pillar['virtualenv']['version'] }}/virtualenv.py env
+    - name: python /home/compute/tmp/virtualenv-{{ pillar['virtualenv']['version'] }}/virtualenv.py env
     - cwd: /home/compute/Edgar
     - user: compute
     - require:
-      - file: /home/compute/Edgar
-      - cmd: python_2_7 make && make altinstall
       - service: kill supervisord
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
     - watch:
       - cmd: compute extract virtual env
+
+#########################
+# Install importing code
+#########################
 
 compute setup.py install:
   cmd.wait:
@@ -126,8 +116,7 @@ compute setup.py install:
     - user: compute
     - require:
       - cmd: install compute virtual env
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
 
 compute bootstrap:
   cmd.run:
@@ -136,19 +125,16 @@ compute bootstrap:
     - name: ../env/bin/python bootstrap.py
     - require:
       - cmd: install compute virtual env
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
 
-compute install GeoAlchemy:
-  cmd.run:
-    - cwd: /home/compute/Edgar/importing
-    - user: compute
-    - name: ../env/bin/pip install GeoAlchemy
-    - require:
-      - cmd: install compute virtual env
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
-
+# Install several eggs manually...
+#
+# Ideally these would happen as part of the buildout process.
+# Due to the split in the modelling and importing processes,
+# these eggs need to be installed priort to the importing buildout.
+#
+# If you remove these egg installs, the modelling won't be able to
+# find the eggs (as they will be in the buildout, but not in the virt. env)
 compute install psycopg2:
   cmd.run:
     - cwd: /home/compute/Edgar/importing
@@ -156,9 +142,23 @@ compute install psycopg2:
     - name: ../env/bin/pip install psycopg2
     - require:
       - cmd: install compute virtual env
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
-      - pkg: Install PostgreSQL92 Client Packages
+      - git: /home/compute/Edgar
+
+compute install SQLAlchemy:
+  cmd.run:
+    - cwd: /home/compute/Edgar/importing
+    - user: compute
+    - name: ../env/bin/pip install SQLAlchemy==0.8.4
+    - require:
+      - cmd: compute install psycopg2
+
+compute install GeoAlchemy:
+  cmd.run:
+    - cwd: /home/compute/Edgar/importing
+    - user: compute
+    - name: ../env/bin/pip install GeoAlchemy==0.7.2
+    - require:
+      - cmd: compute install SQLAlchemy
 
 compute buildout:
   cmd.run:
@@ -167,15 +167,16 @@ compute buildout:
     - name: ./bin/buildout
     - require:
       - cmd: compute bootstrap
-      - file: /home/compute/Edgar
       - file: /etc/supervisord.conf
       - pkg: Install PostgreSQL92 Client Packages
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
       - cmd: compute install GeoAlchemy
-      - cmd: compute install psycopg2
     - watch_in:
       - service: supervisord
 
+#########################
+# Install supervisor
+#########################
 
 yum install supervisor -y:
   cmd.run:
@@ -190,15 +191,13 @@ yum install supervisor -y:
     - target: /home/compute/Edgar/modelling/supervisord/supervisord.conf
     - force: true
     - require:
-      - file: /home/compute/Edgar
       - cmd: compute bootstrap
       - file: /var/log/supervisord
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
 
-save iptables:
-  module.run:
-    - name: iptables.save
-    - filename: /etc/sysconfig/iptables
+#########################
+# Open up port 9001
+#########################
 
 iptables 9001:
   module.run:
@@ -210,16 +209,28 @@ iptables 9001:
     - require_in:
       - module: save iptables
 
+save iptables:
+  module.run:
+    - name: iptables.save
+    - filename: /etc/sysconfig/iptables
+
+#########################
+# Update modelling config
+#########################
+
 update hpc_config base url:
   file.replace:
     - name: /home/compute/Edgar/modelling/src/hpc_config.py
-    - pattern: cakeAppBaseURL = "http://climatebird2.qern.qcif.edu.au/Edgar"
+    - pattern: cakeAppBaseURL = "http://130.102.155.18/edgar"
     - repl: cakeAppBaseURL = "{{pillar['applications']['edgar_base_url']}}"
     - require:
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
     - watch_in:
       - service: supervisord
+
+#########################
+# Update importing config
+#########################
 
 copy importing config:
   file.copy:
@@ -229,8 +240,7 @@ copy importing config:
     - group: compute
     - mode: 640
     - require:
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
 
 update importing database:
   file.replace:
@@ -242,15 +252,15 @@ update importing database:
     - watch_in:
       - service: supervisord
 
-#update importing api_key:
-#  file.replace:
-#    - name: /home/compute/Edgar/importing/config.json
-#    - pattern: '"alaApiKey": null'
-#    - repl: '"alaApiKey": "{{pillar['ala']['api_key']}}"'
-#    - require:
-#      - file: copy importing config
-#    - watch_in:
-#      - service: supervisord
+update importing api_key:
+  file.replace:
+    - name: /home/compute/Edgar/importing/config.json
+    - pattern: '"alaApiKey": null'
+    - repl: '"alaApiKey": "{{pillar['ala']['api_key']}}"'
+    - require:
+      - file: copy importing config
+    - watch_in:
+      - service: supervisord
 
 #update importing ala_sync_url:
 #  file.replace:
@@ -262,31 +272,25 @@ update importing database:
 #    - watch_in:
 #      - service: supervisord
 
-update importing cron:
-  file.replace:
-    - name: /home/compute/Edgar/importing/bin/ala_cron.sh
-    - pattern: 'IMPORTER_DIR="/home/jc171154/Edgar/importing"'
-    - repl: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
-    - require:
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
-
 /home/compute/Edgar/importing/bin/ala_cron.sh:
   file.replace:
     - name: /home/compute/Edgar/importing/bin/ala_cron.sh
-    - pattern: 'IMPORTER_DIR="/home/jc171154/Edgar/importing"'
+    - pattern: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
     - repl: 'IMPORTER_DIR="/home/compute/Edgar/importing"'
     - require:
-      - file: /home/compute/Edgar
-      - git: compute clone edgar
+      - git: /home/compute/Edgar
   cron.present:
     - user: compute
-    # weekly
+    # this is weekly
     - dayweek: 0
     - minute: 0
     - hour: 0
     - require:
       - file: /home/compute/Edgar/importing/bin/ala_cron.sh
+
+#########################
+# Update file perm's
+#########################
 
 /home/compute/Edgar/env/bin:
   file.directory:
@@ -299,8 +303,7 @@ update importing cron:
       - group
       - mode
     - require:
-      - file: /home/compute
-      - file: /home/compute/Edgar
+      - git: /home/compute/Edgar
 
 /home/compute/Edgar/importing/bin/:
   file.directory:
@@ -313,8 +316,7 @@ update importing cron:
       - group
       - mode
     - require:
-      - file: /home/compute
-      - file: /home/compute/Edgar
+      - git: /home/compute/Edgar
 
 /home/compute/Edgar/modelling/bin/:
   file.directory:
@@ -327,5 +329,16 @@ update importing cron:
       - group
       - mode
     - require:
-      - file: /home/compute
-      - file: /home/compute/Edgar
+      - git: /home/compute/Edgar
+
+#########################
+# Helper Actions
+#########################
+
+kill supervisord:
+  service:
+    - name: supervisord
+    - dead
+    - require:
+      - pkg: supervisor
+
