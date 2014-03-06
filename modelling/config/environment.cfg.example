@@ -6,7 +6,7 @@ MAXENT=/home/compute/maxent.jar
 #TRAINCLIMATE=/home/jc165798/Climate/PCMDI/01.Oz.5km.61.90/mxe/1975
 #PROJECTCLIMATE=/home/jc165798/Climate/PCMDI/01.Oz.5km.61.90/mxe
 
-PROJECTCLIMATE=/mnt/edgar_modelling_mount/bioclim_mxe
+PROJECTCLIMATE=/home/compute/bioclim_mxe
 TRAINCLIMATE=$PROJECTCLIMATE/1990
 
 # Filter Projection Climates folder by.. (uses the find -regex option)
@@ -19,7 +19,7 @@ FILTER_FULL_PROJECTION_PATH_BY_EMACS_REGEX="\(\(.*/RCP[^/]*\)\|\(.*/1990[^/]*\)\
 MAX_NUM_JOBS=2
 
 # Where to copy zip outputs to
-TDH_DIR=/mnt/edgar_modelling_mount/TDH/
+TDH_DIR=/home/compute/TDH/
 
 PYTHON_BIN=/home/compute/Edgar/env/bin/python
 
