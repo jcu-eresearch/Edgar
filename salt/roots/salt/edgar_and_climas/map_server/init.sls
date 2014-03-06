@@ -509,7 +509,7 @@ update reports url /home/map_server/climas/applications/CONFIGURATION.cfg:
     - group: map_server
     - require:
 #      - service: autofs
-      - git: /home/map_server/Edgar
+      - git: climas_www /home/map_server/climas
 
 /var/www/html/climas/output:
   file.symlink:
