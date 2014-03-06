@@ -19,6 +19,7 @@ FILTER_FULL_PROJECTION_PATH_BY_EMACS_REGEX="\(\(.*/RCP[^/]*\)\|\(.*/1990[^/]*\)\
 MAX_NUM_JOBS=2
 
 # Where to copy zip outputs to
+# Will be created if it doesn't exist
 TDH_DIR=/home/compute/TDH/
 
 PYTHON_BIN=/home/compute/Edgar/env/bin/python
