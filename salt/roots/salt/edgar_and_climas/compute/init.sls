@@ -16,6 +16,7 @@ compute requirements:
       - wget
       - geos
       - gdal
+      - R-devel
       - python
       - python-devel
       - postgresql-libs
@@ -40,6 +41,7 @@ compute:
       - compute
     - require:
       - group: compute
+      - pkg: compute requirements
 
 #########################
 # Set up Directories
@@ -82,7 +84,6 @@ compute get virtual env:
     - cwd: /home/compute/tmp/
     - require:
       - user: compute
-      - pkg: compute requirements
       - file: /home/compute/tmp
     - unless: test -d /home/compute/Edgar/tmp/env
 
