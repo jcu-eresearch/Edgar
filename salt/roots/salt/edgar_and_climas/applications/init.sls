@@ -170,6 +170,7 @@ update assets compile:
     - require:
       - git: /home/applications/Edgar
 
+
 /home/applications/Edgar/webapplication/config/environments/production.rb:
   file.managed:
     - user: applications
@@ -178,6 +179,28 @@ update assets compile:
     - require:
       - file: update action_mailer host
       - file: update assets compile
+
+
+# Update the map tool path in Edgar's javascript
+
+update map tool path:
+  file.replace:
+    - name: /home/applications/Edgar/webapplication/app/views/species/map.html.erb
+    - pattern: mapToolBaseUrl = "http://130.102.155.33/Edgar/";
+    - repl: mapToolBaseUrl = "{{pillar['map_server']['map_tool_path']}}";
+    - require:
+      - git: /home/applications/Edgar
+
+# Fix the permissions of the file we just did the rpelace in
+
+/home/applications/Edgar/webapplication/app/views/species/map.html.erb:
+  file.managed:
+    - user: applications
+    - group: applications
+    - mode: 640
+    - require:
+      - file: update map tool path
+
 
 sudo /home/rvm/.rvm/bin/rvm ruby-1.9.3 do gem install pg -- --with-pg-config=/usr/pgsql-9.2/bin/pg_config:
   cmd.run:

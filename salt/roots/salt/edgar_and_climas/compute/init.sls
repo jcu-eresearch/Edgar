@@ -16,9 +16,11 @@ compute requirements:
       - wget
       - geos
       - gdal
+      - gdal-devel
       - R-devel
       - python
       - python-devel
+      - gdal-python
       - postgresql-libs
     - require:
       - pkg: epel
@@ -97,7 +99,7 @@ compute extract virtual env:
 
 install compute virtual env:
   cmd.wait:
-    - name: python /home/compute/tmp/virtualenv-{{ pillar['virtualenv']['version'] }}/virtualenv.py env
+    - name: python /home/compute/tmp/virtualenv-{{ pillar['virtualenv']['version'] }}/virtualenv.py --system-site-packages env
     - cwd: /home/compute/Edgar
     - user: compute
     - require:
@@ -161,6 +163,15 @@ compute install GeoAlchemy:
     - require:
       - cmd: compute install SQLAlchemy
 
+compute install paramiko:
+  cmd.run:
+    - cwd: /home/compute/Edgar/importing
+    - user: compute
+    - name: ../env/bin/pip install paramiko==1.12.1
+    - require:
+      - cmd: install compute virtual env
+      - git: /home/compute/Edgar
+
 compute buildout:
   cmd.run:
     - cwd: /home/compute/Edgar/importing
@@ -172,6 +183,7 @@ compute buildout:
       - pkg: Install PostgreSQL92 Client Packages
       - git: /home/compute/Edgar
       - cmd: compute install GeoAlchemy
+      - cmd: compute install paramiko
     - watch_in:
       - service: supervisord
 
