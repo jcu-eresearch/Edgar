@@ -22,6 +22,8 @@ compute requirements:
       - python-devel
       - gdal-python
       - postgresql-libs
+      - openstack-swift
+      - openstack-keystone
     - require:
       - pkg: epel
       - pkg: pgdg-92
