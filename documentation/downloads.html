@@ -1,6 +1,7 @@
 <style>
 html { background-color: #9df; }
 body {
+	line-height: 1.4;
 	max-width: 40em;
 	font-family: sans-serif;
 	margin: 1em auto;
@@ -10,53 +11,55 @@ body {
 h1, h2, h3, h4 {
 	padding-top: 1.5em;
 }
-</style>
-<h1 id="edgar-downloadable-archives">Edgar downloadable archives</h1>
-
+code {
+	padding: 1px 3px;
+	background-color: #eef8ff;
+	border-radius: 2px;
+}
+</style><h1>Edgar downloadable archives</h1>
 <p>There are two zip archives downloadable from Edgar for each modelled species.</p>
-
-<h2 id="observations">Observations</h2>
-
+<h2>Observations</h2>
 <p>The <code>latest-occurrences.zip</code> archive includes a single file in CSV format that includes the occurrences used to model current and projected suitability for the selected species.  The columns in the CSV are:</p>
-
 <ul>
-  <li>LATDEC: the latitude of the occurrence in signed decimal degrees</li>
-  <li>LONGDEC: the longitude of the occurrence in signed decimal degrees</li>
-  <li>DATE: the date of the occurrence</li>
-  <li>BASIS: a category for the occurrence</li>
-  <li>CLASSIFICATION: the category of the occurrence, selected from the classification categories available in Edgar. Only classifications considered useful to suitability modelling are included (e.g. &ldquo;doubtful&rdquo; and &ldquo;vagrant&rdquo; occurrences are excluded from the CSV)</li>
+<li>LATDEC: the latitude of the occurrence in signed decimal degrees</li>
+<li>LONGDEC: the longitude of the occurrence in signed decimal degrees</li>
+<li>DATE: the date of the occurrence</li>
+<li>BASIS: a category for the occurrence</li>
+<li>CLASSIFICATION: the category of the occurrence, selected from the classification categories available in Edgar. Only classifications considered useful to suitability modelling are included (e.g. &quot;doubtful&quot; and &quot;vagrant&quot; occurrences are excluded from the CSV)</li>
+<li>SOURCE: the source of the occurrence records</li>
 </ul>
-
-<h2 id="projections">Projections</h2>
-
+<h2>Projections</h2>
 <p>The <code>latest-projected-distributions.zip</code> archive includes several sets of files:</p>
-
-<h3 id="maxent-process-files">Maxent process files</h3>
-
-<p>A model of species climate suitability is produced using the maxent tool, with seven bioclim variables and the filtered set of occurrences for the selected species.  The archive includes several files related to this model generation.  A summary of the maxent process is available in the <code>{species-id}.html</code> file, which includes various graphs from the <code>plots</code> directory.</p>
-
-<h3 id="current-suitability-distribution">Current suitability distribution</h3>
-
-<p><code>1990.asc</code> is the climate suitability for the species, projected across Australia given the current climate.  This is the current suitability distribution displayed by the Edgar web interface.</p>
-
-<h3 id="individual-model-outputs">Individual model outputs</h3>
-
-<p><code>{scenario}_{modeler}_{year}.asc</code> is the result of a single modelling run, in ASCIIgrid format.  Each pixel encodes a suitability estimate for that geographic area for the selected species, projected across Australia given the climate described.  For each filename:</p>
-
+<h3>Maxent process files</h3>
+<p>A model of species climate suitability is produced using the maxent tool, with seven bioclim variables and the filtered set of occurrences for the selected species.  The archive includes several files related to this model generation.</p>
 <ul>
-  <li><code>{scenario}</code> identifies the Representative Concentration Pathway used for this modelling run from the IPCC&rsquo;s AR5.  Possible values are:
-    <ul>
-      <li><code>RCP3PD</code> is the RCP2.6 scenario</li>
-      <li><code>RCP45</code> is the RCP4.5 scenario</li>
-      <li><code>RCP6</code> is the RCP6.0 scenario</li>
-      <li><code>RCP85</code> is the RCP8.5 scenario</li>
-    </ul>
-  </li>
-  <li><code>{year}</code> is the middle year of the 30 year climate period being modelled</li>
-  <li><code>{modeler}</code> is the climate projection model used to project the climate</li>
+<li><code>{species-id}.html</code> contains a summary of the maxent process and results</li>
+<li><code>/plots</code> includes various graphs used in the maxent summary</li>
+<li><code>maxent.log</code> output of the maxent model creation process</li>
+<li><code>{species-id}.lambdas</code></li>
+<li><code>{species-id}_omission.csv</code></li>
+<li><code>{species-id}_sampleAverages.csv</code></li>
+<li><code>{species-id}_samplePredictions.csv</code></li>
+<li><code>maxentResults.csv</code></li>
 </ul>
-
-<h3 id="medians-of-model-outputs">Medians of model outputs</h3>
-
+<h3>Current suitability distribution</h3>
+<p><code>1990.asc</code> is the climate suitability for the species, projected across Australia given the current climate.  This is the current suitability distribution displayed by the Edgar web interface.</p>
+<h3>Individual model outputs</h3>
+<p><code>{scenario}_{modeler}_{year}.asc</code> is the result of a single modelling run, in ASCIIgrid format.  Each pixel encodes a suitability estimate for that geographic area for the selected species, projected across Australia given the climate described.  For each filename:</p>
+<ul>
+<li><code>{scenario}</code> identifies the Representative Concentration Pathway used for this modelling run from the IPCC's AR5.  Possible values are:
+<ul>
+<li><code>RCP3PD</code> is the RCP2.6 scenario</li>
+<li><code>RCP45</code> is the RCP4.5 scenario</li>
+<li><code>RCP6</code> is the RCP6.0 scenario</li>
+<li><code>RCP85</code> is the RCP8.5 scenario</li>
+</ul>
+</li>
+<li><code>{year}</code> is the middle year of the 30 year climate period being modelled (e.g., 2025 is the middle of the climate period 2011-2040)</li>
+<li><code>{modeler}</code> is the climate projection model used to project the climate</li>
+</ul>
+<h3>Medians of model outputs</h3>
 <p><code>{scenario}_median_{year}.{asc|tif}</code> files are a summary across the various climate projection models.  Each pixel represents the median value across corresponding pixels in the individual model outputs.  The same data is available in ASCIIgrid and GeoTIFF formats.  These are the projected suitability distributions displayed by the Edgar web interface.</p>
-
+<p>Each median file has an auxiliary file <code>{scenario}_median_{year}.asc.aux.xml</code> in an ESRI format containing additional spatial information about the media maps.</p>
+<h3>Other outputs</h3>
+<p><code>JOB_ENV_VARS.txt</code> contains the environmental variables existing in the server environment used to generate all output for this species.</p>
