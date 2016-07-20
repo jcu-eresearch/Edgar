@@ -1,0 +1,16 @@
+
+The downloadable docs are in markdown format in the
+file downloads.md, with minimal formatting supplied
+in _header.html.
+
+To build, copy _header.html to downloads.html, then
+append the rendered markdown to that file.
+
+If you are using commonmark to render markdown:
+
+cp _header.html downloads.html && commonmark < downloads.md >> downloads.html
+
+If you are using kramdown:
+
+cp _header.html downloads.html && kramdown --entity-output :symbolic < downloads.md >> downloads.html
+
