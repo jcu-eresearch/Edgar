@@ -1,7 +1,7 @@
 Edgar is a website where visitors can explore the future impact of climate change on Australian birds.
 
 Edgar, running in all its glory:
-http://spatialecology.jcu.edu.au/Edgar/
+http://tropicaldatahub.org/goto/edgar
 
 Edgar's developer blog:
 http://jcu-eresearch.github.com/Edgar/
