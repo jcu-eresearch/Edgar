@@ -400,15 +400,6 @@ body {
   box-sizing: border-box;
   font-size: 2em;
   padding: 0 0.5em;
-  /*
-firefox
-    position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-*/
-
   width: 100%;
   height: 100%;
 }
@@ -497,11 +488,7 @@ firefox
 /* alert panel content ------------------------------------------------ */
 #alertpanel {
   /* UNCOMMENT the display:none BELOW to hide the alert panel. */
-
   display: none;
-  /*
-*/
-
   left: 1em;
   right: 1em;
   top: 50%;
@@ -632,7 +619,7 @@ firefox
 }
 #toolspanel .dataLayersDiv .labelSpan.loading:before {
   float: right;
-  content: url(../img/loading-bar.gif);
+  content: url(loading-bar.gif);
 }
 /* future projections tool panel -------------------------------------- */
 #tool_future h3 {
@@ -906,11 +893,11 @@ firefox
 }
 #featurePopup.br .map-popup-tabs {
   background: #ffffff;
-  background: -webkit-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: -moz-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: -o-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: -ms-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -webkit-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -moz-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -o-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -ms-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
   -moz-background-size: 200px 200px;
   -webkit-background-size: 200px 200px;
   -o-background-size: 200px 200px;
@@ -934,11 +921,11 @@ firefox
 }
 #featurePopup.tl .map-popup-tabs {
   background: #ffffff;
-  background: -webkit-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: -moz-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: -o-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: -ms-linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
-  background: linear-gradient(135deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(45deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -webkit-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -webkit-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -moz-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -moz-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -o-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -o-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: -ms-linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), -ms-linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
+  background: linear-gradient(-45deg, #ffee88 85px, transparent 85px, transparent 160px, #ffffff 160px), linear-gradient(-135deg, #ffffff 100px, #ffee88 100px, #ffee88 183px, #ffffff 183px);
   -moz-background-size: 200px 200px;
   -webkit-background-size: 200px 200px;
   -o-background-size: 200px 200px;
@@ -955,7 +942,7 @@ firefox
 #featurePopup .map-popup-tabs .close-button {
   width: 17px;
   height: 17px;
-  background: url(img/close.gif);
+  background: url(close.gif);
   position: absolute;
   top: 6px;
   right: 6px;
@@ -1054,3 +1041,4 @@ table.classifications tr.contentious td {
   display: none;
   color: #999;
 }
+

@@ -8,7 +8,8 @@
     $request_type = $_GET['REQUEST'];
 
     // Fill map request object based on WMS GET params.
-    $map_request = ms_newOwsRequestObj();
+    // $map_request = ms_newOwsRequestObj();
+    $map_request = ms_newOwsrequestObj();
     $map_request->loadparams();
 
     // Determine path to map file.
